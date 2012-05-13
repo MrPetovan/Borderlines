@@ -1,0 +1,105 @@
+
+#contentPad{
+margin:20px;
+}
+
+#JT_hg, #JT_bg {
+    height:20px;
+    position:relative;
+    top:0px;
+    width:20px;
+    left:0px;
+    float:left;
+}
+
+#JT_hd, #JT_bd {
+    height:20px;
+    width:20px;
+    position:relative;
+    top:0px;
+    right:0px;
+    float:left;
+}
+
+#JT_top, #JT_bottom {
+    width:260px;
+    position:relative;
+    top:0px;
+    height:20px;
+    left:0px;
+    float:left;
+}
+
+#JT_arrow_left{
+	background-image: url(../images/arrow_left.gif);
+	background-repeat: no-repeat;
+	background-position: left top;
+	position: absolute;
+	z-index:101;
+	left:-12px;
+	height:23px;
+	width:10px;
+    top:-3px;
+}
+
+#JT_arrow_right{
+	background-image: url(../images/arrow_right.gif);
+	background-repeat: no-repeat;
+	background-position: left top;
+	position: absolute;
+	z-index:101;
+	height:23px;
+	width:11px;
+    top:-2px;
+}
+
+#JT {
+	position: absolute;
+	z-index:100;
+    color:white;
+    font-weight:bold;
+    text-align:center;
+}
+
+/*#JT div { border:solid 1px black; }*/
+
+#JT img, #JT_arrow img {
+  behavior: url('style/pngHack.htc');
+}
+
+#JT_content {
+    clear:both;
+    padding:20px 0px;
+    position:relative;
+    top:0px;
+    font-size:28px;
+}
+
+#JT img {
+    border:0px;
+}
+
+#JT_copy{
+	padding:10px 10px 10px 10px;
+	color:#333333;
+}
+
+#JT_arrow {
+    text-align:center;
+}
+
+.JT_loader{
+	background-image: url(../images/loader.gif);
+	background-repeat: no-repeat;
+	background-position: center center;
+	width:100%;
+	height:12px;
+}
+
+.jTip_content {
+    display:none;
+}
+
+.jTip{
+cursor:help;
+}

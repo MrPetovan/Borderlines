@@ -1,0 +1,125 @@
+label img {
+  behavior: url('style/label_img.htc');
+}
+
+#content { padding-right: 4px;}
+#right_column { width: 295px;}
+#left_column .texte_contenu .texte_texte { width: 670px;}
+
+/* Page d'accueil */
+
+.accueil_cadre .texte { padding: 7px 0 0 10px;}
+.accueil_cadre{ margin: 3px;}
+.player_flash_accueil {float: left; margin: 0;}
+
+/* LA METHODE */
+
+/* 01 */
+#la-methode .texte_contenu .texte_texte {
+  padding-right: 0;
+}
+
+#left_column .texte_contenu .texte_texte .encadre_couleur.methode01_01 { margin-left:310px;}
+.texte_contenu .texte_texte .compo_par4 {
+  height: 600px;
+  position: relative;
+}
+.texte_contenu .texte_texte .compo_par4_gauche, .texte_contenu .texte_texte .compo_par4_droite { position:static;}
+.texte_contenu .texte_texte .compo_par4_gauche { margin-left: 40px;}
+.texte_contenu .texte_texte .compo_par4_gauche .compo_par4_03 { margin-right: 285px;}
+
+/* 02 */
+#left_column .texte_contenu .texte_texte .encadre_couleur.methode02_04 {
+  position: relative;
+  padding-top: 270px;
+  margin-left: 115px;
+}
+.texte_contenu .texte_texte .encadre_couleur.methode02_04 img {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+}
+.encadre_image.methode02_02,
+.texte_contenu .texte_texte .encadre_image.methode02_08 {
+  width: 440px;
+}
+
+.texte_contenu .texte_texte .methode02_01 {
+  position: relative;
+}
+.texte_contenu .texte_texte .methode02_01 .img_right {
+  position: absolute;
+  top: 0px;
+  right: 0px;
+}
+.texte_contenu .texte_texte .methode02_01 .encadre_couleur { padding-right: 130px; width:270px;}
+.texte_contenu .texte_texte .encadre_image.methode02_02 .encadre_couleur {right: 0;}
+.texte_contenu .texte_texte .encadre_image.methode02_08 .encadre_couleur {right: 10px;}
+
+
+/* VOTRE PROGRAMME */
+.texte_header .edito {padding-bottom: 0; height: 228px;}
+.texte_header .edito p{ width: 335px;}
+#votre-programme .texte_texte .seances {
+  margin:0;
+  width: 668px;
+}
+.seances .methode_cadre { margin: 8px 0 0 8px;}
+.methode_cadre .texte { padding-bottom:0px;}
+.methode_cadre.cadre_rose2 .texte {padding-bottom: 20px;}
+
+/* CONTACT */
+.texte_marge {
+  width: 560px;
+  padding-right: 0;
+}
+
+/* SPECIALISTES */
+#specialistes-comite-de-parrainage .texte_contenu .texte_texte h4 { clear: both;}
+
+/* TEST */
+#test-express .formulaire p.field label {width: 190px;}
+.formulaire p.field label { line-height: 20px;}
+
+/* TEMOIGNAGES */
+#temoignages .texte_texte { padding: 0;}
+.temoignage_photo {position: absolute;}
+.temoignage_photo.right {right: 20px}
+
+#temoignages .texte_marge {
+  padding:0;
+  width: 450px;
+}
+#temoignages .texte_marge_droite {
+  margin-left: 220px;
+}
+#temoignages .quote_droite {
+  padding: 40px 0 0 40px;
+  margin: 10px 0 20px 260px
+}
+#temoignages .quote_gauche {
+  margin-bottom: 25px;
+}
+
+/* FORMULAIRES*/
+.formulaire p { padding: 0;}
+.formulaire p.field { padding: 0;}
+.formulaire p.radio_line { padding: 0;}
+
+.texte_contenu .texte_texte .accordion h4 { clear: both;}
+#abonnement p.field label,#abonnement p.field input {
+  margin: 0;
+}
+#abonnement p.field {
+  width: 400px;
+  padding:0;
+}
+#abonnement .formulaire {
+
+}
+
+#abonnement img.img_right {
+  margin-left:0;
+}
+
+#services h3 {clear: right}

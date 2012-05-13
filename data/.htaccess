@@ -1,0 +1,15 @@
+RewriteEngine On
+
+#RewriteRule ^video/$ ?page=video [L]
+#RewriteRule ^video/([^/]*)\.html$ ?page=video&issue=$1 [L]
+
+#RewriteRule ^news-([^\.]+)\.html$ ?page=news&news=$1 [L]
+
+#RewriteRule ^add_comment_popup-([^\.]+)\.html$ ?page=add_comment_popup&video_id=$1 [L]
+
+#RewriteRule ^([^\.]+)-([^\.]+)\.html$ ?page=$1&kiosk=$2 [L]
+RewriteRule ^index.html - [L]
+RewriteRule ^([^/^\.]+)\.html$ index.php?page=$1 [L]
+RewriteRule ^(admin_page_mod)/([^/]+)\.html$ index.php?page=$1&id=$2 [L]
+RewriteRule ^([^/^\.]+)\.submit\.html\?([^\n]*)$ index.php?action=$1&$2 [L]
+#RewriteRule ^([^/^\.]+)\.submit\.html$ index.php?action=$1 [L]

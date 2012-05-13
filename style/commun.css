@@ -1,0 +1,42 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+
+a { text-decoration: none;}
+a img { border: none;}
+ul { list-style-type: none;}
+.breaker { clear: both;}
+.break-left { clear: left;}
+
+/* Formulaire deux colonnes */
+
+.formulaire .field label,
+.formulaire .field input,
+.formulaire span.libelle,
+.formulaire span.value {
+  display:block;
+  float: left;
+  line-height: 1em;
+}
+.formulaire p {
+  overflow: hidden;
+}
+.formulaire .radio_line label {display:inline; float: none;}
+.formulaire .field label,
+.formulaire span.libelle,
+.formulaire .field input.input_text { width: 200px;}
+.formulaire input.input_radio { margin: 0 5px;}
+.formulaire p.radio_line label,
+.formulaire p.label_right label { width: auto}
+
+/* Formulaire d'informations */
+.informations.formulaire span.value { font-weight: normal;}
+.informations.formulaire span.libelle { font-weight: bold;}
+
+/* Info panel */
+.info_panel {}
+.info_panel p { overflow: hidden }
+.info_panel span { display: block; float: left; }
+.info_panel span.label { font-weight: bold; width: 25% }
+.info_panel span.libelle { width: 75% }

@@ -1,0 +1,78 @@
+label img {
+  behavior: url('style/label_img.htc');
+}
+
+.formulaire {padding-left: 20px;}
+.formulaire p { padding: 0;}
+.formulaire p.field { padding: 0;}
+.formulaire p.radio_line { padding: 0;}
+
+.texte_contenu .texte_texte .accordion h4 { clear: both;}
+
+#abonnement p.field { width: 400px; margin-bottom: 9px;}
+
+#login .abonnement {
+  padding-left: 0;
+  width: 680px;
+  margin-left: 0;
+}
+
+#services h3 {clear: right}
+
+.texte_contenu .texte_texte .methode02_01 { position: relative;}
+.texte_contenu .texte_texte .methode02_01 .img_right {
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  margin-right:40px;
+}
+.texte_contenu .texte_texte .methode02_01 .encadre_couleur { padding-right: 130px; width:290px;}
+.texte_contenu .texte_texte .encadre_image.methode02_02 { float: right; width: 440px;}
+.texte_contenu .texte_texte .encadre_image.methode02_02 .encadre_couleur {right: 0;}
+.texte_contenu .texte_texte .encadre_image.methode02_08 { float: right; width: 440px;}
+.texte_contenu .texte_texte .encadre_image.methode02_08 .encadre_couleur {right: 10px;}
+
+/* Page d'accueil */
+.accueil_cadre .texte {
+  padding: 7px 0 0 10px;
+}
+
+/*.accueil_cadre .texte p { color: #FFFFFF;}*/
+
+.cadre_rose2.methode_cadre { height: 180px; }
+
+.temoignage_photo {position:absolute;}
+.temoignage_photo.left {left: 20px}
+.temoignage_photo.right {right: 20px}
+#temoignages h6.right {padding-right: 220px; width: 430px;}
+
+.formulaire p.field label { line-height: 20px;}
+
+
+
+.texte_contenu .texte_texte .contenu_test .fin_form p.field{ padding-left: 20px;}
+.texte_contenu .texte_texte .encadre_image.test_express { height:690px;}
+
+/* TEST */
+
+.texte_contenu .texte_texte .contenu_test div.encadre_couleur {
+  margin: 0;
+  height: 110px;
+}
+
+/* PROGRAMME SERVICES */
+
+#telechargement .informations p {
+  padding-left: 0;
+}
+
+#telechargement input.input_submit {width: 330px;}
+
+input.cancel_paiement{width: 160px; text-align:left}
+input.cancel_abonnement{width: 415px;}
+
+.informations.formulaire { zoom: 1 }
+
+.texte_marge.rappel_posture {
+  padding-right: 20px;
+}

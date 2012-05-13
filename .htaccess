@@ -1,0 +1,8 @@
+#RewriteEngine On
+
+#RewriteRule ^index.html - [L]
+#RewriteRule ^([^/^\.]+)\.html$ index.php?page=$1 [QSA,L]
+#RewriteRule ^(admin_page_mod)/([^/]+)\.html$ index.php?page=$1&id=$2 [QSA,L]
+#RewriteRule ^(admin_page_view)/([^/]+)\.html$ index.php?page=$1&id=$2 [QSA,L]
+#RewriteRule ^([^/^\.]+)\.submit\.html?$ index.php?action=$1 [QSA,L]
+#RewriteRule ^([^/^\.]+)\.submit\.html$ index.php?action=$1 [L]
