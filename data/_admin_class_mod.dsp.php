@@ -1,10 +1,8 @@
   include_once('data/static/html_functions.php');
 
   if(!isset($<?php echo $class_db_identifier ?>_mod)) {
-    $<?php echo $class_db_identifier ?>_mod = DBObject::instance('<?php echo $class_php_identifier ?>', getValue('id'));
+    $<?php echo $class_db_identifier ?>_mod = <?php echo $class_php_identifier ?>::instance( getValue('id') );
   }
-
-  var_debug($<?php echo $class_db_identifier ?>_mod);
 
   if(is_null($<?php echo $class_db_identifier ?>_mod->get_id())) {
     $form_url = get_page_url(PAGE_CODE);
@@ -29,9 +27,24 @@
     echo '<div class="texte_texte">
       <h3>'.$PAGE_TITRE.'</h3>
       '.$html_msg.'
-      <form class="formulaire" action="'.get_page_url(PAGE_CODE, true, array('id' => $<?php echo $class_db_identifier ?>_mod->get_id())).'" method="post">
-        '.$<?php echo $class_db_identifier ?>_mod->html_get_form(MEMBER_FORM_ADMIN).'
+      <form class="formulaire" action="'.$form_url.'" method="post">
+        '.$<?php echo $class_db_identifier ?>_mod->html_get_form(MEMBER_FORM_ADMIN);
+
+  // CUSTOM
+
+  //Custom content
+
+  // /CUSTOM
+
+        echo '
         <p>'.HTMLHelper::submit('<?php echo $class_db_identifier ?>_submit', 'Sauvegarder les changements').'</p>
-      </form>
+      </form>';
+
+      if( $<?php echo $class_db_identifier ?>_mod->id ) {
+        echo '
+      <p><a href="'.get_page_url('admin_<?php echo $class_db_identifier?>_view', true, array('id' => $<?php echo $class_db_identifier ?>_mod->get_id())).'">Revenir à la page de l\'objet "'.$<?php echo $class_db_identifier ?>_mod->get_<?php echo $name_field?>().'"</a></p>';
+      }
+      echo '
+      <p><a href="'.get_page_url('admin_<?php echo $class_db_identifier?>').'">Revenir à la liste des objets <?php echo $class_name ?></a></p>
     </div>
   </div>';

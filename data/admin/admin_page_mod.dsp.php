@@ -4,7 +4,7 @@
   }else {
     if(isset($_GET['id'])) {
       $id = $_GET['id'];
-      $page_mod = DBObject::instance('Page', $id);
+      $page_mod = Page::instance( $id );
     }else {
       $id = null;
 
@@ -21,7 +21,7 @@
           $data['admin_required']
         );
       }else {
-        $page_mod = DBObject::instance('Page');
+        $page_mod = Page::instance();
       }
     }
   }

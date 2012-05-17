@@ -21,6 +21,8 @@
       $return = false;
     }
 
+    mysql_uquery("SET NAMES UTF8");
+
     return $return;
   }
 
@@ -51,7 +53,7 @@
 				$return = $value;
 			}elseif(is_array($value)) {
 				foreach ($value as $key => $value_item) {
-					$values[$key] = mysqlm7_real_escape_string($value_item);
+					$values[$key] = mysql_ureal_escape_string($value_item);
 				}
 				$return = implode(',', $values);
 			}else {
@@ -127,4 +129,15 @@
 		  $array_queries[] = array('query' => $query, 'backtrace' => '<strong>'.$array_backtrace[$i]['file'].'</strong> at line <strong>'.$array_backtrace[$i]['line'].'</strong>' );
 	  }
 	}
+
+  function mysql_fetch_to_array( $res ) {
+    $return = array();
+
+    while( $row = mysql_fetch_assoc($res ) ) {
+      $return[] = $row;
+    }
+    mysql_free_result($res);
+
+    return $return;
+  }
 ?>

@@ -15,7 +15,7 @@
   }
 
   if( !isset( $member_register )) {
-    $member_register = DBObject::instance('Member');
+    $member_register = Member::instance();
   }
 
   if(isset($_SESSION['tab_error'])) {

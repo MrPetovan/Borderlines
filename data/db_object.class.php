@@ -53,15 +53,16 @@
 
     /**
      * Fonction de singleton
-     * @example $user = DBObject::instance( 'Member', 12 )
+     * @example $user = Member::instance( 12 )
      *
-     * @param string $class
      * @param int $id
      * @return object
      */
-    public static function instance( $class, $id = null ) {
+    public static function instance( $id = null ) {
+      $class = get_called_class ( );
+    
       if( !is_null( $id )) {
-        $array = debug_backtrace();
+        //$array = debug_backtrace();
 
         if( !isset( self::$object_array[ $class ][ $id ])) {
           self::$object_array[ $class ][ $id ] = new $class($id);
@@ -176,86 +177,53 @@
       return $return;
     }
 
-  	/**
-  	 * A redéfinir dans l'objet hérité pour contourner le problème du get_class()
-  	 * avec cette ligne :
-  	 *
-  	 * return self::db_exists_class($id, get_class())
-  	 *
-  	 * @param int $id
-  	 */
-  	public static abstract function db_exists($id);
-
-  	/**
-  	 * Fonction de vérification de l'existence d'un objet identifié.
-  	 *
-  	 * @param int $id
-  	 * @param string $class
-  	 * @return bool
-  	 */
-  	protected static function db_exists_class($id, $class) {
-      $sql = "SELECT * FROM `".call_user_func(array($class, 'get_table_name'))."` WHERE `id` = ".mysql_ureal_escape_string($id);
+    /**
+     * Fonction de vérification de l'existence d'un objet identifié.
+     *
+     * @param int $id
+     * @return bool
+     */
+    public static function db_exists($id){
+      $return = false;
+      
+      $sql = "SELECT * FROM `".static::get_table_name()."` WHERE `id` = ".mysql_ureal_escape_string($id);
 
       $res = mysql_uquery($sql);
       if($res && mysql_num_rows($res) == 1) {
         $return = true;
-      }else {
-        $return = false;
       }
+
       return $return;
-  	}
+    }
 
-  	/**
-  	 * A redéfinir dans l'objet hérité pour contourner le problème du get_class()
-  	 * avec cette ligne :
-  	 *
-  	 * return self::db_get_by_id_class($id, get_class())
-  	 *
-  	 * @param int $id
-  	 */
-  	public static abstract function db_get_by_id($id);
-
-  	/**
-  	 * Fonction standard de récupération d'un objet identifié.
-  	 *
-  	 * @param int $id
-  	 * @param string $class
-  	 * @return object|false
-  	 */
-  	public static function db_get_by_id_class($id, $class) {
-      if(self::db_exists_class($id, $class)) {
-        return DBObject::instance( $class, $id );
+    /**
+     * Fonction standard de récupération d'un objet identifié.
+     *
+     * @param int $id
+     * @return object|false
+     */
+    public static function db_get_by_id($id) {
+      if( static::db_exists($id) ) {
+        return static::instance( $id );
       }else {
         return false;
       }
     }
 
     /**
-  	 * A redéfinir dans l'objet hérité pour contourner le problème du get_class()
-  	 * avec cette ligne :
-  	 *
-  	 * return self::manage_errors_class($tab_error, $html_msg, get_class())
-  	 *
-  	 * @param array $tab_error
-  	 * @param string $html_msg
-  	 */
-    public static abstract function manage_errors($tab_error, &$html_msg);
-
-    /**
      * Fonction de mise en forme des messages d'erreur de validité d'un objet
      *
      * @param array $tab_error
      * @param string $html_msg
-     * @param string $class
-     * @return unknown
+     * @return bool
      */
-    public static function manage_errors_class($tab_error, &$html_msg, $class) {
+    public static function manage_errors($tab_error, &$html_msg) {
       $return = false;
       if($tab_error === true) {
         $return = true;
       }else {
         foreach ($tab_error as $error) {
-          $tab_msg[] = call_user_func(array($class, 'get_message_erreur'), $error);
+          $tab_msg[] = static::get_message_erreur( $error );
         }
         $tab_msg = array_unique($tab_msg);
         $html_msg = '<div class="error">';
@@ -268,11 +236,11 @@
     }
 
     /**
-  	 * Fonction d'hydratation de l'objet
-  	 *
-  	 * @param int $id
-  	 */
-  	public function db_load_from_id($id) {
+     * Fonction d'hydratation de l'objet
+     *
+     * @param int $id
+     */
+    public function db_load_from_id($id) {
       $sql = "SELECT * FROM `".$this->get_table_name()."` WHERE `id` = ".mysql_ureal_escape_string($id);
 
       $res = mysql_uquery($sql);
@@ -293,25 +261,25 @@
     }
 
     /**
-  	 * Fonction standard d'écriure de l'objet en base. Effectue les vérifications
-  	 * de validité (en fonction des flags), crée l'objet s'il n'existait pas, le
-  	 * met à jour s'il existait (vérification sur _id)
-  	 *
-  	 * @param int $flags
-  	 * @return bool;
-  	 */
-  	public function db_save($flags = 0) {
-  	  if(($return = $this->check_valid($flags)) === true) {
+     * Fonction standard d'écriure de l'objet en base. Effectue les vérifications
+     * de validité (en fonction des flags), crée l'objet s'il n'existait pas, le
+     * met à jour s'il existait (vérification sur _id)
+     *
+     * @param int $flags
+     * @return bool;
+     */
+    public function db_save($flags = 0) {
+      if(($return = $this->check_valid($flags)) === true) {
         if(is_null($this->get_id())) {
           return $this->db_add();
         }else {
           return $this->db_update();
         }
-  	  }
-  	  return $return;
-  	}
+      }
+      return $return;
+    }
 
-  	public function db_update() {
+    public function db_update() {
       $sql = "UPDATE ".$this->get_table_name()." SET";
       $champs_sql = array();
       foreach($this as $nom_champ => $value) {
@@ -346,7 +314,7 @@ WHERE `id` = ".mysql_ureal_escape_string($this->get_id());
       return $return;
     }
 
-  	public function db_delete() {
+    public function db_delete() {
       $sql = "DELETE FROM `".$this->get_table_name()."` WHERE `id` = ".mysql_ureal_escape_string($this->id);
 
       if( isset( self::$object_array[ get_class($this) ][ $this->id ])) {
@@ -360,11 +328,26 @@ WHERE `id` = ".mysql_ureal_escape_string($this->get_id());
      * Fonction retournant une liste de tous les objets d'une table
      *
      * @return array Tableau des objets
-     * @abstract
      * @static
      */
-    public static abstract function db_get_all();
+    public static function db_get_all($page = null, $limit = NB_PER_PAGE) {
+      $sql = 'SELECT `id` FROM `'.static::get_table_name().'` ORDER BY `id`';
 
+      if(!is_null($page) && is_numeric($page)) {
+        $start = ($page - 1) * $limit;
+        $sql .= ' LIMIT '.$start.','.$limit;
+      }
+
+      return static::sql_to_list( $sql );
+    }
+    
+    public static function db_count_all() {
+      $sql = "SELECT COUNT(`id`) FROM `".static::get_table_name().'`';
+      $res = mysql_uquery($sql);
+      return array_pop(mysql_fetch_row($res));
+    }
+
+    public static function db_get_select_list() { return array(); }
 
     /**
      * Fonction retournant une liste d'objets en fonction d'une requête SQL
@@ -376,14 +359,15 @@ WHERE `id` = ".mysql_ureal_escape_string($this->get_id());
      * @return array Tableau des objets
      * @static
      */
-    protected static function sql_to_list($sql, $class) {
+    protected static function sql_to_list($sql) {
       $res = mysql_uquery($sql);
 
       if($res) {
         $return = array();
         while($data = mysql_fetch_assoc($res)) {
-          $return[$data['id']] = DBObject::instance( $class, $data['id'] );
+          $return[$data['id']] = static::instance( $data['id'] );
         }
+        mysql_free_result($res);
       }else {
         $return = false;
       }
@@ -397,16 +381,15 @@ WHERE `id` = ".mysql_ureal_escape_string($this->get_id());
      * La requête doit contenir un champ "id".
      *
      * @param $sql string Requête SQL à exécuter
-     * @param $class string Classe des objets à créer
      * @return object Objet de la classe passée en paramètre
      * @static
      */
-    protected static function sql_to_object($sql, $class) {
+    protected static function sql_to_object($sql) {
       $res = mysql_uquery($sql);
 
       if($res && mysql_num_rows($res) > 0) {
         $data = mysql_fetch_assoc($res);
-        $return = DBObject::instance( $class, $data['id'] );
+        $return = static::instance( $data['id'] );
       }else {
         $return = false;
       }
@@ -528,9 +511,10 @@ WHERE `id` = ".mysql_ureal_escape_string($this->get_id());
       if(ini_get('magic_quote_gpc')) {
         $post_data = rstripslashes($post_data);
       }
+      
       foreach ($post_data as $name => $value) {
-        //$name = '_'.$name;
-        if($name != "_id") {
+        $sql_name = '_'.$name;
+        if($name != "id" && property_exists( $this, $sql_name ) ) {
           $this->__set($name, $value);
         }
       }
@@ -557,14 +541,14 @@ WHERE `id` = ".mysql_ureal_escape_string($this->get_id());
       return $return;
     }
 
- /**
-  * Vérifie qu'une valeur est renseignée ou non. Vérification null strict ou chaîne vide.
-  *
-  * @param mixed $value
-  * @param int $code_erreur
-  * @param bool $null_strict
-  * @return true|int
-  */
+    /**
+     * Vérifie qu'une valeur est renseignée ou non. Vérification null strict ou chaîne vide.
+     *
+     * @param mixed $value
+     * @param int $code_erreur
+     * @param bool $null_strict
+     * @return true|int
+     */
     public static function check_compulsory($value, $code_erreur = false, $null_strict = false) {
       $return = true;
       if($null_strict) {
@@ -575,13 +559,14 @@ WHERE `id` = ".mysql_ureal_escape_string($this->get_id());
       return $return;
     }
 
-   /**
-    * Vérifie la validité syntaxique d'une adresse email.
-    *
-    * @param string $email
-    * @param int $code_erreur
-    * @return true|int
-    */
+     
+    /**
+     * Vérifie la validité syntaxique d'une adresse email.
+     *
+     * @param string $email
+     * @param int $code_erreur
+     * @return true|int
+     */
     public static function check_email($email, $code_erreur = false) {
       $return = true;
       if(filter_var($email, FILTER_VALIDATE_EMAIL) === false) {

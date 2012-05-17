@@ -1,13 +1,9 @@
   $PAGE_TITRE = "Administration des <?php echo $class_name ?>s";
   include_once('data/static/html_functions.php');
 
-  if(isset($_GET['p'])) {
-    $page = $_GET['p'];
-  }else {
-    $page = 1;
-  }
+  $page_no = getValue('p', 1);
   $nb_per_page = NB_PER_PAGE;
-  $tab = <?php echo $class_php_identifier ?>::db_get_all($page, $nb_per_page);
+  $tab = <?php echo $class_php_identifier ?>::db_get_all($page_no, $nb_per_page);
   $nb_total = <?php echo $class_php_identifier ?>::db_count_all();
 
     echo '
@@ -18,17 +14,17 @@
 	echo '
   <div class="texte_texte">
     <h3>Liste des <?php echo $class_name ?>s</h3>
-    '.nav_page(PAGE_CODE, $nb_total, $page, $nb_per_page).'
+    '.nav_page(PAGE_CODE, $nb_total, $page_no, $nb_per_page).'
     <form action="'.get_page_url(PAGE_CODE).'" method="post">
     <table>
       <thead>
         <tr>
           <th>Sel.</th>
           <th><?php echo to_readable($name_field)?></th><?php
-foreach( $table_columns as $column_name => $dummy ) {
+foreach( $table_columns as $column_name => $column_props ) {
   if( $column_name != $name_field && $column_name != "id" )
     echo '
-          <th>'.to_readable($column_name).'</th>';
+          <th>'.$column_props['Comment'].'</th>';
 } ?>
         </tr>
       </thead>
@@ -49,7 +45,7 @@ foreach( $table_columns as $column_name => $column_props ) {
   if( array_key_exists($column_name, $foreign_keys)) {
     $foreign_table = $foreign_keys[$column_name];
     echo "';
-      $".$foreign_table."_temp = DBObject::instance('".to_camel_case($foreign_table, true)."', $".$class_db_identifier."->get_".$column_name."());
+      $".$foreign_table."_temp = ".to_camel_case($foreign_table, true)."::instance( $".$class_db_identifier."->get_".$column_name."());
       echo '
           <td>'.$".$foreign_table."_temp->get_name().'</td>";
   }elseif( $column_name != $name_field && $column_name != "id" )
@@ -86,6 +82,6 @@ foreach( $table_columns as $column_name => $column_props ) {
       <input type="submit" name="submit" value="Valider"/>
     </p>
     </form>
-    '.nav_page(PAGE_CODE, $nb_total, $page, $nb_per_page).'
+    '.nav_page(PAGE_CODE, $nb_total, $page_no, $nb_per_page).'
   </div>
 </div>';

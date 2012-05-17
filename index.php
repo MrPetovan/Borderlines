@@ -27,6 +27,8 @@
   // PATH absolu de la base du site
   define('DIR_ROOT', dirname($_SERVER['SCRIPT_FILENAME']) .'/');
   // PATH du répertoire d'inclusions
+  define('DATA', DIR_ROOT.'data/');
+  // PATH du répertoire d'inclusions
   define('INC', DIR_ROOT.'inc/');
   // PATH du répertoire des templates
   define('TPL', DIR_ROOT.'template/');

@@ -6,7 +6,7 @@
       $id = null;
     }
 
-    $page_mod = DBObject::instance('Page', $id);
+    $page_mod = Page::instance( $id );
 
     $tab_error = $page_mod->load_from_html_form($_POST, $_FILES);
 

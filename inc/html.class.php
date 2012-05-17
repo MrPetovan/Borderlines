@@ -76,6 +76,22 @@
 
       return $return;
     }
+    
+    public static function genererButton( $name = null, $valeur_defaut = null, $attributs = array(), $label_text = null )
+    {
+      $return = '';
+      if(! is_null($name)) {
+        $attributs['name'] = $name;
+      }
+      if(! is_null($valeur_defaut)) {
+        $attributs['value'] = $valeur_defaut;
+      }
+
+      $return = '
+<button '.self::genererAttributs( $attributs ).'>'.(!is_null( $label_text) ?$label_text:$valeur_defaut).'</button>';
+
+      return $return;
+    }
 
     public static function hidden( $name, $valeur_defaut, $attributs = array()) {
       return self::genererInputHidden( $name, $valeur_defaut, $attributs );

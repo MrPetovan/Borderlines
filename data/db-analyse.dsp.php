@@ -1,4 +1,9 @@
 <?php
+  define('CUSTOM_START', "  // CUSTOM");
+  define('CUSTOM_STOP', "  // /CUSTOM");
+
+  echo '<p><a href="'.get_page_url(PAGE_CODE).'">Génération avec Custom Code</a></p>
+  <p><a href="'.get_page_url(PAGE_CODE, true, array('reset' => '')).'">Génération SANS Custom Code</a></p>';
 
   $res = mysql_uquery('SHOW TABLES');
 
@@ -7,32 +12,59 @@
   $primary_keys = array();
   $php_classes = array();
   $name_field_list = array();
-  $reserved_class_list = array('page', 'membre');
+  $reserved_class_list = array('membre', 'page');
   $foreign_keys_list = array();
+  $sub_tables_list = array();
 
   $file_list = array(
-    'db-analyse-file.php' => DIR_ROOT.'data/CLASS/CLASS.class.php',
-    'admin_class.dsp.php' => DIR_ROOT.'data/admin/admin_CLASS.dsp.php',
-    'admin_class.act.php' => DIR_ROOT.'data/admin/admin_CLASS.act.php',
-    'admin_class_view.dsp.php' => DIR_ROOT.'data/admin/admin_CLASS_view.dsp.php',
-    'admin_class_mod.dsp.php' => DIR_ROOT.'data/admin/admin_CLASS_mod.dsp.php',
-    'admin_class_mod.act.php' => DIR_ROOT.'data/admin/admin_CLASS_mod.act.php'
+    '_class.class.php' => DIR_ROOT.'data/CLASS/CLASS.class.php',
+    '_class_model.class.php' => DIR_ROOT.'data/model/CLASS_model.class.php',
+    '_admin_class.dsp.php' => DIR_ROOT.'data/admin/admin_CLASS.dsp.php',
+    '_admin_class.act.php' => DIR_ROOT.'data/admin/admin_CLASS.act.php',
+    '_admin_class_view.dsp.php' => DIR_ROOT.'data/admin/admin_CLASS_view.dsp.php',
+    '_admin_class_view.act.php' => DIR_ROOT.'data/admin/admin_CLASS_view.act.php',
+    '_admin_class_mod.dsp.php' => DIR_ROOT.'data/admin/admin_CLASS_mod.dsp.php',
+    '_admin_class_mod.act.php' => DIR_ROOT.'data/admin/admin_CLASS_mod.act.php'
   );
 
   while($row = mysql_fetch_row($res)) $table_name_list[] = $row[0];
 
   $table_name_list = array_diff($table_name_list, $reserved_class_list);
 
+  // Pour chaque table de la BD
   foreach($table_name_list as $table_name ) {
-    $res = mysql_uquery('SHOW FULL COLUMNS FROM '.$table_name);
+    // Description
+    $create_table_string = array_pop( mysql_fetch_row( mysql_uquery('SHOW CREATE TABLE `'.$table_name.'`') ) );
+
+    $table_description[ $table_name ] = to_readable( $table_name );
+
+    if( strpos($create_table_string, 'COMMENT') !== false ) {
+      $create_table_string = trim( substr($create_table_string, strrpos($create_table_string, ')') + 1) );
+
+      $options = explode(' ', $create_table_string);
+
+      foreach( $options as $option_string ) {
+        if( strpos($option_string, '=') !== false ) {
+          list($option, $value) = explode('=', $option_string);
+          if( $option == 'COMMENT') {
+            $table_description[ $table_name ] = str_replace('\'', '', $value);
+          }
+        }
+      }
+    }
+
+
+    $res = mysql_uquery('SHOW FULL COLUMNS FROM `'.$table_name.'`');
 
     $name_field_list[$table_name] = false;
 
     $foreign_keys_list[$table_name] = array();
 
     while($row = mysql_fetch_assoc($res)) {
-      if( $row['Key'] == 'PRI' ) $primary_keys[$table_name][] = $row['Field'];
+      if( $row['Comment'] == '') $row['Comment'] = to_readable($row['Field']);
+      if( $row['Key'] == 'PRI' ) $primary_keys[ $table_name ][] = $row['Field'];
 
+      // Détermination des classes PHP à ajouter
       if( $row['Field'] == 'id' ) {
         $name_field_list[$table_name] = 'id';
         $php_classes[] = $table_name;
@@ -42,6 +74,7 @@
 
       $table_columns_list[$table_name][$row['Field']] = $row;
 
+      // Détermination du type de la colonne
       if( ($pos = strpos($row['Type'], '(')) !== false ) {
         $simple_type = substr($row['Type'], 0, $pos);
       }else {
@@ -50,24 +83,30 @@
 
       $table_columns_list[$table_name][$row['Field']]['SimpleType'] = $simple_type;
 
-
       // Gestion des clés étrangères
       if( substr($row['Field'], -3) == "_id") {
         $foreign_keys_list[$table_name][$row['Field']] = substr($row['Field'], 0, -3);
       }
     }
 
+
+
     // Gestion des clés étrangères non triviales
     $sql_fk = "SELECT `COLUMN_NAME`, `REFERENCED_TABLE_NAME`
 FROM `information_schema`.`KEY_COLUMN_USAGE`
 WHERE `CONSTRAINT_SCHEMA` = ".mysql_ureal_escape_string(DB_BASE)."
 AND `TABLE_NAME` = ".mysql_ureal_escape_string($table_name)."
-AND `REFERENCED_COLUMN_NAME` = 'id'";
+AND `REFERENCED_COLUMN_NAME` = 'id'
+GROUP BY `REFERENCED_TABLE_NAME`";
 
     $res_fk = mysql_uquery($sql_fk);
 
     while($row_fk = mysql_fetch_row($res_fk)) {
       $foreign_keys_list[$table_name][$row_fk[0]] = $row_fk[1];
+
+      if( !in_array($table_name, $php_classes) && in_array( $row_fk[0], $primary_keys[ $table_name ] ) ) {
+        $sub_tables_list[ $row_fk[1] ][ ] = array('table' => $table_name, 'field' => $row_fk[0] );
+      }
     }
 
     $foreign_keys_list[$table_name] = array_intersect($foreign_keys_list[$table_name], $table_name_list);
@@ -106,24 +145,41 @@ AND `REFERENCED_COLUMN_NAME` = 'id'";
 
     $class_db_identifier = $class;
     $class_php_identifier = to_camel_case($class, true);
-    $class_name = to_readable( $class );
+    $class_name = $table_description[ $class ];
     $name_field = $name_field_list[$class];
     $table_columns = $table_columns_list[$class];
     $foreign_keys = $foreign_keys_list[$class];
+    $sub_tables = isset($sub_tables_list[ $class ])?$sub_tables_list[ $class ]:array();
 
     foreach( $file_list as $file_in => $file_out ) {
       $file_out = str_replace('CLASS', $class_db_identifier, $file_out);
 
+      $custom_content = "\n\n  //Custom content";
+
+      //Gestion du code custom
+      if( is_file($file_out) && ($old_content = file_get_contents($file_out)) !== false) {
+        if( ($start = strpos($old_content, CUSTOM_START)) !== false && ($stop = strpos($old_content, CUSTOM_STOP)) !== false ) {
+          $custom_content = substr($old_content, $start + strlen(CUSTOM_START), $stop - $start - strlen(CUSTOM_START));
+        }
+      }
+
       ob_start();
-      echo '<?php';
+      echo '<?php
+';
       include(dirname(__FILE__).'/'.$file_in);
-      echo '?>';
       $content = ob_get_clean();
 
+      if( ($start = strpos($content, CUSTOM_START)) !== false && ($stop = strpos($content, CUSTOM_STOP)) !== false ) {
+        $content = substr($content, 0, $start + strlen(CUSTOM_START)).rtrim($custom_content)."\n\n".substr($content, $stop);
+      }
+
       _mkdir(dirname($file_out));
-      file_put_contents($file_out, str_replace('<_?php', '<?php', $content));
+      //if( $file_in != '_class.class.php' || !file_exists($file_out) )
+        file_put_contents($file_out, str_replace('<_?php', '<?php', $content));
       echo "<p>Création de ".$file_out."</p>";
     }
+
+
 
     $sql_class = str_replace('CLASS', $class_db_identifier, $sql);
 

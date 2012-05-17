@@ -1,13 +1,14 @@
-
 /**
- * Classe décrivant un compte utilisateur, qu'il soit prospect ou enregistré
+ * Classe <?php echo $class_php_identifier?>
+
  *
  */
 
-class <?php echo $class_php_identifier?> extends DBObject {
+class <?php echo $class_php_identifier?>_Model extends DBObject {
   // Champs BD<?php
 foreach( $table_columns as $column_name => $dummy ) {
-  echo '
+  if( $column_name != 'id')
+    echo '
   protected $_'.$column_name.' = null;';
 } ?>
 
@@ -29,7 +30,7 @@ foreach( $table_columns as $column_name => $column_props ) {
       break;
     case 'tinyint' :
       echo '
-  public function get_'.$column_name.'() { return ($this->is_'.$column_name.'(); }
+  public function get_'.$column_name.'() { return $this->is_'.$column_name.'(); }
   public function is_'.$column_name.'() { return ($this->_'.$column_name.' == 1); }';
       break;
 
@@ -55,7 +56,6 @@ foreach( $table_columns as $column_name => $column_props ) {
     case 'int' :
       echo '
   public function set_'.$column_name.'($'.$column_name.') {
-    var_debug("set_'.$column_name.'($'.$column_name.')");
     if( is_numeric($'.$column_name.') && (int)$'.$column_name.' == $'.$column_name.') $data = intval($'.$column_name.'); else $data = null; $this->_'.$column_name.' = $data;
   }';
       break;
@@ -66,30 +66,11 @@ foreach( $table_columns as $column_name => $column_props ) {
 
   /* FONCTIONS SQL */
 
-  public static function db_exists ($id) { return self::db_exists_class($id, get_class());}
-  public static function db_get_by_id($id) { return self::db_get_by_id_class($id, get_class());}
-
-  public static function db_get_all($page = null, $limit = NB_PER_PAGE) {
-    $sql = 'SELECT `id` FROM `'.self::get_table_name().'` ORDER BY `id`';
-
-    if(!is_null($page) && is_numeric($page)) {
-      $start = ($page - 1) * $limit;
-      $sql .= ' LIMIT '.$start.','.$limit;
-    }
-
-    return self::sql_to_list($sql, get_class());
-  }
-
-  public static function db_count_all() {
-    $sql = "SELECT COUNT(`id`) FROM `".self::get_table_name().'`';
-    $res = mysql_uquery($sql);
-    return array_pop(mysql_fetch_row($res));
-  }
 <?php
 foreach( $table_columns as $column_name => $column_props ) {
   if( $column_props['Key'] == 'UNI' )
       echo '
-  public static function db_get_membre_by_'.$column_name.'($'.$column_name.') {
+  public static function db_get_'.$class_db_identifier.'_by_'.$column_name.'($'.$column_name.') {
     $sql = "
 SELECT `id` FROM `".self::get_table_name()."`
 WHERE `'.$column_name.'` LIKE ".mysql_ureal_escape_string($'.$column_name.')."
@@ -99,9 +80,16 @@ LIMIT 0,1";
   }';
 } ?>
 
-  /* FONCTIONS HTML */
+  public static function db_get_select_list() {
+    $return = array();
 
-  public static function manage_errors($tab_error, &$html_msg) { return self::manage_errors_class($tab_error, $html_msg, get_class());}
+    $object_list = <?php echo $class_php_identifier?>_Model::db_get_all();
+    foreach( $object_list as $object ) $return[ $object->get_id() ] = $object->get_<?php echo $name_field?>();
+
+    return $return;
+  }
+
+  /* FONCTIONS HTML */
 
   /**
    * Formulaire d'édition partie Administration
@@ -123,7 +111,7 @@ foreach( $table_columns as $column_name => $column_props ) {
         $option_list[ $'.$foreign_table.'->id ] = $'.$foreign_table.'->name;
 
       $return .= \'
-      <p class="field">\'.HTMLHelper::genererSelect(\''.$column_name.'\', $option_list, $this->get_'.$column_name.'(), array(), "'.to_readable($column_name).($column_props['Null'] == 'NO'?' *':'').'").\'<a href="\'.get_page_url(\'admin_'.$foreign_table.'_mod\').\'">Créer un objet '.to_readable($foreign_table).'</a></p>';
+      <p class="field">\'.HTMLHelper::genererSelect(\''.$column_name.'\', $option_list, $this->get_'.$column_name.'(), array(), "'.$column_props['Comment'].($column_props['Null'] == 'NO'?' *':'').'").\'<a href="\'.get_page_url(\'admin_'.$foreign_table.'_mod\').\'">Créer un objet '.to_readable($foreign_table).'</a></p>';
 
   }elseif( $column_name != 'id' ) {
     switch ($column_props['SimpleType']) {
@@ -134,11 +122,11 @@ foreach( $table_columns as $column_name => $column_props ) {
       case 'date':
       default:
         echo '
-        <p class="field">\'.HTMLHelper::genererInputText(\''.$column_name.'\', $this->get_'.$column_name.'(), array(), "'.to_readable($column_name).($column_props['Null'] == 'NO'?' *':'').'").\'</p>';
+        <p class="field">\'.HTMLHelper::genererInputText(\''.$column_name.'\', $this->get_'.$column_name.'(), array(), "'.$column_props['Comment'].($column_props['Null'] == 'NO'?' *':'').'").\'</p>';
         break;
       case 'tinyint' :
         echo '
-        <p class="field">\'.HTMLHelper::genererInputCheckBox(\''.$column_name.'\', \'1\', $this->get_'.$column_name.'(), array(\'label_position\' => \'right\'), "'.to_readable($column_name).'" ).\'</p>';
+        <p class="field">\'.HTMLHelper::genererInputCheckBox(\''.$column_name.'\', \'1\', $this->get_'.$column_name.'(), array(\'label_position\' => \'right\'), "'.$column_props['Comment'].'" ).\'</p>';
         break;
     }
   }else {
@@ -160,12 +148,12 @@ foreach( $table_columns as $column_name => $column_props ) {
  * @return string
  */
   public static function get_message_erreur($num_error) {
-    switch($num_error) {<?php
+    switch($num_error) { <?php
 $n = 1;
 foreach( $table_columns as $column_name => $column_props ) {
   if( $column_name != 'id' && $column_props['Null'] == 'NO' ) {
     echo '
-      case '.$n++.' : $return = "Le champ <strong>'.to_readable($column_name).'</strong> est obligatoire."; break;';
+      case '.$n++.' : $return = "Le champ <strong>'.$column_props['Comment'].'</strong> est obligatoire."; break;';
   }
 } ?>
 
@@ -200,4 +188,89 @@ foreach( $table_columns as $column_name => $column_props ) {
     if(count($return) == 0) $return = true;
     return $return;
   }
+<?php
+  foreach( $sub_tables as $sub_table_info ) {
+    $sub_table = $sub_table_info['table'];
+    $sub_table_field = $sub_table_info['field'];
+    $sub_table_pk = $primary_keys[ $sub_table ];
+    $sub_table_pk_clean = array_diff($sub_table_pk, array($sub_table_field));
+
+    $pk_param_list = array();
+    $add_param_list = array();
+    $pk_sql_cond = '';
+    $sql_select = array();
+    $sql_insert = array();
+    $sql_delete = array();
+
+    foreach($sub_table_pk_clean as $field) {
+      $pk_param_list[] = '$'.$field.' = null';
+      $pk_sql_cond .= '
+    if( ! is_null( $'.$field.' )) $where .= \'
+AND `'.$field.'` = \'.mysql_ureal_escape_string($'.$field.');';
+    }
+
+    foreach( $table_columns_list[ $sub_table ] as $field_name => $field ) {
+      $sql_select[] = "`$field_name`";
+
+      if( $field_name == $sub_table_field ) {
+        $sql_insert[] = '$this->get_id()';
+
+      }else {
+        $add_param_list[] = '$'.$field_name;
+        $sql_insert[] = '$'.$field_name;
+
+      }
+
+      if( in_array( $field_name, $sub_table_pk ) ) {
+        if( $field_name == $sub_table_field )
+          $sql_delete[] = '`'.$field_name.'` = \'.mysql_ureal_escape_string( $this->id )';
+        else
+          $sql_delete[] = '`'.$field_name.'` = \'.mysql_ureal_escape_string( $'.$field_name.' )';
+      }
+
+    }
+?>
+
+  public function get_<?php echo $sub_table ?>_list(<?php echo implode( ', ', $pk_param_list )?>) {
+    $where = '';<?php echo $pk_sql_cond; ?>
+
+
+    $sql = '
+SELECT <?php echo implode(', ', $sql_select)?>
+
+FROM `<?php echo $sub_table?>`
+WHERE `<?php echo $sub_table_field?>` = '.mysql_ureal_escape_string($this->get_id()).$where;
+    $res = mysql_uquery($sql);
+
+    return mysql_fetch_to_array($res);
+  }
+
+  public function set_<?php echo $sub_table ?>( <?php echo implode(', ', $add_param_list)?> ) {
+    $sql = "REPLACE INTO `<?php echo $sub_table ?>` ( <?php echo implode(', ', $sql_select ) ?> ) VALUES (".mysql_ureal_escape_string( <?php echo implode( ', ', $sql_insert ) ?> ).")";
+
+    return mysql_uquery($sql);
+  }
+
+  public function del_<?php echo $sub_table ?>( <?php echo implode( ', ', $pk_param_list )?> ) {
+    $where = '';<?php echo $pk_sql_cond; ?>
+
+    $sql = 'DELETE FROM `<?php echo $sub_table ?>`
+    WHERE `<?php echo $sub_table_field?>` = '.mysql_ureal_escape_string($this->get_id()).$where;
+
+    return mysql_uquery($sql);
+  }
+
+
+<?php
+  }
+?>
+
+
+
+
+
+  // CUSTOM
+
+  // /CUSTOM
+
 }

@@ -70,18 +70,6 @@ class Page extends DBObject {
   }
 
   /* FONCTIONS SQL */
-
-  public static function db_exists ($id) { return self::db_exists_class($id, get_class());}
-  public static function db_get_by_id($id) { return self::db_get_by_id_class($id, get_class());}
-
-  public static function db_get_all() {
-    $return = array();
-
-    $sql = 'SELECT `id` FROM `'.self::get_table_name().'` ORDER BY `code`';
-
-    return self::sql_to_list($sql, get_class());
-  }
-
   public static function db_get_page_by_code($code) {
     $return = false;
 
@@ -90,7 +78,7 @@ SELECT `id` FROM `".self::get_table_name()."`
 WHERE `code` LIKE ".mysql_ureal_escape_string($code)."
 LIMIT 0,1";
 
-    return self::sql_to_object($sql, get_class());
+    return self::sql_to_object($sql);
   }
 
   public static function db_get_by_tpl($token) {
@@ -101,13 +89,10 @@ SELECT `id` FROM `".self::get_table_name()."`
 WHERE `remember_token` LIKE ".mysql_ureal_escape_string($token)."
 LIMIT 0,1";
 
-    return self::sql_to_object($sql, get_class());
+    return self::sql_to_object($sql);
   }
 
   /* FONCTIONS HTML */
-
-  public static function manage_errors($tab_error, &$html_msg) { return self::manage_errors_class($tab_error, $html_msg, get_class());}
-
   public function html_get_form($form_url, $post = array()) {
     if(isset($post['code']))
       { $code = $post['code']; }             else { $code = $this->get_code(); }

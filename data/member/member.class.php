@@ -201,35 +201,13 @@ class Member extends DBObject {
   }
 
   /* FONCTIONS SQL */
-
-  public static function db_exists ($id) { return self::db_exists_class($id, get_class());}
-  public static function db_get_by_id($id) { return self::db_get_by_id_class($id, get_class());}
-
-  public static function db_get_all($page = null, $limit = NB_PER_PAGE) {
-    $sql = 'SELECT `id` FROM `'.self::get_table_name().'` ORDER BY `id`';
-
-    if(!is_null($page) && is_numeric($page)) {
-      $start = ($page - 1) * $limit;
-      $sql .= ' LIMIT '.$start.','.$limit;
-    }
-
-    return self::sql_to_list($sql, get_class());
-  }
-
-  public static function db_count_all() {
-    $sql = "SELECT COUNT(`id`) FROM `".self::get_table_name().'`';
-    $res = mysql_uquery($sql);
-    return array_pop(mysql_fetch_row($res));
-  }
-
-
   public static function db_get_membre_by_email($email) {
     $sql = "
 SELECT `id` FROM `".self::get_table_name()."`
 WHERE `email` LIKE ".mysql_ureal_escape_string($email)."
 LIMIT 0,1";
 
-    return self::sql_to_object($sql, get_class());
+    return self::sql_to_object($sql);
   }
 
   public static function db_get_membre_by_code($code) {
@@ -238,7 +216,7 @@ SELECT `id` FROM `".self::get_table_name()."`
 WHERE `code_validation` LIKE ".mysql_ureal_escape_string($code)."
 LIMIT 0,1";
 
-    return self::sql_to_object($sql, get_class());
+    return self::sql_to_object($sql);
   }
 
   public static function db_get_by_remember_token($token) {
@@ -247,7 +225,7 @@ SELECT `id` FROM `".self::get_table_name()."`
 WHERE `remember_token` LIKE ".mysql_ureal_escape_string($token)."
 LIMIT 0,1";
 
-    return self::sql_to_object($sql, get_class());
+    return self::sql_to_object($sql);
   }
 
   private static function sql_between_date($attribute, $jour_deb = null, $jour_fin = null) {
@@ -295,8 +273,6 @@ AND ".$attribute." <= $str_fin";
 
 
   /* FONCTIONS HTML */
-
-  public static function manage_errors($tab_error, &$html_msg) { return self::manage_errors_class($tab_error, $html_msg, get_class());}
 
   /**
    * Formulaire d'édition partie Administration
