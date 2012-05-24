@@ -6,6 +6,7 @@
 
 class Player_Model extends DBObject {
   // Champs BD
+  protected $_member_id = null;
   protected $_name = null;
 
   public function __construct($id = null) {
@@ -20,28 +21,12 @@ class Player_Model extends DBObject {
   public function set_id($id) {
     if( is_numeric($id) && (int)$id == $id) $data = intval($id); else $data = null; $this->_id = $data;
   }
+  public function set_member_id($member_id) {
+    if( is_numeric($member_id) && (int)$member_id == $member_id) $data = intval($member_id); else $data = null; $this->_member_id = $data;
+  }
 
   /* FONCTIONS SQL */
 
-  public static function db_exists ($id) { return self::db_exists_class($id, get_class());}
-  public static function db_get_by_id($id) { return self::db_get_by_id_class($id, get_class());}
-
-  public static function db_get_all($page = null, $limit = NB_PER_PAGE) {
-    $sql = 'SELECT `id` FROM `'.self::get_table_name().'` ORDER BY `id`';
-
-    if(!is_null($page) && is_numeric($page)) {
-      $start = ($page - 1) * $limit;
-      $sql .= ' LIMIT '.$start.','.$limit;
-    }
-
-    return self::sql_to_list($sql, get_class());
-  }
-
-  public static function db_count_all() {
-    $sql = "SELECT COUNT(`id`) FROM `".self::get_table_name().'`';
-    $res = mysql_uquery($sql);
-    return array_pop(mysql_fetch_row($res));
-  }
 
   public static function db_get_select_list() {
     $return = array();
@@ -54,8 +39,6 @@ class Player_Model extends DBObject {
 
   /* FONCTIONS HTML */
 
-  public static function manage_errors($tab_error, &$html_msg) { return self::manage_errors_class($tab_error, $html_msg, get_class());}
-
   /**
    * Formulaire d'édition partie Administration
    *
@@ -67,7 +50,8 @@ class Player_Model extends DBObject {
     <fieldset>
       <legend>Text fields</legend>
         '.HTMLHelper::genererInputHidden('id', $this->get_id()).'
-        <p class="field">'.HTMLHelper::genererInputText('name', $this->get_name(), array(), "Name").'</p>
+        <p class="field">'.HTMLHelper::genererInputText('member_id', $this->get_member_id(), array(), "Member Id *").'</p>
+        <p class="field">'.HTMLHelper::genererInputText('name', $this->get_name(), array(), "Name *").'</p>
     </fieldset>';
 
     return $return;
@@ -82,6 +66,8 @@ class Player_Model extends DBObject {
  */
   public static function get_message_erreur($num_error) {
     switch($num_error) { 
+      case 1 : $return = "Le champ <strong>Member Id</strong> est obligatoire."; break;
+      case 2 : $return = "Le champ <strong>Name</strong> est obligatoire."; break;
       default: $return = "Erreur de saisie, veuillez vérifier les champs.";
     }
     return $return;
@@ -97,6 +83,8 @@ class Player_Model extends DBObject {
   public function check_valid($flags = 0) {
     $return = array();
 
+    $return[] = Member::check_compulsory($this->get_member_id(), 1);
+    $return[] = Member::check_compulsory($this->get_name(), 2);
 
     $return = array_unique($return);
     if(($true_key = array_search(true, $return, true)) !== false) {
@@ -105,6 +93,78 @@ class Player_Model extends DBObject {
     if(count($return) == 0) $return = true;
     return $return;
   }
+
+  public function get_player_resource_history_list($resource_id = null, $datetime = null) {
+    $where = '';
+    if( ! is_null( $resource_id )) $where .= '
+AND `resource_id` = '.mysql_ureal_escape_string($resource_id);
+    if( ! is_null( $datetime )) $where .= '
+AND `datetime` = '.mysql_ureal_escape_string($datetime);
+
+    $sql = '
+SELECT `player_id`, `resource_id`, `datetime`, `delta`, `reason`
+FROM `player_resource_history`
+WHERE `player_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
+    $res = mysql_uquery($sql);
+
+    return mysql_fetch_to_array($res);
+  }
+
+  public function set_player_resource_history( $resource_id, $datetime, $delta, $reason ) {
+    $sql = "REPLACE INTO `player_resource_history` ( `player_id`, `resource_id`, `datetime`, `delta`, `reason` ) VALUES (".mysql_ureal_escape_string( $this->get_id(), $resource_id, $datetime, $delta, $reason ).")";
+
+    return mysql_uquery($sql);
+  }
+
+  public function del_player_resource_history( $resource_id = null, $datetime = null ) {
+    $where = '';
+    if( ! is_null( $resource_id )) $where .= '
+AND `resource_id` = '.mysql_ureal_escape_string($resource_id);
+    if( ! is_null( $datetime )) $where .= '
+AND `datetime` = '.mysql_ureal_escape_string($datetime);
+    $sql = 'DELETE FROM `player_resource_history`
+    WHERE `player_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
+
+    return mysql_uquery($sql);
+  }
+
+
+
+  public function get_player_spygame_value_list($value_guid = null, $datetime = null) {
+    $where = '';
+    if( ! is_null( $value_guid )) $where .= '
+AND `value_guid` = '.mysql_ureal_escape_string($value_guid);
+    if( ! is_null( $datetime )) $where .= '
+AND `datetime` = '.mysql_ureal_escape_string($datetime);
+
+    $sql = '
+SELECT `player_id`, `value_guid`, `datetime`, `real_value`, `masked_value`
+FROM `player_spygame_value`
+WHERE `player_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
+    $res = mysql_uquery($sql);
+
+    return mysql_fetch_to_array($res);
+  }
+
+  public function set_player_spygame_value( $value_guid, $datetime, $real_value, $masked_value ) {
+    $sql = "REPLACE INTO `player_spygame_value` ( `player_id`, `value_guid`, `datetime`, `real_value`, `masked_value` ) VALUES (".mysql_ureal_escape_string( $this->get_id(), $value_guid, $datetime, $real_value, $masked_value ).")";
+
+    return mysql_uquery($sql);
+  }
+
+  public function del_player_spygame_value( $value_guid = null, $datetime = null ) {
+    $where = '';
+    if( ! is_null( $value_guid )) $where .= '
+AND `value_guid` = '.mysql_ureal_escape_string($value_guid);
+    if( ! is_null( $datetime )) $where .= '
+AND `datetime` = '.mysql_ureal_escape_string($datetime);
+    $sql = 'DELETE FROM `player_spygame_value`
+    WHERE `player_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
+
+    return mysql_uquery($sql);
+  }
+
+
 
 
 

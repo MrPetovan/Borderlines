@@ -514,6 +514,7 @@ WHERE `id` = ".mysql_ureal_escape_string($this->get_id());
       
       foreach ($post_data as $name => $value) {
         $sql_name = '_'.$name;
+        
         if($name != "id" && property_exists( $this, $sql_name ) ) {
           $this->__set($name, $value);
         }

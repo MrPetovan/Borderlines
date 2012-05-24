@@ -1,10 +1,10 @@
 <?php
 /**
- * Classe Race
+ * Classe Resource
  *
  */
 
-class Race_Model extends DBObject {
+class Resource_Model extends DBObject {
   // Champs BD
   protected $_name = null;
 
@@ -13,7 +13,7 @@ class Race_Model extends DBObject {
   }
 
   /* ACCESSEURS */
-  public static function get_table_name() { return "race"; }
+  public static function get_table_name() { return "resource"; }
 
 
   /* MUTATEURS */
@@ -23,38 +23,17 @@ class Race_Model extends DBObject {
 
   /* FONCTIONS SQL */
 
-  public static function db_exists ($id) { return self::db_exists_class($id, get_class());}
-  public static function db_get_by_id($id) { return self::db_get_by_id_class($id, get_class());}
-
-  public static function db_get_all($page = null, $limit = NB_PER_PAGE) {
-    $sql = 'SELECT `id` FROM `'.self::get_table_name().'` ORDER BY `id`';
-
-    if(!is_null($page) && is_numeric($page)) {
-      $start = ($page - 1) * $limit;
-      $sql .= ' LIMIT '.$start.','.$limit;
-    }
-
-    return self::sql_to_list($sql, get_class());
-  }
-
-  public static function db_count_all() {
-    $sql = "SELECT COUNT(`id`) FROM `".self::get_table_name().'`';
-    $res = mysql_uquery($sql);
-    return array_pop(mysql_fetch_row($res));
-  }
 
   public static function db_get_select_list() {
     $return = array();
 
-    $object_list = Race_Model::db_get_all();
+    $object_list = Resource_Model::db_get_all();
     foreach( $object_list as $object ) $return[ $object->get_id() ] = $object->get_name();
 
     return $return;
   }
 
   /* FONCTIONS HTML */
-
-  public static function manage_errors($tab_error, &$html_msg) { return self::manage_errors_class($tab_error, $html_msg, get_class());}
 
   /**
    * Formulaire d'édition partie Administration
@@ -107,6 +86,42 @@ class Race_Model extends DBObject {
     if(count($return) == 0) $return = true;
     return $return;
   }
+
+  public function get_player_resource_history_list($player_id = null, $datetime = null) {
+    $where = '';
+    if( ! is_null( $player_id )) $where .= '
+AND `player_id` = '.mysql_ureal_escape_string($player_id);
+    if( ! is_null( $datetime )) $where .= '
+AND `datetime` = '.mysql_ureal_escape_string($datetime);
+
+    $sql = '
+SELECT `player_id`, `resource_id`, `datetime`, `delta`, `reason`
+FROM `player_resource_history`
+WHERE `resource_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
+    $res = mysql_uquery($sql);
+
+    return mysql_fetch_to_array($res);
+  }
+
+  public function set_player_resource_history( $player_id, $datetime, $delta, $reason ) {
+    $sql = "REPLACE INTO `player_resource_history` ( `player_id`, `resource_id`, `datetime`, `delta`, `reason` ) VALUES (".mysql_ureal_escape_string( $player_id, $this->get_id(), $datetime, $delta, $reason ).")";
+
+    return mysql_uquery($sql);
+  }
+
+  public function del_player_resource_history( $player_id = null, $datetime = null ) {
+    $where = '';
+    if( ! is_null( $player_id )) $where .= '
+AND `player_id` = '.mysql_ureal_escape_string($player_id);
+    if( ! is_null( $datetime )) $where .= '
+AND `datetime` = '.mysql_ureal_escape_string($datetime);
+    $sql = 'DELETE FROM `player_resource_history`
+    WHERE `resource_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
+
+    return mysql_uquery($sql);
+  }
+
+
 
 
 

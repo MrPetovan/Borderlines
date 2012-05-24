@@ -869,22 +869,35 @@ function which_os ()
   }
 
   /**
-	* Get a value from $_POST / $_GET
-	* if unavailable, take a default value
-	*
-	* @param string $key Value key
-	* @param mixed $defaultValue (optional)
-	* @return mixed Value
-	*/
+  * Get a value from $_POST / $_GET
+  * if unavailable, take a default value
+  *
+  * @param string $key Value key
+  * @param mixed $defaultValue (optional)
+  * @return mixed Value
+  */
   function getValue($key, $defaultValue = null)
-	{
-	 	if (!isset($key) OR empty($key) OR !is_string($key))
-			return false;
-		$ret = (isset($_POST[$key]) ? $_POST[$key] : (isset($_GET[$key]) ? $_GET[$key] : $defaultValue));
+  {
+    if (!isset($key) OR empty($key) OR !is_string($key))
+      return false;
+    $ret = (isset($_POST[$key]) ? $_POST[$key] : (isset($_GET[$key]) ? $_GET[$key] : $defaultValue));
 
-		if (is_string($ret) === true)
-			$ret = urldecode(preg_replace('/((\%5C0+)|(\%00+))/i', '', urlencode($ret)));
-		return !is_string($ret)? $ret : stripslashes($ret);
-	}
+    if (is_string($ret) === true)
+      $ret = urldecode(preg_replace('/((\%5C0+)|(\%00+))/i', '', urlencode($ret)));
+    return !is_string($ret)? $ret : stripslashes($ret);
+  }
+  
+  /**
+   * Generates a random gaussian number
+   *
+   * @see http://www.protonfish.com/random.shtml
+   */
+  function mt_gaussrand() {
+    $randmax = mt_getrandmax();
+    return
+      ( mt_rand() / $randmax * 2 - 1 ) +
+      ( mt_rand() / $randmax * 2 - 1 ) +
+      ( mt_rand() / $randmax * 2 - 1 );
+  }
 
 ?>
