@@ -12,7 +12,7 @@
   $primary_keys = array();
   $php_classes = array();
   $name_field_list = array();
-  $reserved_class_list = array('membre', 'page');
+  $reserved_class_list = array('member', 'page');
   $foreign_keys_list = array();
   $sub_tables_list = array();
 
@@ -29,7 +29,7 @@
 
   while($row = mysql_fetch_row($res)) $table_name_list[] = $row[0];
 
-  $table_name_list = array_diff($table_name_list, $reserved_class_list);
+  //$table_name_list = array_diff($table_name_list, $reserved_class_list);
 
   // Pour chaque table de la BD
   foreach($table_name_list as $table_name ) {
@@ -141,7 +141,9 @@ GROUP BY `REFERENCED_TABLE_NAME`";
   ('admin_CLASS_mod', 'data/admin/admin_CLASS_mod.act.php', 'data/admin/admin_CLASS_mod.dsp.php', 1, 1, '', '')
   ";
 
-  foreach( $php_classes_ord as $class ) {
+  $processed_classes = array_diff( $php_classes_ord, $reserved_class_list );
+  
+  foreach( $processed_classes as $class ) {
 
     $class_db_identifier = $class;
     $class_php_identifier = to_camel_case($class, true);

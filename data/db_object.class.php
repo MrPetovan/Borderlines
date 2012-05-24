@@ -270,6 +270,7 @@
      */
     public function db_save($flags = 0) {
       if(($return = $this->check_valid($flags)) === true) {
+ 
         if(is_null($this->get_id())) {
           return $this->db_add();
         }else {
@@ -290,7 +291,6 @@
       }
       $sql .= implode('
  ,', $champs_sql);
-
       $sql .= "
 WHERE `id` = ".mysql_ureal_escape_string($this->get_id());
       return mysql_uquery($sql);
@@ -319,6 +319,16 @@ WHERE `id` = ".mysql_ureal_escape_string($this->get_id());
 
       if( isset( self::$object_array[ get_class($this) ][ $this->id ])) {
         unset( self::$object_array[ get_class($this) ][ $this->id ] );
+      }
+
+      return mysql_uquery($sql);
+    }
+
+    public static function db_truncate() {
+      $sql = "DELETE FROM `".static::get_table_name()."`";
+
+      if( isset( self::$object_array[ get_called_class() ])) {
+        unset( self::$object_array[ get_called_class() ] );
       }
 
       return mysql_uquery($sql);

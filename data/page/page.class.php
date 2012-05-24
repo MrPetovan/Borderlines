@@ -219,8 +219,10 @@ LIMIT 0,1";
             $return .= "&";
           }
         }
+        
         if(count($params)) {
           //param1=value1&param2=value2...
+          $params_url = array();
           foreach($params as $name => $value) {
             $params_url[] = $name."=".$value;
           }

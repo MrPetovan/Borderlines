@@ -74,6 +74,8 @@
 
   //Includes classes
   require_once('data/db_object.class.php');
+  
+  require_once( DATA.'order_type/iorder.php');
 
   $flag_action = false;
   if(! mysql_uconnect(DB_HOST, DB_USER, DB_PASS, DB_BASE)) {
@@ -158,7 +160,7 @@
 
   define('PAGE_CODE', $PAGE_CODE);
   // ACT
-  if($flag_action) {
+  if($flag_action || 1) {
     if($CURRENT_PAGE->get_act()) {
       include($CURRENT_PAGE->get_act());
     }

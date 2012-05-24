@@ -36,8 +36,10 @@
         <tr>
           <td><input type="checkbox" name="player_id[]" value="'.$player->get_id().'"/></td>
           <td><a href="'.htmlentities_utf8(get_page_url('admin_player_view', true, array('id' => $player->get_id()))).'">'.$player->get_name().'</a></td>
-
-          <td>'.$player->get_member_id().'</td>
+';
+      $member_temp = Member::instance( $player->get_member_id());
+      echo '
+          <td>'.$member_temp->get_name().'</td>
           <td><a href="'.htmlentities_utf8(get_page_url('admin_player_mod', true, array('id' => $player->get_id()))).'"><img src="'.IMG.'img_html/pencil.png" alt="Modifier" title="Modifier"/></a></td>
         </tr>';
     }

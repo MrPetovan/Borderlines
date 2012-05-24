@@ -31,13 +31,9 @@ class Member extends DBObject {
   // Champs BD
   protected $_prenom = '';
   protected $_nom = '';
-  protected $_adresse = '';
-  protected $_ville = '';
-  protected $_code_postal = '';
   protected $_pays = '';
   protected $_genre = 'F';
   protected $_date_naissance = '';
-  protected $_num_tel_portable = '';
   protected $_email = '';
   protected $_password = '';
   protected $_niveau = 0;
@@ -75,9 +71,9 @@ class Member extends DBObject {
   }
 
 	/* ACCESSEURS */
-  public static function get_table_name() {
-    return "membre";
-  }
+  public static function get_table_name() { return "member";}
+
+  public function get_name()    { return $this->_prenom.' '.$this->nom;}
 
   public function get_date_naissance()    { return guess_date($this->_date_naissance);}
   public function get_date_inscription()  { return guess_date($this->_date_inscription);}
@@ -193,10 +189,8 @@ class Member extends DBObject {
    */
   public static function get_tab_level() {
     return array(
-      0 => "Prospect",
-      1 => "Utilisateur",
-      2 => "Administrateur",
-      3 => "Intranet/RP"
+      0 => "Utilisateur",
+      1 => "Administrateur"
     );
   }
 
@@ -371,16 +365,7 @@ AND ".$attribute." <= $str_fin";
           <p class="field">'.HTMLHelper::genererInputPassword('password_admin', null, array(), 'Changer le mot de passe' ).'</p>';
     }
 
-
-    if( MEMBER_FORM_ABONNEMENT == $type || MEMBER_FORM_ADMIN == $type ) {
-      $return .= '
-          <p class="field">'.HTMLHelper::genererInputText('adresse', $this->get_adresse(), array(), "Adresse" ).'</p>';
-    }
     if( MEMBER_FORM_ABONNEMENT == $type || MEMBER_FORM_NEWSLETTER == $type || MEMBER_FORM_ADMIN == $type) {
-      $return .= '
-          <p class="field">'.HTMLHelper::genererInputText('code_postal', $this->get_code_postal(), array(), 'Code Postal <span class="oblig">*</span>' ).'</p>';
-      $return .= '
-          <p class="field">'.HTMLHelper::genererInputText('ville', $this->get_ville(), array(), "Ville" ).'</p>';
       $return .= '
           <p class="field">';
       $liste_pays = array(

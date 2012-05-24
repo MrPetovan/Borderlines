@@ -14,10 +14,17 @@
     <h3>Consultation des données pour "<?php echo $player->get_name()?>"</h3>
     <div class="informations formulaire">
 
-            <p class="field">
-              <span class="libelle">Member Id</span>
-              <span class="value"><?php echo $player->get_member_id()?></span>
-            </p>    </div>
+<?php
+      $option_list = array();
+      $member_list = Member::db_get_all();
+      foreach( $member_list as $member)
+        $option_list[ $member->id ] = $member->name;
+?>
+      <p class="field">
+        <span class="libelle">Member Id</span>
+        <span class="value"><a href="<?php echo get_page_url('admin_member_view', true, array('id' => $player->get_member_id() ) )?>"><?php echo $option_list[ $player->get_member_id() ]?></a></span>
+      </p>
+    </div>
     <p><a href="<?php echo get_page_url('admin_player_mod', true, array('id' => $player->get_id()))?>">Modifier cet objet Player</a></p>
     <h4>Player Resource History</h4>
 <?php

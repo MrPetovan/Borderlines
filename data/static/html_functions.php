@@ -2,7 +2,7 @@
   function admin_menu($elt_actif = 'admin_member') {
     $data_dir = opendir(DIR_ROOT.'data');
 
-    $exclude = array('.', '..', 'admin', 'member', 'page');
+    $exclude = array('.', '..', 'admin', 'static', 'model');
     $menu_array = array();
 
     while($dir = readdir( $data_dir )) {

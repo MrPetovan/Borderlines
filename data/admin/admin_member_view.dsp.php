@@ -22,7 +22,7 @@
     <p>Vous pouvez modifier les données des utilisateurs. Attention, les changements sont irréversibles.</p>
   </div>
 </div>-->
-<div class="texte_contenu">';
+<div class="texte_contenu">
 <?php echo admin_menu(PAGE_CODE);?>
   <div class="texte_texte">
     <h3>Consultation des données pour "<?php echo $member->get_prenom().' '.$member->get_nom()?>"</h3>
@@ -46,10 +46,6 @@
       <p class="field">
         <span class="libelle">Date inscription</span>
         <span class="value"><?php echo guess_date($member->get_date_inscription(), GUESS_DATE_FR)?></span>
-      </p>
-      <p class="field">
-        <span class="libelle">Adresse</span>
-        <span class="value"><?php echo $member->get_adresse().'<br />'.$member->get_code_postal().' '.$member->get_ville().' '.$member->get_pays()?></span>
       </p>
       <p class="field">
         <span class="libelle">Date de naissance</span>

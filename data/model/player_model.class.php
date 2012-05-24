@@ -49,8 +49,14 @@ class Player_Model extends DBObject {
     $return = '
     <fieldset>
       <legend>Text fields</legend>
-        '.HTMLHelper::genererInputHidden('id', $this->get_id()).'
-        <p class="field">'.HTMLHelper::genererInputText('member_id', $this->get_member_id(), array(), "Member Id *").'</p>
+        '.HTMLHelper::genererInputHidden('id', $this->get_id()).'';
+      $option_list = array();
+      $member_list = Member::db_get_all();
+      foreach( $member_list as $member)
+        $option_list[ $member->id ] = $member->name;
+
+      $return .= '
+      <p class="field">'.HTMLHelper::genererSelect('member_id', $option_list, $this->get_member_id(), array(), "Member Id *").'<a href="'.get_page_url('admin_member_mod').'">Créer un objet Member</a></p>
         <p class="field">'.HTMLHelper::genererInputText('name', $this->get_name(), array(), "Name *").'</p>
     </fieldset>';
 

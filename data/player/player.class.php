@@ -10,8 +10,6 @@ class Player extends Player_Model {
 
   // CUSTOM
 
-  //Custom content
-
   // /CUSTOM
 
 }
