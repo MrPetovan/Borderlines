@@ -46,11 +46,8 @@
       $url = $_SESSION['sess']['url_redirect'];
       unset($_SESSION['sess']['url_redirect']);
     }else {
-      $url = get_page_url('mon-compte');
+      $url = get_page_url('dashboard');
     }
-
-    //A retirer
-    $url = get_page_url('mon-compte');
 
     if($membre->get_niveau() == 2) {
       $url = get_page_url('admin_member');

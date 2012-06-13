@@ -53,18 +53,19 @@ class Page extends DBObject {
    * @param int $type
    */
   public static function set_message( $message, $type = self::PAGE_MESSAGE_NOTICE ) {
-    $_SESSION['page']['message_text'] = $message;
-    $_SESSION['page']['message_type'] = $type;
+    self::add_message( $message, $type );
   }
-  public static function get_message( $message, $type = self::PAGE_MESSAGE_NOTICE ) {
+  
+  public static function add_message( $message, $type = self::PAGE_MESSAGE_NOTICE ) {
+    $_SESSION['page']['message'][$type][] = $message;
+  }
+
+  public static function get_message( $type = self::PAGE_MESSAGE_NOTICE ) {
     $return = false;
 
-    if( isset( $_SESSION['page']['message_text'] ) &&
-        isset(  $_SESSION['page']['message_type'])) {
-      $return = array( 'text' => $_SESSION['page']['message_text'],
-                       'type' => $_SESSION['page']['message_type'] );
-      unset( $_SESSION['page']['message_text'] );
-      unset( $_SESSION['page']['message_type'] );
+    if( isset( $_SESSION['page']['message'][$type] ) ) {
+      $return = $_SESSION['page']['message'][$type];
+      unset( $_SESSION['page']['message'][$type] );
     }
     return $return;
   }

@@ -28,6 +28,15 @@ class Criterion_Model extends DBObject {
   /* FONCTIONS SQL */
 
 
+  public static function db_get_by_category_id($category_id) {
+    $sql = "
+SELECT `id` FROM `".self::get_table_name()."`
+WHERE `category_id` = ".mysql_ureal_escape_string($category_id)."
+LIMIT 0,1";
+
+    return self::sql_to_object($sql, get_class());
+  }
+
   public static function db_get_select_list() {
     $return = array();
 

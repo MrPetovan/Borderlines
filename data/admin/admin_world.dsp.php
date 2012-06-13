@@ -4,8 +4,8 @@
 
   $page_no = getValue('p', 1);
   $nb_per_page = NB_PER_PAGE;
-  $tab = World::db_get_all($page_no, $nb_per_page);
-  $nb_total = World::db_count_all();
+  $tab = World::db_get_all($page_no, $nb_per_page, true);
+  $nb_total = World::db_count_all(true);
 
     echo '
 <div class="texte_contenu">';

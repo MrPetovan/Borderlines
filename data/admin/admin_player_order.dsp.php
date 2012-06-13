@@ -4,8 +4,8 @@
 
   $page_no = getValue('p', 1);
   $nb_per_page = NB_PER_PAGE;
-  $tab = Player_Order::db_get_all($page_no, $nb_per_page);
-  $nb_total = Player_Order::db_count_all();
+  $tab = Player_Order::db_get_all($page_no, $nb_per_page, true);
+  $nb_total = Player_Order::db_count_all(true);
 
     echo '
 <div class="texte_contenu">';
@@ -27,7 +27,8 @@
           <th>Datetime Order</th>
           <th>Datetime Scheduled</th>
           <th>Datetime Execution</th>
-          <th>Parameters</th>        </tr>
+          <th>Parameters</th>
+          <th>Return</th>        </tr>
       </thead>
       <tfoot>
         <tr>
@@ -52,6 +53,7 @@
           <td>'.$player_order->get_datetime_scheduled().'</td>
           <td>'.$player_order->get_datetime_execution().'</td>
           <td>'.$player_order->get_parameters().'</td>
+          <td>'.$player_order->get_return().'</td>
           <td><a href="'.htmlentities_utf8(get_page_url('admin_player_order_mod', true, array('id' => $player_order->get_id()))).'"><img src="'.IMG.'img_html/pencil.png" alt="Modifier" title="Modifier"/></a></td>
         </tr>';
     }

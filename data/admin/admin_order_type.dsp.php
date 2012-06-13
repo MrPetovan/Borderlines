@@ -4,8 +4,8 @@
 
   $page_no = getValue('p', 1);
   $nb_per_page = NB_PER_PAGE;
-  $tab = Order_Type::db_get_all($page_no, $nb_per_page);
-  $nb_total = Order_Type::db_count_all();
+  $tab = Order_Type::db_get_all($page_no, $nb_per_page, true);
+  $nb_total = Order_Type::db_count_all(true);
 
     echo '
 <div class="texte_contenu">';
@@ -22,7 +22,8 @@
         <tr>
           <th>Sel.</th>
           <th>Name</th>
-          <th>Class Name</th>        </tr>
+          <th>Class Name</th>
+          <th>Target Player</th>        </tr>
       </thead>
       <tfoot>
         <tr>
@@ -38,6 +39,7 @@
           <td><a href="'.htmlentities_utf8(get_page_url('admin_order_type_view', true, array('id' => $order_type->get_id()))).'">'.$order_type->get_name().'</a></td>
 
           <td>'.$order_type->get_class_name().'</td>
+          <td>'.$tab_visible[$order_type->get_target_player()].'</td>
           <td><a href="'.htmlentities_utf8(get_page_url('admin_order_type_mod', true, array('id' => $order_type->get_id()))).'"><img src="'.IMG.'img_html/pencil.png" alt="Modifier" title="Modifier"/></a></td>
         </tr>';
     }

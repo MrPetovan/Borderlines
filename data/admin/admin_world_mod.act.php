@@ -9,11 +9,9 @@
     $tab_error = $world_mod->check_valid();
 
     if($tab_error === true) {
-      $world_mod->db_save();
+      $world_mod->save();
 
-      /*echo '<a href="'.Page::get_page_url(PAGE_CODE, false, array('id' => $world_mod->get_id())).'">Lien '.Page::get_page_url(PAGE_CODE, false, array('id' => $world_mod->get_id())).'</a>';
-      die();*/
-      //page_redirect(PAGE_CODE, array('id' => $world_mod->get_id()));
+      Page::set_message( 'Record successfuly saved' );
     }
   }
 

@@ -9,11 +9,9 @@
     $tab_error = $criterion_mod->check_valid();
 
     if($tab_error === true) {
-      $criterion_mod->db_save();
+      $criterion_mod->save();
 
-      /*echo '<a href="'.Page::get_page_url(PAGE_CODE, false, array('id' => $criterion_mod->get_id())).'">Lien '.Page::get_page_url(PAGE_CODE, false, array('id' => $criterion_mod->get_id())).'</a>';
-      die();*/
-      //page_redirect(PAGE_CODE, array('id' => $criterion_mod->get_id()));
+      Page::set_message( 'Record successfuly saved' );
     }
   }
 

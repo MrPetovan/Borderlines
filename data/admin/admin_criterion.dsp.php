@@ -4,8 +4,8 @@
 
   $page_no = getValue('p', 1);
   $nb_per_page = NB_PER_PAGE;
-  $tab = Criterion::db_get_all($page_no, $nb_per_page);
-  $nb_total = Criterion::db_count_all();
+  $tab = Criterion::db_get_all($page_no, $nb_per_page, true);
+  $nb_total = Criterion::db_count_all(true);
 
     echo '
 <div class="texte_contenu">';

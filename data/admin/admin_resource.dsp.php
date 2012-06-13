@@ -4,8 +4,8 @@
 
   $page_no = getValue('p', 1);
   $nb_per_page = NB_PER_PAGE;
-  $tab = Resource::db_get_all($page_no, $nb_per_page);
-  $nb_total = Resource::db_count_all();
+  $tab = Resource::db_get_all($page_no, $nb_per_page, true);
+  $nb_total = Resource::db_count_all(true);
 
     echo '
 <div class="texte_contenu">';
@@ -21,7 +21,8 @@
       <thead>
         <tr>
           <th>Sel.</th>
-          <th>Name</th>        </tr>
+          <th>Name</th>
+          <th>Public</th>        </tr>
       </thead>
       <tfoot>
         <tr>
@@ -36,6 +37,7 @@
           <td><input type="checkbox" name="resource_id[]" value="'.$resource->get_id().'"/></td>
           <td><a href="'.htmlentities_utf8(get_page_url('admin_resource_view', true, array('id' => $resource->get_id()))).'">'.$resource->get_name().'</a></td>
 
+          <td>'.$tab_visible[$resource->get_public()].'</td>
           <td><a href="'.htmlentities_utf8(get_page_url('admin_resource_mod', true, array('id' => $resource->get_id()))).'"><img src="'.IMG.'img_html/pencil.png" alt="Modifier" title="Modifier"/></a></td>
         </tr>';
     }

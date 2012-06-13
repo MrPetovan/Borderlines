@@ -9,11 +9,9 @@
     $tab_error = $territory_mod->check_valid();
 
     if($tab_error === true) {
-      $territory_mod->db_save();
+      $territory_mod->save();
 
-      /*echo '<a href="'.Page::get_page_url(PAGE_CODE, false, array('id' => $territory_mod->get_id())).'">Lien '.Page::get_page_url(PAGE_CODE, false, array('id' => $territory_mod->get_id())).'</a>';
-      die();*/
-      //page_redirect(PAGE_CODE, array('id' => $territory_mod->get_id()));
+      Page::set_message( 'Record successfuly saved' );
     }
   }
 

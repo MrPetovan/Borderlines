@@ -61,10 +61,10 @@
   require_once(INC.'constantes.inc.php');
   // Fonctions MySQL
   require_once(INC.'db.inc.php');
-  // Fonctions liées aux pages
-  require_once(INC.'page.inc.php');
   // Fonctions générales
   require_once(INC.'fonctions.inc.php');
+  // Fonctions liées aux pages
+  require_once(INC.'page.inc.php');
   // Fonctions système de fichier
   require_once(INC.'files.inc.php');
   // Fonctions envoi de mail
@@ -76,7 +76,8 @@
   require_once('data/db_object.class.php');
   
   require_once( DATA.'order_type/iorder.php');
-
+  require_once( INC.'borderlines.inc.php');
+  
   $flag_action = false;
   if(! mysql_uconnect(DB_HOST, DB_USER, DB_PASS, DB_BASE)) {
     //$data_include['dsp'] = 'error_db.php';
@@ -160,10 +161,8 @@
 
   define('PAGE_CODE', $PAGE_CODE);
   // ACT
-  if($flag_action || 1) {
-    if($CURRENT_PAGE->get_act()) {
-      include($CURRENT_PAGE->get_act());
-    }
+  if($CURRENT_PAGE->get_act()) {
+    include($CURRENT_PAGE->get_act());
   }
 
   //DSP

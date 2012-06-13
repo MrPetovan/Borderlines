@@ -23,7 +23,7 @@
         $territory = Territory::instance( getValue('territory_id') );
         if( $territory->id ) {
           $flag_set_territory_neighbour = $territory->set_territory_neighbour(
-            getValue('territory_id')
+            getValue('neighbour_id')
           );
         }
         break;
@@ -31,7 +31,7 @@
         $territory = Territory::instance( getValue('territory_id') );
         if( $territory->id ) {
           $flag_del_territory_neighbour = $matchup->del_territory_neighbour(
-            getValue('territory_id')
+            getValue('neighbour_id')
           );
         }
         break;

@@ -370,18 +370,18 @@ function guess_date($date, $return_flag = GUESS_DATE_TIMESTAMP) {
   $return = false;
   $data_input = false;
   static $array_actions = array(
-  GUESS_DATE_TIMESTAMP => array(
-  GUESS_DATE_MYSQL => 1,
-  GUESS_DATE_FR => 2,
-  ),
-  GUESS_DATE_MYSQL => array(
-  GUESS_DATE_TIMESTAMP => 3,
-  GUESS_DATE_FR => 4,
-  ),
-  GUESS_DATE_FR => array(
-  GUESS_DATE_TIMESTAMP => 5,
-  GUESS_DATE_MYSQL => 6,
-  )
+    GUESS_DATE_TIMESTAMP => array(
+      GUESS_DATE_MYSQL => 1,
+      GUESS_DATE_FR => 2,
+    ),
+    GUESS_DATE_MYSQL => array(
+      GUESS_DATE_TIMESTAMP => 3,
+      GUESS_DATE_FR => 4,
+    ),
+    GUESS_DATE_FR => array(
+      GUESS_DATE_TIMESTAMP => 5,
+      GUESS_DATE_MYSQL => 6,
+    )
   );
 
   if(is_numeric($date)) {
@@ -413,6 +413,65 @@ function guess_date($date, $return_flag = GUESS_DATE_TIMESTAMP) {
     }
   }
   //var_debug('guess_date', $date, $return);
+  return $return;
+}
+
+define("GUESS_TIME_TIMESTAMP", 1);
+define("GUESS_TIME_MYSQL", 2);
+define("GUESS_TIME_FR", 3);
+/**
+   * Teste timestamp, date mysql (YYYY-MM-DD HH:MM:SS) et date FR (JJ/MM/AAAA)
+   * Retourne par défaut un timestamp (possiblement négatif), ou une date mysql ou une date FR
+   *
+   * @param mixed $date
+   */
+function guess_time($date, $return_flag = GUESS_TIME_TIMESTAMP) {
+  $return = false;
+  $data_input = false;
+  static $array_actions = array(
+    GUESS_TIME_TIMESTAMP => array(
+      GUESS_TIME_MYSQL => 1,
+      GUESS_TIME_FR => 2,
+    ),
+    GUESS_TIME_MYSQL => array(
+      GUESS_TIME_TIMESTAMP => 3,
+      GUESS_TIME_FR => 4,
+    ),
+    GUESS_TIME_FR => array(
+      GUESS_TIME_TIMESTAMP => 5,
+      GUESS_TIME_MYSQL => 6,
+    )
+  );
+
+  if(is_numeric($date)) {
+    $data_input = GUESS_TIME_TIMESTAMP;
+  }elseif(preg_match('/([0-9]{4})-([0-9]{2})-([0-9]{2}) ([0-9]{2}):([0-9]{2}):([0-9]{2})/', $date, $matches)) {
+    $data_matches = $matches;
+    $data_input = GUESS_TIME_MYSQL;
+  }elseif(preg_match('#([0-9]{2})/([0-9]{2})/([0-9]{4}) ([0-9]{2}):([0-9]{2}):([0-9]{2})#', $date, $matches)) {
+    $data_matches = $matches;
+    $data_input = GUESS_TIME_FR;
+    if(checkdate($data_matches[2], $data_matches[1], $data_matches[3]) === false) {
+      $data_input = false;
+    }
+  }
+
+  if($data_input !== false) {
+    $return = $date;
+    if(isset($array_actions[$data_input][$return_flag])) {
+      switch($array_actions[$data_input][$return_flag]) {
+        case 1 : $return = mysql_timestamp_to_mysql_date($date); break;
+        case 2 : $return = date('d/m/Y H:m:s', $date); break;
+
+        case 3 : $return = mysql_date_to_timestamp($date); break;
+        case 4 : $return = $data_matches[3]."/".$data_matches[2]."/".$data_matches[1].' '.$data_matches[4].':'.$data_matches[5].':'.$data_matches[6]; break;
+
+        case 5 : $return = mktime( $data_matches[4], $data_matches[5], $data_matches[6], $data_matches[2], $data_matches[1], $data_matches[3]); break;
+        case 6 : $return = $data_matches[3]."-".$data_matches[2]."-".$data_matches[1].' '.$data_matches[4].':'.$data_matches[5].':'.$data_matches[6]; break;
+      }
+    }
+  }
+  //var_debug('guess_time', $date, $return);
   return $return;
 }
 

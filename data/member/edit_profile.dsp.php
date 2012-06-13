@@ -33,7 +33,6 @@
 ?>
 <div class="texte_header">
   <p class="bandeau">Mon compte</p>
-  <img src="<?php echo IMG?>img_html/13login_header.jpg"/>
   <div class="edito">
     <h2>Mon compte</h2>
     <p>Retrouvez ici toutes les informations concernant vos informations et votre abonnement.</p>
@@ -95,6 +94,7 @@
       </div>
       <p class="right"><label>&nbsp;</label><?php echo HTMLHelper::genererInputSubmit('save_profile', "Save changes" );?></p>
       </form>
+<?php /*
       <h4>Adresse</h4>
 
       <p class="texte_intro">Laissez les champs vides si vous ne voulez pas changer les informations.</p>
@@ -125,5 +125,6 @@
       </div>
       <p class="right"><label>&nbsp;</label><?php echo HTMLHelper::genererInputSubmit('save_profile', "Save changes" );?></p>
     </form>
+*/ ?>
   </div>
 </div>

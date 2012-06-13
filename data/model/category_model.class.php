@@ -24,6 +24,7 @@ class Category_Model extends DBObject {
   /* FONCTIONS SQL */
 
 
+
   public static function db_get_select_list() {
     $return = array();
 

@@ -1,6 +1,4 @@
 <?php
-  include_once("fonctions.inc.php");
-
   function get_current_page() {
     return PAGE_CODE;
   }

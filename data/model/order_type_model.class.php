@@ -8,6 +8,7 @@ class Order_Type_Model extends DBObject {
   // Champs BD
   protected $_class_name = null;
   protected $_name = null;
+  protected $_target_player = null;
 
   public function __construct($id = null) {
     parent::__construct($id);
@@ -16,23 +17,37 @@ class Order_Type_Model extends DBObject {
   /* ACCESSEURS */
   public static function get_table_name() { return "order_type"; }
 
+  public function get_target_player() { return $this->is_target_player(); }
+  public function is_target_player() { return ($this->_target_player == 1); }
 
   /* MUTATEURS */
   public function set_id($id) {
     if( is_numeric($id) && (int)$id == $id) $data = intval($id); else $data = null; $this->_id = $data;
   }
+  public function set_target_player($target_player) {
+    if($target_player) $data = 1; else $data = 0; $this->_target_player = $data;
+  }
 
   /* FONCTIONS SQL */
 
 
-  public static function db_get_order_type_by_class_name($class_name) {
+  public static function db_get_by_class_name($class_name) {
     $sql = "
 SELECT `id` FROM `".self::get_table_name()."`
-WHERE `class_name` LIKE ".mysql_ureal_escape_string($class_name)."
+WHERE `class_name` = ".mysql_ureal_escape_string($class_name)."
 LIMIT 0,1";
 
     return self::sql_to_object($sql, get_class());
   }
+  public static function db_get_by_target_player($target_player) {
+    $sql = "
+SELECT `id` FROM `".self::get_table_name()."`
+WHERE `target_player` = ".mysql_ureal_escape_string($target_player)."
+LIMIT 0,1";
+
+    return self::sql_to_object($sql, get_class());
+  }
+
   public static function db_get_select_list() {
     $return = array();
 
@@ -57,6 +72,7 @@ LIMIT 0,1";
         '.HTMLHelper::genererInputHidden('id', $this->get_id()).'
         <p class="field">'.HTMLHelper::genererInputText('class_name', $this->get_class_name(), array(), "Class Name *").'</p>
         <p class="field">'.HTMLHelper::genererInputText('name', $this->get_name(), array(), "Name *").'</p>
+        <p class="field">'.HTMLHelper::genererInputCheckBox('target_player', '1', $this->get_target_player(), array('label_position' => 'right'), "Target Player" ).'</p>
     </fieldset>';
 
     return $return;
@@ -73,6 +89,7 @@ LIMIT 0,1";
     switch($num_error) { 
       case 1 : $return = "Le champ <strong>Class Name</strong> est obligatoire."; break;
       case 2 : $return = "Le champ <strong>Name</strong> est obligatoire."; break;
+      case 3 : $return = "Le champ <strong>Target Player</strong> est obligatoire."; break;
       default: $return = "Erreur de saisie, veuillez vérifier les champs.";
     }
     return $return;
@@ -90,6 +107,7 @@ LIMIT 0,1";
 
     $return[] = Member::check_compulsory($this->get_class_name(), 1);
     $return[] = Member::check_compulsory($this->get_name(), 2);
+    $return[] = Member::check_compulsory($this->get_target_player(), 3, true);
 
     $return = array_unique($return);
     if(($true_key = array_search(true, $return, true)) !== false) {

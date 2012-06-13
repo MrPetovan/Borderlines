@@ -12,6 +12,7 @@ class Player_Order_Model extends DBObject {
   protected $_datetime_scheduled = null;
   protected $_datetime_execution = null;
   protected $_parameters = null;
+  protected $_return = null;
 
   public function __construct($id = null) {
     parent::__construct($id);
@@ -20,6 +21,9 @@ class Player_Order_Model extends DBObject {
   /* ACCESSEURS */
   public static function get_table_name() { return "player_order"; }
 
+  public function get_datetime_order()    { return guess_date($this->_datetime_order);}
+  public function get_datetime_scheduled()    { return guess_date($this->_datetime_scheduled);}
+  public function get_datetime_execution()    { return guess_date($this->_datetime_execution);}
 
   /* MUTATEURS */
   public function set_id($id) {
@@ -31,9 +35,32 @@ class Player_Order_Model extends DBObject {
   public function set_player_id($player_id) {
     if( is_numeric($player_id) && (int)$player_id == $player_id) $data = intval($player_id); else $data = null; $this->_player_id = $data;
   }
+  public function set_datetime_order($date) { $this->_datetime_order = guess_date($date, GUESS_DATE_MYSQL);}
+  public function set_datetime_scheduled($date) { $this->_datetime_scheduled = guess_date($date, GUESS_DATE_MYSQL);}
+  public function set_datetime_execution($date) { $this->_datetime_execution = guess_date($date, GUESS_DATE_MYSQL);}
+  public function set_return($return) {
+    if( is_numeric($return) && (int)$return == $return) $data = intval($return); else $data = null; $this->_return = $data;
+  }
 
   /* FONCTIONS SQL */
 
+
+  public static function db_get_by_order_type_id($order_type_id) {
+    $sql = "
+SELECT `id` FROM `".self::get_table_name()."`
+WHERE `order_type_id` = ".mysql_ureal_escape_string($order_type_id)."
+LIMIT 0,1";
+
+    return self::sql_to_object($sql, get_class());
+  }
+  public static function db_get_by_player_id($player_id) {
+    $sql = "
+SELECT `id` FROM `".self::get_table_name()."`
+WHERE `player_id` = ".mysql_ureal_escape_string($player_id)."
+LIMIT 0,1";
+
+    return self::sql_to_object($sql, get_class());
+  }
 
   public static function db_get_select_list() {
     $return = array();
@@ -74,7 +101,8 @@ class Player_Order_Model extends DBObject {
         <p class="field">'.HTMLHelper::genererInputText('datetime_order', $this->get_datetime_order(), array(), "Datetime Order *").'</p>
         <p class="field">'.HTMLHelper::genererInputText('datetime_scheduled', $this->get_datetime_scheduled(), array(), "Datetime Scheduled *").'</p>
         <p class="field">'.HTMLHelper::genererInputText('datetime_execution', $this->get_datetime_execution(), array(), "Datetime Execution").'</p>
-        <p class="field">'.HTMLHelper::genererInputText('parameters', $this->get_parameters(), array(), "Parameters *").'</p>
+        <p class="field">'.HTMLHelper::genererInputText('parameters', $this->get_parameters(), array(), "Parameters").'</p>
+        <p class="field">'.HTMLHelper::genererInputText('return', $this->get_return(), array(), "Return").'</p>
     </fieldset>';
 
     return $return;
@@ -93,7 +121,6 @@ class Player_Order_Model extends DBObject {
       case 2 : $return = "Le champ <strong>Player Id</strong> est obligatoire."; break;
       case 3 : $return = "Le champ <strong>Datetime Order</strong> est obligatoire."; break;
       case 4 : $return = "Le champ <strong>Datetime Scheduled</strong> est obligatoire."; break;
-      case 5 : $return = "Le champ <strong>Parameters</strong> est obligatoire."; break;
       default: $return = "Erreur de saisie, veuillez vérifier les champs.";
     }
     return $return;
@@ -113,7 +140,6 @@ class Player_Order_Model extends DBObject {
     $return[] = Member::check_compulsory($this->get_player_id(), 2);
     $return[] = Member::check_compulsory($this->get_datetime_order(), 3);
     $return[] = Member::check_compulsory($this->get_datetime_scheduled(), 4);
-    $return[] = Member::check_compulsory($this->get_parameters(), 5);
 
     $return = array_unique($return);
     if(($true_key = array_search(true, $return, true)) !== false) {
@@ -122,6 +148,42 @@ class Player_Order_Model extends DBObject {
     if(count($return) == 0) $return = true;
     return $return;
   }
+
+  public function get_player_resource_history_list($player_id = null, $resource_id = null) {
+    $where = '';
+    if( ! is_null( $player_id )) $where .= '
+AND `player_id` = '.mysql_ureal_escape_string($player_id);
+    if( ! is_null( $resource_id )) $where .= '
+AND `resource_id` = '.mysql_ureal_escape_string($resource_id);
+
+    $sql = '
+SELECT `player_id`, `resource_id`, `datetime`, `delta`, `reason`, `player_order_id`
+FROM `player_resource_history`
+WHERE `player_order_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
+    $res = mysql_uquery($sql);
+
+    return mysql_fetch_to_array($res);
+  }
+
+  public function set_player_resource_history( $player_id, $resource_id, $datetime, $delta, $reason ) {
+    $sql = "REPLACE INTO `player_resource_history` ( `player_id`, `resource_id`, `datetime`, `delta`, `reason`, `player_order_id` ) VALUES (".mysql_ureal_escape_string( $player_id, $resource_id, $datetime, $delta, $reason, $this->get_id() ).")";
+
+    return mysql_uquery($sql);
+  }
+
+  public function del_player_resource_history( $player_id = null, $resource_id = null ) {
+    $where = '';
+    if( ! is_null( $player_id )) $where .= '
+AND `player_id` = '.mysql_ureal_escape_string($player_id);
+    if( ! is_null( $resource_id )) $where .= '
+AND `resource_id` = '.mysql_ureal_escape_string($resource_id);
+    $sql = 'DELETE FROM `player_resource_history`
+    WHERE `player_order_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
+
+    return mysql_uquery($sql);
+  }
+
+
 
 
 

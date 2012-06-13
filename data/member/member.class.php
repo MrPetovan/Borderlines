@@ -404,10 +404,6 @@ AND ".$attribute." <= $str_fin";
       '--' => '-- Autre');
       $return .= HTMLHelper::genererSelect('pays', $liste_pays, $this->get_pays(), array(), 'Pays <span class="oblig">*</span>').'</p>';
     }
-    if( MEMBER_FORM_ABONNEMENT == $type || MEMBER_FORM_ADMIN == $type) {
-      $return .= '
-          <p class="field">'.HTMLHelper::genererInputText('num_tel_portable', $this->get_num_tel_portable(), array(), "N° téléphone portable" ).'</p>';
-    }
     if( MEMBER_FORM_ABONNEMENT == $type || MEMBER_FORM_NEWSLETTER == $type || MEMBER_FORM_ADMIN == $type) {
       $liste_jour = array('' => '--');
       for($i = 1; $i <= 31; $i ++) {

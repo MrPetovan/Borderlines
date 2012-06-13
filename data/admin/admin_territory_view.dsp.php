@@ -94,7 +94,7 @@
     <table>
       <thead>
         <tr>
-          <th>Territory Id</th>          <th>Action</th>
+          <th>Neighbour Id</th>          <th>Action</th>
         </tr>
       </thead>
       <tfoot>
@@ -106,14 +106,13 @@
 <?php
       foreach( $territory_neighbour_list as $territory_neighbour ) {
 
- 
-        $territory_id_territory = Territory::instance( $territory_neighbour['territory_id'] );        echo '
+         echo '
         <tr>
-        <td><a href="'.get_page_url('admin_territory_view', true, array('id' => $territory_id_territory->get_id())).'">'.$territory_id_territory->get_name().'</a></td>          <td>
+        <td>'.$territory_neighbour['neighbour_id'].'</td>          <td>
             <form action="'.get_page_url(PAGE_CODE, true, array('id' => $territory->get_id())).'" method="post">
               '.HTMLHelper::genererInputHidden('territory_id', $territory->get_id()).'
 
-              '.HTMLHelper::genererInputHidden('territory_id', $territory_id_territory->get_id()).'              '.HTMLHelper::genererButton('action',  'del_territory_neighbour', array('type' => 'submit'), 'Supprimer').'
+              '.HTMLHelper::genererInputHidden('neighbour_id', $territory_neighbour['neighbour_id']).'              '.HTMLHelper::genererButton('action',  'del_territory_neighbour', array('type' => 'submit'), 'Supprimer').'
             </form>
           </td>
         </tr>';
@@ -125,14 +124,13 @@
   }else {
     echo '<p>Il n\'y a pas d\'éléments à afficher</p>';
   }
-
-  $liste_valeurs_territory = Territory::db_get_select_list();?>
+?>
     <form action="<?php echo get_page_url(PAGE_CODE, true, array('id' => $territory->get_id()))?>" method="post" class="formulaire">
       <?php echo HTMLHelper::genererInputHidden('territory_id', $territory->get_id() )?>
       <fieldset>
         <legend>Ajouter un élément</legend>
         <p class="field">
-          <?php echo HTMLHelper::genererSelect('territory_id', $liste_valeurs_territory, null, array(), 'Territory' )?><a href="<?php echo get_page_url('admin_territory_mod')?>">Créer un objet Territory</a>
+          <?php echo HTMLHelper::genererInputText('neighbour_id', null, array(), 'Neighbour Id' )?>
         </p>
         <p><?php echo HTMLHelper::genererButton('action',  'set_territory_neighbour', array('type' => 'submit'), 'Ajouter un élément')?></p>
       </fieldset>

@@ -24,7 +24,11 @@
         <span class="libelle">Member Id</span>
         <span class="value"><a href="<?php echo get_page_url('admin_member_view', true, array('id' => $player->get_member_id() ) )?>"><?php echo $option_list[ $player->get_member_id() ]?></a></span>
       </p>
-    </div>
+
+            <p class="field">
+              <span class="libelle">Active</span>
+              <span class="value"><?php echo $tab_visible[$".$class_db_identifier."->get_".$column_name."()]?></span>
+            </p>    </div>
     <p><a href="<?php echo get_page_url('admin_player_mod', true, array('id' => $player->get_id()))?>">Modifier cet objet Player</a></p>
     <h4>Player Resource History</h4>
 <?php
@@ -39,12 +43,13 @@
           <th>Resource Id</th>
           <th>Datetime</th>
           <th>Delta</th>
-          <th>Reason</th>          <th>Action</th>
+          <th>Reason</th>
+          <th>Player Order Id</th>          <th>Action</th>
         </tr>
       </thead>
       <tfoot>
         <tr>
-          <td colspan="5"><?php echo count( $player_resource_history_list )?> lignes</td>
+          <td colspan="6"><?php echo count( $player_resource_history_list )?> lignes</td>
         </tr>
       </tfoot>
       <tbody>
@@ -52,17 +57,19 @@
       foreach( $player_resource_history_list as $player_resource_history ) {
 
  
-        $resource_id_resource = Resource::instance( $player_resource_history['resource_id'] );        echo '
+        $resource_id_resource = Resource::instance( $player_resource_history['resource_id'] );
+        $player_order_id_player_order = Player_Order::instance( $player_resource_history['player_order_id'] );        echo '
         <tr>
         <td><a href="'.get_page_url('admin_resource_view', true, array('id' => $resource_id_resource->get_id())).'">'.$resource_id_resource->get_name().'</a></td>
         <td>'.$player_resource_history['datetime'].'</td>
         <td>'.$player_resource_history['delta'].'</td>
-        <td>'.$player_resource_history['reason'].'</td>          <td>
+        <td>'.$player_resource_history['reason'].'</td>
+        <td><a href="'.get_page_url('admin_player_order_view', true, array('id' => $player_order_id_player_order->get_id())).'">'.$player_order_id_player_order->get_id().'</a></td>          <td>
             <form action="'.get_page_url(PAGE_CODE, true, array('id' => $player->get_id())).'" method="post">
               '.HTMLHelper::genererInputHidden('player_id', $player->get_id()).'
 
               '.HTMLHelper::genererInputHidden('resource_id', $resource_id_resource->get_id()).'
-              '.HTMLHelper::genererInputHidden('datetime', $player_resource_history['datetime']).'              '.HTMLHelper::genererButton('action',  'del_player_resource_history', array('type' => 'submit'), 'Supprimer').'
+              '.HTMLHelper::genererInputHidden('player_order_id', $player_order_id_player_order->get_id()).'              '.HTMLHelper::genererButton('action',  'del_player_resource_history', array('type' => 'submit'), 'Supprimer').'
             </form>
           </td>
         </tr>';
@@ -75,7 +82,8 @@
     echo '<p>Il n\'y a pas d\'éléments à afficher</p>';
   }
 
-  $liste_valeurs_resource = Resource::db_get_select_list();?>
+  $liste_valeurs_resource = Resource::db_get_select_list();
+  $liste_valeurs_player_order = Player_Order::db_get_select_list();?>
     <form action="<?php echo get_page_url(PAGE_CODE, true, array('id' => $player->get_id()))?>" method="post" class="formulaire">
       <?php echo HTMLHelper::genererInputHidden('player_id', $player->get_id() )?>
       <fieldset>
@@ -91,6 +99,9 @@
         </p>
         <p class="field">
           <?php echo HTMLHelper::genererInputText('reason', null, array(), 'Reason' )?>
+        </p>
+        <p class="field">
+          <?php echo HTMLHelper::genererSelect('player_order_id', $liste_valeurs_player_order, null, array(), 'Player Order' )?><a href="<?php echo get_page_url('admin_player_order_mod')?>">Créer un objet Player Order</a>
         </p>
         <p><?php echo HTMLHelper::genererButton('action',  'set_player_resource_history', array('type' => 'submit'), 'Ajouter un élément')?></p>
       </fieldset>

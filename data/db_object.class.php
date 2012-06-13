@@ -133,6 +133,8 @@
     }
 
     public function __call($method, $args) {
+      $return = null;
+
       if(substr($method, 0, strlen("get_")) == "get_") {
         $var = substr($method, strlen("get"));
 
@@ -152,11 +154,16 @@
         if( property_exists($this, $var) ) {
           // Appelle __set
           $this->$var = $value;
+          $return = true;
         }else {
           error_log('[Framework] __call:set : Class variable doesn\'t exist : '.$var);
           throw new Exception('[Framework] __call:set : Class variable doesn\'t exist : '.$var);
           return null;
         }
+      }
+      if( is_null( $return ) ) {
+        error_log('[Framework] __call: Method doesn\'t exist : '.$method);
+        throw new Exception('[Framework] __call: Method doesn\'t exist : '.$method);
       }
     }
 
@@ -261,16 +268,38 @@
     }
 
     /**
-     * Fonction standard d'écriure de l'objet en base. Effectue les vérifications
-     * de validité (en fonction des flags), crée l'objet s'il n'existait pas, le
-     * met à jour s'il existait (vérification sur _id)
+     * Standard database write function. Check object validity given flags,
+     * create the object in database if it did not exist or update it if it
+     * existed (check on _id)
+     *
+     * Return true if write successful, else false
      *
      * @param int $flags
      * @return bool;
      */
+    public function save($flags = 0) {
+      if($return = ($this->check_valid($flags) === true)) {
+        if(is_null($this->get_id())) {
+          return $this->db_add();
+        }else {
+          return $this->db_update();
+        }
+      }
+      return $return;
+    }
+    
+    /**
+     * Standard database write function. Check object validity given flags,
+     * create the object in database if it did not exist or update it if it
+     * existed (check on _id)
+     *
+     * Return true or array of error codes
+     *
+     * @param int $flags
+     * @return bool|array;
+     */
     public function db_save($flags = 0) {
       if(($return = $this->check_valid($flags)) === true) {
- 
         if(is_null($this->get_id())) {
           return $this->db_add();
         }else {
@@ -291,6 +320,7 @@
       }
       $sql .= implode('
  ,', $champs_sql);
+
       $sql .= "
 WHERE `id` = ".mysql_ureal_escape_string($this->get_id());
       return mysql_uquery($sql);
@@ -310,7 +340,6 @@ WHERE `id` = ".mysql_ureal_escape_string($this->get_id());
 
       $return = mysql_uquery($sql);
       $this->set_id(mysql_insert_id());
-//var_debug($sql);
       return $return;
     }
 
@@ -340,20 +369,34 @@ WHERE `id` = ".mysql_ureal_escape_string($this->get_id());
      * @return array Tableau des objets
      * @static
      */
-    public static function db_get_all($page = null, $limit = NB_PER_PAGE) {
-      $sql = 'SELECT `id` FROM `'.static::get_table_name().'` ORDER BY `id`';
+    public static function db_get_all($page = null, $limit = NB_PER_PAGE, $include_inactive = false) {
+      $sql = 'SELECT `id` FROM `'.static::get_table_name().'`';
+      $order_by = 'ORDER BY `id`';
 
+      $where = '';
+      if( !$include_inactive && property_exists( get_called_class(), '_active' ) ) {
+        $where = 'WHERE `active` = 1';
+      }
+      
+      $sql = $sql."\n".$where."\n".$order_by;
+      
       if(!is_null($page) && is_numeric($page)) {
         $start = ($page - 1) * $limit;
-        $sql .= ' LIMIT '.$start.','.$limit;
+        $sql .= "\n".'LIMIT '.$start.','.$limit;
       }
 
       return static::sql_to_list( $sql );
     }
     
-    public static function db_count_all() {
+    public static function db_count_all($include_inactive = false) {
       $sql = "SELECT COUNT(`id`) FROM `".static::get_table_name().'`';
-      $res = mysql_uquery($sql);
+      
+      $where = '';
+      if( !$include_inactive && property_exists( get_called_class(), '_active' ) ) {
+        $where = 'WHERE `active` = 1';
+      }
+      
+      $res = mysql_uquery($sql."\n".$where);
       return array_pop(mysql_fetch_row($res));
     }
 

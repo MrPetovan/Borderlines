@@ -12,14 +12,6 @@
   $nb_total = Member::db_count_all();
 
     echo '
-<!--<div class="texte_header">
-  <p class="bandeau">Administration</p>
-  <img src="'.IMG.'img_html/13login_header.jpg" alt=""/>
-  <div class="edito">
-    <h2>Administration des utilisateurs</h2>
-    <p>Vous pouvez modifier les données des utilisateurs. Attention, les changements sont irréversibles.</p>
-  </div>
-</div>-->
 <div class="texte_contenu">';
 
 	admin_menu(PAGE_CODE);
@@ -37,6 +29,7 @@
           <th>Email</th>
           <th>Niveau</th>
           <th>Inscription</th>
+          <th>Action</th>
         </tr>
       </thead>
       <tfoot>

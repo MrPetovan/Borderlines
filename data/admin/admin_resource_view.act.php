@@ -9,7 +9,8 @@
             getValue('player_id'),
             getValue('datetime'),
             getValue('delta'),
-            getValue('reason')
+            getValue('reason'),
+            getValue('player_order_id')
           );
         }
         break;
@@ -18,7 +19,7 @@
         if( $resource->id ) {
           $flag_del_player_resource_history = $matchup->del_player_resource_history(
             getValue('player_id'),
-            getValue('datetime')
+            getValue('player_order_id')
           );
         }
         break;

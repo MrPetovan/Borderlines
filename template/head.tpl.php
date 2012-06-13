@@ -7,6 +7,7 @@
 
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <link rel="stylesheet" type="text/css" href="<?php echo URL_ROOT ?>style/commun.css" media="all" />
+    <link rel="stylesheet" type="text/css" href="<?php echo URL_ROOT ?>style/framework.css" media="all" />
     <link rel="stylesheet" type="text/css" href="<?php echo URL_ROOT ?>style/jquery.cluetip.css" media="all" />
     <link rel="stylesheet" type="text/css" href="<?php echo URL_ROOT ?>style/jquery.tooltip.css" media="all" />
 

@@ -7,6 +7,7 @@
 class Resource_Model extends DBObject {
   // Champs BD
   protected $_name = null;
+  protected $_public = null;
 
   public function __construct($id = null) {
     parent::__construct($id);
@@ -15,13 +16,19 @@ class Resource_Model extends DBObject {
   /* ACCESSEURS */
   public static function get_table_name() { return "resource"; }
 
+  public function get_public() { return $this->is_public(); }
+  public function is_public() { return ($this->_public == 1); }
 
   /* MUTATEURS */
   public function set_id($id) {
     if( is_numeric($id) && (int)$id == $id) $data = intval($id); else $data = null; $this->_id = $data;
   }
+  public function set_public($public) {
+    if($public) $data = 1; else $data = 0; $this->_public = $data;
+  }
 
   /* FONCTIONS SQL */
+
 
 
   public static function db_get_select_list() {
@@ -47,6 +54,7 @@ class Resource_Model extends DBObject {
       <legend>Text fields</legend>
         '.HTMLHelper::genererInputHidden('id', $this->get_id()).'
         <p class="field">'.HTMLHelper::genererInputText('name', $this->get_name(), array(), "Name *").'</p>
+        <p class="field">'.HTMLHelper::genererInputCheckBox('public', '1', $this->get_public(), array('label_position' => 'right'), "Public" ).'</p>
     </fieldset>';
 
     return $return;
@@ -62,6 +70,7 @@ class Resource_Model extends DBObject {
   public static function get_message_erreur($num_error) {
     switch($num_error) { 
       case 1 : $return = "Le champ <strong>Name</strong> est obligatoire."; break;
+      case 2 : $return = "Le champ <strong>Public</strong> est obligatoire."; break;
       default: $return = "Erreur de saisie, veuillez vérifier les champs.";
     }
     return $return;
@@ -78,6 +87,7 @@ class Resource_Model extends DBObject {
     $return = array();
 
     $return[] = Member::check_compulsory($this->get_name(), 1);
+    $return[] = Member::check_compulsory($this->get_public(), 2, true);
 
     $return = array_unique($return);
     if(($true_key = array_search(true, $return, true)) !== false) {
@@ -87,15 +97,15 @@ class Resource_Model extends DBObject {
     return $return;
   }
 
-  public function get_player_resource_history_list($player_id = null, $datetime = null) {
+  public function get_player_resource_history_list($player_id = null, $player_order_id = null) {
     $where = '';
     if( ! is_null( $player_id )) $where .= '
 AND `player_id` = '.mysql_ureal_escape_string($player_id);
-    if( ! is_null( $datetime )) $where .= '
-AND `datetime` = '.mysql_ureal_escape_string($datetime);
+    if( ! is_null( $player_order_id )) $where .= '
+AND `player_order_id` = '.mysql_ureal_escape_string($player_order_id);
 
     $sql = '
-SELECT `player_id`, `resource_id`, `datetime`, `delta`, `reason`
+SELECT `player_id`, `resource_id`, `datetime`, `delta`, `reason`, `player_order_id`
 FROM `player_resource_history`
 WHERE `resource_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
     $res = mysql_uquery($sql);
@@ -103,18 +113,18 @@ WHERE `resource_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
     return mysql_fetch_to_array($res);
   }
 
-  public function set_player_resource_history( $player_id, $datetime, $delta, $reason ) {
-    $sql = "REPLACE INTO `player_resource_history` ( `player_id`, `resource_id`, `datetime`, `delta`, `reason` ) VALUES (".mysql_ureal_escape_string( $player_id, $this->get_id(), $datetime, $delta, $reason ).")";
+  public function set_player_resource_history( $player_id, $datetime, $delta, $reason, $player_order_id ) {
+    $sql = "REPLACE INTO `player_resource_history` ( `player_id`, `resource_id`, `datetime`, `delta`, `reason`, `player_order_id` ) VALUES (".mysql_ureal_escape_string( $player_id, $this->get_id(), $datetime, $delta, $reason, $player_order_id ).")";
 
     return mysql_uquery($sql);
   }
 
-  public function del_player_resource_history( $player_id = null, $datetime = null ) {
+  public function del_player_resource_history( $player_id = null, $player_order_id = null ) {
     $where = '';
     if( ! is_null( $player_id )) $where .= '
 AND `player_id` = '.mysql_ureal_escape_string($player_id);
-    if( ! is_null( $datetime )) $where .= '
-AND `datetime` = '.mysql_ureal_escape_string($datetime);
+    if( ! is_null( $player_order_id )) $where .= '
+AND `player_order_id` = '.mysql_ureal_escape_string($player_order_id);
     $sql = 'DELETE FROM `player_resource_history`
     WHERE `resource_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
 

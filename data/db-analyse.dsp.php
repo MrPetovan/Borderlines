@@ -29,8 +29,6 @@
 
   while($row = mysql_fetch_row($res)) $table_name_list[] = $row[0];
 
-  //$table_name_list = array_diff($table_name_list, $reserved_class_list);
-
   // Pour chaque table de la BD
   foreach($table_name_list as $table_name ) {
     // Description
@@ -63,6 +61,7 @@
     while($row = mysql_fetch_assoc($res)) {
       if( $row['Comment'] == '') $row['Comment'] = to_readable($row['Field']);
       if( $row['Key'] == 'PRI' ) $primary_keys[ $table_name ][] = $row['Field'];
+      if( $row['Key'] == 'MUL' ) $primary_keys[ $table_name ][] = $row['Field'];
 
       // Détermination des classes PHP à ajouter
       if( $row['Field'] == 'id' ) {

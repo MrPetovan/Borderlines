@@ -8,11 +8,9 @@
     $tab_error = $<?php echo $class_db_identifier ?>_mod->check_valid();
 
     if($tab_error === true) {
-      $<?php echo $class_db_identifier ?>_mod->db_save();
+      $<?php echo $class_db_identifier ?>_mod->save();
 
-      /*echo '<a href="'.Page::get_page_url(PAGE_CODE, false, array('id' => $<?php echo $class_db_identifier ?>_mod->get_id())).'">Lien '.Page::get_page_url(PAGE_CODE, false, array('id' => $<?php echo $class_db_identifier ?>_mod->get_id())).'</a>';
-      die();*/
-      //page_redirect(PAGE_CODE, array('id' => $<?php echo $class_db_identifier ?>_mod->get_id()));
+      Page::set_message( 'Record successfuly saved' );
     }
   }
 

@@ -1,7 +1,13 @@
 <?php
 
+define('SPY_TIMEOUT', 120);
+
 function spygame( $spy1, $spy2, $value ) {
   $return = null;
+  
+  if( $spy2 == 0 ) {
+    $spy2 = 1;
+  }
   
   $diff = $spy1 - $spy2;
   $diffPercent = 100 * $spy1 / $spy2;

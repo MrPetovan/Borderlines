@@ -24,6 +24,7 @@ foreach( $table_columns as $column_name => $column_props ) {
   switch ($column_props['SimpleType']) {
     case 'datetime':
     case 'time':
+    case 'timestamp':
     case 'date':
       echo '
   public function get_'.$column_name.'()    { return guess_date($this->_'.$column_name.');}';
@@ -43,6 +44,7 @@ foreach( $table_columns as $column_name => $column_props ) {
   switch ($column_props['SimpleType']) {
     case 'datetime':
     case 'time':
+    case 'timestamp':
     case 'date':
       echo '
   public function set_'.$column_name.'($date) { $this->_'.$column_name.' = guess_date($date, GUESS_DATE_MYSQL);}';
@@ -68,17 +70,19 @@ foreach( $table_columns as $column_name => $column_props ) {
 
 <?php
 foreach( $table_columns as $column_name => $column_props ) {
-  if( $column_props['Key'] == 'UNI' )
-      echo '
-  public static function db_get_'.$class_db_identifier.'_by_'.$column_name.'($'.$column_name.') {
+  if( $column_props['Key'] == 'UNI' || $column_props['Key'] == 'MUL' )
+    // public static function db_get_'.$class_db_identifier.'_by_'.$column_name.'($'.$column_name.') {
+    echo '
+  public static function db_get_by_'.$column_name.'($'.$column_name.') {
     $sql = "
 SELECT `id` FROM `".self::get_table_name()."`
-WHERE `'.$column_name.'` LIKE ".mysql_ureal_escape_string($'.$column_name.')."
+WHERE `'.$column_name.'` = ".mysql_ureal_escape_string($'.$column_name.')."
 LIMIT 0,1";
 
     return self::sql_to_object($sql, get_class());
   }';
 } ?>
+
 
   public static function db_get_select_list() {
     $return = array();
@@ -175,8 +179,14 @@ foreach( $table_columns as $column_name => $column_props ) {
 $n = 1;
 foreach( $table_columns as $column_name => $column_props ) {
   if( $column_name != 'id' && $column_props['Null'] == 'NO' ) {
+    $strict = '';
+    switch ($column_props['SimpleType']) {
+      case 'tinyint' :
+        $strict = ', true';
+        break;
+    }
     echo '
-    $return[] = Member::check_compulsory($this->get_'.$column_name.'(), '.$n++.');';
+    $return[] = Member::check_compulsory($this->get_'.$column_name.'(), '.$n++.$strict.');';
   }
 } ?>
 

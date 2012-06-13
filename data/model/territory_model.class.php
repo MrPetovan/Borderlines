@@ -28,6 +28,15 @@ class Territory_Model extends DBObject {
   /* FONCTIONS SQL */
 
 
+  public static function db_get_by_world_id($world_id) {
+    $sql = "
+SELECT `id` FROM `".self::get_table_name()."`
+WHERE `world_id` = ".mysql_ureal_escape_string($world_id)."
+LIMIT 0,1";
+
+    return self::sql_to_object($sql, get_class());
+  }
+
   public static function db_get_select_list() {
     $return = array();
 
@@ -132,32 +141,32 @@ AND `criterion_id` = '.mysql_ureal_escape_string($criterion_id);
 
 
 
-  public function get_territory_neighbour_list($territory_id = null) {
+  public function get_territory_neighbour_list($neighbour_id = null) {
     $where = '';
-    if( ! is_null( $territory_id )) $where .= '
-AND `territory_id` = '.mysql_ureal_escape_string($territory_id);
+    if( ! is_null( $neighbour_id )) $where .= '
+AND `neighbour_id` = '.mysql_ureal_escape_string($neighbour_id);
 
     $sql = '
 SELECT `territory_id`, `neighbour_id`
 FROM `territory_neighbour`
-WHERE `neighbour_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
+WHERE `territory_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
     $res = mysql_uquery($sql);
 
     return mysql_fetch_to_array($res);
   }
 
-  public function set_territory_neighbour( $territory_id ) {
-    $sql = "REPLACE INTO `territory_neighbour` ( `territory_id`, `neighbour_id` ) VALUES (".mysql_ureal_escape_string( $territory_id, $this->get_id() ).")";
+  public function set_territory_neighbour( $neighbour_id ) {
+    $sql = "REPLACE INTO `territory_neighbour` ( `territory_id`, `neighbour_id` ) VALUES (".mysql_ureal_escape_string( $this->get_id(), $neighbour_id ).")";
 
     return mysql_uquery($sql);
   }
 
-  public function del_territory_neighbour( $territory_id = null ) {
+  public function del_territory_neighbour( $neighbour_id = null ) {
     $where = '';
-    if( ! is_null( $territory_id )) $where .= '
-AND `territory_id` = '.mysql_ureal_escape_string($territory_id);
+    if( ! is_null( $neighbour_id )) $where .= '
+AND `neighbour_id` = '.mysql_ureal_escape_string($neighbour_id);
     $sql = 'DELETE FROM `territory_neighbour`
-    WHERE `neighbour_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
+    WHERE `territory_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
 
     return mysql_uquery($sql);
   }

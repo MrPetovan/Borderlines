@@ -17,6 +17,10 @@
             <p class="field">
               <span class="libelle">Class Name</span>
               <span class="value"><?php echo $order_type->get_class_name()?></span>
+            </p>
+            <p class="field">
+              <span class="libelle">Target Player</span>
+              <span class="value"><?php echo $tab_visible[$".$class_db_identifier."->get_".$column_name."()]?></span>
             </p>    </div>
     <p><a href="<?php echo get_page_url('admin_order_type_mod', true, array('id' => $order_type->get_id()))?>">Modifier cet objet Order Type</a></p>
 <?php
