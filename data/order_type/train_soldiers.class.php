@@ -9,6 +9,8 @@
       $parameters = unserialize( $this->get_parameters() );
       
       if( isset( $parameters['count'] ) ) {
+        $game_id = $player->current_game->id;
+        $resource_turn = $player->current_game->current_turn + 1;
         $budget_spent = $parameters['count'];
         
         $return_code = 0;
@@ -24,8 +26,8 @@
         
         $message = 'Training '.$soldiers_trained.' soldiers for -'.$budget_spent;
         
-        $player->set_player_resource_history( 5, guess_date( mktime(), GUESS_DATE_MYSQL ), - $budget_spent, $message, $this->get_id() );
-        $player->set_player_resource_history( 2, guess_date( mktime(), GUESS_DATE_MYSQL ), $soldiers_trained, $message, $this->get_id() );
+        $player->set_player_resource_history( $game_id, 5, $resource_turn, guess_time( mktime(), GUESS_DATE_MYSQL ), - $budget_spent, $message, $this->get_id() );
+        $player->set_player_resource_history( $game_id, 2, $resource_turn, guess_time( mktime(), GUESS_DATE_MYSQL ), $soldiers_trained, $message, $this->get_id() );
         
         $return = true;
       }
@@ -37,6 +39,13 @@
       return $return;
     }
     
+    /**
+     * Generate HTML form for the action
+     * Mandatory parameters :
+     * - page_code (string) : The page code where the form is displayed
+     * Optional parameters :
+     * - page_params (array) : Current page parameters where the form is displayed
+     */
     public static function get_html_form( $params ) {
       $title = 'Train soldiers';
 

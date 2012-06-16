@@ -45,11 +45,11 @@
       </p>
       <p class="field">
         <span class="libelle">Date inscription</span>
-        <span class="value"><?php echo guess_date($member->get_date_inscription(), GUESS_DATE_FR)?></span>
+        <span class="value"><?php echo guess_time($member->get_date_inscription(), GUESS_DATE_FR)?></span>
       </p>
       <p class="field">
         <span class="libelle">Date de naissance</span>
-        <span class="value"><?php echo guess_date($member->get_date_naissance(), GUESS_DATE_FR)?></span>
+        <span class="value"><?php echo guess_time($member->get_date_naissance(), GUESS_DATE_FR)?></span>
       </p>
       <p class="field">
         <span class="libelle">Origine</span>

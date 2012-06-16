@@ -30,7 +30,7 @@
       case 'del_<?php echo $sub_table?>':
         $<?php echo $class_db_identifier ?> = <?php echo $class_php_identifier ?>::instance( getValue('<?php echo $class_db_identifier ?>_id') );
         if( $<?php echo $class_db_identifier ?>->id ) {
-          $flag_del_<?php echo $sub_table?> = $matchup->del_<?php echo $sub_table?>(<?php
+          $flag_del_<?php echo $sub_table?> = $<?php echo $class_db_identifier ?>->del_<?php echo $sub_table?>(<?php
     $param_list = array();
     foreach( $sub_table_pk_clean as $field_name ) {
       $param_list[] = '

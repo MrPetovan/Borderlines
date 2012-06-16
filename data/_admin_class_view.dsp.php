@@ -48,7 +48,7 @@ foreach( $table_columns as $column_name => $column_props ) {
           echo '
             <p class="field">
               <span class="libelle">'.$column_props['Comment'].'</span>
-              <span class="value"><?php echo guess_date($'.$class_db_identifier.'->get_'.$column_name.'(), GUESS_DATE_FR)?></span>
+              <span class="value"><?php echo guess_time($'.$class_db_identifier.'->get_'.$column_name.'(), GUESS_DATE_FR)?></span>
             </p>';
           break;
         case 'tinyint' :

@@ -6,11 +6,15 @@
 
 class Player_Order_Model extends DBObject {
   // Champs BD
+  protected $_game_id = null;
   protected $_order_type_id = null;
   protected $_player_id = null;
   protected $_datetime_order = null;
   protected $_datetime_scheduled = null;
   protected $_datetime_execution = null;
+  protected $_turn_ordered = null;
+  protected $_turn_scheduled = null;
+  protected $_turn_executed = null;
   protected $_parameters = null;
   protected $_return = null;
 
@@ -21,13 +25,16 @@ class Player_Order_Model extends DBObject {
   /* ACCESSEURS */
   public static function get_table_name() { return "player_order"; }
 
-  public function get_datetime_order()    { return guess_date($this->_datetime_order);}
-  public function get_datetime_scheduled()    { return guess_date($this->_datetime_scheduled);}
-  public function get_datetime_execution()    { return guess_date($this->_datetime_execution);}
+  public function get_datetime_order()    { return guess_time($this->_datetime_order);}
+  public function get_datetime_scheduled()    { return guess_time($this->_datetime_scheduled);}
+  public function get_datetime_execution()    { return guess_time($this->_datetime_execution);}
 
   /* MUTATEURS */
   public function set_id($id) {
     if( is_numeric($id) && (int)$id == $id) $data = intval($id); else $data = null; $this->_id = $data;
+  }
+  public function set_game_id($game_id) {
+    if( is_numeric($game_id) && (int)$game_id == $game_id) $data = intval($game_id); else $data = null; $this->_game_id = $data;
   }
   public function set_order_type_id($order_type_id) {
     if( is_numeric($order_type_id) && (int)$order_type_id == $order_type_id) $data = intval($order_type_id); else $data = null; $this->_order_type_id = $data;
@@ -35,9 +42,18 @@ class Player_Order_Model extends DBObject {
   public function set_player_id($player_id) {
     if( is_numeric($player_id) && (int)$player_id == $player_id) $data = intval($player_id); else $data = null; $this->_player_id = $data;
   }
-  public function set_datetime_order($date) { $this->_datetime_order = guess_date($date, GUESS_DATE_MYSQL);}
-  public function set_datetime_scheduled($date) { $this->_datetime_scheduled = guess_date($date, GUESS_DATE_MYSQL);}
-  public function set_datetime_execution($date) { $this->_datetime_execution = guess_date($date, GUESS_DATE_MYSQL);}
+  public function set_datetime_order($date) { $this->_datetime_order = guess_time($date, GUESS_DATE_MYSQL);}
+  public function set_datetime_scheduled($date) { $this->_datetime_scheduled = guess_time($date, GUESS_DATE_MYSQL);}
+  public function set_datetime_execution($date) { $this->_datetime_execution = guess_time($date, GUESS_DATE_MYSQL);}
+  public function set_turn_ordered($turn_ordered) {
+    if( is_numeric($turn_ordered) && (int)$turn_ordered == $turn_ordered) $data = intval($turn_ordered); else $data = null; $this->_turn_ordered = $data;
+  }
+  public function set_turn_scheduled($turn_scheduled) {
+    if( is_numeric($turn_scheduled) && (int)$turn_scheduled == $turn_scheduled) $data = intval($turn_scheduled); else $data = null; $this->_turn_scheduled = $data;
+  }
+  public function set_turn_executed($turn_executed) {
+    if( is_numeric($turn_executed) && (int)$turn_executed == $turn_executed) $data = intval($turn_executed); else $data = null; $this->_turn_executed = $data;
+  }
   public function set_return($return) {
     if( is_numeric($return) && (int)$return == $return) $data = intval($return); else $data = null; $this->_return = $data;
   }
@@ -45,6 +61,14 @@ class Player_Order_Model extends DBObject {
   /* FONCTIONS SQL */
 
 
+  public static function db_get_by_game_id($game_id) {
+    $sql = "
+SELECT `id` FROM `".self::get_table_name()."`
+WHERE `game_id` = ".mysql_ureal_escape_string($game_id)."
+LIMIT 0,1";
+
+    return self::sql_to_object($sql, get_class());
+  }
   public static function db_get_by_order_type_id($order_type_id) {
     $sql = "
 SELECT `id` FROM `".self::get_table_name()."`
@@ -85,6 +109,13 @@ LIMIT 0,1";
       <legend>Text fields</legend>
         '.HTMLHelper::genererInputHidden('id', $this->get_id()).'';
       $option_list = array();
+      $game_list = Game::db_get_all();
+      foreach( $game_list as $game)
+        $option_list[ $game->id ] = $game->name;
+
+      $return .= '
+      <p class="field">'.HTMLHelper::genererSelect('game_id', $option_list, $this->get_game_id(), array(), "Game Id *").'<a href="'.get_page_url('admin_game_mod').'">Créer un objet Game</a></p>';
+      $option_list = array();
       $order_type_list = Order_Type::db_get_all();
       foreach( $order_type_list as $order_type)
         $option_list[ $order_type->id ] = $order_type->name;
@@ -101,6 +132,9 @@ LIMIT 0,1";
         <p class="field">'.HTMLHelper::genererInputText('datetime_order', $this->get_datetime_order(), array(), "Datetime Order *").'</p>
         <p class="field">'.HTMLHelper::genererInputText('datetime_scheduled', $this->get_datetime_scheduled(), array(), "Datetime Scheduled *").'</p>
         <p class="field">'.HTMLHelper::genererInputText('datetime_execution', $this->get_datetime_execution(), array(), "Datetime Execution").'</p>
+        <p class="field">'.HTMLHelper::genererInputText('turn_ordered', $this->get_turn_ordered(), array(), "Turn Ordered *").'</p>
+        <p class="field">'.HTMLHelper::genererInputText('turn_scheduled', $this->get_turn_scheduled(), array(), "Turn Scheduled *").'</p>
+        <p class="field">'.HTMLHelper::genererInputText('turn_executed', $this->get_turn_executed(), array(), "Turn Executed").'</p>
         <p class="field">'.HTMLHelper::genererInputText('parameters', $this->get_parameters(), array(), "Parameters").'</p>
         <p class="field">'.HTMLHelper::genererInputText('return', $this->get_return(), array(), "Return").'</p>
     </fieldset>';
@@ -117,10 +151,13 @@ LIMIT 0,1";
  */
   public static function get_message_erreur($num_error) {
     switch($num_error) { 
-      case 1 : $return = "Le champ <strong>Order Type Id</strong> est obligatoire."; break;
-      case 2 : $return = "Le champ <strong>Player Id</strong> est obligatoire."; break;
-      case 3 : $return = "Le champ <strong>Datetime Order</strong> est obligatoire."; break;
-      case 4 : $return = "Le champ <strong>Datetime Scheduled</strong> est obligatoire."; break;
+      case 1 : $return = "Le champ <strong>Game Id</strong> est obligatoire."; break;
+      case 2 : $return = "Le champ <strong>Order Type Id</strong> est obligatoire."; break;
+      case 3 : $return = "Le champ <strong>Player Id</strong> est obligatoire."; break;
+      case 4 : $return = "Le champ <strong>Datetime Order</strong> est obligatoire."; break;
+      case 5 : $return = "Le champ <strong>Datetime Scheduled</strong> est obligatoire."; break;
+      case 6 : $return = "Le champ <strong>Turn Ordered</strong> est obligatoire."; break;
+      case 7 : $return = "Le champ <strong>Turn Scheduled</strong> est obligatoire."; break;
       default: $return = "Erreur de saisie, veuillez vérifier les champs.";
     }
     return $return;
@@ -136,10 +173,13 @@ LIMIT 0,1";
   public function check_valid($flags = 0) {
     $return = array();
 
-    $return[] = Member::check_compulsory($this->get_order_type_id(), 1);
-    $return[] = Member::check_compulsory($this->get_player_id(), 2);
-    $return[] = Member::check_compulsory($this->get_datetime_order(), 3);
-    $return[] = Member::check_compulsory($this->get_datetime_scheduled(), 4);
+    $return[] = Member::check_compulsory($this->get_game_id(), 1);
+    $return[] = Member::check_compulsory($this->get_order_type_id(), 2);
+    $return[] = Member::check_compulsory($this->get_player_id(), 3);
+    $return[] = Member::check_compulsory($this->get_datetime_order(), 4);
+    $return[] = Member::check_compulsory($this->get_datetime_scheduled(), 5);
+    $return[] = Member::check_compulsory($this->get_turn_ordered(), 6);
+    $return[] = Member::check_compulsory($this->get_turn_scheduled(), 7);
 
     $return = array_unique($return);
     if(($true_key = array_search(true, $return, true)) !== false) {
@@ -149,15 +189,17 @@ LIMIT 0,1";
     return $return;
   }
 
-  public function get_player_resource_history_list($player_id = null, $resource_id = null) {
+  public function get_player_resource_history_list($game_id = null, $player_id = null, $resource_id = null) {
     $where = '';
+    if( ! is_null( $game_id )) $where .= '
+AND `game_id` = '.mysql_ureal_escape_string($game_id);
     if( ! is_null( $player_id )) $where .= '
 AND `player_id` = '.mysql_ureal_escape_string($player_id);
     if( ! is_null( $resource_id )) $where .= '
 AND `resource_id` = '.mysql_ureal_escape_string($resource_id);
 
     $sql = '
-SELECT `player_id`, `resource_id`, `datetime`, `delta`, `reason`, `player_order_id`
+SELECT `game_id`, `player_id`, `resource_id`, `turn`, `datetime`, `delta`, `reason`, `player_order_id`
 FROM `player_resource_history`
 WHERE `player_order_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
     $res = mysql_uquery($sql);
@@ -165,14 +207,16 @@ WHERE `player_order_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
     return mysql_fetch_to_array($res);
   }
 
-  public function set_player_resource_history( $player_id, $resource_id, $datetime, $delta, $reason ) {
-    $sql = "REPLACE INTO `player_resource_history` ( `player_id`, `resource_id`, `datetime`, `delta`, `reason`, `player_order_id` ) VALUES (".mysql_ureal_escape_string( $player_id, $resource_id, $datetime, $delta, $reason, $this->get_id() ).")";
+  public function set_player_resource_history( $game_id, $player_id, $resource_id, $turn, $datetime, $delta, $reason ) {
+    $sql = "REPLACE INTO `player_resource_history` ( `game_id`, `player_id`, `resource_id`, `turn`, `datetime`, `delta`, `reason`, `player_order_id` ) VALUES (".mysql_ureal_escape_string( $game_id, $player_id, $resource_id, $turn, $datetime, $delta, $reason, $this->get_id() ).")";
 
     return mysql_uquery($sql);
   }
 
-  public function del_player_resource_history( $player_id = null, $resource_id = null ) {
+  public function del_player_resource_history( $game_id = null, $player_id = null, $resource_id = null ) {
     $where = '';
+    if( ! is_null( $game_id )) $where .= '
+AND `game_id` = '.mysql_ureal_escape_string($game_id);
     if( ! is_null( $player_id )) $where .= '
 AND `player_id` = '.mysql_ureal_escape_string($player_id);
     if( ! is_null( $resource_id )) $where .= '

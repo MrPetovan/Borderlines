@@ -118,15 +118,49 @@ LIMIT 0,1";
     return $return;
   }
 
-  public function get_player_resource_history_list($resource_id = null, $player_order_id = null) {
+  public function get_game_player_list($game_id = null) {
     $where = '';
+    if( ! is_null( $game_id )) $where .= '
+AND `game_id` = '.mysql_ureal_escape_string($game_id);
+
+    $sql = '
+SELECT `game_id`, `player_id`
+FROM `game_player`
+WHERE `player_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
+    $res = mysql_uquery($sql);
+
+    return mysql_fetch_to_array($res);
+  }
+
+  public function set_game_player( $game_id ) {
+    $sql = "REPLACE INTO `game_player` ( `game_id`, `player_id` ) VALUES (".mysql_ureal_escape_string( $game_id, $this->get_id() ).")";
+
+    return mysql_uquery($sql);
+  }
+
+  public function del_game_player( $game_id = null ) {
+    $where = '';
+    if( ! is_null( $game_id )) $where .= '
+AND `game_id` = '.mysql_ureal_escape_string($game_id);
+    $sql = 'DELETE FROM `game_player`
+    WHERE `player_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
+
+    return mysql_uquery($sql);
+  }
+
+
+
+  public function get_player_resource_history_list($game_id = null, $resource_id = null, $player_order_id = null) {
+    $where = '';
+    if( ! is_null( $game_id )) $where .= '
+AND `game_id` = '.mysql_ureal_escape_string($game_id);
     if( ! is_null( $resource_id )) $where .= '
 AND `resource_id` = '.mysql_ureal_escape_string($resource_id);
     if( ! is_null( $player_order_id )) $where .= '
 AND `player_order_id` = '.mysql_ureal_escape_string($player_order_id);
 
     $sql = '
-SELECT `player_id`, `resource_id`, `datetime`, `delta`, `reason`, `player_order_id`
+SELECT `game_id`, `player_id`, `resource_id`, `turn`, `datetime`, `delta`, `reason`, `player_order_id`
 FROM `player_resource_history`
 WHERE `player_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
     $res = mysql_uquery($sql);
@@ -134,14 +168,16 @@ WHERE `player_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
     return mysql_fetch_to_array($res);
   }
 
-  public function set_player_resource_history( $resource_id, $datetime, $delta, $reason, $player_order_id ) {
-    $sql = "REPLACE INTO `player_resource_history` ( `player_id`, `resource_id`, `datetime`, `delta`, `reason`, `player_order_id` ) VALUES (".mysql_ureal_escape_string( $this->get_id(), $resource_id, $datetime, $delta, $reason, $player_order_id ).")";
+  public function set_player_resource_history( $game_id, $resource_id, $turn, $datetime, $delta, $reason, $player_order_id ) {
+    $sql = "REPLACE INTO `player_resource_history` ( `game_id`, `player_id`, `resource_id`, `turn`, `datetime`, `delta`, `reason`, `player_order_id` ) VALUES (".mysql_ureal_escape_string( $game_id, $this->get_id(), $resource_id, $turn, $datetime, $delta, $reason, $player_order_id ).")";
 
     return mysql_uquery($sql);
   }
 
-  public function del_player_resource_history( $resource_id = null, $player_order_id = null ) {
+  public function del_player_resource_history( $game_id = null, $resource_id = null, $player_order_id = null ) {
     $where = '';
+    if( ! is_null( $game_id )) $where .= '
+AND `game_id` = '.mysql_ureal_escape_string($game_id);
     if( ! is_null( $resource_id )) $where .= '
 AND `resource_id` = '.mysql_ureal_escape_string($resource_id);
     if( ! is_null( $player_order_id )) $where .= '
@@ -154,15 +190,17 @@ AND `player_order_id` = '.mysql_ureal_escape_string($player_order_id);
 
 
 
-  public function get_player_spygame_value_list($value_guid = null, $datetime = null) {
+  public function get_player_spygame_value_list($game_id = null, $value_guid = null, $turn = null) {
     $where = '';
+    if( ! is_null( $game_id )) $where .= '
+AND `game_id` = '.mysql_ureal_escape_string($game_id);
     if( ! is_null( $value_guid )) $where .= '
 AND `value_guid` = '.mysql_ureal_escape_string($value_guid);
-    if( ! is_null( $datetime )) $where .= '
-AND `datetime` = '.mysql_ureal_escape_string($datetime);
+    if( ! is_null( $turn )) $where .= '
+AND `turn` = '.mysql_ureal_escape_string($turn);
 
     $sql = '
-SELECT `player_id`, `value_guid`, `datetime`, `real_value`, `masked_value`
+SELECT `game_id`, `player_id`, `value_guid`, `turn`, `datetime`, `real_value`, `masked_value`
 FROM `player_spygame_value`
 WHERE `player_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
     $res = mysql_uquery($sql);
@@ -170,18 +208,20 @@ WHERE `player_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
     return mysql_fetch_to_array($res);
   }
 
-  public function set_player_spygame_value( $value_guid, $datetime, $real_value, $masked_value ) {
-    $sql = "REPLACE INTO `player_spygame_value` ( `player_id`, `value_guid`, `datetime`, `real_value`, `masked_value` ) VALUES (".mysql_ureal_escape_string( $this->get_id(), $value_guid, $datetime, $real_value, $masked_value ).")";
+  public function set_player_spygame_value( $game_id, $value_guid, $turn, $datetime, $real_value, $masked_value ) {
+    $sql = "REPLACE INTO `player_spygame_value` ( `game_id`, `player_id`, `value_guid`, `turn`, `datetime`, `real_value`, `masked_value` ) VALUES (".mysql_ureal_escape_string( $game_id, $this->get_id(), $value_guid, $turn, $datetime, $real_value, $masked_value ).")";
 
     return mysql_uquery($sql);
   }
 
-  public function del_player_spygame_value( $value_guid = null, $datetime = null ) {
+  public function del_player_spygame_value( $game_id = null, $value_guid = null, $turn = null ) {
     $where = '';
+    if( ! is_null( $game_id )) $where .= '
+AND `game_id` = '.mysql_ureal_escape_string($game_id);
     if( ! is_null( $value_guid )) $where .= '
 AND `value_guid` = '.mysql_ureal_escape_string($value_guid);
-    if( ! is_null( $datetime )) $where .= '
-AND `datetime` = '.mysql_ureal_escape_string($datetime);
+    if( ! is_null( $turn )) $where .= '
+AND `turn` = '.mysql_ureal_escape_string($turn);
     $sql = 'DELETE FROM `player_spygame_value`
     WHERE `player_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
 

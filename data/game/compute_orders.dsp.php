@@ -1,7 +1,19 @@
 <?php
-  
+  if( is_null( $game_id = getValue('id') ) ) {
+?>
+<ul>
+<?php
+  foreach( $game_list as $game ) {
+    echo '
+  <li><a href="'.Page::get_page_url(PAGE_CODE, false, array('id' => $game->id)).'">'.$game->name.'</a></li>';
+  }
+?>
+</ul>
+<?php
+  }else {
 ?>
 <h2>Compute orders</h2>
+<h2>Game <?php echo $game->name?></h2>
 <table border="1">
   <tr>
     <th>Id</th>
@@ -85,5 +97,6 @@
     </td>
   </tr>
 </table>
-<p><a href="<?php echo Page::get_page_url( PAGE_CODE, false, array('action' => 'init' ) )?>">Init game</a></p>
-<p><a href="<?php echo Page::get_page_url( PAGE_CODE, false, array('action' => 'compute' ) )?>">Compute orders</a></p>
+<p><a href="<?php echo Page::get_page_url( PAGE_CODE, false, array('action' => 'init', 'id' => $game->id ) )?>">Init game</a></p>
+<p><a href="<?php echo Page::get_page_url( PAGE_CODE, false, array('action' => 'compute', 'id' => $game->id ) )?>">Compute orders</a></p>
+<?php } ?>

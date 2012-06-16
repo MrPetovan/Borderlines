@@ -41,8 +41,7 @@
           $spied = $current_player->get_spied_value(
             'player'.$player->get_id().'-resource'.$resource->get_id(),
             $player,
-            $player->get_resource_sum( $resource->get_id() ),
-            SPY_TIMEOUT
+            $player->get_resource_sum( $resource->get_id() )
           );
 
           $value = $spied['masked_value'];

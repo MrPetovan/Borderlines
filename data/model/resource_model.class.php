@@ -97,15 +97,17 @@ class Resource_Model extends DBObject {
     return $return;
   }
 
-  public function get_player_resource_history_list($player_id = null, $player_order_id = null) {
+  public function get_player_resource_history_list($game_id = null, $player_id = null, $player_order_id = null) {
     $where = '';
+    if( ! is_null( $game_id )) $where .= '
+AND `game_id` = '.mysql_ureal_escape_string($game_id);
     if( ! is_null( $player_id )) $where .= '
 AND `player_id` = '.mysql_ureal_escape_string($player_id);
     if( ! is_null( $player_order_id )) $where .= '
 AND `player_order_id` = '.mysql_ureal_escape_string($player_order_id);
 
     $sql = '
-SELECT `player_id`, `resource_id`, `datetime`, `delta`, `reason`, `player_order_id`
+SELECT `game_id`, `player_id`, `resource_id`, `turn`, `datetime`, `delta`, `reason`, `player_order_id`
 FROM `player_resource_history`
 WHERE `resource_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
     $res = mysql_uquery($sql);
@@ -113,14 +115,16 @@ WHERE `resource_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
     return mysql_fetch_to_array($res);
   }
 
-  public function set_player_resource_history( $player_id, $datetime, $delta, $reason, $player_order_id ) {
-    $sql = "REPLACE INTO `player_resource_history` ( `player_id`, `resource_id`, `datetime`, `delta`, `reason`, `player_order_id` ) VALUES (".mysql_ureal_escape_string( $player_id, $this->get_id(), $datetime, $delta, $reason, $player_order_id ).")";
+  public function set_player_resource_history( $game_id, $player_id, $turn, $datetime, $delta, $reason, $player_order_id ) {
+    $sql = "REPLACE INTO `player_resource_history` ( `game_id`, `player_id`, `resource_id`, `turn`, `datetime`, `delta`, `reason`, `player_order_id` ) VALUES (".mysql_ureal_escape_string( $game_id, $player_id, $this->get_id(), $turn, $datetime, $delta, $reason, $player_order_id ).")";
 
     return mysql_uquery($sql);
   }
 
-  public function del_player_resource_history( $player_id = null, $player_order_id = null ) {
+  public function del_player_resource_history( $game_id = null, $player_id = null, $player_order_id = null ) {
     $where = '';
+    if( ! is_null( $game_id )) $where .= '
+AND `game_id` = '.mysql_ureal_escape_string($game_id);
     if( ! is_null( $player_id )) $where .= '
 AND `player_id` = '.mysql_ureal_escape_string($player_id);
     if( ! is_null( $player_order_id )) $where .= '

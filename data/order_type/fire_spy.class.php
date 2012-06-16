@@ -9,6 +9,8 @@
       $parameters = unserialize( $this->get_parameters() );
       
       if( isset( $parameters['count'] ) ) {
+        $game_id = $player->current_game->id;
+        $resource_turn = $player->current_game->current_turn + 1;
         $spies_fired = $parameters['count'];
         
         $return_code = 0;
@@ -24,8 +26,8 @@
         
         $message = 'Firing '.$spies_fired.' spies for +'.$budget_gained;
         
-        $player->set_player_resource_history( 3, guess_date( mktime(), GUESS_DATE_MYSQL ), - $spies_fired, $message, $this->get_id() );
-        $player->set_player_resource_history( 5, guess_date( mktime(), GUESS_DATE_MYSQL ), $budget_gained, $message, $this->get_id() );
+        $player->set_player_resource_history( $game_id, 3, $resource_turn, guess_time( mktime(), GUESS_DATE_MYSQL ), - $spies_fired, $message, $this->get_id() );
+        $player->set_player_resource_history( $game_id, 5, $resource_turn, guess_time( mktime(), GUESS_DATE_MYSQL ), $budget_gained, $message, $this->get_id() );
         
         $return = true;
       }
@@ -37,6 +39,13 @@
       return $return;
     }
     
+    /**
+     * Generate HTML form for the action
+     * Mandatory parameters :
+     * - page_code (string) : The page code where the form is displayed
+     * Optional parameters :
+     * - page_params (array) : Current page parameters where the form is displayed
+     */
     public static function get_html_form( $params ) {
       $title = 'Dismiss spies';
       

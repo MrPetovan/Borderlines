@@ -4,7 +4,6 @@
   $current_player = array_shift( $player_list );
 
   if( $action = getValue('action') ) {
-  
     if( $action == "cancel" ) {
       if( $player_order_id = getValue('id') ) {
         $player_order = Player_Order::instance( $player_order_id );
@@ -14,9 +13,11 @@
           $class = $order_type->class_name;
           require_once(DATA.'order_type/'.$class.'.class.php');
           $player_order = $class::instance($player_order->get_id());
-          $player_order->cancel();
-          
-          Page::set_message('Order successfuly canceled');
+          if( $player_order->cancel() ) {
+            Page::set_message('Order successfuly canceled');
+          }else {
+            Page::set_message( 'Error while canceling order', Page::PAGE_MESSAGE_ERROR );
+          }          
         }else {
           Page::set_message( 'Error while canceling order', Page::PAGE_MESSAGE_ERROR );
         }

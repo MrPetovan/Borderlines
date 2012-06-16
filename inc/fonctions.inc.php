@@ -367,7 +367,7 @@ define("GUESS_DATE_FR", 3);
    * @param mixed $date
    */
 function guess_date($date, $return_flag = GUESS_DATE_TIMESTAMP) {
-  $return = false;
+  $return = null;
   $data_input = false;
   static $array_actions = array(
     GUESS_DATE_TIMESTAMP => array(
@@ -396,7 +396,7 @@ function guess_date($date, $return_flag = GUESS_DATE_TIMESTAMP) {
       $data_input = false;
     }
   }
-
+  
   if($data_input !== false) {
     $return = $date;
     if(isset($array_actions[$data_input][$return_flag])) {
@@ -412,7 +412,7 @@ function guess_date($date, $return_flag = GUESS_DATE_TIMESTAMP) {
       }
     }
   }
-  //var_debug('guess_date', $date, $return);
+  //var_debug('guess_time', $date, $return);
   return $return;
 }
 
@@ -426,7 +426,7 @@ define("GUESS_TIME_FR", 3);
    * @param mixed $date
    */
 function guess_time($date, $return_flag = GUESS_TIME_TIMESTAMP) {
-  $return = false;
+  $return = null;
   $data_input = false;
   static $array_actions = array(
     GUESS_TIME_TIMESTAMP => array(

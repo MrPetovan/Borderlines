@@ -14,7 +14,7 @@
       case 'del_territory_criterion':
         $territory = Territory::instance( getValue('territory_id') );
         if( $territory->id ) {
-          $flag_del_territory_criterion = $matchup->del_territory_criterion(
+          $flag_del_territory_criterion = $territory->del_territory_criterion(
             getValue('criterion_id')
           );
         }
@@ -30,7 +30,7 @@
       case 'del_territory_neighbour':
         $territory = Territory::instance( getValue('territory_id') );
         if( $territory->id ) {
-          $flag_del_territory_neighbour = $matchup->del_territory_neighbour(
+          $flag_del_territory_neighbour = $territory->del_territory_neighbour(
             getValue('neighbour_id')
           );
         }
@@ -46,7 +46,7 @@
       case 'del_territory_vertex':
         $territory = Territory::instance( getValue('territory_id') );
         if( $territory->id ) {
-          $flag_del_territory_vertex = $matchup->del_territory_vertex(
+          $flag_del_territory_vertex = $territory->del_territory_vertex(
             getValue('vertex_id')
           );
         }

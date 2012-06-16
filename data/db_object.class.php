@@ -569,7 +569,7 @@ WHERE `id` = ".mysql_ureal_escape_string($this->get_id());
         $sql_name = '_'.$name;
         
         if($name != "id" && property_exists( $this, $sql_name ) ) {
-          $this->__set($name, $value);
+          $this->$name = $value;
         }
       }
     }
@@ -638,7 +638,7 @@ WHERE `id` = ".mysql_ureal_escape_string($this->get_id());
      */
     public static function check_birthdate($date, $code_erreur = false) {
       $return = $code_erreur;
-      $date = guess_date($date);
+      $date = guess_time($date);
       if($date) {
         $date_array = getdate($date);
         if(is_array($date_array)) {

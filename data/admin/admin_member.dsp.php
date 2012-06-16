@@ -47,7 +47,7 @@
           <td><a href="'.htmlentities_utf8(get_page_url('admin_member_view', true, array('id' => $member->get_id()))).'">'.$member->get_prenom().' '.$member->get_nom().'</a></td>
           <td>'.$member->get_email().'</td>
           <td>'.$tab_level[$member->get_niveau()].'</td>
-          <td>'.guess_date($member->get_date_inscription(), GUESS_DATE_FR).'</td>
+          <td>'.guess_time($member->get_date_inscription(), GUESS_DATE_FR).'</td>
           <td><a href="'.htmlentities_utf8(get_page_url('admin_member_mod', true, array('id' => $member->get_id()))).'"><img src="'.IMG.'img_html/pencil.png" alt="Modifier" title="Modifier"/></a></td>
         </tr>';
     }

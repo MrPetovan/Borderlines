@@ -75,16 +75,16 @@ class Member extends DBObject {
 
   public function get_name()    { return $this->_prenom.' '.$this->nom;}
 
-  public function get_date_naissance()    { return guess_date($this->_date_naissance);}
-  public function get_date_inscription()  { return guess_date($this->_date_inscription);}
-  public function get_date_connexion()    { return guess_date($this->_date_connexion);}
+  public function get_date_naissance()    { return guess_time($this->_date_naissance);}
+  public function get_date_inscription()  { return guess_time($this->_date_inscription);}
+  public function get_date_connexion()    { return guess_time($this->_date_connexion);}
 
   public function is_visible() { return ($this->visible == 1); }
 
   /* MUTATEURS */
-  public function set_date_naissance($date) { $this->_date_naissance = guess_date($date, GUESS_DATE_MYSQL);}
-  public function set_date_inscription($date) { $this->_date_inscription = guess_date($date, GUESS_DATE_MYSQL);}
-  public function set_date_connexion($date) { $this->_date_connexion = guess_date($date, GUESS_DATE_MYSQL);}
+  public function set_date_naissance($date) { $this->_date_naissance = guess_time($date, GUESS_DATE_MYSQL);}
+  public function set_date_inscription($date) { $this->_date_inscription = guess_time($date, GUESS_DATE_MYSQL);}
+  public function set_date_connexion($date) { $this->_date_connexion = guess_time($date, GUESS_DATE_MYSQL);}
 
   public function set_password($password, $is_crypted = true) {
     if($is_crypted) {

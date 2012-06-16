@@ -14,14 +14,13 @@
       $spied = $current_player->get_spied_value(
         'player'.$player->get_id().'-resource'.$resource->get_id(),
         $player,
-        $player->get_resource_sum( $resource->get_id() ),
-        SPY_TIMEOUT
+        $player->get_resource_sum( $resource->get_id() )
       );
 
       $value = $spied['masked_value'];
       
       echo '
-  <li>'.$resource->get_name().' : '.(is_null( $value )?'N/C':$value).' ('.guess_time( $spied['datetime'], GUESS_TIME_FR ).')</li>';
+  <li>'.$resource->get_name().' : '.(is_null( $value )?'N/C':$value).($spied['turn'] ?' (Turn '.$spied['turn'].')':'').'</li>';
     }
   }
 ?>
@@ -80,7 +79,7 @@
 <h3>Orders</h3>
 <h4>Orders planned</h4>
 <?php
-  $orders = Player_Order::db_get_planned_by_player_id( $player->get_id() );
+  $orders = Player_Order::db_get_planned_by_player_id( $player->get_id(), $player->current_game->id );
 ?>
 <table>
   <tr>

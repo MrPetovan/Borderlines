@@ -13,9 +13,8 @@ class Attack extends Player_Order {
       
       $params['count'] = $soldiers_sent;
     }
-
     $message = 'Sending '.$soldiers_sent.' soldiers to attack '.$defending_player->name;
-    $attacking_player->set_player_resource_history( 2, guess_date( mktime(), GUESS_DATE_MYSQL ), - $soldiers_sent, $message, $this->id );
+    $attacking_player->set_player_resource_history( $attacking_player->current_game->id, 2, $attacking_player->current_game->current_turn, guess_time( mktime(), GUESS_DATE_MYSQL ), - $soldiers_sent, $message, $this->id );
     
     $this->parameters = serialize( $params );
     
@@ -36,9 +35,12 @@ class Attack extends Player_Order {
       $defending_player = Player::instance( $parameters['player_id'] );
       
       if( $defending_player ) {
+        $game_id = $attacking_player->current_game->id;
+        $resource_turn = $attacking_player->current_game->current_turn + 1;
+      
+      
         $return_code = 0;
-      
-      
+
         $soldiers_sent = $parameters['count'];
         
         $soldiers_defending = $defending_player->get_resource_sum( 2 );
@@ -76,10 +78,10 @@ class Attack extends Player_Order {
         $attacker_message = 'Attacking '.$defending_player->get_name().' with '.$soldiers_sent.' soldiers : '.$attacker_losses.' losses, '.$soldiers_returned.' returned, '.$territory_gained.' territory gained';
         $defender_message = 'Defending against '.$attacking_player->get_name().' with '.$soldiers_defending.' soldiers : '.$defender_losses.' losses, '.$territory_gained.' territory lost';
 
-        $attacking_player->set_player_resource_history( 2, guess_date( mktime(), GUESS_DATE_MYSQL ), max( 0, $soldiers_returned ), $attacker_message, $this->get_id() );
-        $attacking_player->set_player_resource_history( 4, guess_date( mktime(), GUESS_DATE_MYSQL ), $territory_gained, $attacker_message, $this->get_id() );
-        $defending_player->set_player_resource_history( 2, guess_date( mktime(), GUESS_DATE_MYSQL ), - min( $defender_losses, $soldiers_defending ), $defender_message, $this->get_id() );
-        $defending_player->set_player_resource_history( 4, guess_date( mktime(), GUESS_DATE_MYSQL ), - $territory_gained, $defender_message, $this->get_id() );
+        $attacking_player->set_player_resource_history( $game_id, 2, $resource_turn, guess_time( mktime(), GUESS_DATE_MYSQL ), max( 0, $soldiers_returned ), $attacker_message, $this->get_id() );
+        $attacking_player->set_player_resource_history( $game_id, 4, $resource_turn, guess_time( mktime(), GUESS_DATE_MYSQL ), $territory_gained, $attacker_message, $this->get_id() );
+        $defending_player->set_player_resource_history( $game_id, 2, $resource_turn, guess_time( mktime(), GUESS_DATE_MYSQL ), - min( $defender_losses, $soldiers_defending ), $defender_message, $this->get_id() );
+        $defending_player->set_player_resource_history( $game_id, 4, $resource_turn, guess_time( mktime(), GUESS_DATE_MYSQL ), - $territory_gained, $defender_message, $this->get_id() );
         
         $return = true;
       }
@@ -92,6 +94,15 @@ class Attack extends Player_Order {
     return $return;
   }
   
+  /**
+   * Generate HTML form for the action
+   * Mandatory parameters :
+   * - current_player (Player) : The player attacking
+   * - page_code (string) : The page code where the form is displayed
+   * Optional parameters :
+   * - target_player (Player) : The player attacked
+   * - page_params (array) : Current page parameters where the form is displayed
+   */
   public static function get_html_form( $params ) {
     $title = 'Attack a player';
     
@@ -103,10 +114,13 @@ class Attack extends Player_Order {
     if( isset( $params['page_params'] ) ) {
       $page_params = $params['page_params'];
     }
-
-    $player_list = Player::db_get_select_list();
-    if( isset( $params['current_player'] ) ) {
-      $player_list = array_diff_assoc( $player_list, array( $params['current_player']->get_id() => $params['current_player']->get_name() ) );
+    
+    $game = $params['current_player']->get_current_game();
+    $game_player_list = $game->get_game_player_list( );
+    foreach( $game_player_list as $game_player ) {
+      if( $game_player['player_id'] == $params['current_player']->id ) continue;
+      $player = Player::instance( $game_player['player_id'] );
+      $player_list[  $player->id ] = $player->name;
     }
     $return = '
 <form action="'.Page::get_page_url( 'order' ).'" method="post">

@@ -27,7 +27,7 @@ foreach( $table_columns as $column_name => $column_props ) {
     case 'timestamp':
     case 'date':
       echo '
-  public function get_'.$column_name.'()    { return guess_date($this->_'.$column_name.');}';
+  public function get_'.$column_name.'()    { return guess_time($this->_'.$column_name.');}';
       break;
     case 'tinyint' :
       echo '
@@ -47,7 +47,7 @@ foreach( $table_columns as $column_name => $column_props ) {
     case 'timestamp':
     case 'date':
       echo '
-  public function set_'.$column_name.'($date) { $this->_'.$column_name.' = guess_date($date, GUESS_DATE_MYSQL);}';
+  public function set_'.$column_name.'($date) { $this->_'.$column_name.' = guess_time($date, GUESS_DATE_MYSQL);}';
       break;
     case 'tinyint' :
       echo '

@@ -6,8 +6,10 @@
         $player_order = Player_Order::instance( getValue('player_order_id') );
         if( $player_order->id ) {
           $flag_set_player_resource_history = $player_order->set_player_resource_history(
+            getValue('game_id'),
             getValue('player_id'),
             getValue('resource_id'),
+            getValue('turn'),
             getValue('datetime'),
             getValue('delta'),
             getValue('reason')
@@ -17,7 +19,8 @@
       case 'del_player_resource_history':
         $player_order = Player_Order::instance( getValue('player_order_id') );
         if( $player_order->id ) {
-          $flag_del_player_resource_history = $matchup->del_player_resource_history(
+          $flag_del_player_resource_history = $player_order->del_player_resource_history(
+            getValue('game_id'),
             getValue('player_id'),
             getValue('resource_id')
           );

@@ -22,11 +22,15 @@
         <tr>
           <th>Sel.</th>
           <th>Id</th>
+          <th>Game Id</th>
           <th>Order Type Id</th>
           <th>Player Id</th>
           <th>Datetime Order</th>
           <th>Datetime Scheduled</th>
           <th>Datetime Execution</th>
+          <th>Turn Ordered</th>
+          <th>Turn Scheduled</th>
+          <th>Turn Executed</th>
           <th>Parameters</th>
           <th>Return</th>        </tr>
       </thead>
@@ -43,15 +47,21 @@
           <td><input type="checkbox" name="player_order_id[]" value="'.$player_order->get_id().'"/></td>
           <td><a href="'.htmlentities_utf8(get_page_url('admin_player_order_view', true, array('id' => $player_order->get_id()))).'">'.$player_order->get_id().'</a></td>
 ';
+      $game_temp = Game::instance( $player_order->get_game_id());
+      echo '
+          <td>'.$game_temp->get_name().'</td>';
       $order_type_temp = Order_Type::instance( $player_order->get_order_type_id());
       echo '
           <td>'.$order_type_temp->get_name().'</td>';
       $player_temp = Player::instance( $player_order->get_player_id());
       echo '
           <td>'.$player_temp->get_name().'</td>
-          <td>'.$player_order->get_datetime_order().'</td>
-          <td>'.$player_order->get_datetime_scheduled().'</td>
-          <td>'.$player_order->get_datetime_execution().'</td>
+          <td>'.guess_time($player_order->get_datetime_order(), GUESS_DATE_FR).'</td>
+          <td>'.guess_time($player_order->get_datetime_scheduled(), GUESS_DATE_FR).'</td>
+          <td>'.guess_time($player_order->get_datetime_execution(), GUESS_DATE_FR).'</td>
+          <td>'.$player_order->get_turn_ordered().'</td>
+          <td>'.$player_order->get_turn_scheduled().'</td>
+          <td>'.$player_order->get_turn_executed().'</td>
           <td>'.$player_order->get_parameters().'</td>
           <td>'.$player_order->get_return().'</td>
           <td><a href="'.htmlentities_utf8(get_page_url('admin_player_order_mod', true, array('id' => $player_order->get_id()))).'"><img src="'.IMG.'img_html/pencil.png" alt="Modifier" title="Modifier"/></a></td>

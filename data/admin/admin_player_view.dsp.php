@@ -30,6 +30,59 @@
               <span class="value"><?php echo $tab_visible[$".$class_db_identifier."->get_".$column_name."()]?></span>
             </p>    </div>
     <p><a href="<?php echo get_page_url('admin_player_mod', true, array('id' => $player->get_id()))?>">Modifier cet objet Player</a></p>
+    <h4>Game Player</h4>
+<?php
+
+  $game_player_list = $player->get_game_player_list();
+
+  if(count($game_player_list)) {
+?>
+    <table>
+      <thead>
+        <tr>
+          <th>Game Id</th>          <th>Action</th>
+        </tr>
+      </thead>
+      <tfoot>
+        <tr>
+          <td colspan="2"><?php echo count( $game_player_list )?> lignes</td>
+        </tr>
+      </tfoot>
+      <tbody>
+<?php
+      foreach( $game_player_list as $game_player ) {
+
+ 
+        $game_id_game = Game::instance( $game_player['game_id'] );        echo '
+        <tr>
+        <td><a href="'.get_page_url('admin_game_view', true, array('id' => $game_id_game->get_id())).'">'.$game_id_game->get_name().'</a></td>          <td>
+            <form action="'.get_page_url(PAGE_CODE, true, array('id' => $player->get_id())).'" method="post">
+              '.HTMLHelper::genererInputHidden('player_id', $player->get_id()).'
+
+              '.HTMLHelper::genererInputHidden('game_id', $game_id_game->get_id()).'              '.HTMLHelper::genererButton('action',  'del_game_player', array('type' => 'submit'), 'Supprimer').'
+            </form>
+          </td>
+        </tr>';
+      }
+?>
+      </tbody>
+    </table>
+<?php
+  }else {
+    echo '<p>Il n\'y a pas d\'éléments à afficher</p>';
+  }
+
+  $liste_valeurs_game = Game::db_get_select_list();?>
+    <form action="<?php echo get_page_url(PAGE_CODE, true, array('id' => $player->get_id()))?>" method="post" class="formulaire">
+      <?php echo HTMLHelper::genererInputHidden('player_id', $player->get_id() )?>
+      <fieldset>
+        <legend>Ajouter un élément</legend>
+        <p class="field">
+          <?php echo HTMLHelper::genererSelect('game_id', $liste_valeurs_game, null, array(), 'Game' )?><a href="<?php echo get_page_url('admin_game_mod')?>">Créer un objet Game</a>
+        </p>
+        <p><?php echo HTMLHelper::genererButton('action',  'set_game_player', array('type' => 'submit'), 'Ajouter un élément')?></p>
+      </fieldset>
+    </form>
     <h4>Player Resource History</h4>
 <?php
 
@@ -40,7 +93,9 @@
     <table>
       <thead>
         <tr>
+          <th>Game Id</th>
           <th>Resource Id</th>
+          <th>Turn</th>
           <th>Datetime</th>
           <th>Delta</th>
           <th>Reason</th>
@@ -49,7 +104,7 @@
       </thead>
       <tfoot>
         <tr>
-          <td colspan="6"><?php echo count( $player_resource_history_list )?> lignes</td>
+          <td colspan="8"><?php echo count( $player_resource_history_list )?> lignes</td>
         </tr>
       </tfoot>
       <tbody>
@@ -57,10 +112,13 @@
       foreach( $player_resource_history_list as $player_resource_history ) {
 
  
+        $game_id_game = Game::instance( $player_resource_history['game_id'] );
         $resource_id_resource = Resource::instance( $player_resource_history['resource_id'] );
         $player_order_id_player_order = Player_Order::instance( $player_resource_history['player_order_id'] );        echo '
         <tr>
+        <td><a href="'.get_page_url('admin_game_view', true, array('id' => $game_id_game->get_id())).'">'.$game_id_game->get_name().'</a></td>
         <td><a href="'.get_page_url('admin_resource_view', true, array('id' => $resource_id_resource->get_id())).'">'.$resource_id_resource->get_name().'</a></td>
+        <td>'.$player_resource_history['turn'].'</td>
         <td>'.$player_resource_history['datetime'].'</td>
         <td>'.$player_resource_history['delta'].'</td>
         <td>'.$player_resource_history['reason'].'</td>
@@ -68,6 +126,7 @@
             <form action="'.get_page_url(PAGE_CODE, true, array('id' => $player->get_id())).'" method="post">
               '.HTMLHelper::genererInputHidden('player_id', $player->get_id()).'
 
+              '.HTMLHelper::genererInputHidden('game_id', $game_id_game->get_id()).'
               '.HTMLHelper::genererInputHidden('resource_id', $resource_id_resource->get_id()).'
               '.HTMLHelper::genererInputHidden('player_order_id', $player_order_id_player_order->get_id()).'              '.HTMLHelper::genererButton('action',  'del_player_resource_history', array('type' => 'submit'), 'Supprimer').'
             </form>
@@ -82,6 +141,7 @@
     echo '<p>Il n\'y a pas d\'éléments à afficher</p>';
   }
 
+  $liste_valeurs_game = Game::db_get_select_list();
   $liste_valeurs_resource = Resource::db_get_select_list();
   $liste_valeurs_player_order = Player_Order::db_get_select_list();?>
     <form action="<?php echo get_page_url(PAGE_CODE, true, array('id' => $player->get_id()))?>" method="post" class="formulaire">
@@ -89,7 +149,13 @@
       <fieldset>
         <legend>Ajouter un élément</legend>
         <p class="field">
+          <?php echo HTMLHelper::genererSelect('game_id', $liste_valeurs_game, null, array(), 'Game' )?><a href="<?php echo get_page_url('admin_game_mod')?>">Créer un objet Game</a>
+        </p>
+        <p class="field">
           <?php echo HTMLHelper::genererSelect('resource_id', $liste_valeurs_resource, null, array(), 'Resource' )?><a href="<?php echo get_page_url('admin_resource_mod')?>">Créer un objet Resource</a>
+        </p>
+        <p class="field">
+          <?php echo HTMLHelper::genererInputText('turn', null, array(), 'Turn' )?>
         </p>
         <p class="field">
           <?php echo HTMLHelper::genererInputText('datetime', null, array(), 'Datetime' )?>
@@ -116,7 +182,9 @@
     <table>
       <thead>
         <tr>
+          <th>Game Id</th>
           <th>Value Guid</th>
+          <th>Turn</th>
           <th>Datetime</th>
           <th>Real Value</th>
           <th>Masked Value</th>          <th>Action</th>
@@ -124,24 +192,28 @@
       </thead>
       <tfoot>
         <tr>
-          <td colspan="5"><?php echo count( $player_spygame_value_list )?> lignes</td>
+          <td colspan="7"><?php echo count( $player_spygame_value_list )?> lignes</td>
         </tr>
       </tfoot>
       <tbody>
 <?php
       foreach( $player_spygame_value_list as $player_spygame_value ) {
 
-         echo '
+ 
+        $game_id_game = Game::instance( $player_spygame_value['game_id'] );        echo '
         <tr>
+        <td><a href="'.get_page_url('admin_game_view', true, array('id' => $game_id_game->get_id())).'">'.$game_id_game->get_name().'</a></td>
         <td>'.$player_spygame_value['value_guid'].'</td>
+        <td>'.$player_spygame_value['turn'].'</td>
         <td>'.$player_spygame_value['datetime'].'</td>
         <td>'.$player_spygame_value['real_value'].'</td>
         <td>'.$player_spygame_value['masked_value'].'</td>          <td>
             <form action="'.get_page_url(PAGE_CODE, true, array('id' => $player->get_id())).'" method="post">
               '.HTMLHelper::genererInputHidden('player_id', $player->get_id()).'
 
+              '.HTMLHelper::genererInputHidden('game_id', $game_id_game->get_id()).'
               '.HTMLHelper::genererInputHidden('value_guid', $player_spygame_value['value_guid']).'
-              '.HTMLHelper::genererInputHidden('datetime', $player_spygame_value['datetime']).'              '.HTMLHelper::genererButton('action',  'del_player_spygame_value', array('type' => 'submit'), 'Supprimer').'
+              '.HTMLHelper::genererInputHidden('turn', $player_spygame_value['turn']).'              '.HTMLHelper::genererButton('action',  'del_player_spygame_value', array('type' => 'submit'), 'Supprimer').'
             </form>
           </td>
         </tr>';
@@ -153,13 +225,20 @@
   }else {
     echo '<p>Il n\'y a pas d\'éléments à afficher</p>';
   }
-?>
+
+  $liste_valeurs_game = Game::db_get_select_list();?>
     <form action="<?php echo get_page_url(PAGE_CODE, true, array('id' => $player->get_id()))?>" method="post" class="formulaire">
       <?php echo HTMLHelper::genererInputHidden('player_id', $player->get_id() )?>
       <fieldset>
         <legend>Ajouter un élément</legend>
         <p class="field">
+          <?php echo HTMLHelper::genererSelect('game_id', $liste_valeurs_game, null, array(), 'Game' )?><a href="<?php echo get_page_url('admin_game_mod')?>">Créer un objet Game</a>
+        </p>
+        <p class="field">
           <?php echo HTMLHelper::genererInputText('value_guid', null, array(), 'Value Guid' )?>
+        </p>
+        <p class="field">
+          <?php echo HTMLHelper::genererInputText('turn', null, array(), 'Turn' )?>
         </p>
         <p class="field">
           <?php echo HTMLHelper::genererInputText('datetime', null, array(), 'Datetime' )?>
