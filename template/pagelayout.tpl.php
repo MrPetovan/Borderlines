@@ -15,6 +15,7 @@
       <nav role="main">
         <ul>
           <li><a href="<?php echo Page::get_page_url('dashboard') ?>">Play</a></li>
+          <li><a href="<?php echo Page::get_page_url('game_list') ?>">Games</a></li>
           <li><a href="<?php echo Page::get_page_url('mon-compte') ?>">Account</a></li>
           <li><a href="<?php echo Page::get_page_url('logout') ?>">Logout</a></li>
         </ul>

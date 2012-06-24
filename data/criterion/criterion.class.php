@@ -1,6 +1,6 @@
 <?php
 /**
- * Classe Criterion
+ * Class Criterion
  *
  */
 

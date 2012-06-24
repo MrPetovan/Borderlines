@@ -25,10 +25,13 @@
           <th>Current Turn</th>
           <th>Turn Interval</th>
           <th>Turn Limit</th>
+          <th>Min Players</th>
+          <th>Max Players</th>
           <th>Created</th>
           <th>Started</th>
           <th>Updated</th>
-          <th>Ended</th>        </tr>
+          <th>Ended</th>
+          <th>Created By</th>        </tr>
       </thead>
       <tfoot>
         <tr>
@@ -46,10 +49,15 @@
           <td>'.$game->get_current_turn().'</td>
           <td>'.$game->get_turn_interval().'</td>
           <td>'.$game->get_turn_limit().'</td>
+          <td>'.$game->get_min_players().'</td>
+          <td>'.$game->get_max_players().'</td>
           <td>'.guess_time($game->get_created(), GUESS_DATE_FR).'</td>
           <td>'.guess_time($game->get_started(), GUESS_DATE_FR).'</td>
           <td>'.guess_time($game->get_updated(), GUESS_DATE_FR).'</td>
-          <td>'.guess_time($game->get_ended(), GUESS_DATE_FR).'</td>
+          <td>'.guess_time($game->get_ended(), GUESS_DATE_FR).'</td>';
+      $player_temp = Player::instance( $game->get_created_by());
+      echo '
+          <td>'.$player_temp->get_name().'</td>
           <td><a href="'.htmlentities_utf8(get_page_url('admin_game_mod', true, array('id' => $game->get_id()))).'"><img src="'.IMG.'img_html/pencil.png" alt="Modifier" title="Modifier"/></a></td>
         </tr>';
     }

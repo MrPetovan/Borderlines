@@ -62,10 +62,9 @@ LIMIT 0,1";
   /**
    * Formulaire d'édition partie Administration
    *
-   * @param string $form_url URL de la page action
    * @return string
    */
-  public function html_get_form($form_url) {
+  public function html_get_form() {
     $return = '
     <fieldset>
       <legend>Text fields</legend>
@@ -73,6 +72,7 @@ LIMIT 0,1";
         <p class="field">'.HTMLHelper::genererInputText('class_name', $this->get_class_name(), array(), "Class Name *").'</p>
         <p class="field">'.HTMLHelper::genererInputText('name', $this->get_name(), array(), "Name *").'</p>
         <p class="field">'.HTMLHelper::genererInputCheckBox('target_player', '1', $this->get_target_player(), array('label_position' => 'right'), "Target Player" ).'</p>
+
     </fieldset>';
 
     return $return;

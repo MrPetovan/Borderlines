@@ -1,6 +1,6 @@
 <?php
 /**
- * Classe Category
+ * Class Category
  *
  */
 

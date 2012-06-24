@@ -1,3 +1,4 @@
+  $<?php echo $class_db_identifier ?> = <?php echo $class_php_identifier ?>::instance( getValue('id') );
 
   if(!is_null(getValue('action'))) {
     switch( getValue('action') ) {
@@ -13,7 +14,6 @@
     $sub_table_description = $table_description[ $sub_table ];
 ?>
       case 'set_<?php echo $sub_table?>':
-        $<?php echo $class_db_identifier ?> = <?php echo $class_php_identifier ?>::instance( getValue('<?php echo $class_db_identifier ?>_id') );
         if( $<?php echo $class_db_identifier ?>->id ) {
           $flag_set_<?php echo $sub_table?> = $<?php echo $class_db_identifier ?>->set_<?php echo $sub_table?>(<?php
     $param_list = array();
@@ -28,7 +28,6 @@
         }
         break;
       case 'del_<?php echo $sub_table?>':
-        $<?php echo $class_db_identifier ?> = <?php echo $class_php_identifier ?>::instance( getValue('<?php echo $class_db_identifier ?>_id') );
         if( $<?php echo $class_db_identifier ?>->id ) {
           $flag_del_<?php echo $sub_table?> = $<?php echo $class_db_identifier ?>->del_<?php echo $sub_table?>(<?php
     $param_list = array();

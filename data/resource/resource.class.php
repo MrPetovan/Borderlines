@@ -1,6 +1,6 @@
 <?php
 /**
- * Classe Resource
+ * Class Resource
  *
  */
 

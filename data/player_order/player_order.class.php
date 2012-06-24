@@ -1,6 +1,6 @@
 <?php
 /**
- * Classe Player_Order
+ * Class Player_Order
  *
  */
 

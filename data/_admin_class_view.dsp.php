@@ -1,16 +1,14 @@
   include_once('data/static/html_functions.php');
 
-  $<?php echo $class_db_identifier ?> = <?php echo $class_php_identifier ?>::instance( getValue('id') );
-
   $tab_visible = array('0' => 'Non', '1' => 'Oui');
 
-  $form_url = get_page_url($PAGE_CODE).'&id='.$<?php echo $class_db_identifier ?>->get_id();
-  $PAGE_TITRE = '<?php echo $class_name ?> : Consultation de "'.$<?php echo $class_db_identifier ?>->get_<?php echo $name_field?>().'"';
+  $form_url = get_page_url($PAGE_CODE).'&id='.$<?php echo $class_db_identifier ?>->id;
+  $PAGE_TITRE = '<?php echo $class_name ?> : Showing "'.$<?php echo $class_db_identifier ?>-><?php echo $name_field?>.'"';
 ?>
 <div class="texte_contenu">
 <_?php echo admin_menu(PAGE_CODE);?>
   <div class="texte_texte">
-    <h3>Consultation des données pour "<_?php echo $<?php echo $class_db_identifier ?>->get_<?php echo $name_field?>()?>"</h3>
+    <h3>Showing "<_?php echo $<?php echo $class_db_identifier ?>-><?php echo $name_field?>?>"</h3>
     <div class="informations formulaire">
 <?php
 foreach( $table_columns as $column_name => $column_props ) {
@@ -28,7 +26,7 @@ foreach( $table_columns as $column_name => $column_props ) {
 
       <p class="field">
         <span class="libelle"><?php echo $column_props['Comment'] ?></span>
-        <span class="value"><a href="<_?php echo get_page_url('admin_<?php echo $foreign_table ?>_view', true, array('id' => $<?php echo $class_db_identifier ?>->get_<?php echo $column_name ?>() ) )?>"><_?php echo $option_list[ $<?php echo $class_db_identifier ?>->get_<?php echo $column_name ?>() ]?></a></span>
+        <span class="value"><a href="<_?php echo get_page_url('admin_<?php echo $foreign_table ?>_view', true, array('id' => $<?php echo $class_db_identifier ?>-><?php echo $column_name ?> ) )?>"><_?php echo $option_list[ $<?php echo $class_db_identifier ?>-><?php echo $column_name ?> ]?></a></span>
       </p>
 <?php
     }elseif( $column_name != $name_field )
@@ -39,7 +37,7 @@ foreach( $table_columns as $column_name => $column_props ) {
           echo '
             <p class="field">
               <span class="libelle">'.$column_props['Comment'].'</span>
-              <span class="value"><?php echo $'.$class_db_identifier.'->get_'.$column_name.'()?></span>
+              <span class="value"><?php echo $'.$class_db_identifier.'->'.$column_name.'?></span>
             </p>';
           break;
         case 'datetime':
@@ -48,21 +46,21 @@ foreach( $table_columns as $column_name => $column_props ) {
           echo '
             <p class="field">
               <span class="libelle">'.$column_props['Comment'].'</span>
-              <span class="value"><?php echo guess_time($'.$class_db_identifier.'->get_'.$column_name.'(), GUESS_DATE_FR)?></span>
+              <span class="value"><?php echo guess_time($'.$class_db_identifier.'->'.$column_name.', GUESS_DATE_FR)?></span>
             </p>';
           break;
         case 'tinyint' :
           echo '
             <p class="field">
               <span class="libelle">'.$column_props['Comment'].'</span>
-              <span class="value"><?php echo $tab_visible[$".$class_db_identifier."->get_".$column_name."()]?></span>
+              <span class="value"><?php echo $tab_visible[$'.$class_db_identifier.'->'.$column_name.']?></span>
             </p>';
           break;
       }
   }
 } ?>
     </div>
-    <p><a href="<_?php echo get_page_url('admin_<?php echo $class_db_identifier ?>_mod', true, array('id' => $<?php echo $class_db_identifier ?>->get_id()))?>">Modifier cet objet <?php echo $class_name?></a></p>
+    <p><a href="<_?php echo get_page_url('admin_<?php echo $class_db_identifier ?>_mod', true, array('id' => $<?php echo $class_db_identifier ?>->id))?>">Modifier cet objet <?php echo $class_name?></a></p>
 <?php
   foreach( $sub_tables as $sub_table_info ) {
     $sub_table = $sub_table_info['table'];
@@ -111,7 +109,7 @@ foreach( $table_columns as $column_name => $column_props ) {
         echo '
         $'. $field_name. '_' . $foreign_table .' = '.to_camel_case( $foreign_table, true).'::instance( $'.$sub_table.'[\''.$field_name.'\'] );';
         $td_list .= '
-        <td><a href="\'.get_page_url(\'admin_'.$foreign_table.'_view\', true, array(\'id\' => $'. $field_name. '_' . $foreign_table .'->get_id())).\'">\'.$'. $field_name. '_' . $foreign_table .'->get_'.$name_field_list[ $foreign_table ].'().\'</a></td>';
+        <td><a href="\'.get_page_url(\'admin_'.$foreign_table.'_view\', true, array(\'id\' => $'. $field_name. '_' . $foreign_table .'->id)).\'">\'.$'. $field_name. '_' . $foreign_table .'->'.$name_field_list[ $foreign_table ].'.\'</a></td>';
       }else {
         $td_list .= '
         <td>\'.$'.$sub_table.'[\''.$field_name.'\'].\'</td>';
@@ -121,14 +119,14 @@ foreach( $table_columns as $column_name => $column_props ) {
         echo '
         <tr><?php echo $td_list?>
           <td>
-            <form action="'.get_page_url(PAGE_CODE, true, array('id' => $<?php echo $class_db_identifier ?>->get_id())).'" method="post">
-              '.HTMLHelper::genererInputHidden('<?php echo $class_db_identifier ?>_id', $<?php echo $class_db_identifier ?>->get_id()).'
+            <form action="'.get_page_url(PAGE_CODE, true, array('id' => $<?php echo $class_db_identifier ?>->id)).'" method="post">
+              '.HTMLHelper::genererInputHidden('id', $<?php echo $class_db_identifier ?>->id).'
 <?php
     foreach( $sub_table_pk_clean as $field_name ) {
       if ( array_key_exists( $field_name,  $foreign_keys_list[ $sub_table ] )) {
         $foreign_table = $foreign_keys_list[ $sub_table ][ $field_name ];
         echo '
-              \'.HTMLHelper::genererInputHidden(\''.$foreign_table.'_id\', $'. $field_name. '_' . $foreign_table .'->get_id()).\'';
+              \'.HTMLHelper::genererInputHidden(\''.$foreign_table.'_id\', $'. $field_name. '_' . $foreign_table .'->id).\'';
       }else {
         echo '
               \'.HTMLHelper::genererInputHidden(\''.$field_name.'\', $'.$sub_table.'[\''.$field_name.'\']).\'';
@@ -168,8 +166,8 @@ foreach( $table_columns as $column_name => $column_props ) {
 
 ?>
 ?>
-    <form action="<_?php echo get_page_url(PAGE_CODE, true, array('id' => $<?php echo $class_db_identifier ?>->get_id()))?>" method="post" class="formulaire">
-      <_?php echo HTMLHelper::genererInputHidden('<?php echo $class_db_identifier ?>_id', $<?php echo $class_db_identifier ?>->get_id() )?>
+    <form action="<_?php echo get_page_url(PAGE_CODE, true, array('id' => $<?php echo $class_db_identifier ?>->id))?>" method="post" class="formulaire">
+      <_?php echo HTMLHelper::genererInputHidden('id', $<?php echo $class_db_identifier ?>->id )?>
       <fieldset>
         <legend>Ajouter un élément</legend><?php echo $form_field?>
 

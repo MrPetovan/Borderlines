@@ -51,10 +51,9 @@ LIMIT 0,1";
   /**
    * Formulaire d'édition partie Administration
    *
-   * @param string $form_url URL de la page action
    * @return string
    */
-  public function html_get_form($form_url) {
+  public function html_get_form() {
     $return = '
     <fieldset>
       <legend>Text fields</legend>
@@ -67,6 +66,7 @@ LIMIT 0,1";
 
       $return .= '
       <p class="field">'.HTMLHelper::genererSelect('category_id', $option_list, $this->get_category_id(), array(), "Category Id *").'<a href="'.get_page_url('admin_category_mod').'">Créer un objet Category</a></p>
+
     </fieldset>';
 
     return $return;
@@ -99,7 +99,7 @@ LIMIT 0,1";
     $return = array();
 
     $return[] = Member::check_compulsory($this->get_name(), 1);
-    $return[] = Member::check_compulsory($this->get_category_id(), 2);
+    $return[] = Member::check_compulsory($this->get_category_id(), 2, true);
 
     $return = array_unique($return);
     if(($true_key = array_search(true, $return, true)) !== false) {

@@ -1,17 +1,15 @@
 <?php
   include_once('data/static/html_functions.php');
 
-  $territory = Territory::instance( getValue('id') );
-
   $tab_visible = array('0' => 'Non', '1' => 'Oui');
 
-  $form_url = get_page_url($PAGE_CODE).'&id='.$territory->get_id();
-  $PAGE_TITRE = 'Territory : Consultation de "'.$territory->get_name().'"';
+  $form_url = get_page_url($PAGE_CODE).'&id='.$territory->id;
+  $PAGE_TITRE = 'Territory : Showing "'.$territory->name.'"';
 ?>
 <div class="texte_contenu">
 <?php echo admin_menu(PAGE_CODE);?>
   <div class="texte_texte">
-    <h3>Consultation des données pour "<?php echo $territory->get_name()?>"</h3>
+    <h3>Showing "<?php echo $territory->name?>"</h3>
     <div class="informations formulaire">
 
 <?php
@@ -22,10 +20,10 @@
 ?>
       <p class="field">
         <span class="libelle">World Id</span>
-        <span class="value"><a href="<?php echo get_page_url('admin_world_view', true, array('id' => $territory->get_world_id() ) )?>"><?php echo $option_list[ $territory->get_world_id() ]?></a></span>
+        <span class="value"><a href="<?php echo get_page_url('admin_world_view', true, array('id' => $territory->world_id ) )?>"><?php echo $option_list[ $territory->world_id ]?></a></span>
       </p>
     </div>
-    <p><a href="<?php echo get_page_url('admin_territory_mod', true, array('id' => $territory->get_id()))?>">Modifier cet objet Territory</a></p>
+    <p><a href="<?php echo get_page_url('admin_territory_mod', true, array('id' => $territory->id))?>">Modifier cet objet Territory</a></p>
     <h4>Territory Criterion</h4>
 <?php
 
@@ -52,12 +50,12 @@
  
         $criterion_id_criterion = Criterion::instance( $territory_criterion['criterion_id'] );        echo '
         <tr>
-        <td><a href="'.get_page_url('admin_criterion_view', true, array('id' => $criterion_id_criterion->get_id())).'">'.$criterion_id_criterion->get_name().'</a></td>
+        <td><a href="'.get_page_url('admin_criterion_view', true, array('id' => $criterion_id_criterion->id)).'">'.$criterion_id_criterion->name.'</a></td>
         <td>'.$territory_criterion['percentage'].'</td>          <td>
-            <form action="'.get_page_url(PAGE_CODE, true, array('id' => $territory->get_id())).'" method="post">
-              '.HTMLHelper::genererInputHidden('territory_id', $territory->get_id()).'
+            <form action="'.get_page_url(PAGE_CODE, true, array('id' => $territory->id)).'" method="post">
+              '.HTMLHelper::genererInputHidden('id', $territory->id).'
 
-              '.HTMLHelper::genererInputHidden('criterion_id', $criterion_id_criterion->get_id()).'              '.HTMLHelper::genererButton('action',  'del_territory_criterion', array('type' => 'submit'), 'Supprimer').'
+              '.HTMLHelper::genererInputHidden('criterion_id', $criterion_id_criterion->id).'              '.HTMLHelper::genererButton('action',  'del_territory_criterion', array('type' => 'submit'), 'Supprimer').'
             </form>
           </td>
         </tr>';
@@ -71,8 +69,8 @@
   }
 
   $liste_valeurs_criterion = Criterion::db_get_select_list();?>
-    <form action="<?php echo get_page_url(PAGE_CODE, true, array('id' => $territory->get_id()))?>" method="post" class="formulaire">
-      <?php echo HTMLHelper::genererInputHidden('territory_id', $territory->get_id() )?>
+    <form action="<?php echo get_page_url(PAGE_CODE, true, array('id' => $territory->id))?>" method="post" class="formulaire">
+      <?php echo HTMLHelper::genererInputHidden('id', $territory->id )?>
       <fieldset>
         <legend>Ajouter un élément</legend>
         <p class="field">
@@ -109,8 +107,8 @@
          echo '
         <tr>
         <td>'.$territory_neighbour['neighbour_id'].'</td>          <td>
-            <form action="'.get_page_url(PAGE_CODE, true, array('id' => $territory->get_id())).'" method="post">
-              '.HTMLHelper::genererInputHidden('territory_id', $territory->get_id()).'
+            <form action="'.get_page_url(PAGE_CODE, true, array('id' => $territory->id)).'" method="post">
+              '.HTMLHelper::genererInputHidden('id', $territory->id).'
 
               '.HTMLHelper::genererInputHidden('neighbour_id', $territory_neighbour['neighbour_id']).'              '.HTMLHelper::genererButton('action',  'del_territory_neighbour', array('type' => 'submit'), 'Supprimer').'
             </form>
@@ -125,8 +123,8 @@
     echo '<p>Il n\'y a pas d\'éléments à afficher</p>';
   }
 ?>
-    <form action="<?php echo get_page_url(PAGE_CODE, true, array('id' => $territory->get_id()))?>" method="post" class="formulaire">
-      <?php echo HTMLHelper::genererInputHidden('territory_id', $territory->get_id() )?>
+    <form action="<?php echo get_page_url(PAGE_CODE, true, array('id' => $territory->id))?>" method="post" class="formulaire">
+      <?php echo HTMLHelper::genererInputHidden('id', $territory->id )?>
       <fieldset>
         <legend>Ajouter un élément</legend>
         <p class="field">
@@ -160,11 +158,11 @@
  
         $vertex_id_vertex = Vertex::instance( $territory_vertex['vertex_id'] );        echo '
         <tr>
-        <td><a href="'.get_page_url('admin_vertex_view', true, array('id' => $vertex_id_vertex->get_id())).'">'.$vertex_id_vertex->get_name().'</a></td>          <td>
-            <form action="'.get_page_url(PAGE_CODE, true, array('id' => $territory->get_id())).'" method="post">
-              '.HTMLHelper::genererInputHidden('territory_id', $territory->get_id()).'
+        <td><a href="'.get_page_url('admin_vertex_view', true, array('id' => $vertex_id_vertex->id)).'">'.$vertex_id_vertex->name.'</a></td>          <td>
+            <form action="'.get_page_url(PAGE_CODE, true, array('id' => $territory->id)).'" method="post">
+              '.HTMLHelper::genererInputHidden('id', $territory->id).'
 
-              '.HTMLHelper::genererInputHidden('vertex_id', $vertex_id_vertex->get_id()).'              '.HTMLHelper::genererButton('action',  'del_territory_vertex', array('type' => 'submit'), 'Supprimer').'
+              '.HTMLHelper::genererInputHidden('vertex_id', $vertex_id_vertex->id).'              '.HTMLHelper::genererButton('action',  'del_territory_vertex', array('type' => 'submit'), 'Supprimer').'
             </form>
           </td>
         </tr>';
@@ -178,8 +176,8 @@
   }
 
   $liste_valeurs_vertex = Vertex::db_get_select_list();?>
-    <form action="<?php echo get_page_url(PAGE_CODE, true, array('id' => $territory->get_id()))?>" method="post" class="formulaire">
-      <?php echo HTMLHelper::genererInputHidden('territory_id', $territory->get_id() )?>
+    <form action="<?php echo get_page_url(PAGE_CODE, true, array('id' => $territory->id))?>" method="post" class="formulaire">
+      <?php echo HTMLHelper::genererInputHidden('id', $territory->id )?>
       <fieldset>
         <legend>Ajouter un élément</legend>
         <p class="field">

@@ -36,7 +36,7 @@
       // $player_order->check();
       
       if( $player_order->save() ) {
-        Page::set_message( 'Ordre lancé avec succès' );
+        Page::set_message( 'Order successfully saved' );
       }else {
         Page::set_message( 'Error while saving order', Page::PAGE_MESSAGE_ERROR );
       }

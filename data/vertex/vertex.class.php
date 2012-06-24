@@ -1,6 +1,6 @@
 <?php
 /**
- * Classe Vertex
+ * Class Vertex
  *
  */
 

@@ -10,12 +10,16 @@
 
     if( $action = getValue('action') ) {
       switch( $action ) {
-        case "init" : {
-          $game->init();
+        case "reset" : {
+          $game->reset();
           
-          Page::set_message('init game OK');
+          Page::set_message('reset game OK');
+          break;
+        }
+        case "start" : {
+          $game->start();
           
-          Page::page_redirect( PAGE_CODE, array('id' => $game->id ) );
+          Page::set_message('start game OK');
           break;
         }
         case "compute" : {
@@ -24,12 +28,10 @@
           }else {
             Page::set_message('compute KO', Page::PAGE_MESSAGE_ERROR);
           }
-          Page::page_redirect( PAGE_CODE );
           break;
         }
       }
-    
-      
+      Page::page_redirect( PAGE_CODE, array('id' => $game->id ) );
     }
   }
 ?>

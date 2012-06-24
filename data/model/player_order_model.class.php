@@ -100,10 +100,9 @@ LIMIT 0,1";
   /**
    * Formulaire d'édition partie Administration
    *
-   * @param string $form_url URL de la page action
    * @return string
    */
-  public function html_get_form($form_url) {
+  public function html_get_form() {
     $return = '
     <fieldset>
       <legend>Text fields</legend>
@@ -137,6 +136,7 @@ LIMIT 0,1";
         <p class="field">'.HTMLHelper::genererInputText('turn_executed', $this->get_turn_executed(), array(), "Turn Executed").'</p>
         <p class="field">'.HTMLHelper::genererInputText('parameters', $this->get_parameters(), array(), "Parameters").'</p>
         <p class="field">'.HTMLHelper::genererInputText('return', $this->get_return(), array(), "Return").'</p>
+
     </fieldset>';
 
     return $return;
@@ -173,13 +173,13 @@ LIMIT 0,1";
   public function check_valid($flags = 0) {
     $return = array();
 
-    $return[] = Member::check_compulsory($this->get_game_id(), 1);
-    $return[] = Member::check_compulsory($this->get_order_type_id(), 2);
-    $return[] = Member::check_compulsory($this->get_player_id(), 3);
+    $return[] = Member::check_compulsory($this->get_game_id(), 1, true);
+    $return[] = Member::check_compulsory($this->get_order_type_id(), 2, true);
+    $return[] = Member::check_compulsory($this->get_player_id(), 3, true);
     $return[] = Member::check_compulsory($this->get_datetime_order(), 4);
     $return[] = Member::check_compulsory($this->get_datetime_scheduled(), 5);
-    $return[] = Member::check_compulsory($this->get_turn_ordered(), 6);
-    $return[] = Member::check_compulsory($this->get_turn_scheduled(), 7);
+    $return[] = Member::check_compulsory($this->get_turn_ordered(), 6, true);
+    $return[] = Member::check_compulsory($this->get_turn_scheduled(), 7, true);
 
     $return = array_unique($return);
     if(($true_key = array_search(true, $return, true)) !== false) {

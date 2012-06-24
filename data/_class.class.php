@@ -1,5 +1,5 @@
 /**
- * Classe <?php echo $class_php_identifier?>
+ * Class <?php echo $class_php_identifier?>
 
  *
  */

@@ -1,17 +1,15 @@
 <?php
   include_once('data/static/html_functions.php');
 
-  $criterion = Criterion::instance( getValue('id') );
-
   $tab_visible = array('0' => 'Non', '1' => 'Oui');
 
-  $form_url = get_page_url($PAGE_CODE).'&id='.$criterion->get_id();
-  $PAGE_TITRE = 'Criterion : Consultation de "'.$criterion->get_name().'"';
+  $form_url = get_page_url($PAGE_CODE).'&id='.$criterion->id;
+  $PAGE_TITRE = 'Criterion : Showing "'.$criterion->name.'"';
 ?>
 <div class="texte_contenu">
 <?php echo admin_menu(PAGE_CODE);?>
   <div class="texte_texte">
-    <h3>Consultation des données pour "<?php echo $criterion->get_name()?>"</h3>
+    <h3>Showing "<?php echo $criterion->name?>"</h3>
     <div class="informations formulaire">
 
 <?php
@@ -22,10 +20,10 @@
 ?>
       <p class="field">
         <span class="libelle">Category Id</span>
-        <span class="value"><a href="<?php echo get_page_url('admin_category_view', true, array('id' => $criterion->get_category_id() ) )?>"><?php echo $option_list[ $criterion->get_category_id() ]?></a></span>
+        <span class="value"><a href="<?php echo get_page_url('admin_category_view', true, array('id' => $criterion->category_id ) )?>"><?php echo $option_list[ $criterion->category_id ]?></a></span>
       </p>
     </div>
-    <p><a href="<?php echo get_page_url('admin_criterion_mod', true, array('id' => $criterion->get_id()))?>">Modifier cet objet Criterion</a></p>
+    <p><a href="<?php echo get_page_url('admin_criterion_mod', true, array('id' => $criterion->id))?>">Modifier cet objet Criterion</a></p>
     <h4>Territory Criterion</h4>
 <?php
 
@@ -52,12 +50,12 @@
  
         $territory_id_territory = Territory::instance( $territory_criterion['territory_id'] );        echo '
         <tr>
-        <td><a href="'.get_page_url('admin_territory_view', true, array('id' => $territory_id_territory->get_id())).'">'.$territory_id_territory->get_name().'</a></td>
+        <td><a href="'.get_page_url('admin_territory_view', true, array('id' => $territory_id_territory->id)).'">'.$territory_id_territory->name.'</a></td>
         <td>'.$territory_criterion['percentage'].'</td>          <td>
-            <form action="'.get_page_url(PAGE_CODE, true, array('id' => $criterion->get_id())).'" method="post">
-              '.HTMLHelper::genererInputHidden('criterion_id', $criterion->get_id()).'
+            <form action="'.get_page_url(PAGE_CODE, true, array('id' => $criterion->id)).'" method="post">
+              '.HTMLHelper::genererInputHidden('id', $criterion->id).'
 
-              '.HTMLHelper::genererInputHidden('territory_id', $territory_id_territory->get_id()).'              '.HTMLHelper::genererButton('action',  'del_territory_criterion', array('type' => 'submit'), 'Supprimer').'
+              '.HTMLHelper::genererInputHidden('territory_id', $territory_id_territory->id).'              '.HTMLHelper::genererButton('action',  'del_territory_criterion', array('type' => 'submit'), 'Supprimer').'
             </form>
           </td>
         </tr>';
@@ -71,8 +69,8 @@
   }
 
   $liste_valeurs_territory = Territory::db_get_select_list();?>
-    <form action="<?php echo get_page_url(PAGE_CODE, true, array('id' => $criterion->get_id()))?>" method="post" class="formulaire">
-      <?php echo HTMLHelper::genererInputHidden('criterion_id', $criterion->get_id() )?>
+    <form action="<?php echo get_page_url(PAGE_CODE, true, array('id' => $criterion->id))?>" method="post" class="formulaire">
+      <?php echo HTMLHelper::genererInputHidden('id', $criterion->id )?>
       <fieldset>
         <legend>Ajouter un élément</legend>
         <p class="field">

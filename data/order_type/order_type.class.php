@@ -1,6 +1,6 @@
 <?php
 /**
- * Classe Order_Type
+ * Class Order_Type
  *
  */
 

@@ -1,6 +1,6 @@
 <?php
 /**
- * Classe Territory
+ * Class Territory
  *
  */
 

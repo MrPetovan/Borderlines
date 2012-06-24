@@ -7,5 +7,10 @@
   
   // Game retrival
   // TODO : Select game page
-  $current_game = $current_player->current_game;
+  if( $current_game = $current_player->last_game ) {
+    // In game OR game ended
+  }else {
+    // No game ever played
+    Page::redirect( 'game_list' );
+  }
 ?>

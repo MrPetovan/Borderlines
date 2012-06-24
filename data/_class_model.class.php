@@ -98,10 +98,9 @@ LIMIT 0,1";
   /**
    * Formulaire d'édition partie Administration
    *
-   * @param string $form_url URL de la page action
    * @return string
    */
-  public function html_get_form($form_url) {
+  public function html_get_form() {
     $return = '
     <fieldset>
       <legend>Text fields</legend><?php
@@ -126,7 +125,7 @@ foreach( $table_columns as $column_name => $column_props ) {
       case 'date':
       default:
         echo '
-        <p class="field">\'.HTMLHelper::genererInputText(\''.$column_name.'\', $this->get_'.$column_name.'(), array(), "'.$column_props['Comment'].($column_props['Null'] == 'NO'?' *':'').'").\'</p>';
+        <p class="field">\'.HTMLHelper::genererInputText(\''.$column_name.'\', $this->get_'.$column_name.'(), array(), "'.$column_props['Comment'].($column_props['Null'] == 'NO' && is_null( $column_props['Default'] )?' *':'').'").\'</p>';
         break;
       case 'tinyint' :
         echo '
@@ -138,6 +137,7 @@ foreach( $table_columns as $column_name => $column_props ) {
         \'.HTMLHelper::genererInputHidden(\''.$column_name.'\', $this->get_'.$column_name.'()).\'';
   }
 } ?>
+
 
     </fieldset>';
 
@@ -155,7 +155,7 @@ foreach( $table_columns as $column_name => $column_props ) {
     switch($num_error) { <?php
 $n = 1;
 foreach( $table_columns as $column_name => $column_props ) {
-  if( $column_name != 'id' && $column_props['Null'] == 'NO' ) {
+  if( $column_name != 'id' && $column_props['Null'] == 'NO' && is_null( $column_props['Default'] ) ) {
     echo '
       case '.$n++.' : $return = "Le champ <strong>'.$column_props['Comment'].'</strong> est obligatoire."; break;';
   }
@@ -178,9 +178,10 @@ foreach( $table_columns as $column_name => $column_props ) {
 <?php
 $n = 1;
 foreach( $table_columns as $column_name => $column_props ) {
-  if( $column_name != 'id' && $column_props['Null'] == 'NO' ) {
+  if( $column_name != 'id' && $column_props['Null'] == 'NO' && is_null( $column_props['Default'] ) ) {
     $strict = '';
     switch ($column_props['SimpleType']) {
+      case 'int' :
       case 'tinyint' :
         $strict = ', true';
         break;

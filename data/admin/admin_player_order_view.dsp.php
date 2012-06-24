@@ -1,17 +1,15 @@
 <?php
   include_once('data/static/html_functions.php');
 
-  $player_order = Player_Order::instance( getValue('id') );
-
   $tab_visible = array('0' => 'Non', '1' => 'Oui');
 
-  $form_url = get_page_url($PAGE_CODE).'&id='.$player_order->get_id();
-  $PAGE_TITRE = 'Player Order : Consultation de "'.$player_order->get_id().'"';
+  $form_url = get_page_url($PAGE_CODE).'&id='.$player_order->id;
+  $PAGE_TITRE = 'Player Order : Showing "'.$player_order->id.'"';
 ?>
 <div class="texte_contenu">
 <?php echo admin_menu(PAGE_CODE);?>
   <div class="texte_texte">
-    <h3>Consultation des données pour "<?php echo $player_order->get_id()?>"</h3>
+    <h3>Showing "<?php echo $player_order->id?>"</h3>
     <div class="informations formulaire">
 
 <?php
@@ -22,7 +20,7 @@
 ?>
       <p class="field">
         <span class="libelle">Game Id</span>
-        <span class="value"><a href="<?php echo get_page_url('admin_game_view', true, array('id' => $player_order->get_game_id() ) )?>"><?php echo $option_list[ $player_order->get_game_id() ]?></a></span>
+        <span class="value"><a href="<?php echo get_page_url('admin_game_view', true, array('id' => $player_order->game_id ) )?>"><?php echo $option_list[ $player_order->game_id ]?></a></span>
       </p>
 
 <?php
@@ -33,7 +31,7 @@
 ?>
       <p class="field">
         <span class="libelle">Order Type Id</span>
-        <span class="value"><a href="<?php echo get_page_url('admin_order_type_view', true, array('id' => $player_order->get_order_type_id() ) )?>"><?php echo $option_list[ $player_order->get_order_type_id() ]?></a></span>
+        <span class="value"><a href="<?php echo get_page_url('admin_order_type_view', true, array('id' => $player_order->order_type_id ) )?>"><?php echo $option_list[ $player_order->order_type_id ]?></a></span>
       </p>
 
 <?php
@@ -44,42 +42,42 @@
 ?>
       <p class="field">
         <span class="libelle">Player Id</span>
-        <span class="value"><a href="<?php echo get_page_url('admin_player_view', true, array('id' => $player_order->get_player_id() ) )?>"><?php echo $option_list[ $player_order->get_player_id() ]?></a></span>
+        <span class="value"><a href="<?php echo get_page_url('admin_player_view', true, array('id' => $player_order->player_id ) )?>"><?php echo $option_list[ $player_order->player_id ]?></a></span>
       </p>
 
             <p class="field">
               <span class="libelle">Datetime Order</span>
-              <span class="value"><?php echo guess_time($player_order->get_datetime_order(), GUESS_DATE_FR)?></span>
+              <span class="value"><?php echo guess_time($player_order->datetime_order, GUESS_DATE_FR)?></span>
             </p>
             <p class="field">
               <span class="libelle">Datetime Scheduled</span>
-              <span class="value"><?php echo guess_time($player_order->get_datetime_scheduled(), GUESS_DATE_FR)?></span>
+              <span class="value"><?php echo guess_time($player_order->datetime_scheduled, GUESS_DATE_FR)?></span>
             </p>
             <p class="field">
               <span class="libelle">Datetime Execution</span>
-              <span class="value"><?php echo guess_time($player_order->get_datetime_execution(), GUESS_DATE_FR)?></span>
+              <span class="value"><?php echo guess_time($player_order->datetime_execution, GUESS_DATE_FR)?></span>
             </p>
             <p class="field">
               <span class="libelle">Turn Ordered</span>
-              <span class="value"><?php echo $player_order->get_turn_ordered()?></span>
+              <span class="value"><?php echo $player_order->turn_ordered?></span>
             </p>
             <p class="field">
               <span class="libelle">Turn Scheduled</span>
-              <span class="value"><?php echo $player_order->get_turn_scheduled()?></span>
+              <span class="value"><?php echo $player_order->turn_scheduled?></span>
             </p>
             <p class="field">
               <span class="libelle">Turn Executed</span>
-              <span class="value"><?php echo $player_order->get_turn_executed()?></span>
+              <span class="value"><?php echo $player_order->turn_executed?></span>
             </p>
             <p class="field">
               <span class="libelle">Parameters</span>
-              <span class="value"><?php echo $player_order->get_parameters()?></span>
+              <span class="value"><?php echo $player_order->parameters?></span>
             </p>
             <p class="field">
               <span class="libelle">Return</span>
-              <span class="value"><?php echo $player_order->get_return()?></span>
+              <span class="value"><?php echo $player_order->return?></span>
             </p>    </div>
-    <p><a href="<?php echo get_page_url('admin_player_order_mod', true, array('id' => $player_order->get_id()))?>">Modifier cet objet Player Order</a></p>
+    <p><a href="<?php echo get_page_url('admin_player_order_mod', true, array('id' => $player_order->id))?>">Modifier cet objet Player Order</a></p>
     <h4>Player Resource History</h4>
 <?php
 
@@ -113,19 +111,19 @@
         $player_id_player = Player::instance( $player_resource_history['player_id'] );
         $resource_id_resource = Resource::instance( $player_resource_history['resource_id'] );        echo '
         <tr>
-        <td><a href="'.get_page_url('admin_game_view', true, array('id' => $game_id_game->get_id())).'">'.$game_id_game->get_name().'</a></td>
-        <td><a href="'.get_page_url('admin_player_view', true, array('id' => $player_id_player->get_id())).'">'.$player_id_player->get_name().'</a></td>
-        <td><a href="'.get_page_url('admin_resource_view', true, array('id' => $resource_id_resource->get_id())).'">'.$resource_id_resource->get_name().'</a></td>
+        <td><a href="'.get_page_url('admin_game_view', true, array('id' => $game_id_game->id)).'">'.$game_id_game->name.'</a></td>
+        <td><a href="'.get_page_url('admin_player_view', true, array('id' => $player_id_player->id)).'">'.$player_id_player->name.'</a></td>
+        <td><a href="'.get_page_url('admin_resource_view', true, array('id' => $resource_id_resource->id)).'">'.$resource_id_resource->name.'</a></td>
         <td>'.$player_resource_history['turn'].'</td>
         <td>'.$player_resource_history['datetime'].'</td>
         <td>'.$player_resource_history['delta'].'</td>
         <td>'.$player_resource_history['reason'].'</td>          <td>
-            <form action="'.get_page_url(PAGE_CODE, true, array('id' => $player_order->get_id())).'" method="post">
-              '.HTMLHelper::genererInputHidden('player_order_id', $player_order->get_id()).'
+            <form action="'.get_page_url(PAGE_CODE, true, array('id' => $player_order->id)).'" method="post">
+              '.HTMLHelper::genererInputHidden('id', $player_order->id).'
 
-              '.HTMLHelper::genererInputHidden('game_id', $game_id_game->get_id()).'
-              '.HTMLHelper::genererInputHidden('player_id', $player_id_player->get_id()).'
-              '.HTMLHelper::genererInputHidden('resource_id', $resource_id_resource->get_id()).'              '.HTMLHelper::genererButton('action',  'del_player_resource_history', array('type' => 'submit'), 'Supprimer').'
+              '.HTMLHelper::genererInputHidden('game_id', $game_id_game->id).'
+              '.HTMLHelper::genererInputHidden('player_id', $player_id_player->id).'
+              '.HTMLHelper::genererInputHidden('resource_id', $resource_id_resource->id).'              '.HTMLHelper::genererButton('action',  'del_player_resource_history', array('type' => 'submit'), 'Supprimer').'
             </form>
           </td>
         </tr>';
@@ -141,8 +139,8 @@
   $liste_valeurs_game = Game::db_get_select_list();
   $liste_valeurs_player = Player::db_get_select_list();
   $liste_valeurs_resource = Resource::db_get_select_list();?>
-    <form action="<?php echo get_page_url(PAGE_CODE, true, array('id' => $player_order->get_id()))?>" method="post" class="formulaire">
-      <?php echo HTMLHelper::genererInputHidden('player_order_id', $player_order->get_id() )?>
+    <form action="<?php echo get_page_url(PAGE_CODE, true, array('id' => $player_order->id))?>" method="post" class="formulaire">
+      <?php echo HTMLHelper::genererInputHidden('id', $player_order->id )?>
       <fieldset>
         <legend>Ajouter un élément</legend>
         <p class="field">

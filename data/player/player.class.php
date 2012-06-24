@@ -1,6 +1,6 @@
 <?php
 /**
- * Classe Player
+ * Class Player
  *
  */
 
@@ -190,6 +190,18 @@ LIMIT 0,1';
     return $return;
   }
   
+  public function get_last_game() {
+    $sql = '
+SELECT `id`
+FROM `'.Game::get_table_name().'`
+JOIN `game_player` ON `game_id` = `id`
+WHERE `player_id` = '.mysql_ureal_escape_string($this->get_id()).'
+ORDER BY UNIX_TIMESTAMP( GREATEST( IFNULL(  `updated` , 0 ) , IFNULL(  `started` , 0 ) , IFNULL(  `created` , 0 ) ) ) DESC
+LIMIT 0,1';
+
+    return Game::sql_to_object( $sql );
+  }
+  
   public function get_current_game() {
     if( is_null( $this->current_game ) ) {
       $sql = '
@@ -200,7 +212,7 @@ WHERE `player_id` = '.mysql_ureal_escape_string($this->get_id()).'
 AND `ended` IS NULL
 LIMIT 0,1';
 
-      $this->current_game = Game::sql_to_object( $sql );;
+      $this->current_game = Game::sql_to_object( $sql );
     }
     
     return $this->current_game;
@@ -215,6 +227,22 @@ LIMIT 0,1';
       $return = $current_game->id;
     }
     
+    return $return;
+  }
+
+  public static function db_get_leaderboard_list( $game_id ) {
+    $return = null;
+    
+$sql = "
+SELECT `".self::get_table_name()."`.`id`
+FROM `".self::get_table_name()."`
+JOIN `player_resource_history` ON `".self::get_table_name()."`.`id` = `player_resource_history`.`player_id`
+WHERE `player_resource_history`.`game_id` = ".mysql_ureal_escape_string( $game_id )."
+AND `player_resource_history`.`resource_id` = 4
+GROUP BY `".self::get_table_name()."`.`id`
+ORDER BY SUM( `delta` ) DESC";
+    $return = self::sql_to_list( $sql );
+
     return $return;
   }
 

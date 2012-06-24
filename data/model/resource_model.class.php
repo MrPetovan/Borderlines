@@ -45,16 +45,16 @@ class Resource_Model extends DBObject {
   /**
    * Formulaire d'édition partie Administration
    *
-   * @param string $form_url URL de la page action
    * @return string
    */
-  public function html_get_form($form_url) {
+  public function html_get_form() {
     $return = '
     <fieldset>
       <legend>Text fields</legend>
         '.HTMLHelper::genererInputHidden('id', $this->get_id()).'
         <p class="field">'.HTMLHelper::genererInputText('name', $this->get_name(), array(), "Name *").'</p>
         <p class="field">'.HTMLHelper::genererInputCheckBox('public', '1', $this->get_public(), array('label_position' => 'right'), "Public" ).'</p>
+
     </fieldset>';
 
     return $return;

@@ -1,6 +1,6 @@
 <?php
 /**
- * Classe World
+ * Class World
  *
  */
 

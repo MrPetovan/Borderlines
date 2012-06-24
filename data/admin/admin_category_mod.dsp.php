@@ -29,7 +29,7 @@
       <h3>'.$PAGE_TITRE.'</h3>
       '.$html_msg.'
       <form class="formulaire" action="'.$form_url.'" method="post">
-        '.$category_mod->html_get_form(MEMBER_FORM_ADMIN);
+        '.$category_mod->html_get_form();
 
   // CUSTOM
 

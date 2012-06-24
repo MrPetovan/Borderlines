@@ -100,7 +100,7 @@ GROUP BY `REFERENCED_TABLE_NAME`";
 
     $res_fk = mysql_uquery($sql_fk);
 
-    while($row_fk = mysql_fetch_row($res_fk)) {
+    while($row_fk = mysql_fetch_row($res_fk)) {    
       $foreign_keys_list[$table_name][$row_fk[0]] = $row_fk[1];
 
       if( !in_array($table_name, $php_classes) && in_array( $row_fk[0], $primary_keys[ $table_name ] ) ) {
@@ -142,6 +142,11 @@ GROUP BY `REFERENCED_TABLE_NAME`";
 
   $processed_classes = array_diff( $php_classes_ord, $reserved_class_list );
   
+  
+  $created_file_list = array();
+  $overwritten_file_list = array();
+  $unchanged_file_list = array();
+
   foreach( $processed_classes as $class ) {
 
     $class_db_identifier = $class;
@@ -151,7 +156,7 @@ GROUP BY `REFERENCED_TABLE_NAME`";
     $table_columns = $table_columns_list[$class];
     $foreign_keys = $foreign_keys_list[$class];
     $sub_tables = isset($sub_tables_list[ $class ])?$sub_tables_list[ $class ]:array();
-
+    
     foreach( $file_list as $file_in => $file_out ) {
       $file_out = str_replace('CLASS', $class_db_identifier, $file_out);
 
@@ -173,19 +178,69 @@ GROUP BY `REFERENCED_TABLE_NAME`";
       if( ($start = strpos($content, CUSTOM_START)) !== false && ($stop = strpos($content, CUSTOM_STOP)) !== false ) {
         $content = substr($content, 0, $start + strlen(CUSTOM_START)).rtrim($custom_content)."\n\n".substr($content, $stop);
       }
+      
+      $content = str_replace('<_?php', '<?php', $content);
 
       _mkdir(dirname($file_out));
-      //if( $file_in != '_class.class.php' || !file_exists($file_out) )
-        file_put_contents($file_out, str_replace('<_?php', '<?php', $content));
-      echo "<p>Création de ".$file_out."</p>";
+      
+      if( file_exists($file_out) ) {
+        $file_out_size = strlen( file_get_contents( $file_out ) );
+        $content_size = strlen( $content );
+        if( $file_out_size != $content_size ) {
+          $overwritten_file_list[] = $file_out;
+          
+          file_put_contents($file_out, $content);
+        }else {
+          $unchanged_file_list[] = $file_out;
+        }
+      }else {
+        $created_file_list[] = $file_out;
+      
+        file_put_contents($file_out, $content);
+      }
     }
-
-
 
     $sql_class = str_replace('CLASS', $class_db_identifier, $sql);
 
     mysql_uquery($sql_class);
-
-    //echo '<pre>'.htmlentities_utf8($content).'</pre>';
   }
+  if( count( $created_file_list ) ) {
+    echo '
+    <p>File created :</p>
+    <ul>';
+    foreach( $created_file_list as $file ) {
+      echo '
+      <li>'.$file.'</li>';
+    }
+    echo '
+    </ul>';
+  }
+  if( count( $overwritten_file_list ) ) {
+    echo '
+    <p>File overwritten :</p>
+    <ul>';
+    foreach( $overwritten_file_list as $file ) {
+      echo '
+      <li>'.$file.'</li>';
+    }
+    echo '
+    </ul>';
+  }
+  echo '<p>'.count( $unchanged_file_list ).' files unchanged</p>';
+  
+  // Sauvegarde de la structure de la base
+  $command = MYSQLDUMP_PATH.'mysqldump --host="'.DB_HOST.'" --user="'.DB_USER.'" --password="'.DB_PASS.'" "'.DB_BASE.'" 2>&1 > "'.DATA.'database_structure_'.date('Ymd').'.sql"';
+  $return_var = null;
+  $output = array();
+  exec( $command, $output, $return_var );
+  
+  if( $return_var === 0 ) {
+    echo '
+    <p>Database structure saved in '.DATA.'database_structure_'.date('Ymd').'.sql</p>';
+  }else {
+    echo '<p>Error while saving database structure</p>
+    <p>'.implode('<br/>', $output).'</p>';
+  }
+  
+  
 ?>

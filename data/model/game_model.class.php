@@ -10,10 +10,13 @@ class Game_Model extends DBObject {
   protected $_current_turn = null;
   protected $_turn_interval = null;
   protected $_turn_limit = null;
+  protected $_min_players = null;
+  protected $_max_players = null;
   protected $_created = null;
   protected $_started = null;
   protected $_updated = null;
   protected $_ended = null;
+  protected $_created_by = null;
 
   public function __construct($id = null) {
     parent::__construct($id);
@@ -40,14 +43,31 @@ class Game_Model extends DBObject {
   public function set_turn_limit($turn_limit) {
     if( is_numeric($turn_limit) && (int)$turn_limit == $turn_limit) $data = intval($turn_limit); else $data = null; $this->_turn_limit = $data;
   }
+  public function set_min_players($min_players) {
+    if( is_numeric($min_players) && (int)$min_players == $min_players) $data = intval($min_players); else $data = null; $this->_min_players = $data;
+  }
+  public function set_max_players($max_players) {
+    if( is_numeric($max_players) && (int)$max_players == $max_players) $data = intval($max_players); else $data = null; $this->_max_players = $data;
+  }
   public function set_created($date) { $this->_created = guess_time($date, GUESS_DATE_MYSQL);}
   public function set_started($date) { $this->_started = guess_time($date, GUESS_DATE_MYSQL);}
   public function set_updated($date) { $this->_updated = guess_time($date, GUESS_DATE_MYSQL);}
   public function set_ended($date) { $this->_ended = guess_time($date, GUESS_DATE_MYSQL);}
+  public function set_created_by($created_by) {
+    if( is_numeric($created_by) && (int)$created_by == $created_by) $data = intval($created_by); else $data = null; $this->_created_by = $data;
+  }
 
   /* FONCTIONS SQL */
 
 
+  public static function db_get_by_created_by($created_by) {
+    $sql = "
+SELECT `id` FROM `".self::get_table_name()."`
+WHERE `created_by` = ".mysql_ureal_escape_string($created_by)."
+LIMIT 0,1";
+
+    return self::sql_to_object($sql, get_class());
+  }
 
   public static function db_get_select_list() {
     $return = array();
@@ -63,22 +83,31 @@ class Game_Model extends DBObject {
   /**
    * Formulaire d'édition partie Administration
    *
-   * @param string $form_url URL de la page action
    * @return string
    */
-  public function html_get_form($form_url) {
+  public function html_get_form() {
     $return = '
     <fieldset>
       <legend>Text fields</legend>
         '.HTMLHelper::genererInputHidden('id', $this->get_id()).'
         <p class="field">'.HTMLHelper::genererInputText('name', $this->get_name(), array(), "Name *").'</p>
-        <p class="field">'.HTMLHelper::genererInputText('current_turn', $this->get_current_turn(), array(), "Current Turn *").'</p>
+        <p class="field">'.HTMLHelper::genererInputText('current_turn', $this->get_current_turn(), array(), "Current Turn").'</p>
         <p class="field">'.HTMLHelper::genererInputText('turn_interval', $this->get_turn_interval(), array(), "Turn Interval *").'</p>
         <p class="field">'.HTMLHelper::genererInputText('turn_limit', $this->get_turn_limit(), array(), "Turn Limit *").'</p>
+        <p class="field">'.HTMLHelper::genererInputText('min_players', $this->get_min_players(), array(), "Min Players").'</p>
+        <p class="field">'.HTMLHelper::genererInputText('max_players', $this->get_max_players(), array(), "Max Players").'</p>
         <p class="field">'.HTMLHelper::genererInputText('created', $this->get_created(), array(), "Created *").'</p>
         <p class="field">'.HTMLHelper::genererInputText('started', $this->get_started(), array(), "Started").'</p>
         <p class="field">'.HTMLHelper::genererInputText('updated', $this->get_updated(), array(), "Updated").'</p>
-        <p class="field">'.HTMLHelper::genererInputText('ended', $this->get_ended(), array(), "Ended").'</p>
+        <p class="field">'.HTMLHelper::genererInputText('ended', $this->get_ended(), array(), "Ended").'</p>';
+      $option_list = array();
+      $player_list = Player::db_get_all();
+      foreach( $player_list as $player)
+        $option_list[ $player->id ] = $player->name;
+
+      $return .= '
+      <p class="field">'.HTMLHelper::genererSelect('created_by', $option_list, $this->get_created_by(), array(), "Created By *").'<a href="'.get_page_url('admin_player_mod').'">Créer un objet Player</a></p>
+
     </fieldset>';
 
     return $return;
@@ -94,10 +123,10 @@ class Game_Model extends DBObject {
   public static function get_message_erreur($num_error) {
     switch($num_error) { 
       case 1 : $return = "Le champ <strong>Name</strong> est obligatoire."; break;
-      case 2 : $return = "Le champ <strong>Current Turn</strong> est obligatoire."; break;
-      case 3 : $return = "Le champ <strong>Turn Interval</strong> est obligatoire."; break;
-      case 4 : $return = "Le champ <strong>Turn Limit</strong> est obligatoire."; break;
-      case 5 : $return = "Le champ <strong>Created</strong> est obligatoire."; break;
+      case 2 : $return = "Le champ <strong>Turn Interval</strong> est obligatoire."; break;
+      case 3 : $return = "Le champ <strong>Turn Limit</strong> est obligatoire."; break;
+      case 4 : $return = "Le champ <strong>Created</strong> est obligatoire."; break;
+      case 5 : $return = "Le champ <strong>Created By</strong> est obligatoire."; break;
       default: $return = "Erreur de saisie, veuillez vérifier les champs.";
     }
     return $return;
@@ -114,10 +143,10 @@ class Game_Model extends DBObject {
     $return = array();
 
     $return[] = Member::check_compulsory($this->get_name(), 1);
-    $return[] = Member::check_compulsory($this->get_current_turn(), 2);
-    $return[] = Member::check_compulsory($this->get_turn_interval(), 3);
-    $return[] = Member::check_compulsory($this->get_turn_limit(), 4);
-    $return[] = Member::check_compulsory($this->get_created(), 5);
+    $return[] = Member::check_compulsory($this->get_turn_interval(), 2, true);
+    $return[] = Member::check_compulsory($this->get_turn_limit(), 3, true);
+    $return[] = Member::check_compulsory($this->get_created(), 4);
+    $return[] = Member::check_compulsory($this->get_created_by(), 5, true);
 
     $return = array_unique($return);
     if(($true_key = array_search(true, $return, true)) !== false) {
@@ -133,7 +162,7 @@ class Game_Model extends DBObject {
 AND `player_id` = '.mysql_ureal_escape_string($player_id);
 
     $sql = '
-SELECT `game_id`, `player_id`
+SELECT `game_id`, `player_id`, `turn_ready`
 FROM `game_player`
 WHERE `game_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
     $res = mysql_uquery($sql);
@@ -141,8 +170,8 @@ WHERE `game_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
     return mysql_fetch_to_array($res);
   }
 
-  public function set_game_player( $player_id ) {
-    $sql = "REPLACE INTO `game_player` ( `game_id`, `player_id` ) VALUES (".mysql_ureal_escape_string( $this->get_id(), $player_id ).")";
+  public function set_game_player( $player_id, $turn_ready ) {
+    $sql = "REPLACE INTO `game_player` ( `game_id`, `player_id`, `turn_ready` ) VALUES (".mysql_ureal_escape_string( $this->get_id(), $player_id, $turn_ready ).")";
 
     return mysql_uquery($sql);
   }

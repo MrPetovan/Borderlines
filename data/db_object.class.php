@@ -323,6 +323,7 @@
 
       $sql .= "
 WHERE `id` = ".mysql_ureal_escape_string($this->get_id());
+
       return mysql_uquery($sql);
     }
 

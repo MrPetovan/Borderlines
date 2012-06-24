@@ -14,9 +14,11 @@
     if($tab_error === true) {
       $member_mod->db_save();
 
-      /*echo '<a href="'.Page::get_page_url(PAGE_CODE, false, array('id' => $member_mod->get_id())).'">Lien '.Page::get_page_url(PAGE_CODE, false, array('id' => $member_mod->get_id())).'</a>';
-      die();*/
-      //page_redirect(PAGE_CODE, array('id' => $member_mod->get_id()));
+      if( is_null( $id ) ) {
+        page_redirect('admin_member');
+      }else {
+        page_redirect(PAGE_CODE, array('id' => $member_mod->get_id()));
+      }
     }
   }
 

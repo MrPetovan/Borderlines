@@ -57,10 +57,9 @@ LIMIT 0,1";
   /**
    * Formulaire d'édition partie Administration
    *
-   * @param string $form_url URL de la page action
    * @return string
    */
-  public function html_get_form($form_url) {
+  public function html_get_form() {
     $return = '
     <fieldset>
       <legend>Text fields</legend>
@@ -74,6 +73,7 @@ LIMIT 0,1";
       <p class="field">'.HTMLHelper::genererSelect('member_id', $option_list, $this->get_member_id(), array(), "Member Id *").'<a href="'.get_page_url('admin_member_mod').'">Créer un objet Member</a></p>
         <p class="field">'.HTMLHelper::genererInputText('name', $this->get_name(), array(), "Name *").'</p>
         <p class="field">'.HTMLHelper::genererInputCheckBox('active', '1', $this->get_active(), array('label_position' => 'right'), "Active" ).'</p>
+
     </fieldset>';
 
     return $return;
@@ -90,7 +90,6 @@ LIMIT 0,1";
     switch($num_error) { 
       case 1 : $return = "Le champ <strong>Member Id</strong> est obligatoire."; break;
       case 2 : $return = "Le champ <strong>Name</strong> est obligatoire."; break;
-      case 3 : $return = "Le champ <strong>Active</strong> est obligatoire."; break;
       default: $return = "Erreur de saisie, veuillez vérifier les champs.";
     }
     return $return;
@@ -106,9 +105,8 @@ LIMIT 0,1";
   public function check_valid($flags = 0) {
     $return = array();
 
-    $return[] = Member::check_compulsory($this->get_member_id(), 1);
+    $return[] = Member::check_compulsory($this->get_member_id(), 1, true);
     $return[] = Member::check_compulsory($this->get_name(), 2);
-    $return[] = Member::check_compulsory($this->get_active(), 3, true);
 
     $return = array_unique($return);
     if(($true_key = array_search(true, $return, true)) !== false) {
@@ -124,7 +122,7 @@ LIMIT 0,1";
 AND `game_id` = '.mysql_ureal_escape_string($game_id);
 
     $sql = '
-SELECT `game_id`, `player_id`
+SELECT `game_id`, `player_id`, `turn_ready`
 FROM `game_player`
 WHERE `player_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
     $res = mysql_uquery($sql);
@@ -132,8 +130,8 @@ WHERE `player_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
     return mysql_fetch_to_array($res);
   }
 
-  public function set_game_player( $game_id ) {
-    $sql = "REPLACE INTO `game_player` ( `game_id`, `player_id` ) VALUES (".mysql_ureal_escape_string( $game_id, $this->get_id() ).")";
+  public function set_game_player( $game_id, $turn_ready ) {
+    $sql = "REPLACE INTO `game_player` ( `game_id`, `player_id`, `turn_ready` ) VALUES (".mysql_ureal_escape_string( $game_id, $this->get_id(), $turn_ready ).")";
 
     return mysql_uquery($sql);
   }

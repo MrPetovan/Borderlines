@@ -1,24 +1,22 @@
 <?php
   include_once('data/static/html_functions.php');
 
-  $resource = Resource::instance( getValue('id') );
-
   $tab_visible = array('0' => 'Non', '1' => 'Oui');
 
-  $form_url = get_page_url($PAGE_CODE).'&id='.$resource->get_id();
-  $PAGE_TITRE = 'Resource : Consultation de "'.$resource->get_name().'"';
+  $form_url = get_page_url($PAGE_CODE).'&id='.$resource->id;
+  $PAGE_TITRE = 'Resource : Showing "'.$resource->name.'"';
 ?>
 <div class="texte_contenu">
 <?php echo admin_menu(PAGE_CODE);?>
   <div class="texte_texte">
-    <h3>Consultation des données pour "<?php echo $resource->get_name()?>"</h3>
+    <h3>Showing "<?php echo $resource->name?>"</h3>
     <div class="informations formulaire">
 
             <p class="field">
               <span class="libelle">Public</span>
-              <span class="value"><?php echo $tab_visible[$".$class_db_identifier."->get_".$column_name."()]?></span>
+              <span class="value"><?php echo $tab_visible[$resource->public]?></span>
             </p>    </div>
-    <p><a href="<?php echo get_page_url('admin_resource_mod', true, array('id' => $resource->get_id()))?>">Modifier cet objet Resource</a></p>
+    <p><a href="<?php echo get_page_url('admin_resource_mod', true, array('id' => $resource->id))?>">Modifier cet objet Resource</a></p>
     <h4>Player Resource History</h4>
 <?php
 
@@ -52,19 +50,19 @@
         $player_id_player = Player::instance( $player_resource_history['player_id'] );
         $player_order_id_player_order = Player_Order::instance( $player_resource_history['player_order_id'] );        echo '
         <tr>
-        <td><a href="'.get_page_url('admin_game_view', true, array('id' => $game_id_game->get_id())).'">'.$game_id_game->get_name().'</a></td>
-        <td><a href="'.get_page_url('admin_player_view', true, array('id' => $player_id_player->get_id())).'">'.$player_id_player->get_name().'</a></td>
+        <td><a href="'.get_page_url('admin_game_view', true, array('id' => $game_id_game->id)).'">'.$game_id_game->name.'</a></td>
+        <td><a href="'.get_page_url('admin_player_view', true, array('id' => $player_id_player->id)).'">'.$player_id_player->name.'</a></td>
         <td>'.$player_resource_history['turn'].'</td>
         <td>'.$player_resource_history['datetime'].'</td>
         <td>'.$player_resource_history['delta'].'</td>
         <td>'.$player_resource_history['reason'].'</td>
-        <td><a href="'.get_page_url('admin_player_order_view', true, array('id' => $player_order_id_player_order->get_id())).'">'.$player_order_id_player_order->get_id().'</a></td>          <td>
-            <form action="'.get_page_url(PAGE_CODE, true, array('id' => $resource->get_id())).'" method="post">
-              '.HTMLHelper::genererInputHidden('resource_id', $resource->get_id()).'
+        <td><a href="'.get_page_url('admin_player_order_view', true, array('id' => $player_order_id_player_order->id)).'">'.$player_order_id_player_order->id.'</a></td>          <td>
+            <form action="'.get_page_url(PAGE_CODE, true, array('id' => $resource->id)).'" method="post">
+              '.HTMLHelper::genererInputHidden('id', $resource->id).'
 
-              '.HTMLHelper::genererInputHidden('game_id', $game_id_game->get_id()).'
-              '.HTMLHelper::genererInputHidden('player_id', $player_id_player->get_id()).'
-              '.HTMLHelper::genererInputHidden('player_order_id', $player_order_id_player_order->get_id()).'              '.HTMLHelper::genererButton('action',  'del_player_resource_history', array('type' => 'submit'), 'Supprimer').'
+              '.HTMLHelper::genererInputHidden('game_id', $game_id_game->id).'
+              '.HTMLHelper::genererInputHidden('player_id', $player_id_player->id).'
+              '.HTMLHelper::genererInputHidden('player_order_id', $player_order_id_player_order->id).'              '.HTMLHelper::genererButton('action',  'del_player_resource_history', array('type' => 'submit'), 'Supprimer').'
             </form>
           </td>
         </tr>';
@@ -80,8 +78,8 @@
   $liste_valeurs_game = Game::db_get_select_list();
   $liste_valeurs_player = Player::db_get_select_list();
   $liste_valeurs_player_order = Player_Order::db_get_select_list();?>
-    <form action="<?php echo get_page_url(PAGE_CODE, true, array('id' => $resource->get_id()))?>" method="post" class="formulaire">
-      <?php echo HTMLHelper::genererInputHidden('resource_id', $resource->get_id() )?>
+    <form action="<?php echo get_page_url(PAGE_CODE, true, array('id' => $resource->id))?>" method="post" class="formulaire">
+      <?php echo HTMLHelper::genererInputHidden('id', $resource->id )?>
       <fieldset>
         <legend>Ajouter un élément</legend>
         <p class="field">

@@ -28,7 +28,7 @@
       <h3>'.$PAGE_TITRE.'</h3>
       '.$html_msg.'
       <form class="formulaire" action="'.$form_url.'" method="post">
-        '.$<?php echo $class_db_identifier ?>_mod->html_get_form(MEMBER_FORM_ADMIN);
+        '.$<?php echo $class_db_identifier ?>_mod->html_get_form();
 
   // CUSTOM
 

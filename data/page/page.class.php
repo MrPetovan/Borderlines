@@ -286,5 +286,9 @@ LIMIT 0,1";
       redirect($redirect);
     }
   }
+  
+  public static function redirect( $page, $params = array()) {
+    self::page_redirect($page, $params );
+  }
 }
 ?>

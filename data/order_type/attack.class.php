@@ -117,6 +117,7 @@ class Attack extends Player_Order {
     
     $game = $params['current_player']->get_current_game();
     $game_player_list = $game->get_game_player_list( );
+    $player_list = array();
     foreach( $game_player_list as $game_player ) {
       if( $game_player['player_id'] == $params['current_player']->id ) continue;
       $player = Player::instance( $game_player['player_id'] );

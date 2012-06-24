@@ -77,7 +77,7 @@
   
   require_once( DATA.'order_type/iorder.php');
   require_once( INC.'borderlines.inc.php');
-  
+
   $flag_action = false;
   if(! mysql_uconnect(DB_HOST, DB_USER, DB_PASS, DB_BASE)) {
     //$data_include['dsp'] = 'error_db.php';

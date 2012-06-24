@@ -11,9 +11,36 @@
 </ul>
 <?php
   }else {
+    if( $game->has_ended() ) {
+      $game_status = "Ended";
+    }elseif( $game->started ) {
+      $game_status = "Started";
+    }else {
+      $game_status = "Waiting players";
+    }
 ?>
 <h2>Compute orders</h2>
 <h2>Game <?php echo $game->name?></h2>
+<ul>
+  <li>Name : <?php echo $game->name ?></li>
+  <li>Turn : <?php echo $game->current_turn.'/'.$game->turn_limit ?></li>
+  <li>Turn interval : <?php echo $game->turn_interval ?> seconds</li>
+  <li>Status : <?php echo $game_status ?></li>
+  <li>Created : <?php echo guess_time( $game->created, GUESS_TIME_FR ) ?></li>
+<?php if( $game->started ) { ?>
+  <li>Started : <?php echo guess_time( $game->started, GUESS_TIME_FR ) ?></li>
+<?php } ?>
+<?php if( $game->updated ) { ?>
+  <li>Last turn : <?php echo guess_time( $game->updated, GUESS_TIME_FR ) ?></li>
+  <li>Next turn : <?php echo guess_time( $game->updated + $game->turn_interval, GUESS_TIME_FR ) ?></li>
+<?php } ?>
+<?php if( $game->ended ) { ?>
+  <li>Ended : <?php echo guess_time( $game->ended, GUESS_TIME_FR ) ?></li>
+<?php } ?>
+</ul>
+<p><a href="<?php echo Page::get_page_url( PAGE_CODE, false, array('action' => 'reset', 'id' => $game->id ) )?>">Reset game</a></p>
+<p><a href="<?php echo Page::get_page_url( PAGE_CODE, false, array('action' => 'start', 'id' => $game->id ) )?>">Start game</a></p>
+<p><a href="<?php echo Page::get_page_url( PAGE_CODE, false, array('action' => 'compute', 'id' => $game->id ) )?>">Compute orders</a></p>
 <table border="1">
   <tr>
     <th>Id</th>
@@ -97,6 +124,4 @@
     </td>
   </tr>
 </table>
-<p><a href="<?php echo Page::get_page_url( PAGE_CODE, false, array('action' => 'init', 'id' => $game->id ) )?>">Init game</a></p>
-<p><a href="<?php echo Page::get_page_url( PAGE_CODE, false, array('action' => 'compute', 'id' => $game->id ) )?>">Compute orders</a></p>
 <?php } ?>
