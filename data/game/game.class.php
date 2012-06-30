@@ -27,6 +27,7 @@ class Game extends Game_Model {
   
   public function reset() {
     $this->current_turn = 0;
+    $this->started = null;
     $this->ended = null;
     $this->updated = null;
     
@@ -71,12 +72,12 @@ class Game extends Game_Model {
     if( !$this->has_ended() ) {
       $this->current_turn++;
     
-      $game_player_list = $this->get_game_player_list( );
-      foreach( $game_player_list as $game_player ) {
-        $player = Player::instance( $game_player['player_id'] );
+      $player_list = Player::db_get_by_game( $this->id );
+    
+      foreach( $player_list as $player ) {
         $territory_gain = $player->get_resource_sum( 4 ) * 0.1;
         $message = "Territory gain";
-        $this->set_player_resource_history( $player->id, 5, $this->current_turn, guess_time( mktime(), GUESS_DATE_MYSQL ), $territory_gain, $message, null );
+        $this->set_player_resource_history( $player->id, 5, $this->current_turn, guess_time( time(), GUESS_DATE_MYSQL ), $territory_gain, $message, null );
       }
       
       $player_order_list = Player_Order::get_ready_orders( $this->id );
@@ -93,6 +94,26 @@ class Game extends Game_Model {
       
       if( $this->current_turn == $this->turn_limit ) {
         $this->ended = time();
+        
+        foreach( $player_list as $player ) {
+          $member = Member::instance( $player->member_id );
+          if( php_mail($member->email, SITE_NAME." | Game ended", $player->get_email_game_end( $this ), true) ) {
+            Page::add_message("Message sent to ".$player->name);
+          }else {
+            Page::add_message("Message failed to ".$player->name, Page::PAGE_MESSAGE_WARNING);
+            Page::add_message(var_export( error_get_last(), 1 ), Page::PAGE_MESSAGE_WARNING);
+          }
+        }
+      }else {
+        foreach( $player_list as $player ) {
+          $member = Member::instance( $player->member_id );
+          if( php_mail($member->email, SITE_NAME." | New turn", $player->get_email_game_new_turn( $this ), true)) {
+            Page::add_message("Message sent to ".$player->name);
+          }else {
+            Page::add_message("Message failed to ".$player->name, Page::PAGE_MESSAGE_WARNING);
+            Page::add_message(var_export( error_get_last(), 1 ), Page::PAGE_MESSAGE_WARNING);
+          }
+        }
       }
     
       $return = $this->save();
@@ -110,6 +131,17 @@ AND `updated` + `turn_interval` < NOW()";
 
     return self::sql_to_list( $sql );
   }
+  
+  public function db_get_nonended_game_list() {
+    $sql = "
+SELECT *
+FROM `".self::get_table_name()."`
+WHERE `ended` IS NULL";
+
+    return self::sql_to_list( $sql );
+  }
+  
+  
   
   public function html_get_game_list_form() {
     $turn_interval_list = array(

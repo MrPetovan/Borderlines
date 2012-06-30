@@ -412,7 +412,6 @@ function guess_date($date, $return_flag = GUESS_DATE_TIMESTAMP) {
       }
     }
   }
-  //var_debug('guess_time', $date, $return);
   return $return;
 }
 

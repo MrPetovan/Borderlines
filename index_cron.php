@@ -75,16 +75,22 @@
     mysql_uquery("SET NAMES 'utf8'");    
   }
 
-  $game_list = Game::db_get_ready_game_list();
-  
+  $game_list = Game::db_get_nonended_game_list();
+
   foreach( $game_list as $game ) {
-    $game->compute();
+    if( $game->started ) {
+      $game->compute_auto();
+    }else {
+      if( $game->min_players && count( $game->get_game_player_list() ) >= $game->min_players ) {
+        $game->start();
+      }
+    }
     
-    if( $game->has_ended( ) ) {
+    /*if( $game->has_ended( ) ) {
       $new_game = clone $game;
       $new_game->id = null;
       $new_game->reset();
-    }
+    }*/
   }
   
   

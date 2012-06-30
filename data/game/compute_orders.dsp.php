@@ -20,7 +20,7 @@
     }
 ?>
 <h2>Compute orders</h2>
-<h2>Game <?php echo $game->name?></h2>
+<h2><a href="<?php echo Page::get_url('show_game', array('id'=> $game->id))?>">Game <?php echo $game->name?></a></h2>
 <ul>
   <li>Name : <?php echo $game->name ?></li>
   <li>Turn : <?php echo $game->current_turn.'/'.$game->turn_limit ?></li>

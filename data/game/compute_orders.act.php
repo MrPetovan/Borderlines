@@ -31,7 +31,7 @@
           break;
         }
       }
-      Page::page_redirect( PAGE_CODE, array('id' => $game->id ) );
+      //Page::page_redirect( PAGE_CODE, array('id' => $game->id ) );
     }
   }
 ?>

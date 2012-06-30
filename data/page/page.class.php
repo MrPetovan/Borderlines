@@ -177,6 +177,10 @@ LIMIT 0,1";
     return $return;
   }
 
+  public static function get_url($code_page, $params = array(), $root = true) {
+    return self::get_page_url($code_page, $root, $params);
+  }
+  
   /**
    * Retourne l'URL de la page selon son code
    *

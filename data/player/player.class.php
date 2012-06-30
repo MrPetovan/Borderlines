@@ -245,6 +245,54 @@ ORDER BY SUM( `delta` ) DESC";
 
     return $return;
   }
+  
+  public static function db_get_by_game( $game_id ) {
+
+    $sql = '
+SELECT `player_id` as `id`
+FROM `game_player`
+WHERE `game_id` = '.mysql_ureal_escape_string($game_id);
+
+    $return = self::sql_to_list( $sql );
+
+    return $return;
+  }
+  
+  /**
+   * Game new turn mail
+   *
+   * @see php_mail
+   * @param string $game Current game
+   * @return string
+   */
+  public function get_email_game_new_turn( $game ) {
+    $return = '
+      <td width="698" style="vertical-align:top; padding-left:80px; padding-right:80px; font-size: 14px; color:#444444;">
+        <p>Hi '.wash_utf8($this->name).',</p>
+        <p>Game '.wash_utf8($game->name).'\'s turn has been computed and is ready for you.</p>
+        <p><a href="'.Page::get_url('dashboard').'">Play now</a></p>
+      </td>';
+
+    return $return;
+  }
+
+  /**
+   * Game ended mail
+   *
+   * @see php_mail
+   * @param string $game Current game
+   * @return string
+   */
+  public function get_email_game_end( $game ) {
+    $return = '
+      <td width="698" style="vertical-align:top; padding-left:80px; padding-right:80px; font-size: 14px; color:#444444;">
+        <p>Hi '.wash_utf8($this->name).',</p>
+        <p>Game '.wash_utf8($game->name).'has ended !</p>
+        <p><a href="'.Page::get_url('dashboard').'">Check the leaderboard</a></p>
+      </td>';
+
+    return $return;
+  }
 
   // /CUSTOM
 

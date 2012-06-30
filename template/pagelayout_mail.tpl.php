@@ -1,21 +1,16 @@
 <html>
   <head>
-    <meta name="generator" content="HTML Tidy for Windows (vers 14 February 2006), see www.w3.org">
-    <title>
-      mails_auto_maquette_090106
-    </title>
+    <title></title>
   </head>
   <body bgcolor="white" style="font-family: Arial, sans serif; margin: 0; padding: 10px;" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
-    <table align="center" id="mail_auto" width="698" border="0" cellpadding="0" cellspacing="0" style="border:solid 1px #ff569d;font-family: Arial, sans serif;">
+    <table align="center" id="mail_auto" width="698" border="0" cellpadding="0" cellspacing="0" style="border:solid 1px #E0E0E0;font-family: Arial, sans serif;">
       <tr>
-        <td style="font-size: 72px; color: #FFFFFF; background-color: #FF569D; font-weight: bold"><a href="<?php echo get_page_url('accueil')?>"><?php echo SITE_NAME ?></a></td>
-      </tr>
-      <tr>
-        <td><a href="<?php echo get_page_url('accueil')?>"><img src="<?php echo IMG?>img_html/mails_auto_slogan.jpg" width="698" height="241" border="0" alt=""></a></td>
+        <td style="font-size: 72px; color: #FFFFFF; background-color: #E0E0E0; font-weight: bold"><a style="color: #000000; text-decoration:none" href="<?php echo Page::get_url('accueil')?>"><?php echo SITE_NAME ?></a></td>
       </tr>
       <tr>
         <?php echo $PAGE_CONTENU?>
       </tr>
+<?php /*
       <tr>
         <td style="padding-left:30px; padding-right:30px;">
           <p style="font-size: 12px; color:#444444; line-height: 15px; text-align:justify; margin-top:50px; margin-bottom:30px;">
@@ -24,6 +19,7 @@
           </p>
         </td>
       </tr>
+*/?>
     </table>
   </body>
 </html>

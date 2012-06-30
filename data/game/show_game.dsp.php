@@ -103,5 +103,8 @@
 <p><a href="'.Page::get_page_url(PAGE_CODE, false, array('action' => 'join', 'id' => $game->id)).'">Join this game</a></p>';
   }
   
+  if( is_admin() ) {
+    echo '<p><a href="'.Page::get_url('compute_orders', array('id' => $game->id )).'">Manage game</a></p>';
+  }
 ?>
 <p><a href="<?php echo get_page_url('game_list')?>">Return to game list</a></p>
