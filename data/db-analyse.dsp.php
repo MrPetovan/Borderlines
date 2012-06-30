@@ -229,7 +229,7 @@ GROUP BY `REFERENCED_TABLE_NAME`";
   echo '<p>'.count( $unchanged_file_list ).' files unchanged</p>';
   
   // Sauvegarde de la structure de la base
-  $command = MYSQLDUMP_PATH.'mysqldump --host="'.DB_HOST.'" --user="'.DB_USER.'" --password="'.DB_PASS.'" "'.DB_BASE.'" 2>&1 > "'.DATA.'database_structure_'.date('Ymd').'.sql"';
+  $command = MYSQLDUMP_PATH.'mysqldump --no-data --host="'.DB_HOST.'" --user="'.DB_USER.'" --password="'.DB_PASS.'" "'.DB_BASE.'" 2>&1 > "'.DATA.'database_structure_'.date('Ymd').'.sql"';
   $return_var = null;
   $output = array();
   exec( $command, $output, $return_var );
