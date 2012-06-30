@@ -68,7 +68,7 @@
   // Fonctions système de fichier
   require_once(INC.'files.inc.php');
   // Fonctions envoi de mail
-  require_once(INC.'php_mailer/class.phpmailer.php');
+  require_once(INC.'PHPMailer/class.phpmailer.php');
   // Fonctions html
   require_once(INC.'html.class.php');
 
