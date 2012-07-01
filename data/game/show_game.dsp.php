@@ -104,7 +104,7 @@
   }
   
   if( is_admin() ) {
-    echo '<p><a href="'.Page::get_url('compute_orders', array('id' => $game->id )).'">Manage game</a></p>';
+    echo '<p><a href="'.Page::get_url('admin_game_view', array('id' => $game->id )).'">Manage game</a></p>';
   }
 ?>
 <p><a href="<?php echo get_page_url('game_list')?>">Return to game list</a></p>
