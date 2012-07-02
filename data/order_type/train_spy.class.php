@@ -58,7 +58,7 @@
 <form action="'.Page::get_page_url( 'order' ).'" method="post">
   <fieldset>
     <legend>'.$title.'</legend>
-    <p>1 budget spent = 1 soldier trained</p>
+    <p>1 budget spent = 1 spy trained</p>
     '.HTMLHelper::genererInputHidden('url_return', Page::get_page_url( $params['page_code'], true, $page_params ) ).'
     <p>'.HTMLHelper::genererInputText( 'parameters[count]', 0, array(), 'Intelligence budget increase', null ).'</p>
     <p>'.HTMLHelper::genererButton( 'action', 'train_spy', array('type' => 'submit'), "Train 00 agents" ).'</p>
