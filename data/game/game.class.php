@@ -35,7 +35,7 @@ class Game extends Game_Model {
     
     Player_Order::db_truncate_by_game( $this->id );
     $this->del_player_resource_history();
-    $this->del_game_player();
+    //$this->del_game_player();
   }
   
   public function start() {
@@ -44,25 +44,36 @@ class Game extends Game_Model {
     
     $this->save();
   
-    $game_player_list = $this->get_game_player_list( );
+    $player_list = Player::db_get_by_game( $this->id );
     
     $resources = Resource::db_get_select_list();
-    foreach( $game_player_list as $game_player ) {
-      $player = Player::instance( $game_player['player_id'] );
-
+    foreach( $player_list as $player ) {
       foreach( $resources as $resource_id => $resource_name ) {
         $this->set_player_resource_history( $player->id, $resource_id, $this->current_turn, guess_time( time(), GUESS_DATE_MYSQL), 1000, "Init ($resource_name)", null );
       }
-      
-      // TODO : Send notification
+
+      $member = Member::instance( $player->member_id );
+      if( php_mail($member->email, SITE_NAME." | Game started", $player->get_email_game_new_turn( $this ), true)) {
+        Page::add_message("Message sent to ".$player->name);
+      }else {
+        Page::add_message("Message failed to ".$player->name, Page::PAGE_MESSAGE_WARNING);
+        Page::add_message(var_export( error_get_last(), 1 ), Page::PAGE_MESSAGE_WARNING);
+      }
     }
   }
 
   public function compute_auto() {
-    if(
-      $this->current_turn < $this->turn_limit && 
-      $this->updated + $this->turn_interval < time()
-    ) {
+    $flag_turn_limit = $this->current_turn < $this->turn_limit;
+    $flag_turn_interval = $this->updated + $this->turn_interval < time();
+    
+    // Checking if every player is ready
+    $game_players = $this->get_game_player_list();
+    $flag_players_ready = true;
+    while( $flag_players_ready && $game_player = each( $game_players ) ) {
+      $flag_players_ready = $game_player['turn_ready'] > $this->current_turn;
+    }
+  
+    if( $flag_turn_limit && ( $flag_turn_interval || $flag_players_ready ) ) {
       $this->compute();
     }
   }

@@ -152,6 +152,14 @@
       }
 ?>
 </table>
+<?php
+  $turn_ready = array_shift( $current_player->get_game_player_list( $current_game->id ) );
+  if( $turn_ready['turn_ready'] <= $current_game->current_turn ) {
+    echo '<p><a href="'.Page::get_url(PAGE_CODE, array('action' => 'ready')).'">I\'m ready for the next turn</a></p>';
+  }else {
+    echo '<p><a href="'.Page::get_url(PAGE_CODE, array('action' => 'ready')).'">I\'m not ready for the next turn yet</a></p>';
+  }
+?>
 <h4>New order</h4>
 <?php
       foreach( Order_Type::db_get_all() as $order_type ) {
