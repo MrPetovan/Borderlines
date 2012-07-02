@@ -269,7 +269,7 @@ WHERE `game_id` = '.mysql_ureal_escape_string($game_id);
     $return = '
       <td width="698" style="vertical-align:top; padding-left:80px; padding-right:80px; font-size: 14px; color:#444444;">
         <p>Hi '.wash_utf8($this->name).',</p>
-        <p>Game '.wash_utf8($game->name).'\'s turn has been computed and is ready for you.</p>
+        <p>Game "'.wash_utf8($game->name).'"\'s turn has been computed and is ready for you.</p>
         <p><a href="'.Page::get_url('dashboard').'">Play now</a></p>
       </td>';
 
@@ -287,7 +287,7 @@ WHERE `game_id` = '.mysql_ureal_escape_string($game_id);
     $return = '
       <td width="698" style="vertical-align:top; padding-left:80px; padding-right:80px; font-size: 14px; color:#444444;">
         <p>Hi '.wash_utf8($this->name).',</p>
-        <p>Game '.wash_utf8($game->name).'has ended !</p>
+        <p>Game "'.wash_utf8($game->name).'" has ended !</p>
         <p><a href="'.Page::get_url('dashboard').'">Check the leaderboard</a></p>
       </td>';
 
