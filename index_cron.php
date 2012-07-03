@@ -20,12 +20,16 @@
 
   define('URL_ROOT_RELATIVE', $URL_ROOT_RELATIVE);
 
+  // Constante principale, c'est l'URL absolue de la base du site
+  define("URL_ROOT", "http://borderlines.mrpetovan.com".URL_ROOT_RELATIVE.'/');
   // PATH absolu de la base du site
   define('DIR_ROOT', dirname($_SERVER['SCRIPT_FILENAME']) .'/');
   // PATH du répertoire d'inclusions
   define('DATA', DIR_ROOT.'data/');
   // PATH du répertoire d'inclusions
   define('INC', DIR_ROOT.'inc/');
+  // PATH du répertoire des templates
+  define('TPL', DIR_ROOT.'template/');
 
   // Constante de debug SQL général
   define('DEBUG_SQL', false);
@@ -57,7 +61,7 @@
   // Fonctions système de fichier
   require_once(INC.'files.inc.php');
   // Fonctions envoi de mail
-  require_once(INC.'php_mailer/class.phpmailer.php');
+  require_once(INC.'PHPMailer/class.phpmailer.php');
 
   //Includes classes
   require_once('data/db_object.class.php');
