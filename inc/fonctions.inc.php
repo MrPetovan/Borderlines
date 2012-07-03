@@ -633,7 +633,11 @@ function php_mail($address, $subject, $body, $html_template = false, $debug = fa
 
     if(is_array($address)) {
       // Cas particulier : array(email, name)
-      if(count($address) == 2 && Member::check_email($address[0]) === true && !is_array($address[1]) && ($address[1] == '' || Member::check_email($address[0]) !== true)) {
+      if(
+        count($address) == 2
+        && Member::check_email($address[0]) === true
+        && !is_array($address[1])
+        && ($address[1] == '' || Member::check_email($address[1]) !== true)) {
         $mail->AddAddress($address[0], $address[1]);
       }else {
         //Cas général : array(email, array(email, name), email, ...)
@@ -663,7 +667,6 @@ function php_mail($address, $subject, $body, $html_template = false, $debug = fa
     $mail->Subject = iconv('utf-8', 'iso-8859-15', $subject);
     $mail->Body    = iconv('utf-8', 'iso-8859-15', $body);
     //    $mail->AltBody = $PAGE_CONTENU;
-
     if($debug) {
       var_dump($body);
     }else {
