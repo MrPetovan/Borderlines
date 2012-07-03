@@ -69,7 +69,7 @@ class Game extends Game_Model {
     // Checking if every player is ready
     $game_players = $this->get_game_player_list();
     $flag_players_ready = true;
-    while( $flag_players_ready && $game_player = each( $game_players ) ) {
+    while( (list( $key, $game_player) = each( $game_players )) && $flag_players_ready  ) {
       $flag_players_ready = $game_player['turn_ready'] > $this->current_turn;
     }
   
