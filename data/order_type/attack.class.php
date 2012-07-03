@@ -36,7 +36,7 @@ class Attack extends Player_Order {
       
       if( $defending_player ) {
         $game_id = $attacking_player->current_game->id;
-        $resource_turn = $attacking_player->current_game->current_turn + 1;
+        $resource_turn = $attacking_player->current_game->current_turn;
       
       
         $return_code = 0;

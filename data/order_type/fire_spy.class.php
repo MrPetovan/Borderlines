@@ -10,7 +10,7 @@
       
       if( isset( $parameters['count'] ) ) {
         $game_id = $player->current_game->id;
-        $resource_turn = $player->current_game->current_turn + 1;
+        $resource_turn = $player->current_game->current_turn;
         $spies_fired = $parameters['count'];
         
         $return_code = 0;
