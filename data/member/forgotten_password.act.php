@@ -25,8 +25,8 @@
 
     if($tab_error === true) {
       if(php_mail(
-        array($member->get_email(), $member->get_pseudo()),
-        "Geo : Oubli de mot de passe.",
+        array($member->email, $member->name),
+        SITE_NAME." : Forgotten password",
         $member->get_email_forgotten_password($new_password), true
       )) {
         $succes_msg = true;
