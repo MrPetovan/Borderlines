@@ -37,15 +37,14 @@ SELECT `id` FROM `".self::get_table_name()."`
 WHERE `class_name` = ".mysql_ureal_escape_string($class_name)."
 LIMIT 0,1";
 
-    return self::sql_to_object($sql, get_class());
+    return self::sql_to_object($sql);
   }
   public static function db_get_by_target_player($target_player) {
     $sql = "
 SELECT `id` FROM `".self::get_table_name()."`
-WHERE `target_player` = ".mysql_ureal_escape_string($target_player)."
-LIMIT 0,1";
+WHERE `target_player` = ".mysql_ureal_escape_string($target_player);
 
-    return self::sql_to_object($sql, get_class());
+    return self::sql_to_list($sql);
   }
 
   public static function db_get_select_list() {

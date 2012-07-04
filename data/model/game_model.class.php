@@ -63,10 +63,9 @@ class Game_Model extends DBObject {
   public static function db_get_by_created_by($created_by) {
     $sql = "
 SELECT `id` FROM `".self::get_table_name()."`
-WHERE `created_by` = ".mysql_ureal_escape_string($created_by)."
-LIMIT 0,1";
+WHERE `created_by` = ".mysql_ureal_escape_string($created_by);
 
-    return self::sql_to_object($sql, get_class());
+    return self::sql_to_list($sql);
   }
 
   public static function db_get_select_list() {

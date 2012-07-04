@@ -64,26 +64,23 @@ class Player_Order_Model extends DBObject {
   public static function db_get_by_game_id($game_id) {
     $sql = "
 SELECT `id` FROM `".self::get_table_name()."`
-WHERE `game_id` = ".mysql_ureal_escape_string($game_id)."
-LIMIT 0,1";
+WHERE `game_id` = ".mysql_ureal_escape_string($game_id);
 
-    return self::sql_to_object($sql, get_class());
+    return self::sql_to_list($sql);
   }
   public static function db_get_by_order_type_id($order_type_id) {
     $sql = "
 SELECT `id` FROM `".self::get_table_name()."`
-WHERE `order_type_id` = ".mysql_ureal_escape_string($order_type_id)."
-LIMIT 0,1";
+WHERE `order_type_id` = ".mysql_ureal_escape_string($order_type_id);
 
-    return self::sql_to_object($sql, get_class());
+    return self::sql_to_list($sql);
   }
   public static function db_get_by_player_id($player_id) {
     $sql = "
 SELECT `id` FROM `".self::get_table_name()."`
-WHERE `player_id` = ".mysql_ureal_escape_string($player_id)."
-LIMIT 0,1";
+WHERE `player_id` = ".mysql_ureal_escape_string($player_id);
 
-    return self::sql_to_object($sql, get_class());
+    return self::sql_to_list($sql);
   }
 
   public static function db_get_select_list() {

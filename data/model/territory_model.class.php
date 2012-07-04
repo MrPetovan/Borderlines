@@ -31,10 +31,9 @@ class Territory_Model extends DBObject {
   public static function db_get_by_world_id($world_id) {
     $sql = "
 SELECT `id` FROM `".self::get_table_name()."`
-WHERE `world_id` = ".mysql_ureal_escape_string($world_id)."
-LIMIT 0,1";
+WHERE `world_id` = ".mysql_ureal_escape_string($world_id);
 
-    return self::sql_to_object($sql, get_class());
+    return self::sql_to_list($sql);
   }
 
   public static function db_get_select_list() {

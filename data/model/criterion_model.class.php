@@ -31,10 +31,9 @@ class Criterion_Model extends DBObject {
   public static function db_get_by_category_id($category_id) {
     $sql = "
 SELECT `id` FROM `".self::get_table_name()."`
-WHERE `category_id` = ".mysql_ureal_escape_string($category_id)."
-LIMIT 0,1";
+WHERE `category_id` = ".mysql_ureal_escape_string($category_id);
 
-    return self::sql_to_object($sql, get_class());
+    return self::sql_to_list($sql);
   }
 
   public static function db_get_select_list() {

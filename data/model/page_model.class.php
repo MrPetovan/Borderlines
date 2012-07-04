@@ -37,8 +37,8 @@ class Page_Model extends DBObject {
 
   /* FONCTIONS SQL */
 
-  public static function db_exists ($id) { return self::db_exists_class($id, get_class());}
-  public static function db_get_by_id($id) { return self::db_get_by_id_class($id, get_class());}
+  public static function db_exists ($id) { return self::db_exists($id);}
+  public static function db_get_by_id($id) { return self::db_get_by_id($id);}
 
   public static function db_get_all($page = null, $limit = NB_PER_PAGE) {
     $sql = 'SELECT `id` FROM `'.self::get_table_name().'` ORDER BY `id`';
@@ -75,8 +75,6 @@ LIMIT 0,1";
   }
 
   /* FONCTIONS HTML */
-
-  public static function manage_errors($tab_error, &$html_msg) { return self::manage_errors_class($tab_error, $html_msg, get_class());}
 
   /**
    * Formulaire d'édition partie Administration
