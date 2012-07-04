@@ -16,10 +16,6 @@
    * - Les getter et les setter standards sont générés à la volée par la
    *   fonction magique __call, de la forme get_{nom champ sql} et
    *   set_[nom champ sql}. Ils peuvent être surchargés
-   * - Les fonctions *_class sont dûes à une limitation de PHP qui fait que le
-   *   mot clé self n'est pas typé de la classe fille quand appelée depuis une
-   *   fonction héritée. D'où l'utilisation de get_class() et le renvoit à la
-   *   fonction sans "_class"
    * - Les objets chargés depuis la base sont en singleton, chaque instanciation
    *   d'un objet avec le même "id" appelera le même objet. Cela permet de
    *   réduire le nombre de requête en base, et d'être sûr de modifier les
