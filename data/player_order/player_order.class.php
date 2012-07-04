@@ -23,7 +23,8 @@ SELECT id
 FROM `".self::get_table_name()."`
 WHERE `game_id` = ".mysql_ureal_escape_string( $game_id )."
 AND `datetime_execution` IS NULL
-AND `datetime_scheduled` <= NOW()";
+AND `datetime_scheduled` <= NOW()
+ORDER BY `order_type_id`";
 
     return self::sql_to_list( $sql );
   }
