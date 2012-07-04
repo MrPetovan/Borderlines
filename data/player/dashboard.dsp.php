@@ -4,7 +4,6 @@
 ?>
 <h2>Dashboard</h2>
 <p>Welcome <?php echo $current_player->get_name()?> !</p>
-<p><a href="<?php echo Page::get_page_url('player_list')?>">Player list</a></p>
 <h3>Current Game</h3>
 <ul>
   <li>Name : <a href="<?php echo Page::get_page_url('show_game', false, array('id' => $current_game->id))?>"><?php echo $current_game->name ?></a></li>
@@ -30,6 +29,21 @@
 <?php
   if( $current_game->started ) {
 ?>
+<p><a href="<?php echo Page::get_page_url('player_list')?>">Player list</a></p>
+<h4>Wall</h4>
+<div id="shoutwall">
+<?php
+  $shouts = Shout::db_get_by_game_id( $current_game->id );
+  foreach( array_reverse( $shouts ) as $shout ) {
+    $player = Player::instance($shout->shouter_id);
+    echo '
+  <div class="shout"><strong>'.wash_utf8($player->name).'</strong>: '.wash_utf8($shout->text).'</div>';
+  }
+?>
+</div>
+<form action="<?php echo Page::get_url('shout', array('game_id' => $current_game->id ))?>" method="post">
+  <p><input type="text" name="text" value=""/><button type="submit" name="action" value="shout">Say</button></p>
+</form>
 <h3>Resources</h3>
 <?php
     $sums = $current_player->get_resource_sum_list( $current_game->id );
