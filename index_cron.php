@@ -21,7 +21,7 @@
   define('URL_ROOT_RELATIVE', $URL_ROOT_RELATIVE);
 
   // Constante principale, c'est l'URL absolue de la base du site
-  define("URL_ROOT", "http://borderlines.mrpetovan.com".URL_ROOT_RELATIVE.'/');
+  define("URL_ROOT", 'http://borderlines.mrpetovan.com/');
   // PATH absolu de la base du site
   define('DIR_ROOT', dirname($_SERVER['SCRIPT_FILENAME']) .'/');
   // PATH du répertoire d'inclusions
