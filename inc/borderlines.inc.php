@@ -9,8 +9,6 @@ function spygame( $spy1, $spy2, $value ) {
     $spy2 = 1;
   }
   
-  $diff = $spy1 - $spy2;
-  $diffPercent = 100 * $spy1 / $spy2;
   $diffAddPercent = $spy1 / ($spy1 + $spy2);
   
   $uncoveringValueChance = $diffAddPercent;
