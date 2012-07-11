@@ -59,6 +59,7 @@
 <table>
   <thead>
     <tr>
+      <th>Turn</th>
       <th>Date</th>
       <th>Event</th>
       <th>Changes</th>
@@ -72,6 +73,7 @@
         $resource = Resource::instance($event['resource_id']);
         echo '
     <tr>
+      <td class="date">'.$event['turn'].'</td>
       <td class="date">'.guess_time( $event['datetime'], GUESS_DATE_FR ).'</td>
       <td>'.$event['reason'].'</td>
       <td class="num">'. ($event['delta'] > 0?'+':'') . $event['delta'] .'</td>
@@ -96,7 +98,7 @@
 <?php
       foreach( $orders as $player_order ) {
         $order_type = Order_Type::instance( $player_order->order_type_id );
-        $parameters = unserialize( $player_order->parameters );
+        $parameters = $player_order->parameters;
         $param_string = '';
         foreach( $parameters as $key => $value ) {
           if( $key == 'player_id' ) {
@@ -109,8 +111,8 @@
         echo '
   <tr>
     <td>'.$order_type->name .'</td>
-    <td>'.guess_time( $player_order->datetime_order, GUESS_TIME_FR ) .'</td>
-    <td>'.guess_time( $player_order->datetime_scheduled, GUESS_TIME_FR ) .'</td>
+    <td>'.guess_time( $player_order->datetime_order, GUESS_TIME_LOCALE ) .'</td>
+    <td>'.guess_time( $player_order->datetime_scheduled, GUESS_TIME_LOCALE ) .'</td>
     <td>'.$param_string.'</td>
     <td>
       <form action="'.Page::get_page_url('order').'" method="post">

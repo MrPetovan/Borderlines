@@ -42,16 +42,21 @@ GROUP BY `resource`.`id`';
     return $return;
   }
   
-  public function get_resource_sum( $resource_id, $game_id = null ) {
+  public function get_resource_sum( $resource_id, $turn = null, $game_id = null ) {
     $return = null;
     
     if( !is_null( $game_id ) || !is_null( $game_id = $this->get_current_game_id() ) ) {
+      $where = '';
+      if( !is_null( $turn ) ) {
+        $where = '
+AND `turn` <= '.mysql_ureal_escape_string( $turn );
+      }
       $sql = '
 SELECT IFNULL( SUM( `delta` ), 0 )
 FROM `player_resource_history`
 WHERE `player_id` = '.mysql_ureal_escape_string($this->get_id()).'
 AND `game_id` = '.mysql_ureal_escape_string($game_id).'
-AND `resource_id` = '.mysql_ureal_escape_string($resource_id);
+AND `resource_id` = '.mysql_ureal_escape_string($resource_id).$where;
       $res = mysql_uquery( $sql );
       $row = mysql_fetch_row( $res );
       $return = array_shift( $row );
@@ -71,7 +76,7 @@ SELECT `player_id`, `resource_id`, `turn`, `datetime`, `delta`, `reason`, `playe
 FROM `player_resource_history`
 WHERE `player_id` = '.mysql_ureal_escape_string($this->get_id()).'
 AND `game_id` = '.mysql_ureal_escape_string($game_id).'
-ORDER BY `datetime` DESC';
+ORDER BY `turn` DESC, `datetime` DESC';
       $res = mysql_uquery($sql);
 
       $return = mysql_fetch_to_array($res);

@@ -444,7 +444,7 @@ function guess_time($date, $return_flag = GUESS_TIME_TIMESTAMP) {
     switch($return_flag) {
       case GUESS_TIME_TIMESTAMP : $return = $timestamp; break;
       case GUESS_TIME_MYSQL     : $return = mysql_timestamp_to_mysql_date($timestamp); break;
-      case GUESS_TIME_LOCALE    : $return = strftime('%x %X ('.$timestamp.')', $timestamp); break;
+      case GUESS_TIME_LOCALE    : $return = strftime('%x %X', $timestamp); break;
     }
   }
   return $return;

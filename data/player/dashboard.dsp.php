@@ -10,17 +10,17 @@
   <li>Turn : <?php echo $current_game->current_turn.'/'.$current_game->turn_limit ?></li>
   <li>Turn interval : <?php echo $current_game->turn_interval ?> seconds</li>
   <li>Status : <?php echo $current_game->status_string ?></li>
-  <li>Created : <?php echo guess_time( $current_game->created, GUESS_TIME_FR ) ?></li>
+  <li>Created : <?php echo guess_time( $current_game->created, GUESS_TIME_LOCALE ) ?></li>
 <?php if( $current_game->started ) { ?>
-  <li>Started : <?php echo guess_time( $current_game->started, GUESS_TIME_FR ) ?></li>
+  <li>Started : <?php echo guess_time( $current_game->started, GUESS_TIME_LOCALE ) ?></li>
 <?php } ?>
 <?php if( $current_game->updated ) { ?>
-  <li>Last turn : <?php echo guess_time( $current_game->updated, GUESS_TIME_FR ) ?></li>
+  <li>Last turn : <?php echo guess_time( $current_game->updated, GUESS_TIME_LOCALE ) ?></li>
   <?php } ?>
 <?php if( $current_game->ended ) { ?>
-  <li>Ended : <?php echo guess_time( $current_game->ended, GUESS_TIME_FR ) ?></li>
+  <li>Ended : <?php echo guess_time( $current_game->ended, GUESS_TIME_LOCALE ) ?></li>
 <?php }elseif( $current_game->updated ) { ?>
-  <li>Next turn : <?php echo guess_time( $current_game->updated + $current_game->turn_interval, GUESS_TIME_FR ) ?></li>
+  <li>Next turn : <?php echo guess_time( $current_game->updated + $current_game->turn_interval, GUESS_TIME_LOCALE ) ?></li>
 <?php }?>
 </ul>
 <?php if( $current_game->has_ended() ) {?>
@@ -87,22 +87,18 @@
     $event_list = array();
     $key = -1;
     foreach( $history as $history_item ) {
-      if( is_null( $history_item['player_order_id'] ) || $current_player_order_id != $history_item['player_order_id'] ) {
-        $key++;
-        foreach( $resource_list as $resource ) {
-          $resource_delta[ $resource->id ] = 0;
-        }
-        $current_player_order_id = $history_item['player_order_id'];
-      }
+      $key = $history_item['turn'].'-'.$history_item['player_order_id'];
+
       $event_list[ $key ]['reason'] = $history_item['reason'];
       $event_list[ $key ]['turn'] = $history_item['turn'];
+      $event_list[ $key ]['datetime'] = $history_item['datetime'];
       $event_list[ $key ]['resource_delta'][ $history_item['resource_id'] ] = $history_item['delta'];
     }
 
     foreach( $event_list as $event ) {
       echo '
     <tr>
-      <td class="date">'.$event['turn'].'</td>
+      <td class="date"><abbr title="'.$event['datetime'].'">'.$event['turn'].'</abbr></td>
       <td>'.$event['reason'].'</td>';
       foreach( $resource_list as $resource ) {
         if( isset( $event['resource_delta'][ $resource->id ] ) ) {
@@ -139,7 +135,7 @@
 <?php
       foreach( $orders as $player_order ) {
         $order_type = Order_Type::instance( $player_order->order_type_id );
-        $parameters = unserialize( $player_order->parameters );
+        $parameters = $player_order->parameters;
         $param_string = '';
         foreach( $parameters as $key => $value ) {
           if( $key == 'player_id' ) {
@@ -152,8 +148,8 @@
         echo '
   <tr>
     <td>'.$order_type->name .'</td>
-    <td>'.guess_time( $player_order->datetime_order, GUESS_TIME_FR ) .'</td>
-    <td>'.guess_time( $player_order->datetime_scheduled, GUESS_TIME_FR ) .'</td>
+    <td>'.guess_time( $player_order->datetime_order, GUESS_TIME_LOCALE ) .'</td>
+    <td>'.guess_time( $player_order->datetime_scheduled, GUESS_TIME_LOCALE ) .'</td>
     <td>'.$param_string.'</td>
     <td>
       <form action="'.Page::get_page_url('order').'" method="post">
