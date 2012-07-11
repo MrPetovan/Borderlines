@@ -16,11 +16,6 @@ header {
   overflow: hidden;
 }
 
-h1 {
-  float: left;
-}
-
-
 #form_login {
   float: right;
 }
@@ -50,15 +45,14 @@ nav[role=main] li a {
   margin-right: 10px;
 }
 
-/*
-#editorial_content{
-  background-image: url(../img/img_css/background_blanc_rose.png);
-  background-repeat: repeat-y;
+h1 {
+  float: left;
 }
-*/
+
 #main {
   background: transparent url(../img/img_css/contenu_fond.png) top left repeat-y;
   padding: 0 5px 0 7px;
+  position: relative;
 }
 
 #content {
