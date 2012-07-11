@@ -9,6 +9,9 @@ require_once( DATA."model/player_order_model.class.php" );
 class Player_Order extends Player_Order_Model {
 
   // CUSTOM
+  
+  public function get_parameters()        { return unserialize($this->_parameters);}
+  public function set_parameters($params) { $this->_parameters = serialize($params);}
 
   public static function db_truncate_by_game( $game_id ) {
     $sql = "DELETE FROM `".self::get_table_name()."`
@@ -73,11 +76,12 @@ ORDER BY `datetime_execution` DESC, `".self::get_table_name()."`.`player_id`";
     $this->turn_scheduled = $player->current_game->current_turn;
     $this->datetime_order = time();
     $this->datetime_scheduled = time();
-    $this->parameters = serialize( $params );
+    $this->parameters = $params;
     
     $this->save();
   }
 
+  public function pre_execute() {}
   public function execute() {}
 
   public function cancel( ) {

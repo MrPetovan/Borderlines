@@ -6,7 +6,7 @@
       $return_code = -1;
       
       $player = Player::instance( $this->get_player_id() );
-      $parameters = unserialize( $this->get_parameters() );
+      $parameters = $this->parameters;
       
       if( isset( $parameters['count'] ) ) {
         $game_id = $player->current_game->id;

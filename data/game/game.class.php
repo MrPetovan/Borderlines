@@ -82,13 +82,13 @@ class Game extends Game_Model {
     $return = false;
     if( !$this->has_ended() ) {
       $this->current_turn++;
-    
+
       $player_list = Player::db_get_by_game( $this->id );
     
       foreach( $player_list as $player ) {
         $territory_gain = $player->get_resource_sum( 4 ) * 0.1;
         $message = "Territory gain";
-        $this->set_player_resource_history( $player->id, 5, $this->current_turn, guess_time( time(), GUESS_DATE_MYSQL ), $territory_gain, $message, null );
+        $this->set_player_resource_history( $player->id, 5, $this->current_turn - 1, guess_time( time(), GUESS_DATE_MYSQL ), $territory_gain, $message, null );
       }
       
       $player_order_list = Player_Order::get_ready_orders( $this->id );
@@ -97,7 +97,15 @@ class Game extends Game_Model {
         $order_type = Order_Type::instance( $order->get_order_type_id() );
         $class = $order_type->get_class_name();
         require_once ('data/order_type/'.strtolower( $class ).'.class.php');
-        $order = $class::instance( $order->get_id() );
+        $order_list[] = $class::instance( $order->get_id() );
+      }
+      
+      //Pre-execution (soldiers go to war)
+      foreach( $order_list as $order ) {
+        $order->pre_execute();
+      }
+      // Execution (soldiers return)
+      foreach( $order_list as $order ) {
         $order->execute();
       }
       

@@ -5,22 +5,28 @@ class Attack extends Player_Order {
 
     $soldiers_sent = $params['count'];
     $attacking_player = Player::instance( $this->player_id );
-    $defending_player = Player::instance( $params['player_id'] );
 
     $available_soldiers = $attacking_player->get_resource_sum( 2 );
-    if( $available_soldiers < $soldiers_sent ) {
-      $soldiers_sent = $available_soldiers;
-      
-      $params['count'] = $soldiers_sent;
+    if( $available_soldiers < $soldiers_sent ) {      
+      $params['count'] = $available_soldiers;
     }
-    $message = 'Sending '.$soldiers_sent.' soldiers to attack '.$defending_player->name;
-    $attacking_player->set_player_resource_history( $attacking_player->current_game->id, 2, $attacking_player->current_game->current_turn, guess_time( mktime(), GUESS_DATE_MYSQL ), - $soldiers_sent, $message, $this->id );
-    
-    $this->parameters = serialize( $params );
-    
+
+    $this->parameters = $params;
+
     return $this->save();
   }
 
+  public function pre_execute() {
+    $params = $this->parameters;
+
+    $soldiers_sent = $params['count'];
+    $attacking_player = Player::instance( $this->player_id );
+    $defending_player = Player::instance( $params['player_id'] );
+  
+    $message = 'Sending '.$soldiers_sent.' soldiers to attack '.$defending_player->name;
+    $attacking_player->set_player_resource_history( $attacking_player->current_game->id, 2, $attacking_player->current_game->current_turn - 1, guess_time( mktime(), GUESS_DATE_MYSQL ), - $soldiers_sent, $message, $this->id );
+  }
+  
   public function execute() {
     $return = false;
     
@@ -28,7 +34,7 @@ class Attack extends Player_Order {
     
     $attacking_player = Player::instance( $this->get_player_id() );
     
-    $parameters = unserialize( $this->get_parameters() );
+    $parameters = $this->parameters;
     
     if( isset( $parameters['count'] ) && isset( $parameters['player_id'] ) ) {
     
@@ -36,6 +42,7 @@ class Attack extends Player_Order {
       
       if( $defending_player ) {
         $game_id = $attacking_player->current_game->id;
+        $action_turn = $attacking_player->current_game->current_turn - 1;
         $resource_turn = $attacking_player->current_game->current_turn;
       
       
@@ -43,24 +50,26 @@ class Attack extends Player_Order {
 
         $soldiers_sent = $parameters['count'];
         
-        $soldiers_defending = $defending_player->get_resource_sum( 2 );
-        $territory_defended = $defending_player->get_resource_sum( 4 );
+        $soldiers_defending = $defending_player->get_resource_sum( 2, $action_turn );
+        $territory_defended = $defending_player->get_resource_sum( 4, $action_turn );
         
-        $attacker_efficiency = (mt_gaussrand() * 0.1 + 1) * 0.1;
+        $attacker_efficiency_per_soldier = (mt_gaussrand() * 0.1 + 1) * 0.1;
         
-        $defender_losses = round( $attacker_efficiency * $soldiers_sent );
+        $attacker_efficiency = round($attacker_efficiency_per_soldier * $soldiers_sent);
+        
+        $defender_losses = min( $soldiers_defending, $attacker_efficiency );
         
         // Pas de défenseurs
         if( $soldiers_defending == 0 ) {
           $attacker_losses = 0;
-          $territory_gained = min( $defender_losses, $territory_defended );
+          $territory_gained = min( $attacker_efficiency, $territory_defended );
           $defender_losses = 0;
         }else {
-          $defender_efficiency = (mt_gaussrand() * 0.1 + 1) * 0.1 + ( $soldiers_defending / $territory_defended / 10 );
+          $defender_efficiency_per_soldier = (mt_gaussrand() * 0.1 + 1) * 0.1 + ( $soldiers_defending / $territory_defended / 10 );
 
-          $attacker_losses = round( $defender_efficiency * $soldiers_defending );
+          $attacker_losses = min( $soldiers_sent, $defender_efficiency_per_soldier * $soldiers_defending );
           
-          $territory_gained = min( $territory_defended, round( $territory_defended * ( $defender_losses / $soldiers_defending ) ) );
+          $territory_gained = min( $territory_defended, $attacker_efficiency, round( $territory_defended * ( $defender_losses / $soldiers_defending ) ) );
         }
         
         /*var_debug(
@@ -78,10 +87,10 @@ class Attack extends Player_Order {
         $attacker_message = 'Attacking '.$defending_player->get_name().' with '.$soldiers_sent.' soldiers : '.$attacker_losses.' losses, '.$soldiers_returned.' returned, '.$territory_gained.' territory gained';
         $defender_message = 'Defending against '.$attacking_player->get_name().' with '.$soldiers_defending.' soldiers : '.$defender_losses.' losses, '.$territory_gained.' territory lost';
 
-        $attacking_player->set_player_resource_history( $game_id, 2, $resource_turn, guess_time( mktime(), GUESS_DATE_MYSQL ), max( 0, $soldiers_returned ), $attacker_message, $this->get_id() );
+        $attacking_player->set_player_resource_history( $game_id, 2, $resource_turn, guess_time( mktime(), GUESS_DATE_MYSQL ), $soldiers_returned, $attacker_message, $this->get_id() );
         $attacking_player->set_player_resource_history( $game_id, 4, $resource_turn, guess_time( mktime(), GUESS_DATE_MYSQL ), $territory_gained, $attacker_message, $this->get_id() );
-        $defending_player->set_player_resource_history( $game_id, 2, $resource_turn, guess_time( mktime(), GUESS_DATE_MYSQL ), - min( $defender_losses, $soldiers_defending ), $defender_message, $this->get_id() );
-        $defending_player->set_player_resource_history( $game_id, 4, $resource_turn, guess_time( mktime(), GUESS_DATE_MYSQL ), - $territory_gained, $defender_message, $this->get_id() );
+        $defending_player->set_player_resource_history( $game_id, 2, $action_turn, guess_time( mktime(), GUESS_DATE_MYSQL ), - $defender_losses, $defender_message, $this->get_id() );
+        $defending_player->set_player_resource_history( $game_id, 4, $action_turn, guess_time( mktime(), GUESS_DATE_MYSQL ), - $territory_gained, $defender_message, $this->get_id() );
         
         $return = true;
       }
