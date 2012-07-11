@@ -337,13 +337,6 @@ AND ".$attribute." <= $str_fin";
       $return .= HTMLHelper::genererInputHidden('id', $this->get_id());
 
     $return .= '
-          <p class="radio_line"><label class="full_width">&nbsp;</label>
-          '.
-          HTMLHelper::genererInputRadio('genre', 'F', $this->get_genre(), array('id' => 'radio_genre_mme', 'checked' => 'checked', 'label_position' => 'right'), "Mme" ).
-          HTMLHelper::genererInputRadio('genre', 'M', $this->get_genre(), array('id' => 'radio_genre_mlle', 'label_position' => 'right'), "Mlle" ).
-          HTMLHelper::genererInputRadio('genre', 'H', $this->get_genre(), array('id' => 'radio_genre_m', 'label_position' => 'right'), "M" ).'
-          </p>';
-    $return .= '
           <p class="field">'.HTMLHelper::genererInputText('prenom', $this->get_prenom(), array(), 'Prénom <span class="oblig">*</span>' ).'</p>';
     $return .= '
           <p class="field">'.HTMLHelper::genererInputText('nom', $this->get_nom(), array(), 'Nom <span class="oblig">*</span>' ).'</p>';
@@ -551,11 +544,11 @@ AND ".$attribute." <= $str_fin";
       }
     }
     if($flags & MEMBER_PERSONAL_INFO_CHECK) {
-      $return[] = Member::check_compulsory($this->get_code_postal(), 14);
-      /*$return[] = Member::check_compulsory($this->get_ville(), 15);
+      /*$return[] = Member::check_compulsory($this->get_code_postal(), 14);
+      $return[] = Member::check_compulsory($this->get_ville(), 15);
       $return[] = Member::check_compulsory($this->get_adresse(), 13);
-      */
       $return[] = Member::check_compulsory($this->get_genre(), 17);
+      */
       $return[] = Member::check_compulsory($this->get_pays(), 16);
       if($flags & MEMBER_BIRTHDAY_CHECK) {
         if(($code = Member::check_compulsory($this->get_date_naissance(), 18)) === true && $flags & MEMBER_GROWNUP_CHECK) {
