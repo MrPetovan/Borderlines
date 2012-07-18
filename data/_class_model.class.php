@@ -94,8 +94,12 @@ WHERE `'.$column_name.'` = ".mysql_ureal_escape_string($'.$column_name.');
 }?>
 
 
-  public static function db_get_select_list() {
+  public static function db_get_select_list( $with_null = false ) {
     $return = array();
+    
+    if( $with_null ) {
+        $return[ null ] = 'N/A';
+    }
 
     $object_list = <?php echo $class_php_identifier?>_Model::db_get_all();
     foreach( $object_list as $object ) $return[ $object->get_id() ] = $object->get_<?php echo $name_field?>();

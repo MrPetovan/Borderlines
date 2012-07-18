@@ -27,8 +27,12 @@ class Vertex_Model extends DBObject {
 
 
 
-  public static function db_get_select_list() {
+  public static function db_get_select_list( $with_null = false ) {
     $return = array();
+    
+    if( $with_null ) {
+        $return[ null ] = 'N/A';
+    }
 
     $object_list = Vertex_Model::db_get_all();
     foreach( $object_list as $object ) $return[ $object->get_id() ] = $object->get_name();

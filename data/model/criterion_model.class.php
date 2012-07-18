@@ -36,8 +36,12 @@ WHERE `category_id` = ".mysql_ureal_escape_string($category_id);
     return self::sql_to_list($sql);
   }
 
-  public static function db_get_select_list() {
+  public static function db_get_select_list( $with_null = false ) {
     $return = array();
+    
+    if( $with_null ) {
+        $return[ null ] = 'N/A';
+    }
 
     $object_list = Criterion_Model::db_get_all();
     foreach( $object_list as $object ) $return[ $object->get_id() ] = $object->get_name();
