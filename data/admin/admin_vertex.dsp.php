@@ -22,6 +22,7 @@
         <tr>
           <th>Sel.</th>
           <th>Name</th>
+          <th>Guid</th>
           <th>X</th>
           <th>Y</th>        </tr>
       </thead>
@@ -38,6 +39,7 @@
           <td><input type="checkbox" name="vertex_id[]" value="'.$vertex->get_id().'"/></td>
           <td><a href="'.htmlentities_utf8(get_page_url('admin_vertex_view', true, array('id' => $vertex->get_id()))).'">'.$vertex->get_name().'</a></td>
 
+          <td>'.$vertex->get_guid().'</td>
           <td>'.$vertex->get_x().'</td>
           <td>'.$vertex->get_y().'</td>
           <td><a href="'.htmlentities_utf8(get_page_url('admin_vertex_mod', true, array('id' => $vertex->get_id()))).'"><img src="'.IMG.'img_html/pencil.png" alt="Modifier" title="Modifier"/></a></td>

@@ -36,6 +36,9 @@ class Game extends Game_Model {
     Player_Order::db_truncate_by_game( $this->id );
     $this->del_player_resource_history();
     //$this->del_game_player();
+    
+    $world = new World();
+    $world->initializeTerritories();
   }
   
   public function start() {
@@ -86,7 +89,7 @@ class Game extends Game_Model {
       $player_list = Player::db_get_by_game( $this->id );
     
       foreach( $player_list as $player ) {
-        $territory_gain = $player->get_resource_sum( 4 ) * 0.1;
+        $territory_gain = $player->get_resource_sum( 4 );
         $message = "Territory gain";
         $this->set_player_resource_history( $player->id, 5, $this->current_turn - 1, guess_time( time(), GUESS_DATE_MYSQL ), $territory_gain, $message, null );
       }
