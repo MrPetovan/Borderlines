@@ -242,6 +242,7 @@ $sql = "
 SELECT `".self::get_table_name()."`.`id`
 FROM `".self::get_table_name()."`
 JOIN `player_resource_history` ON `".self::get_table_name()."`.`id` = `player_resource_history`.`player_id`
+JOIN `game_player` ON `game_player`.`player_id` = `".self::get_table_name()."`.`id` AND `game_player`.`game_id` = `player_resource_history`.`game_id`
 WHERE `player_resource_history`.`game_id` = ".mysql_ureal_escape_string( $game_id )."
 AND `player_resource_history`.`resource_id` = 4
 GROUP BY `".self::get_table_name()."`.`id`

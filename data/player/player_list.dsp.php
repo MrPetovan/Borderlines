@@ -27,7 +27,7 @@
     <td>#'.($i++).'</td>
     <td><a href="'.Page::get_page_url('show_player', false, array('id' => $player->get_id())).'">'.$player->get_name().'</a></td>';
     foreach( $resource_list as $resource ) {
-      $value = $player->get_resource_sum( $resource->get_id(), $current_game->id );
+      $value = $player->get_resource_sum( $resource->get_id(), null, $current_game->id );
       echo '
     <td class="num">'.(is_null( $value )?'N/C':$value).'</li>';
     }
