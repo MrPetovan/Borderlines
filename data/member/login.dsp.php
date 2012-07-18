@@ -1,14 +1,14 @@
 <?php
-  $PAGE_TITRE = 'Connectez-vous';
+  $PAGE_TITRE = 'Login';
 
   if( $PAGE_CODE == 'logout' ) {
     Member::del_current_user_id();
-    site_redirect();
+    Page::redirect('accueil');
   }
 
   $flag_show_form = true;
   $html_msg = '';
-
+  
   if(isset($membre)) {
     if(isset($_GET['code'])) {
       $flag_show_form = false;
@@ -50,19 +50,8 @@
     $error_code_login = null;
   }
 ?>
-
-  <div class="texte_header">
-    <p class="bandeau">Connectez-vous</p>
-    <img src="<?php echo IMG?>img_html/13login_header.jpg"/>
-    <div class="edito">
-      <h2>Accédez à votre compte</h2>
-      <p>Accéder à votre compte ? Rien de plus simple ! Entrez votre email et votre mot de passe, ou, si vous n'êtes pas encore membre <?php echo SITE_NAME ?>, créez votre compte.</p>
-    </div>
-  </div>
-  <div class="texte_contenu">
-    <div class="texte_texte">
-      <h3>Accédez à votre compte</h3>
-      <h4>Déjà membre ? Identifiez-vous !</h4>
+<h2>Log In</h2>
+<p>Don't have an account yet ? <a href="<?php echo Page::get_url('register')?>">Sign Up now</a> !</p>
 <?php
   $login_email = '';
   if(is_null($error_code_login)) {
@@ -72,22 +61,19 @@
     echo '<p class="texte_intro error">Les identifiants que vous avez entrés sont incorrects. Veuillez vérifier votre email et votre mot de passe.</p>';
   }
 ?>
-      <form id="login_form" class="formulaire" action="<?php echo get_page_url('login')?>" method="post">
-        <p class="field"><?php echo HTMLHelper::genererInputText('email', $login_email, array(), "Email")?></p>
-        <p class="field"><?php echo HTMLHelper::genererInputPassword('pass', null, array(),"Mot de passe");?></p>
-         <p>
-          <label>&nbsp;</label>
-          <a href="<?php echo get_page_url('rappel-identifiants')?>">Mot de passe perdu ?</a>
-        </p>
-        <!--<p>
-          <label>&nbsp;</label>
-          <?php echo HTMLHelper::genererInputCheckBox('remember_me', '1', null, array('label_position' => 'right'), "Se rappeler de moi");?>
-        </p>-->
-        <p class="align">
-          <label>&nbsp;</label>
-          <?php echo HTMLHelper::genererInputSubmit('submit_login', 'Se connecter');?>
-        </p>
-        <p>&nbsp;</p>
-      </form>
-   </div>
-  </div>
+<form id="login_form" class="formulaire" action="<?php echo get_page_url('login')?>" method="post">
+<p class="field"><?php echo HTMLHelper::genererInputText('email', $login_email, array(), "Email")?></p>
+<p class="field"><?php echo HTMLHelper::genererInputPassword('pass', null, array(),"Mot de passe");?></p>
+ <p>
+  <label>&nbsp;</label>
+  <a href="<?php echo Page::get_url('rappel-identifiants')?>">Forgotten password ?</a>
+</p>
+<!--<p>
+  <label>&nbsp;</label>
+  <?php echo HTMLHelper::genererInputCheckBox('remember_me', '1', null, array('label_position' => 'right'), "Se rappeler de moi");?>
+</p>-->
+<p class="align">
+  <label>&nbsp;</label>
+  <?php echo HTMLHelper::genererInputSubmit('submit_login', 'Se connecter');?>
+</p>
+</form>

@@ -5,19 +5,6 @@
   $show_formulaire_member = true;
   $html_msg = '';
 
-  if($member = Member::get_logged_user()) {
-    $member = Member::get_current_user();
-
-    //Admin ou Compte entreprise
-    if($member->get_niveau() > 0){
-      page_redirect('dashboard');
-    }
-  }
-
-  if( !isset( $member_register )) {
-    $member_register = Member::instance();
-  }
-
   if(isset($_SESSION['tab_error'])) {
     $tab_error = $_SESSION['tab_error'];
     unset($_SESSION['tab_error']);

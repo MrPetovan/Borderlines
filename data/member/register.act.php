@@ -1,5 +1,15 @@
 <?php
 
+  if($member = Member::get_logged_user()) {
+    //$member = Member::get_current_user();
+
+    page_redirect('dashboard');
+  }
+
+  if( !isset( $member_register )) {
+    $member_register = Member::instance();
+  }
+
   if(isset($_POST['submit_register']) || isset($_POST['submit_register_x'])) {
     //Visiteur (!id)
     // + On passe le niveau à 1
@@ -26,7 +36,7 @@
         $member_register = new Member();
       }
 
-      $member_register->set_niveau(1);
+      $member_register->niveau = 0;
       $member_register->load_from_html_form($_POST, $_FILES);
 
       $tab_error = $member_register->check_valid($check_flags);

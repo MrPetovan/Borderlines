@@ -36,7 +36,7 @@
       <h3>'.$PAGE_TITRE.'</h3>
       '.$html_msg.'
       <form class="formulaire" action="'.get_page_url(PAGE_CODE, true, array('id' => $member_mod->get_id())).'" method="post">
-        '.$member_mod->html_get_abonnement_form(MEMBER_FORM_ADMIN).'
+        '.$member_mod->html_get_form().'
         <p>'.HTMLHelper::submit('member_submit', 'Sauvegarder les changements').'</p>
       </form>
     </div>

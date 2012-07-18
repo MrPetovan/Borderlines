@@ -175,7 +175,7 @@ class Member extends DBObject {
    */
   public static function get_logged_user() {
     $member = Member::get_current_user();
-    if(!$member || $member->get_niveau() == 0) {
+    if(!$member || $member->niveau == 0) {
       $member = false;
     }
     return $member;
@@ -276,35 +276,28 @@ AND ".$attribute." <= $str_fin";
    */
   public function html_get_form($form_url) {
     $return = '
-  <form class="formulaire" action="'.wash_utf8($form_url).'" method="post" enctype="multipart/form-data">
-
     <fieldset>
       <legend>Text fields</legend>
-      <p class="field">'.HTMLHelper::genererInputText('prenom', $this->get_prenom(), array(), "Prénom *").'</p>
-      <p class="field">'.HTMLHelper::genererInputText('nom', $this->get_nom(), array(), "Nom *").'</p>
-      <p class="field">'.HTMLHelper::genererInputText('ville', $this->get_ville(), array(), "Ville *").'</p>
-      <p class="field">'.HTMLHelper::genererInputText('code_postal', $this->get_code_postal(), array(), "Code Postal *").'</p>
-      <p class="field">'.HTMLHelper::genererInputText('pays', $this->get_pays(), array(), "Pays *").'</p>
+      <p class="field">'.HTMLHelper::genererInputText('prenom', $this->prenom, array(), "Prénom *").'</p>
+      <p class="field">'.HTMLHelper::genererInputText('nom', $this->nom, array(), "Nom *").'</p>
+      <p class="field">'.HTMLHelper::genererInputText('pays', $this->pays, array(), "Pays *").'</p>
       <p class="field">
         <label>Vous êtes un(e)*</label>'.
-          HTMLHelper::genererInputRadio('genre', 'F', $this->get_genre(), array('id' => 'radio_genre_mme', 'checked' => 'checked', 'label_position' => 'right'), "Mme" ).
-          HTMLHelper::genererInputRadio('genre', 'M', $this->get_genre(), array('id' => 'radio_genre_mlle', 'label_position' => 'right'), "Mlle" ).
-          HTMLHelper::genererInputRadio('genre', 'H', $this->get_genre(), array('id' => 'radio_genre_m', 'label_position' => 'right'), "M" ).'
+          HTMLHelper::genererInputRadio('genre', 'F', $this->genre, array('id' => 'radio_genre_mme', 'checked' => 'checked', 'label_position' => 'right'), "Mme" ).
+          HTMLHelper::genererInputRadio('genre', 'M', $this->genre, array('id' => 'radio_genre_mlle', 'label_position' => 'right'), "Mlle" ).
+          HTMLHelper::genererInputRadio('genre', 'H', $this->genre, array('id' => 'radio_genre_m', 'label_position' => 'right'), "M" ).'
       </p>
-      <p class="field">'.HTMLHelper::genererInputText('date_naissance', $this->get_date_naissance(), array(), "Date de naissance *").'</p>
+      <p class="field">'.HTMLHelper::genererInputText('date_naissance', $this->date_naissance, array(), "Date de naissance *").'</p>
 
-      <p class="field"><strong>Email</strong> : '.$this->get_email().'</p>
-      <p class="field">'.HTMLHelper::genererInputText('email', isset($post['email'])?$post['email']:'', array(), "Change Email").'</p>
-      <p class="field">'.HTMLHelper::genererInputText('email2', isset($post['email2'])?$post['email2']:'', array(), "Re-Type Email").'</p>
-      <p class="field">'.HTMLHelper::genererInputCheckBox('inscr_newsletter', '1', $this->get_inscr_newsletter(), array('label_position' => 'right'), "Inscrit à la newsletter" ).'</p>
+      <p class="field">'.HTMLHelper::genererInputText('email', $this->email, array(), "Email").'</p>
       <p class="field"><label for="select_level">Level</label>
       <select id="select_level" name="level">';
     foreach(Member::get_tab_level() as $key_level => $name_level) {
       $return .= '
-        <option value="'.$key_level.'"'.(($key_level == $this->get_niveau())?' selected="selected"':'').'>'.$name_level.'</option>';
+        <option value="'.$key_level.'"'.(($key_level == $this->niveau)?' selected="selected"':'').'>'.$name_level.'</option>';
     }
     $return .= '
-      </select>
+      </select></p>
     </fieldset>
     <fieldset>
       <legend>Change Password</legend>
@@ -313,8 +306,7 @@ AND ".$attribute." <= $str_fin";
     </fieldset>
     <fieldset>
       '.HTMLHelper::genererInputSubmit('member_submit', 'Save Changes').'
-    </fieldset>
-  </form>';
+    </fieldset>';
 
     return $return;
   }
@@ -330,18 +322,18 @@ AND ".$attribute." <= $str_fin";
 
     //$this->load_from_html_form($post, array());
     if( MEMBER_FORM_ABONNEMENT == $type ) {
-      $return = HTMLHelper::genererInputHidden('origin', $this->get_origin(), array());
+      $return = HTMLHelper::genererInputHidden('origin', $this->origin, array());
     }
 
     if( MEMBER_FORM_ADMIN == $type )
-      $return .= HTMLHelper::genererInputHidden('id', $this->get_id());
+      $return .= HTMLHelper::genererInputHidden('id', $this->id);
 
     $return .= '
-          <p class="field">'.HTMLHelper::genererInputText('prenom', $this->get_prenom(), array(), 'Prénom <span class="oblig">*</span>' ).'</p>';
+          <p class="field">'.HTMLHelper::genererInputText('prenom', $this->prenom, array(), 'Prénom <span class="oblig">*</span>' ).'</p>';
     $return .= '
-          <p class="field">'.HTMLHelper::genererInputText('nom', $this->get_nom(), array(), 'Nom <span class="oblig">*</span>' ).'</p>';
+          <p class="field">'.HTMLHelper::genererInputText('nom', $this->nom, array(), 'Nom <span class="oblig">*</span>' ).'</p>';
     $return .= '
-          <p class="field">'.HTMLHelper::genererInputText('email', $this->get_email(), array(), 'Votre email <span class="oblig">*</span>' ).'</p>';
+          <p class="field">'.HTMLHelper::genererInputText('email', $this->email, array(), 'Votre email <span class="oblig">*</span>' ).'</p>';
     if( MEMBER_FORM_ADMIN != $type ) {
       $return .= '
           <p class="field">'.HTMLHelper::genererInputText('email2', $this->email2, array(), 'Confirmation email <span class="oblig">*</span>' ).'</p>';
@@ -349,7 +341,7 @@ AND ".$attribute." <= $str_fin";
 
     if( MEMBER_FORM_ABONNEMENT == $type ) {
       $return .= '
-          <p class="field">'.HTMLHelper::genererInputPassword('password', $this->get_password(), array(), 'Mot de passe <span class="oblig">*</span>' ).'</p>
+          <p class="field">'.HTMLHelper::genererInputPassword('password', $this->password, array(), 'Mot de passe <span class="oblig">*</span>' ).'</p>
           <p class="field">'.HTMLHelper::genererInputPassword('password2', $this->password2, array(), 'Confirmation mot de passe <span class="oblig">*</span>' ).'</p>';
     }
 
@@ -395,7 +387,7 @@ AND ".$attribute." <= $str_fin";
       'SE' => 'Suède',
       'CH' => 'Suisse',
       '--' => '-- Autre');
-      $return .= HTMLHelper::genererSelect('pays', $liste_pays, $this->get_pays(), array(), 'Pays <span class="oblig">*</span>').'</p>';
+      $return .= HTMLHelper::genererSelect('pays', $liste_pays, $this->pays, array(), 'Pays <span class="oblig">*</span>').'</p>';
     }
     if( MEMBER_FORM_ABONNEMENT == $type || MEMBER_FORM_NEWSLETTER == $type || MEMBER_FORM_ADMIN == $type) {
       $liste_jour = array('' => '--');
@@ -420,8 +412,8 @@ AND ".$attribute." <= $str_fin";
       $date_naiss_mois = null;
       $date_naiss_annee = null;
 
-      if($this->get_date_naissance()) {
-        $date_naiss = date('d/m/Y', $this->get_date_naissance());
+      if($this->date_naissance) {
+        $date_naiss = date('d/m/Y', $this->date_naissance);
         list($date_naiss_jour, $date_naiss_mois, $date_naiss_annee) = explode('/',$date_naiss);
       }
       $return .= '
@@ -505,19 +497,19 @@ AND ".$attribute." <= $str_fin";
     $return = array();
 
     if($flags & MEMBER_NAME_CHECK) {
-      $return[] = Member::check_compulsory($this->get_prenom(), 1);
-      $return[] = Member::check_compulsory($this->get_nom(), 2);
+      $return[] = Member::check_compulsory($this->prenom, 1);
+      $return[] = Member::check_compulsory($this->nom, 2);
     }
 
-    if(($code = Member::check_compulsory($this->get_email(), 6)) === true) {
-      if(($code = Member::check_email($this->get_email(), 9)) === true) {
+    if(($code = Member::check_compulsory($this->email, 6)) === true) {
+      if(($code = Member::check_email($this->email, 9)) === true) {
         if($flags & MEMBER_NEW_USER_CHECK) {
-          $check_new_member = Member::db_get_membre_by_email( $this->get_email() );
+          $check_new_member = Member::db_get_membre_by_email( $this->email );
           if($check_new_member === false) {
             $code = true;
           }else {
-            if($check_new_member->get_niveau() == 0) {
-              $this->set_id($check_new_member->get_id());
+            if($check_new_member->niveau == 0) {
+              $this->set_id($check_new_member->id);
               $code = true;
             }else {
               $code = 11;
@@ -529,30 +521,30 @@ AND ".$attribute." <= $str_fin";
     $return[] = $code;
     if(isset($this->email2)) {
       if(($code = Member::check_compulsory($this->email2, 7)) === true) {
-        $code = Member::check_equal($this->get_email(), $this->email2, 8);
+        $code = Member::check_equal($this->email, $this->email2, 8);
       }
       $return[] = $code;
     }
 
-    if($this->get_niveau() != 0) {
-      $return[] = Member::check_compulsory($this->get_password(), 3);
+    if($this->niveau != 0) {
+      $return[] = Member::check_compulsory($this->password, 3);
       if(isset($this->password2)) {
         if(($code = Member::check_compulsory($this->password2, 4)) === true) {
-          $code = Member::check_equal($this->get_password(), $this->password2, 5);
+          $code = Member::check_equal($this->password, $this->password2, 5);
         }
         $return[] = $code;
       }
     }
     if($flags & MEMBER_PERSONAL_INFO_CHECK) {
-      /*$return[] = Member::check_compulsory($this->get_code_postal(), 14);
-      $return[] = Member::check_compulsory($this->get_ville(), 15);
-      $return[] = Member::check_compulsory($this->get_adresse(), 13);
-      $return[] = Member::check_compulsory($this->get_genre(), 17);
+      /*$return[] = Member::check_compulsory($this->code_postal, 14);
+      $return[] = Member::check_compulsory($this->ville, 15);
+      $return[] = Member::check_compulsory($this->adresse, 13);
+      $return[] = Member::check_compulsory($this->genre, 17);
       */
-      $return[] = Member::check_compulsory($this->get_pays(), 16);
+      $return[] = Member::check_compulsory($this->pays, 16);
       if($flags & MEMBER_BIRTHDAY_CHECK) {
-        if(($code = Member::check_compulsory($this->get_date_naissance(), 18)) === true && $flags & MEMBER_GROWNUP_CHECK) {
-          $code = ((time() - $this->get_date_naissance()) > 18 * 365 * 24 * 60 * 60)?true:19;
+        if(($code = Member::check_compulsory($this->date_naissance, 18)) === true && $flags & MEMBER_GROWNUP_CHECK) {
+          $code = ((time() - $this->date_naissance) > 18 * 365 * 24 * 60 * 60)?true:19;
         }
         $return[] = $code;
       }
@@ -604,7 +596,7 @@ AND ".$attribute." <= $str_fin";
   public function get_email_forgotten_password($new_password) {
     $return = '
       <td width="698" style="vertical-align:top; padding-left:80px; padding-right:80px; font-size: 14px; color:#444444;">
-        <p>Bonjour '.wash_utf8($this->get_prenom()).',</p>
+        <p>Bonjour '.wash_utf8($this->prenom).',</p>
         <p>Vous recevez cet email car vous avez demandé un nouveau mot de passe sur le site Geo.</p>
         <table border="0" cellspacing="0" cellpadding="0" style="color:#FFFFFF; background-color:#ff569d; margin:20px 70px 20px 70px; width: 350px; font-family: Arial, sans serif; height:100%">
           <tr>
@@ -615,7 +607,7 @@ AND ".$attribute." <= $str_fin";
           </tr>
           <tr>
             <td style="padding:10px; color:#FFFFFF; font-size: 14px">
-              <p><span style="font-weight:bold;">Votre email :</span> '.$this->get_email().'<br>
+              <p><span style="font-weight:bold;">Votre email :</span> '.$this->email.'<br>
               <span style="font-weight:bold;">Votre nouveau mot de passe :</span> '.wash_utf8($new_password).'</p>
             </td>
           </tr>
@@ -636,7 +628,7 @@ AND ".$attribute." <= $str_fin";
   public function get_email_confirmation($password) {
     $return = '
       <td width="698" style="vertical-align:top; padding-left:80px; padding-right:80px; font-size: 14px; color:#444444;">
-        <p>Bonjour '.wash_utf8($this->get_prenom()).',</p>
+        <p>Bonjour '.wash_utf8($this->prenom).',</p>
         <p>Votre inscription a bien été prise en compte. Merci d\'avoir choisi Geo !</p>
         <table border="0" cellspacing="0" cellpadding="0" style="color:#FFFFFF; background-color:#ff569d; margin:20px 70px 20px 70px; width: 350px; font-family: Arial, sans serif; height:100%">
           <tr>
@@ -647,7 +639,7 @@ AND ".$attribute." <= $str_fin";
           </tr>
           <tr>
             <td style="padding:10px; color:#FFFFFF; font-size: 14px">
-              <p><span style="font-weight:bold;">Votre email :</span> '.$this->get_email().'<br>
+              <p><span style="font-weight:bold;">Votre email :</span> '.$this->email.'<br>
               <span style="font-weight:bold;">Votre mot de passe :</span> '.wash_utf8($password).'</p>
             </td>
           </tr>
@@ -667,7 +659,7 @@ AND ".$attribute." <= $str_fin";
   public function get_email_modif_identifiants($new_password) {
     $return = '
       <td width="698" style="vertical-align:top; padding-left:80px; padding-right:80px; font-size: 14px; color:#444444;">
-        <p>Bonjour '.wash_utf8($this->get_prenom()).',</p>
+        <p>Bonjour '.wash_utf8($this->prenom).',</p>
         <p>Vous avez souhaité modifier vos identifiants. Ils sont pris en compte dès à présent.</p>
         <table border="0" cellspacing="0" cellpadding="0" style="color:#FFFFFF; background-color:#ff569d; margin:20px 70px 20px 70px; width: 350px; font-family: Arial, sans serif; height:100%">
           <tr>
@@ -678,7 +670,7 @@ AND ".$attribute." <= $str_fin";
           </tr>
           <tr>
             <td style="padding:10px; color:#FFFFFF; font-size: 14px">
-              <p><span style="font-weight:bold;">Votre email :</span> '.$this->get_email().'<br>
+              <p><span style="font-weight:bold;">Votre email :</span> '.$this->email.'<br>
               <span style="font-weight:bold;">Votre nouveau mot de passe :</span> '.wash_utf8($new_password).'</p>
             </td>
           </tr>
