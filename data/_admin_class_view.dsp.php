@@ -151,7 +151,7 @@ foreach( $table_columns as $column_name => $column_props ) {
     if ( array_key_exists( $field_name,  $foreign_keys_list[ $sub_table ] )) {
       $foreign_table = $foreign_keys_list[ $sub_table ][ $field_name ];
       echo '
-  $liste_valeurs_'.$foreign_table.' = '.to_camel_case( $foreign_table, true ).'::db_get_select_list();';
+  $liste_valeurs_'.$foreign_table.' = '.to_camel_case( $foreign_table, true ).'::db_get_select_list('.($field['Null'] != 'NO'?' true ':'').');';
       $form_field .= '
         <p class="field">
           <_?php echo HTMLHelper::genererSelect(\''.$field_name.'\', $liste_valeurs_'.$foreign_table.', null, array(), \''.$table_description[ $foreign_table ].'\' )?><a href="<_?php echo get_page_url(\'admin_'.$foreign_table.'_mod\')?>">Créer un objet '.to_readable($foreign_table).'</a>
@@ -159,7 +159,8 @@ foreach( $table_columns as $column_name => $column_props ) {
     }else {
       $form_field .= '
         <p class="field">
-          <_?php echo HTMLHelper::genererInputText(\''.$field_name.'\', null, array(), \''.$table_columns_list[$sub_table][$field_name]['Comment'].'\' )?>
+          <_?php echo HTMLHelper::genererInputText(\''.$field_name.'\', null, array(), \''.$table_columns_list[$sub_table][$field_name]['Comment'].($field['Null'] == 'NO'?'*':'').'\' )?>
+          '.(in_array( $field['SimpleType'], array('date', 'datetime', 'timestamp'))?'<span><_?php echo guess_time(time(), GUESS_TIME_MYSQL)?></span>':'').' 
         </p>';
     }
   }

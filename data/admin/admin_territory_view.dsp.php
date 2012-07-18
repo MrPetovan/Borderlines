@@ -77,7 +77,8 @@
           <?php echo HTMLHelper::genererSelect('criterion_id', $liste_valeurs_criterion, null, array(), 'Criterion' )?><a href="<?php echo get_page_url('admin_criterion_mod')?>">Créer un objet Criterion</a>
         </p>
         <p class="field">
-          <?php echo HTMLHelper::genererInputText('percentage', null, array(), 'Percentage' )?>
+          <?php echo HTMLHelper::genererInputText('percentage', null, array(), 'Percentage*' )?>
+           
         </p>
         <p><?php echo HTMLHelper::genererButton('action',  'set_territory_criterion', array('type' => 'submit'), 'Ajouter un élément')?></p>
       </fieldset>
@@ -128,7 +129,8 @@
       <fieldset>
         <legend>Ajouter un élément</legend>
         <p class="field">
-          <?php echo HTMLHelper::genererInputText('neighbour_id', null, array(), 'Neighbour Id' )?>
+          <?php echo HTMLHelper::genererInputText('neighbour_id', null, array(), 'Neighbour Id*' )?>
+           
         </p>
         <p><?php echo HTMLHelper::genererButton('action',  'set_territory_neighbour', array('type' => 'submit'), 'Ajouter un élément')?></p>
       </fieldset>

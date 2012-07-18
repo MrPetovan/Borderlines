@@ -77,7 +77,8 @@
           <?php echo HTMLHelper::genererSelect('territory_id', $liste_valeurs_territory, null, array(), 'Territory' )?><a href="<?php echo get_page_url('admin_territory_mod')?>">Créer un objet Territory</a>
         </p>
         <p class="field">
-          <?php echo HTMLHelper::genererInputText('percentage', null, array(), 'Percentage' )?>
+          <?php echo HTMLHelper::genererInputText('percentage', null, array(), 'Percentage*' )?>
+           
         </p>
         <p><?php echo HTMLHelper::genererButton('action',  'set_territory_criterion', array('type' => 'submit'), 'Ajouter un élément')?></p>
       </fieldset>

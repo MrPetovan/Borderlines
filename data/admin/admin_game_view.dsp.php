@@ -113,7 +113,8 @@
           <?php echo HTMLHelper::genererSelect('player_id', $liste_valeurs_player, null, array(), 'Player' )?><a href="<?php echo get_page_url('admin_player_mod')?>">Créer un objet Player</a>
         </p>
         <p class="field">
-          <?php echo HTMLHelper::genererInputText('turn_ready', null, array(), 'Turn Ready' )?>
+          <?php echo HTMLHelper::genererInputText('turn_ready', null, array(), 'Turn Ready*' )?>
+           
         </p>
         <p><?php echo HTMLHelper::genererButton('action',  'set_game_player', array('type' => 'submit'), 'Ajouter un élément')?></p>
       </fieldset>
@@ -178,7 +179,7 @@
 
   $liste_valeurs_player = Player::db_get_select_list();
   $liste_valeurs_resource = Resource::db_get_select_list();
-  $liste_valeurs_player_order = Player_Order::db_get_select_list();?>
+  $liste_valeurs_player_order = Player_Order::db_get_select_list( true );?>
     <form action="<?php echo get_page_url(PAGE_CODE, true, array('id' => $game->id))?>" method="post" class="formulaire">
       <?php echo HTMLHelper::genererInputHidden('id', $game->id )?>
       <fieldset>
@@ -190,16 +191,20 @@
           <?php echo HTMLHelper::genererSelect('resource_id', $liste_valeurs_resource, null, array(), 'Resource' )?><a href="<?php echo get_page_url('admin_resource_mod')?>">Créer un objet Resource</a>
         </p>
         <p class="field">
-          <?php echo HTMLHelper::genererInputText('turn', null, array(), 'Turn' )?>
+          <?php echo HTMLHelper::genererInputText('turn', null, array(), 'Turn*' )?>
+           
         </p>
         <p class="field">
-          <?php echo HTMLHelper::genererInputText('datetime', null, array(), 'Datetime' )?>
+          <?php echo HTMLHelper::genererInputText('datetime', null, array(), 'Datetime*' )?>
+          <span><?php echo guess_time(time(), GUESS_TIME_MYSQL)?></span> 
         </p>
         <p class="field">
-          <?php echo HTMLHelper::genererInputText('delta', null, array(), 'Delta' )?>
+          <?php echo HTMLHelper::genererInputText('delta', null, array(), 'Delta*' )?>
+           
         </p>
         <p class="field">
-          <?php echo HTMLHelper::genererInputText('reason', null, array(), 'Reason' )?>
+          <?php echo HTMLHelper::genererInputText('reason', null, array(), 'Reason*' )?>
+           
         </p>
         <p class="field">
           <?php echo HTMLHelper::genererSelect('player_order_id', $liste_valeurs_player_order, null, array(), 'Player Order' )?><a href="<?php echo get_page_url('admin_player_order_mod')?>">Créer un objet Player Order</a>

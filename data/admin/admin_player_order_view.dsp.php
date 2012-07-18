@@ -153,16 +153,20 @@
           <?php echo HTMLHelper::genererSelect('resource_id', $liste_valeurs_resource, null, array(), 'Resource' )?><a href="<?php echo get_page_url('admin_resource_mod')?>">Créer un objet Resource</a>
         </p>
         <p class="field">
-          <?php echo HTMLHelper::genererInputText('turn', null, array(), 'Turn' )?>
+          <?php echo HTMLHelper::genererInputText('turn', null, array(), 'Turn*' )?>
+           
         </p>
         <p class="field">
-          <?php echo HTMLHelper::genererInputText('datetime', null, array(), 'Datetime' )?>
+          <?php echo HTMLHelper::genererInputText('datetime', null, array(), 'Datetime*' )?>
+          <span><?php echo guess_time(time(), GUESS_TIME_MYSQL)?></span> 
         </p>
         <p class="field">
-          <?php echo HTMLHelper::genererInputText('delta', null, array(), 'Delta' )?>
+          <?php echo HTMLHelper::genererInputText('delta', null, array(), 'Delta*' )?>
+           
         </p>
         <p class="field">
-          <?php echo HTMLHelper::genererInputText('reason', null, array(), 'Reason' )?>
+          <?php echo HTMLHelper::genererInputText('reason', null, array(), 'Reason*' )?>
+           
         </p>
         <p><?php echo HTMLHelper::genererButton('action',  'set_player_resource_history', array('type' => 'submit'), 'Ajouter un élément')?></p>
       </fieldset>

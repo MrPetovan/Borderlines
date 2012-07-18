@@ -13,6 +13,10 @@
     <div class="informations formulaire">
 
             <p class="field">
+              <span class="libelle">Guid</span>
+              <span class="value"><?php echo $vertex->guid?></span>
+            </p>
+            <p class="field">
               <span class="libelle">X</span>
               <span class="value"><?php echo $vertex->x?></span>
             </p>
