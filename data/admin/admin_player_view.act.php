@@ -6,58 +6,67 @@
        case 'set_game_player':
         if( $player->id ) {
           $flag_set_game_player = $player->set_game_player(
-            getValue('game_id'),
-            getValue('turn_ready')
+            ($value = getValue('game_id')) == ''?null:$value,
+            ($value = getValue('turn_ready')) == ''?null:$value
           );
+          if( ! $flag_set_game_player ) {
+            Page::add_message( '$player->set_game_player : ' . mysql_error(), Page::PAGE_MESSAGE_ERROR );
+          }
         }
         break;
       case 'del_game_player':
         if( $player->id ) {
           $flag_del_game_player = $player->del_game_player(
-            getValue('game_id')
+            ($value = getValue('game_id')) == ''?null:$value
           );
         }
         break;
       case 'set_player_resource_history':
         if( $player->id ) {
           $flag_set_player_resource_history = $player->set_player_resource_history(
-            getValue('game_id'),
-            getValue('resource_id'),
-            getValue('turn'),
-            getValue('datetime'),
-            getValue('delta'),
+            ($value = getValue('game_id')) == ''?null:$value,
+            ($value = getValue('resource_id')) == ''?null:$value,
+            ($value = getValue('turn')) == ''?null:$value,
+            ($value = getValue('datetime')) == ''?null:$value,
+            ($value = getValue('delta')) == ''?null:$value,
             getValue('reason'),
-            getValue('player_order_id')
+            ($value = getValue('player_order_id')) == ''?null:$value
           );
+          if( ! $flag_set_player_resource_history ) {
+            Page::add_message( '$player->set_player_resource_history : ' . mysql_error(), Page::PAGE_MESSAGE_ERROR );
+          }
         }
         break;
       case 'del_player_resource_history':
         if( $player->id ) {
           $flag_del_player_resource_history = $player->del_player_resource_history(
-            getValue('game_id'),
-            getValue('resource_id'),
-            getValue('player_order_id')
+            ($value = getValue('game_id')) == ''?null:$value,
+            ($value = getValue('resource_id')) == ''?null:$value,
+            ($value = getValue('player_order_id')) == ''?null:$value
           );
         }
         break;
       case 'set_player_spygame_value':
         if( $player->id ) {
           $flag_set_player_spygame_value = $player->set_player_spygame_value(
-            getValue('game_id'),
+            ($value = getValue('game_id')) == ''?null:$value,
             getValue('value_guid'),
-            getValue('turn'),
-            getValue('datetime'),
-            getValue('real_value'),
-            getValue('masked_value')
+            ($value = getValue('turn')) == ''?null:$value,
+            ($value = getValue('datetime')) == ''?null:$value,
+            ($value = getValue('real_value')) == ''?null:$value,
+            ($value = getValue('masked_value')) == ''?null:$value
           );
+          if( ! $flag_set_player_spygame_value ) {
+            Page::add_message( '$player->set_player_spygame_value : ' . mysql_error(), Page::PAGE_MESSAGE_ERROR );
+          }
         }
         break;
       case 'del_player_spygame_value':
         if( $player->id ) {
           $flag_del_player_spygame_value = $player->del_player_spygame_value(
-            getValue('game_id'),
-            getValue('value_guid'),
-            getValue('turn')
+            ($value = getValue('game_id')) == ''?null:$value,
+            ($value = getValue('value_guid')) == ''?null:$value,
+            ($value = getValue('turn')) == ''?null:$value
           );
         }
         break;

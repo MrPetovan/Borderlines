@@ -6,37 +6,43 @@
        case 'set_game_player':
         if( $game->id ) {
           $flag_set_game_player = $game->set_game_player(
-            getValue('player_id'),
-            getValue('turn_ready')
+            ($value = getValue('player_id')) == ''?null:$value,
+            ($value = getValue('turn_ready')) == ''?null:$value
           );
+          if( ! $flag_set_game_player ) {
+            Page::add_message( '$game->set_game_player : ' . mysql_error(), Page::PAGE_MESSAGE_ERROR );
+          }
         }
         break;
       case 'del_game_player':
         if( $game->id ) {
           $flag_del_game_player = $game->del_game_player(
-            getValue('player_id')
+            ($value = getValue('player_id')) == ''?null:$value
           );
         }
         break;
       case 'set_player_resource_history':
         if( $game->id ) {
           $flag_set_player_resource_history = $game->set_player_resource_history(
-            getValue('player_id'),
-            getValue('resource_id'),
-            getValue('turn'),
-            getValue('datetime'),
-            getValue('delta'),
+            ($value = getValue('player_id')) == ''?null:$value,
+            ($value = getValue('resource_id')) == ''?null:$value,
+            ($value = getValue('turn')) == ''?null:$value,
+            ($value = getValue('datetime')) == ''?null:$value,
+            ($value = getValue('delta')) == ''?null:$value,
             getValue('reason'),
-            getValue('player_order_id')
+            ($value = getValue('player_order_id')) == ''?null:$value
           );
+          if( ! $flag_set_player_resource_history ) {
+            Page::add_message( '$game->set_player_resource_history : ' . mysql_error(), Page::PAGE_MESSAGE_ERROR );
+          }
         }
         break;
       case 'del_player_resource_history':
         if( $game->id ) {
           $flag_del_player_resource_history = $game->del_player_resource_history(
-            getValue('player_id'),
-            getValue('resource_id'),
-            getValue('player_order_id')
+            ($value = getValue('player_id')) == ''?null:$value,
+            ($value = getValue('resource_id')) == ''?null:$value,
+            ($value = getValue('player_order_id')) == ''?null:$value
           );
         }
         break;

@@ -18,13 +18,21 @@
           $flag_set_<?php echo $sub_table?> = $<?php echo $class_db_identifier ?>->set_<?php echo $sub_table?>(<?php
     $param_list = array();
     foreach( $sub_table_columns_clean as $field_name => $field ) {
-      $param_list[] = '
+      if( $field['SimpleType'] == 'varchar' ) {
+        $param_list[] = '
             getValue(\''.$field_name.'\')';
+      }else {
+        $param_list[] = '
+            ($value = getValue(\''.$field_name.'\')) == \'\'?null:$value';
+      }
     }
     echo implode(',', $param_list);
 ?>
 
           );
+          if( ! $flag_set_<?php echo $sub_table?> ) {
+            Page::add_message( '$<?php echo $class_db_identifier ?>->set_<?php echo $sub_table?> : ' . mysql_error(), Page::PAGE_MESSAGE_ERROR );
+          }
         }
         break;
       case 'del_<?php echo $sub_table?>':
@@ -32,8 +40,13 @@
           $flag_del_<?php echo $sub_table?> = $<?php echo $class_db_identifier ?>->del_<?php echo $sub_table?>(<?php
     $param_list = array();
     foreach( $sub_table_pk_clean as $field_name ) {
-      $param_list[] = '
+      if( $field['SimpleType'] == 'varchar' ) {
+        $param_list[] = '
             getValue(\''.$field_name.'\')';
+      }else {
+        $param_list[] = '
+            ($value = getValue(\''.$field_name.'\')) == \'\'?null:$value';
+      }
     }
     echo implode(',', $param_list);
 ?>

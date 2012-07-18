@@ -6,14 +6,17 @@
        case 'set_territory_vertex':
         if( $vertex->id ) {
           $flag_set_territory_vertex = $vertex->set_territory_vertex(
-            getValue('territory_id')
+            ($value = getValue('territory_id')) == ''?null:$value
           );
+          if( ! $flag_set_territory_vertex ) {
+            Page::add_message( '$vertex->set_territory_vertex : ' . mysql_error(), Page::PAGE_MESSAGE_ERROR );
+          }
         }
         break;
       case 'del_territory_vertex':
         if( $vertex->id ) {
           $flag_del_territory_vertex = $vertex->del_territory_vertex(
-            getValue('territory_id')
+            ($value = getValue('territory_id')) == ''?null:$value
           );
         }
         break;

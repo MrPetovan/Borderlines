@@ -6,22 +6,25 @@
        case 'set_player_resource_history':
         if( $resource->id ) {
           $flag_set_player_resource_history = $resource->set_player_resource_history(
-            getValue('game_id'),
-            getValue('player_id'),
-            getValue('turn'),
-            getValue('datetime'),
-            getValue('delta'),
+            ($value = getValue('game_id')) == ''?null:$value,
+            ($value = getValue('player_id')) == ''?null:$value,
+            ($value = getValue('turn')) == ''?null:$value,
+            ($value = getValue('datetime')) == ''?null:$value,
+            ($value = getValue('delta')) == ''?null:$value,
             getValue('reason'),
-            getValue('player_order_id')
+            ($value = getValue('player_order_id')) == ''?null:$value
           );
+          if( ! $flag_set_player_resource_history ) {
+            Page::add_message( '$resource->set_player_resource_history : ' . mysql_error(), Page::PAGE_MESSAGE_ERROR );
+          }
         }
         break;
       case 'del_player_resource_history':
         if( $resource->id ) {
           $flag_del_player_resource_history = $resource->del_player_resource_history(
-            getValue('game_id'),
-            getValue('player_id'),
-            getValue('player_order_id')
+            ($value = getValue('game_id')) == ''?null:$value,
+            ($value = getValue('player_id')) == ''?null:$value,
+            ($value = getValue('player_order_id')) == ''?null:$value
           );
         }
         break;
