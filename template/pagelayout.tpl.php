@@ -9,6 +9,7 @@
   <div id="page">
     <header>
       <h1><a href="<?php echo URL_ROOT?>"><?php echo SITE_NAME?></a></h1>
+      <p class="banner"><a href="http://www.aeriesguard.com/forum/Jeux-video/Borderlines-Alpha-fermee">Jeu en Alpha fermée</a></p>
       <!--<p>Testeurs : rendez-vous sur <a href="http://www.aeriesguard.com/IRC">le canal IRC d'Aerie's Guard</a></p>-->
 <?php if(Member::get_current_user_id()) {?>
       <nav role="main">
@@ -29,8 +30,15 @@
         </p>
         <button type="submit" name="submit_login" value="Ok">Sign in</button>
       </form>
+      <nav role="main">
+        <ul>
+          <li><a href="<?php echo Page::get_page_url('accueil') ?>">Home</a></li>
+          <li><a href="<?php echo Page::get_page_url('register') ?>">Sign Up</a></li>
+          <li><a href="<?php echo Page::get_page_url('rappel-identifiants') ?>">Forgotten password ?</a></li>
+        </ul>
+      </nav>
 <?php } ?>
-      <p class="banner"><a href="http://www.aeriesguard.com/forum/Jeux-video/Borderlines-Alpha-fermee">Jeu en Alpha fermée</a></p>
+      
       
     </header>
     <section id="main">
