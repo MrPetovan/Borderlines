@@ -54,7 +54,7 @@
 <?php }elseif( $game->updated ) { ?>
   <p class="field">
     <span class="libelle">Next turn</span>
-    <span class="value"><?php echo guess_time( $game->updated + $game->turn_interval, GUESS_TIME_FR ) ?></span>
+    <span class="value"><?php echo guess_time( $game->updated + $game->turn_interval, GUESS_TIME_LOCALE ) ?></span>
   </p>
 <?php }?>
 </div>
