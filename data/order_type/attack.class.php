@@ -67,7 +67,7 @@ class Attack extends Player_Order {
         }else {
           $defender_efficiency_per_soldier = (mt_gaussrand() * 0.1 + 1) * 0.1 + ( $soldiers_defending / $territory_defended / 10 );
 
-          $attacker_losses = min( $soldiers_sent, $defender_efficiency_per_soldier * $soldiers_defending );
+          $attacker_losses = min( $soldiers_sent, round(  $defender_efficiency_per_soldier * $soldiers_defending ) );
           
           $territory_gained = min( $territory_defended, $attacker_efficiency, round( $territory_defended * ( $defender_losses / $soldiers_defending ) ) );
         }
