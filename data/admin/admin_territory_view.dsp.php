@@ -22,7 +22,11 @@
         <span class="libelle">World Id</span>
         <span class="value"><a href="<?php echo get_page_url('admin_world_view', true, array('id' => $territory->world_id ) )?>"><?php echo $option_list[ $territory->world_id ]?></a></span>
       </p>
-    </div>
+
+            <p class="field">
+              <span class="libelle">Vertices</span>
+              <span class="value"><?php echo $territory->vertices?></span>
+            </p>    </div>
     <p><a href="<?php echo get_page_url('admin_territory_mod', true, array('id' => $territory->id))?>">Modifier cet objet Territory</a></p>
     <h4>Territory Criterion</h4>
 <?php
@@ -133,59 +137,6 @@
            
         </p>
         <p><?php echo HTMLHelper::genererButton('action',  'set_territory_neighbour', array('type' => 'submit'), 'Ajouter un élément')?></p>
-      </fieldset>
-    </form>
-    <h4>Territory Vertex</h4>
-<?php
-
-  $territory_vertex_list = $territory->get_territory_vertex_list();
-
-  if(count($territory_vertex_list)) {
-?>
-    <table>
-      <thead>
-        <tr>
-          <th>Vertex Id</th>          <th>Action</th>
-        </tr>
-      </thead>
-      <tfoot>
-        <tr>
-          <td colspan="2"><?php echo count( $territory_vertex_list )?> lignes</td>
-        </tr>
-      </tfoot>
-      <tbody>
-<?php
-      foreach( $territory_vertex_list as $territory_vertex ) {
-
- 
-        $vertex_id_vertex = Vertex::instance( $territory_vertex['vertex_id'] );        echo '
-        <tr>
-        <td><a href="'.get_page_url('admin_vertex_view', true, array('id' => $vertex_id_vertex->id)).'">'.$vertex_id_vertex->name.'</a></td>          <td>
-            <form action="'.get_page_url(PAGE_CODE, true, array('id' => $territory->id)).'" method="post">
-              '.HTMLHelper::genererInputHidden('id', $territory->id).'
-
-              '.HTMLHelper::genererInputHidden('vertex_id', $vertex_id_vertex->id).'              '.HTMLHelper::genererButton('action',  'del_territory_vertex', array('type' => 'submit'), 'Supprimer').'
-            </form>
-          </td>
-        </tr>';
-      }
-?>
-      </tbody>
-    </table>
-<?php
-  }else {
-    echo '<p>Il n\'y a pas d\'éléments à afficher</p>';
-  }
-
-  $liste_valeurs_vertex = Vertex::db_get_select_list();?>
-    <form action="<?php echo get_page_url(PAGE_CODE, true, array('id' => $territory->id))?>" method="post" class="formulaire">
-      <?php echo HTMLHelper::genererInputHidden('id', $territory->id )?>
-      <fieldset>
-        <legend>Ajouter un élément</legend>
-        <p class="field">
-          <?php echo HTMLHelper::genererSelect('vertex_id', $liste_valeurs_vertex, null, array(), 'Vertex' )?><a href="<?php echo get_page_url('admin_vertex_mod')?>">Créer un objet Vertex</a>
-        </p>
-        <p><?php echo HTMLHelper::genererButton('action',  'set_territory_vertex', array('type' => 'submit'), 'Ajouter un élément')?></p>
       </fieldset>
     </form>
 <?php

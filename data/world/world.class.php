@@ -9,7 +9,7 @@ require_once( DATA."model/world_model.class.php" );
 class World extends World_Model {
 
   // CUSTOM
-  
+
   protected $territories = array();
 
   public function initializeTerritories() {
@@ -17,11 +17,9 @@ class World extends World_Model {
     $graph->randomVertexGenerationDisk( 500, 150, 200 );
     $graph->randomNoncrossingEdgeGeneration( 2, 200 );
     
-    var_debug( $graph );
-    
-    $this->territories = Territory::find_polygons_in_graph( $graph );
+    $this->territories = Territory::find_in_graph( $graph );
 
-    $graph->drawImg();
+    //$graph->drawImg();
 /*
     foreach( $polygon_list as $polygon_id => $polygon ) {
       $territory = new Territory();
@@ -50,7 +48,19 @@ class World extends World_Model {
       }
     }
 */
-    var_dump( $this->territories );
+    //var_dump( $this->territories );
+  }
+  
+  public function save( $flags = 0 ) {
+    $return = parent::save( $flags );
+    
+    if( $return === true ) {
+        foreach( $this->territories as $territory ) {
+            $territory->world_id = $this->id;
+            $territory->save();
+        }
+    }
+    return $return;
   }
 
   // /CUSTOM

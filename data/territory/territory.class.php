@@ -10,21 +10,69 @@ class Territory extends Territory_Model {
 
   // CUSTOM
   
-  protected $vertices = array();
+  public function get_vertices() {
+    return unserialize( $this->_vertices );
+  }
+
+  public function set_vertices( $value ) {
+    $this->_vertices = serialize( $value );
+  }
   
-  public function __construct($id = null) {
-    parent::__construct($id);
-    
-    if( !is_null( $id ) ) {
-      $vertex_id_list = $this->get_territory_vertex_list();
-      foreach( $vertex_id_list as $vertex_id ) {
-        $this->addVertex( Vertex::instance( $vertex_id ) );
-      }
+  public static function get_random_name() {
+    $countries = array();
+    $fh = fopen( dirname( __FILE__ ).'/country_names_and_code_elements_txt.txt', 'r' );
+    while( $row = fgetcsv( $fh, 1000, ';' ) ) {
+        if( strpos( $row[0], ' ' ) === false )
+            $countries[] = $row[0];
     }
+    fclose($fh);
+    
+    // header line
+    unset( $countries[ 0 ] );
+    
+    $first_idx = array_rand( $countries );
+    $last_idx = array_rand( $countries );
+    
+    $voyels = array( 'A', 'E', 'I', 'O', 'U', 'Y' );
+    
+    // first part, up to a voyel excluded from the middle
+    $first_name = $countries[ $first_idx ];
+    $first_pos = floor( strlen( $first_name ) / 2 );
+    //echo 'first half : '.substr( $first_name, 0, $first_pos ).' = '.$first_name[ $first_pos ].'<br/>';
+    while( isset( $first_name[ $first_pos ] ) && ! in_array( $first_name[ $first_pos ], $voyels ) ) {
+        $first_pos++;
+        //echo substr( $first_name, 0, $first_pos ).' = '.$first_name[ $first_pos ].'<br/>';
+    }
+    //echo '<hr/>';
+    $first_name = substr( $first_name, 0, $first_pos );
+    
+    // last part, from a voyel included from the middle
+    $last_name = $countries[ $last_idx ];
+    $last_pos = floor( strlen( $last_name ) / 2 );
+    //echo 'last half : '.substr( $last_name, $last_pos ).' = '.$last_name[ $last_pos ].'<br/>';
+    while( isset( $last_name[ $last_pos ] ) && !in_array( $last_name[ $last_pos ], array( 'A', 'E', 'I', 'O', 'U', 'Y' ) ) ) {
+        $last_pos--;
+        //echo substr( $last_name, $last_pos ).' = '.$last_name[ $last_pos ].'<br/>';
+    }
+    //echo '<hr/>';
+    $last_name = substr( $last_name, $last_pos );
+
+    //echo '<p><strong>'.$first_name.' '.$last_name.'</strong></p>';
+    
+    $return = ucfirst( strtolower( $first_name.$last_name ) );
+    //echo '<p><strong>'.$return.'</strong></p>';
+    
+    return $return;
   }
 
   public function addVertex( Vertex $vertex ) {
-    $this->vertices[] = $vertex;
+    $vertices = $this->vertices;
+    $vertices[] = $vertex;
+    $this->vertices = $vertices;
+  }
+
+  public function getVertex( $index ) {
+    return $this->vertices[ $index ];
   }
   
   public function contains( Vertex $vertex ) {
@@ -32,13 +80,13 @@ class Territory extends Territory_Model {
   }
   
   /**
-   * Checks the presence of a vertex in the polygon
+   * Checks the presence of a vertex in the territory
    * Returns :
-   * 0 : Vertex not in polygon
-   * 1 : Vertex in polygon
-   * 2 : Vertex is a node of the polygon
+   * 0 : Vertex not in territory
+   * 1 : Vertex in territory
+   * 2 : Vertex is a node of the territory
    * 
-   * @see http://stackoverflow.com/questions/217578/vertex-in-polygon-aka-hit-test
+   * @see http://stackoverflow.com/questions/217578/vertex-in-territory-aka-hit-test
    */
   public function includes( Vertex $vertex ) {
     $return = 0;
@@ -87,8 +135,8 @@ class Territory extends Territory_Model {
   }
   
   /**
-   * Calculates the area of any given non-crossing polygon
-   * @see http://www.mathopenref.com/coordpolygonarea2.html
+   * Calculates the area of any given non-crossing territory
+   * @see http://www.mathopenref.com/coordterritoryarea2.html
    */
   public function getArea() {
     $return = null;
@@ -108,8 +156,8 @@ class Territory extends Territory_Model {
   }
   
   /**
-   * Gets the coordinates of the centroid of the polygon
-   * @see http://stackoverflow.com/questions/2792443/finding-the-centroid-of-a-polygon
+   * Gets the coordinates of the centroid of the territory
+   * @see http://stackoverflow.com/questions/2792443/finding-the-centroid-of-a-territory
    */
   public function getCentroid() {
     $return = null;
@@ -144,67 +192,69 @@ class Territory extends Territory_Model {
     return $return;
   }
   
-  public static function find_polygons_in_graph( Graph $graph ) {
-    $polygonList = array();
+  public static function find_in_graph( Graph $graph ) {
+    $territoryList = array();
 
     $vertices = $graph->vertices;
     $edges = $graph->edges;
     
     foreach( $vertices as $guid => $vertex ) {      
-      $polygonList = array_merge( $polygonList, self::polygon_finder_recursive( $graph, array(), $vertex, null, false ) );
+      $territoryList = array_merge( $territoryList, self::finder_recursive( $graph, array(), $vertex, null, false ) );
     }
     
-    return $polygonList;
+    return $territoryList;
   }
   
-  public static function polygon_finder_recursive( Graph $graph, $currentPolygon, $currentVertex, $lastVertex ) {    
+  public static function finder_recursive( Graph $graph, $currentTerritory, $currentVertex, $lastVertex ) {    
     // Interdiction path table
     // Struct : array[ vertexGuid1 ][ vertexGuid2 ]
     static $pathTable = array();
-    $polygons = array();
+    $territories = array();
     $return = false;
     $vertices = $graph->vertices;
     $edges = $graph->edges;
     
     if( is_null( $lastVertex) || !isset( $pathTable[ $lastVertex->guid ][ $currentVertex->guid ] ) ) {
       // The path loops = area found
-      if( in_array( $currentVertex, $currentPolygon ) ) {
+      if( in_array( $currentVertex, $currentTerritory ) ) {
 
         // Working backward to find the closure vertex, exclude non-area included vertices
-        $polygon = new Polygon;
+        $territory = new Territory();
+        $territory->name = Territory::get_random_name();
         do {
-          $newVertex = array_pop( $currentPolygon );
-          $polygon->addVertex( $newVertex );
+          $newVertex = array_pop( $currentTerritory );
+          $territory->addVertex( $newVertex );
         }while( $currentVertex != $newVertex );
-        $currentPolygon = $polygon;
+        $currentTerritory = $territory;
 
-        // If the polygon area doesn't include the central vertex
-        if( $polygon->includes( reset( $vertices ) ) !== 1 ) {
+        // If the territory area doesn't include the central vertex
+        if( $territory->includes( reset( $vertices ) ) !== 1 ) {
         
           // Update the interdiction table
-          $j = count( $currentPolygon ) - 1;
-          for( $k = 0; $k < count( $currentPolygon ); $k++ ) {
-            //$pathTable[ $currentPolygon[ $j ]->guid ][ $currentPolygon[ $k ]->guid ] = true;
-            $pathTable[ $currentPolygon[ $k ]->guid ][ $currentPolygon[ $j ]->guid ] = true;
+          $vertices = $currentTerritory->vertices;
+          $j = count( $vertices ) - 1;
+          for( $k = 0; $k < count( $vertices ); $k++ ) {
+            //$pathTable[ $currentTerritory[ $j ]->guid ][ $currentTerritory[ $k ]->guid ] = true;
+            $pathTable[ $vertices[ $k ]->guid ][ $vertices[ $j ]->guid ] = true;
 
             $j ++;
-            if( $j == count( $currentPolygon ) ) $j = 0;
+            if( $j == count( $vertices ) ) $j = 0;
           }
 
-          $return = $currentPolygon;
+          $return = $currentTerritory;
         }
       }else {
-        $currentPolygon[] = $currentVertex;
+        $currentTerritory[] = $currentVertex;
 
         if( is_null( $lastVertex ) ) {
           // First vertex : we search every line from the vertex
-          $polygonList = array();
+          $territoryList = array();
           foreach( array_keys( $edges[ $currentVertex->guid ] ) as $guid ) {
-            $polygon = self::polygon_finder_recursive( $graph, $currentPolygon, $vertices[ $guid ], $currentVertex );
+            $territory = self::finder_recursive( $graph, $currentTerritory, $vertices[ $guid ], $currentVertex );
             
-            if( $polygon !== false ) $polygonList[] = $polygon;
+            if( $territory !== false ) $territoryList[] = $territory;
 
-            $return = $polygonList;
+            $return = $territoryList;
           }
         }else{        
           // Existing line : we follow the first available path with the smallest angle      
@@ -222,7 +272,7 @@ class Territory extends Territory_Model {
 
           list( $guid, $angle ) = each( $angleList );
           if( ! is_null( $guid ) ) {
-            $return = self::polygon_finder_recursive( $graph, $currentPolygon, $vertices[ $guid ], $currentVertex );
+            $return = self::finder_recursive( $graph, $currentTerritory, $vertices[ $guid ], $currentVertex );
           }
         }
       }

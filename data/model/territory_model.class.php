@@ -8,6 +8,7 @@ class Territory_Model extends DBObject {
   // Champs BD
   protected $_name = null;
   protected $_world_id = null;
+  protected $_vertices = null;
 
   public function __construct($id = null) {
     parent::__construct($id);
@@ -69,6 +70,7 @@ WHERE `world_id` = ".mysql_ureal_escape_string($world_id);
 
       $return .= '
       <p class="field">'.HTMLHelper::genererSelect('world_id', $option_list, $this->get_world_id(), array(), "World Id *").'<a href="'.get_page_url('admin_world_mod').'">Créer un objet World</a></p>
+        <p class="field">'.HTMLHelper::genererInputText('vertices', $this->get_vertices(), array(), "Vertices").'</p>
 
     </fieldset>';
 
@@ -169,38 +171,6 @@ WHERE `territory_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
     if( ! is_null( $neighbour_id )) $where .= '
 AND `neighbour_id` = '.mysql_ureal_escape_string($neighbour_id);
     $sql = 'DELETE FROM `territory_neighbour`
-    WHERE `territory_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
-
-    return mysql_uquery($sql);
-  }
-
-
-
-  public function get_territory_vertex_list($vertex_id = null) {
-    $where = '';
-    if( ! is_null( $vertex_id )) $where .= '
-AND `vertex_id` = '.mysql_ureal_escape_string($vertex_id);
-
-    $sql = '
-SELECT `territory_id`, `vertex_id`
-FROM `territory_vertex`
-WHERE `territory_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
-    $res = mysql_uquery($sql);
-
-    return mysql_fetch_to_array($res);
-  }
-
-  public function set_territory_vertex( $vertex_id ) {
-    $sql = "REPLACE INTO `territory_vertex` ( `territory_id`, `vertex_id` ) VALUES (".mysql_ureal_escape_string( $this->get_id(), $vertex_id ).")";
-
-    return mysql_uquery($sql);
-  }
-
-  public function del_territory_vertex( $vertex_id = null ) {
-    $where = '';
-    if( ! is_null( $vertex_id )) $where .= '
-AND `vertex_id` = '.mysql_ureal_escape_string($vertex_id);
-    $sql = 'DELETE FROM `territory_vertex`
     WHERE `territory_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
 
     return mysql_uquery($sql);

@@ -22,7 +22,8 @@
         <tr>
           <th>Sel.</th>
           <th>Name</th>
-          <th>World Id</th>        </tr>
+          <th>World Id</th>
+          <th>Vertices</th>        </tr>
       </thead>
       <tfoot>
         <tr>
@@ -40,6 +41,7 @@
       $world_temp = World::instance( $territory->get_world_id());
       echo '
           <td>'.$world_temp->get_name().'</td>
+          <td>'.$territory->get_vertices().'</td>
           <td><a href="'.htmlentities_utf8(get_page_url('admin_territory_mod', true, array('id' => $territory->get_id()))).'"><img src="'.IMG.'img_html/pencil.png" alt="Modifier" title="Modifier"/></a></td>
         </tr>';
     }

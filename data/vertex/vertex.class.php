@@ -1,71 +1,72 @@
 <?php
-/**
- * Class Vertex
- *
- */
 
-require_once( DATA."model/vertex_model.class.php" );
-
-class Vertex extends Vertex_Model {
-
-  // CUSTOM
-
+class Vertex {
+  public $guid;
+  public $x;
+  public $y;
+  public $label;
+  
   static $distanceTable = array();
   static $angleTable = array();
   static $anglePolarTable = array();
   
-  public function __construct( $id = null ) {
-    parent::__construct( $id );
-    
-    $this->guid = str_pad( $this->x, 0, '0', STR_PAD_LEFT ).','.str_pad( $coordY, 0, '0', STR_PAD_LEFT );
+  function __construct( $coordX, $coordY, $guid = null, $label = null ) {
+    $this->x = $coordX;
+    $this->y = $coordY;
+    $this->guid = $guid;
+    $this->label = $label;
+
+    if( is_null( $this->guid ) ) {
+      $this->guid = str_pad( $coordX, 0, '0', STR_PAD_LEFT ).','.str_pad( $coordY, 0, '0', STR_PAD_LEFT );
+    }
   }
   
   public function __toString() {
-    $return = is_null( $this->name )?$this->guid:$this->name;
+    $return = is_null( $this->label )?$this->guid:$this->label;
     
     return (string)$return;
   }
   
-  static function distance( $point1, $point2 ) {
+  static function distance( $vertex1, $vertex2 ) {
     
-    //if( !isset( self::$distanceTable[ $point1->guid ][ $point2->guid ] ) ) {
+    //if( !isset( self::$distanceTable[ $vertex1->guid ][ $vertex2->guid ] ) ) {
     
-      $a = $point2->x - $point1->x;
-      $b = $point2->y - $point1->y;
+      $a = $vertex2->x - $vertex1->x;
+      $b = $vertex2->y - $vertex1->y;
       
       $distance = round( sqrt( pow( $a, 2 ) + pow( $b, 2 ) ), 1 );
       
-      self::$distanceTable[ $point1->guid ][ $point2->guid ] = $distance;
-      self::$distanceTable[ $point2->guid ][ $point1->guid ] = $distance;
+      self::$distanceTable[ $vertex1->guid ][ $vertex2->guid ] = $distance;
+      self::$distanceTable[ $vertex2->guid ][ $vertex1->guid ] = $distance;
     //}
 
-    return self::$distanceTable[ $point1->guid ][ $point2->guid ];
+    return self::$distanceTable[ $vertex1->guid ][ $vertex2->guid ];
   }
   
   static function getDistanceTable() {
     return self::$distanceTable;
   }
   
-  static function angle( $pointA, $pointB, $pointC ) {
-    if( ! isset( self::$angleTable[ $pointA->guid . ';' . $pointB->guid . ';' . $pointC->guid ] ) ) {
-      $AB = Point::distance( $pointA, $pointB );
-      $BC = Point::distance( $pointB, $pointC );
-      $AC = Point::distance( $pointC, $pointA );
+  static function angle( $vertexA, $vertexB, $vertexC ) {
+    if( ! isset( self::$angleTable[ $vertexA->guid . ';' . $vertexB->guid . ';' . $vertexC->guid ] ) ) {
+      $AB = Vertex::distance( $vertexA, $vertexB );
+      $BC = Vertex::distance( $vertexB, $vertexC );
+      $AC = Vertex::distance( $vertexC, $vertexA );
       
       // Al-Khashi theorem
-      self::$angleTable[ $pointA->guid.';'.$pointB->guid.';'.$pointC->guid ] =
+      self::$angleTable[ $vertexA->guid.';'.$vertexB->guid.';'.$vertexC->guid ] =
         rad2deg( acos( ( pow( $AB, 2 ) + pow( $BC, 2 ) - pow( $AC, 2 ) ) / ( 2 * $AB * $BC ) ) );
     }
-    return self::$angleTable[ $pointA->guid.';'.$pointB->guid.';'.$pointC->guid ];
+    return self::$angleTable[ $vertexA->guid.';'.$vertexB->guid.';'.$vertexC->guid ];
   }
   
-  /* Polar angle difference between $pointA and $pointC, $pointB is the origin, $pointA is 0 angle */
-  static function anglePolar( $pointA, $pointB, $pointC ) {
-    if( ! isset( self::$anglePolarTable[ $pointA->guid . ';' . $pointB->guid . ';' . $pointC->guid ] ) ) {
-      $Ax = $pointA->x - $pointB->x;
-      $Ay = $pointA->y - $pointB->y;
-      $Cx = $pointC->x - $pointB->x;
-      $Cy = $pointC->y - $pointB->y;
+  /* Polar angle difference between $vertexA and $vertexC, $vertexB is the origin, $vertexA is 0 angle */
+  static function anglePolar( $vertexA, $vertexB, $vertexC ) {
+    if( ! isset( self::$anglePolarTable[ $vertexA->guid . ';' . $vertexB->guid . ';' . $vertexC->guid ] ) ) {
+      $Ax = $vertexA->x - $vertexB->x;
+      $Ay = $vertexA->y - $vertexB->y;
+      $Cx = $vertexC->x - $vertexB->x;
+      $Cy = $vertexC->y - $vertexB->y;
       
       if( $Ax <= 0 && pow( $Ay, 2 ) == 0 ) {
         $Apolar = 180;
@@ -81,92 +82,89 @@ class Vertex extends Vertex_Model {
       $result = $Cpolar - $Apolar;
       if( $result < 0 ) $result += 360;
 
-      self::$anglePolarTable[ $pointA->guid.';'.$pointB->guid.';'.$pointC->guid ] = $result;
+      self::$anglePolarTable[ $vertexA->guid.';'.$vertexB->guid.';'.$vertexC->guid ] = $result;
     }
-    return self::$anglePolarTable[ $pointA->guid.';'.$pointB->guid.';'.$pointC->guid ];
+    return self::$anglePolarTable[ $vertexA->guid.';'.$vertexB->guid.';'.$vertexC->guid ];
   }
   
-  static function aireTriangle( $pointA, $pointB, $pointC ) {
-    $AB = Point::distance( $pointA, $pointB );
-    $BC = Point::distance( $pointB, $pointC );
-    $AC = Point::distance( $pointC, $pointA );
+  static function aireTriangle( $vertexA, $vertexB, $vertexC ) {
+    $AB = Vertex::distance( $vertexA, $vertexB );
+    $BC = Vertex::distance( $vertexB, $vertexC );
+    $AC = Vertex::distance( $vertexC, $vertexA );
     
     return sqrt( ( $AB + $BC + $AC) * ( - $AB + $BC + $AC ) * ( $AB - $BC + $AC ) * ( $AB + $BC - $AC ) ) / 4;
   }
   
-  static function isCrossing( $pointA, $pointB, $pointC, $pointD ) {
-    //var_dump( "isCrossing", $pointA->guid, $pointB->guid, $pointC->guid, $pointD->guid );
+  static function isCrossing( $vertexA, $vertexB, $vertexC, $vertexD ) {
+    //var_dump( "isCrossing", $vertexA->guid, $vertexB->guid, $vertexC->guid, $vertexD->guid );
     $isCrossing = false;
     
     if(
-      $pointA == $pointC && $pointB == $pointD ||
-      $pointA == $pointD && $pointB == $pointC ) {
-      // All identical points
+      $vertexA == $vertexC && $vertexB == $vertexD ||
+      $vertexA == $vertexD && $vertexB == $vertexC ) {
+      // All identical vertices
       $isCrossing = true;
     }elseif(
-      $pointA != $pointC && $pointB != $pointD &&
-      $pointA != $pointD && $pointB != $pointC
+      $vertexA != $vertexC && $vertexB != $vertexD &&
+      $vertexA != $vertexD && $vertexB != $vertexC
     ) {
-      // If only one point id identical => not crossing
+      // If only one vertex id identical => not crossing
       
       
       
       // Division by zero protection
-      $v1 = ($pointA->x == $pointB->x);
-      $v2 = ($pointC->x == $pointD->x);
+      $v1 = ($vertexA->x == $vertexB->x);
+      $v2 = ($vertexC->x == $vertexD->x);
       
       if( ! ($v1 && $v2) ) {
         if( $v1 ) {
           // AB is vertical
-          $aCD = ($pointD->y - $pointC->y) / ($pointD->x - $pointC->x);
-          $bCD = $pointC->y - $aCD * $pointC->x;
+          $aCD = ($vertexD->y - $vertexC->y) / ($vertexD->x - $vertexC->x);
+          $bCD = $vertexC->y - $aCD * $vertexC->x;
           
-          $commonY= $aCD * $pointA->x + $bCD;
+          $commonY= $aCD * $vertexA->x + $bCD;
           
           $isCrossing =
-            $commonY > min( $pointA->y, $pointB->y ) &&
-            $commonY < max( $pointA->y, $pointB->y ) &&
-            $commonY > min( $pointC->y, $pointD->y ) &&
-            $commonY < max( $pointC->y, $pointD->y );
+            $commonY > min( $vertexA->y, $vertexB->y ) &&
+            $commonY < max( $vertexA->y, $vertexB->y ) &&
+            $commonY > min( $vertexC->y, $vertexD->y ) &&
+            $commonY < max( $vertexC->y, $vertexD->y );
         }elseif( $v2 ) {
           // CD is vertical
-          $aAB = ($pointB->y - $pointA->y) / ($pointB->x - $pointA->x);
-          $bAB = $pointA->y - $aAB * $pointA->x;
+          $aAB = ($vertexB->y - $vertexA->y) / ($vertexB->x - $vertexA->x);
+          $bAB = $vertexA->y - $aAB * $vertexA->x;
 
-          $commonY= $aAB * $pointC->x + $bAB;
+          $commonY= $aAB * $vertexC->x + $bAB;
           
           $isCrossing =
-            $commonY > min( $pointA->y, $pointB->y ) &&
-            $commonY < max( $pointA->y, $pointB->y ) &&
-            $commonY > min( $pointC->y, $pointD->y ) &&
-            $commonY < max( $pointC->y, $pointD->y );
+            $commonY > min( $vertexA->y, $vertexB->y ) &&
+            $commonY < max( $vertexA->y, $vertexB->y ) &&
+            $commonY > min( $vertexC->y, $vertexD->y ) &&
+            $commonY < max( $vertexC->y, $vertexD->y );
         }else {
           // a : directional coefficient / b : origin oodonnée
-          $aAB = ($pointB->y - $pointA->y) / ($pointB->x - $pointA->x);
-          $aCD = ($pointD->y - $pointC->y) / ($pointD->x - $pointC->x);
+          $aAB = ($vertexB->y - $vertexA->y) / ($vertexB->x - $vertexA->x);
+          $aCD = ($vertexD->y - $vertexC->y) / ($vertexD->x - $vertexC->x);
           
           // AB and CD are not parallel
           if( $aAB != $aCD ) {
-            $bAB = $pointA->y - $aAB * $pointA->x;
-            $bCD = $pointC->y - $aCD * $pointC->x;
+            $bAB = $vertexA->y - $aAB * $vertexA->x;
+            $bCD = $vertexC->y - $aCD * $vertexC->x;
             // X coordinate of the extended line crossing
             $commonX = ( $bCD - $bAB ) / ( $aAB - $aCD );
             
-            // Lines are crossing between the given points
+            // Lines are crossing between the given vertices
             $isCrossing =
-              $commonX > min( $pointA->x, $pointB->x ) &&
-              $commonX < max( $pointA->x, $pointB->x ) &&
-              $commonX > min( $pointC->x, $pointD->x ) &&
-              $commonX < max( $pointC->x, $pointD->x );
+              $commonX > min( $vertexA->x, $vertexB->x ) &&
+              $commonX < max( $vertexA->x, $vertexB->x ) &&
+              $commonX > min( $vertexC->x, $vertexD->x ) &&
+              $commonX < max( $vertexC->x, $vertexD->x );
           }
         }
       }
     }
     //var_dump( $isCrossing );
-    //if( $isCrossing ) var_dump( "isCrossing", $pointA->guid, $pointB->guid, $pointC->guid, $pointD->guid );
+    //if( $isCrossing ) var_dump( "isCrossing", $vertexA->guid, $vertexB->guid, $vertexC->guid, $vertexD->guid );
     return $isCrossing;
-  }
-
-  // /CUSTOM
-
+  }  
 }

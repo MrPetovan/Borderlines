@@ -38,7 +38,9 @@ class Game extends Game_Model {
     //$this->del_game_player();
     
     $world = new World();
+    $world->name = $this->name;
     $world->initializeTerritories();
+    $world->save();
   }
   
   public function start() {
