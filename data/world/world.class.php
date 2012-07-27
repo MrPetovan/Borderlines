@@ -20,40 +20,51 @@ class World extends World_Model {
   }
 
   public function initializeTerritories() {
-    $graph = new Graph();
-    $graph->randomVertexGenerationDisk( $this->size_x, 100, 120 );
-    $graph->randomNoncrossingEdgeGeneration( 2, 200 );
+    $return = true;
 
-    $this->territories = Territory::find_in_graph( $graph );
-/*
-    foreach( $polygon_list as $polygon_id => $polygon ) {
-      $territory = new Territory();
-      $territory->polygon = $polygon;
-      $territory->initializePopulation();
-      $this->territories[] = $territory;
-
-      $vertices = $polygon->getVertices();
-      $currentVertex = array_shift( $vertices );
-      $vertices[] = $currentVertex;
-      foreach( $vertices as $vertex ) {
-        $neighbour_array[ $currentVertex->id ][ $vertex->id ][] = $polygon_id;
-        $neighbour_array[ $vertex->id ][ $currentVertex->id ][] = $polygon_id;
-        $currentVertex = $vertex;
-      }
+    if( is_null( $this->id ) ) {
+      $return = $this->save();
     }
 
-    foreach( $neighbour_array as $startVertexGuid => $array ) {
-      foreach( $array as $endVertexGuid => $neighbours ) {
-        if( count( $neighbours ) == 2 ) {
-          $neighbourA = $this->territories[ $neighbours[0] ];
-          $neighbourB = $this->territories[ $neighbours[1] ];
-          $neighbourA->addNeighbour( $neighbourB );
-          $neighbourB->addNeighbour( $neighbourA );
+    if( $return ) {
+      Territory::db_remove_by_world_id( $this->id );
+
+      $graph = new Graph();
+      $graph->randomVertexGenerationDisk( $this->size_x, 100, 120 );
+      $graph->randomNoncrossingEdgeGeneration( 2, 200 );
+
+      $this->territories = Territory::find_in_graph( $graph );
+
+      foreach( $this->territories as $territory ) {
+        $territory->world_id = $this->id;
+        $territory->save();
+      }
+
+      $neighbour_array = array();
+      foreach( $this->territories as $territory ) {
+        $vertices = $territory->vertices;
+        $currentVertex = array_shift( $vertices );
+        $vertices[] = $currentVertex;
+        foreach( $vertices as $vertex ) {
+          $neighbour_array[ $currentVertex->guid ][ $vertex->guid ][] = $territory;
+          $neighbour_array[ $vertex->guid ][ $currentVertex->guid ][] = $territory;
+          $currentVertex = $vertex;
         }
       }
+
+      foreach( $neighbour_array as $startVertexGuid => $array ) {
+        foreach( $array as $endVertexGuid => $neighbours ) {
+          if( count( $neighbours ) == 2 ) {
+
+            $neighbours[0]->set_territory_neighbour( $neighbours[1]->id );
+            $neighbours[1]->set_territory_neighbour( $neighbours[0]->id );
+          }
+        }
+      }
+
+      //var_dump( $this->territories );
     }
-*/
-    //var_dump( $this->territories );
+    return $return;
   }
 
   public function save( $flags = 0 ) {
@@ -139,12 +150,28 @@ class World extends World_Model {
     return $img;
   }
 
-  public function drawImg( ) {
+  public function drawImg( $with_map = false ) {
     $image = $this->draw( );
     ob_start();
     imagepng($image);
     $imagevariable = ob_get_clean();
-    echo '<img src="data:image/png;base64,'.base64_encode( $imagevariable ).'"/>';
+    if( $with_map ) {
+      echo '
+      <map name="world">';
+      foreach( $this->territories as $territory ) {
+        $coords = array();
+        foreach( $territory->vertices as $vertex ) {
+          $coords[] = $vertex->x .','. ($this->size_y - $vertex->y);
+        }
+        echo '
+        <area shape="polygon" coords="'.implode(',', $coords).'" href="'.Page::get_url('show_territory', array('id' => $territory->id)).'" title="'.$territory->name.'">';
+      }
+      echo '
+      </map>
+      <img usemap="#world" src="data:image/png;base64,'.base64_encode( $imagevariable ).'">';
+    }else {
+      echo '<img src="data:image/png;base64,'.base64_encode( $imagevariable ).'"/>';
+    }
   }
 
   // /CUSTOM

@@ -8,8 +8,8 @@
 
   <h3>Map</h3>
 <?php
-  $world->initializeTerritories();
-  echo $world->drawImg()
+  //$world->initializeTerritories();
+  echo $world->drawImg(true);
 ?>
 <h3>Territories</h3>
 <?php
@@ -19,6 +19,7 @@
   <thead>
     <tr>
       <th>Name</th>
+      <th>Area</th>
     </tr>
   </thead>
   <tfoot>
@@ -32,6 +33,7 @@
       echo '
     <tr>
       <td><a href="'.get_page_url('show_territory', true, array('id' => $territory->id)).'">'.$territory->name.'</a></td>
+      <td>'.$territory->getArea().' km²</td>
     </tr>';
     }
 ?>
