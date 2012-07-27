@@ -1,4 +1,5 @@
-<?php/**
+<?php
+/**
  * Classe Page_Model *
  */
 
