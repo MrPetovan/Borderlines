@@ -22,6 +22,7 @@
         <tr>
           <th>Sel.</th>
           <th>Name</th>
+          <th>World Id</th>
           <th>Current Turn</th>
           <th>Turn Interval</th>
           <th>Turn Limit</th>
@@ -45,7 +46,10 @@
         <tr>
           <td><input type="checkbox" name="game_id[]" value="'.$game->get_id().'"/></td>
           <td><a href="'.htmlentities_utf8(get_page_url('admin_game_view', true, array('id' => $game->get_id()))).'">'.$game->get_name().'</a></td>
-
+';
+      $world_temp = World::instance( $game->get_world_id());
+      echo '
+          <td>'.$world_temp->get_name().'</td>
           <td>'.$game->get_current_turn().'</td>
           <td>'.$game->get_turn_interval().'</td>
           <td>'.$game->get_turn_limit().'</td>

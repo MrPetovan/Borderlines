@@ -12,6 +12,17 @@
     <h3>Showing "<?php echo $game->name?>"</h3>
     <div class="informations formulaire">
 
+<?php
+      $option_list = array();
+      $world_list = World::db_get_all();
+      foreach( $world_list as $world)
+        $option_list[ $world->id ] = $world->name;
+?>
+      <p class="field">
+        <span class="libelle">World Id</span>
+        <span class="value"><a href="<?php echo get_page_url('admin_world_view', true, array('id' => $game->world_id ) )?>"><?php echo $option_list[ $game->world_id ]?></a></span>
+      </p>
+
             <p class="field">
               <span class="libelle">Current Turn</span>
               <span class="value"><?php echo $game->current_turn?></span>
