@@ -22,6 +22,7 @@
         <tr>
           <th>Sel.</th>
           <th>Name</th>
+          <th>Capital Name</th>
           <th>World Id</th>
           <th>Vertices</th>        </tr>
       </thead>
@@ -37,7 +38,8 @@
         <tr>
           <td><input type="checkbox" name="territory_id[]" value="'.$territory->get_id().'"/></td>
           <td><a href="'.htmlentities_utf8(get_page_url('admin_territory_view', true, array('id' => $territory->get_id()))).'">'.$territory->get_name().'</a></td>
-';
+
+          <td>'.$territory->get_capital_name().'</td>';
       $world_temp = World::instance( $territory->get_world_id());
       echo '
           <td>'.$world_temp->get_name().'</td>

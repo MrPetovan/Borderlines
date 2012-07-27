@@ -7,6 +7,7 @@
 class Territory_Model extends DBObject {
   // Champs BD
   protected $_name = null;
+  protected $_capital_name = null;
   protected $_world_id = null;
   protected $_vertices = null;
 
@@ -62,7 +63,8 @@ WHERE `world_id` = ".mysql_ureal_escape_string($world_id);
     <fieldset>
       <legend>Text fields</legend>
         '.HTMLHelper::genererInputHidden('id', $this->get_id()).'
-        <p class="field">'.HTMLHelper::genererInputText('name', $this->get_name(), array(), "Name *").'</p>';
+        <p class="field">'.HTMLHelper::genererInputText('name', $this->get_name(), array(), "Name *").'</p>
+        <p class="field">'.HTMLHelper::genererInputText('capital_name', $this->get_capital_name(), array(), "Capital Name *").'</p>';
       $option_list = array();
       $world_list = World::db_get_all();
       foreach( $world_list as $world)
@@ -87,7 +89,8 @@ WHERE `world_id` = ".mysql_ureal_escape_string($world_id);
   public static function get_message_erreur($num_error) {
     switch($num_error) { 
       case 1 : $return = "Le champ <strong>Name</strong> est obligatoire."; break;
-      case 2 : $return = "Le champ <strong>World Id</strong> est obligatoire."; break;
+      case 2 : $return = "Le champ <strong>Capital Name</strong> est obligatoire."; break;
+      case 3 : $return = "Le champ <strong>World Id</strong> est obligatoire."; break;
       default: $return = "Erreur de saisie, veuillez vérifier les champs.";
     }
     return $return;
@@ -104,7 +107,8 @@ WHERE `world_id` = ".mysql_ureal_escape_string($world_id);
     $return = array();
 
     $return[] = Member::check_compulsory($this->get_name(), 1);
-    $return[] = Member::check_compulsory($this->get_world_id(), 2, true);
+    $return[] = Member::check_compulsory($this->get_capital_name(), 2);
+    $return[] = Member::check_compulsory($this->get_world_id(), 3, true);
 
     $return = array_unique($return);
     if(($true_key = array_search(true, $return, true)) !== false) {

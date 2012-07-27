@@ -23,9 +23,9 @@ class Territory extends Territory_Model {
     $this->_vertices = serialize( $value );
   }
 
-  public static function get_random_name() {
+  public static function get_random_country_name() {
     $countries = array();
-    $fh = fopen( dirname( __FILE__ ).'/country_names_and_code_elements_txt.txt', 'r' );
+    $fh = fopen( __DIR__.'/country_names_and_code_elements_txt.txt', 'r' );
     while( $row = fgetcsv( $fh, 1000, ';' ) ) {
         if( strpos( $row[0], ' ' ) === false )
             $countries[] = $row[0];
@@ -35,13 +35,32 @@ class Territory extends Territory_Model {
     // header line
     unset( $countries[ 0 ] );
 
-    $first_idx = array_rand( $countries );
-    $last_idx = array_rand( $countries );
+    return self::get_random_name( $countries );
+  }
+
+  public static function get_random_capital_name() {
+    /*$simpleXML = simplexml_load_file( __DIR__.'/list_capital_cities_html.txt' );
+    $capitals = array();
+    foreach( $simpleXML->body->table->tr as $tr ) {
+      if( isset( $tr->td[0]->a ) ) {
+        $capitals[] = (string)$tr->td[0]->a;
+      }
+    }
+    file_put_contents( __DIR__.'/list_capital_cities.txt', implode("\n", $capitals));*/
+
+    $capitals = explode("\n", file_get_contents(__DIR__.'/list_capital_cities.txt'));
+
+    return self::get_random_name( $capitals );
+  }
+
+  public static function get_random_name( $list ) {
+    $first_idx = mt_rand( 0, count( $list ) - 1 );
+    $last_idx = mt_rand( 0, count( $list ) - 1 );
 
     $voyels = array( 'A', 'E', 'I', 'O', 'U', 'Y' );
 
     // first part, up to a voyel excluded from the middle
-    $first_name = $countries[ $first_idx ];
+    $first_name = strtoupper($list[ $first_idx ]);
     $first_pos = floor( strlen( $first_name ) / 2 );
     //echo 'first half : '.substr( $first_name, 0, $first_pos ).' = '.$first_name[ $first_pos ].'<br/>';
     while( isset( $first_name[ $first_pos ] ) && ! in_array( $first_name[ $first_pos ], $voyels ) ) {
@@ -52,7 +71,7 @@ class Territory extends Territory_Model {
     $first_name = substr( $first_name, 0, $first_pos );
 
     // last part, from a voyel included from the middle
-    $last_name = $countries[ $last_idx ];
+    $last_name = strtoupper($list[ $last_idx ]);
     $last_pos = floor( strlen( $last_name ) / 2 );
     //echo 'last half : '.substr( $last_name, $last_pos ).' = '.$last_name[ $last_pos ].'<br/>';
     while( isset( $last_name[ $last_pos ] ) && !in_array( $last_name[ $last_pos ], array( 'A', 'E', 'I', 'O', 'U', 'Y' ) ) ) {
@@ -225,7 +244,8 @@ class Territory extends Territory_Model {
       if( in_array( $currentVertex, $currentTerritory->vertices ) ) {
         // Working backward to find the closure vertex, exclude non-area included vertices
         $territory = new Territory();
-        $territory->name = Territory::get_random_name();
+        $territory->name = self::get_random_country_name();
+        $territory->capital_name = self::get_random_capital_name();
         $currentTerritoryVertices = $currentTerritory->vertices;
         do {
           $newVertex = array_pop( $currentTerritoryVertices );
@@ -285,6 +305,14 @@ class Territory extends Territory_Model {
     }
 
     return $return;
+  }
+
+  public static function db_remove_by_world_id($world_id) {
+    $sql = "
+DELETE FROM `".self::get_table_name()."`
+WHERE `world_id` = ".mysql_ureal_escape_string($world_id);
+
+    return mysql_uquery($sql);
   }
 
   // /CUSTOM

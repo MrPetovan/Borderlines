@@ -12,6 +12,10 @@
     <h3>Showing "<?php echo $territory->name?>"</h3>
     <div class="informations formulaire">
 
+            <p class="field">
+              <span class="libelle">Capital Name</span>
+              <span class="value"><?php echo $territory->capital_name?></span>
+            </p>
 <?php
       $option_list = array();
       $world_list = World::db_get_all();
