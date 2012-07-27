@@ -46,8 +46,8 @@ class Page extends DBObject {
   }
 
   /**
-   * Syst�me de message simple : On remplit la variable de session avec un message.
-   * D�s qu'une page demande � afficher les messages, on vide la variable.
+   * Système de message simple : On remplit la variable de session avec un message.
+   * Dès qu'une page demande à afficher les messages, on vide la variable.
    *
    * @param string $message
    * @param int $type
@@ -121,7 +121,7 @@ LIMIT 0,1";
       <p>'.HTMLHelper::genererInputText('tpl', $tpl, array('style' => 'width: 300px'), "Fichier TemPLate").'</p>
       <p>'.HTMLHelper::genererInputCheckBox('login_required', '1', $login_required, array(), "Page membre").'</p>
       <p>'.HTMLHelper::genererInputCheckBox('admin_required', '1', $admin_required, array(), "Page Administtrateur").'</p>
-      <p>'.HTMLHelper::genererInputText('rewrite_pattern', $rewrite_pattern, array('style' => 'width: 300px'), "Schéma Rewrite URL").'</p>
+      <p>'.HTMLHelper::genererInputText('rewrite_pattern', $rewrite_pattern, array('style' => 'width: 300px'), "SchÃ©ma Rewrite URL").'</p>
     </fieldset>
     <fieldset>
       '.HTMLHelper::genererInputSubmit('page_submit', 'Enregistrer').'
@@ -148,15 +148,15 @@ LIMIT 0,1";
   }
 
   /**
-   * Mets à jour les champs de l'objet en fonctions des données POST et FILES présente.
-   * Effectue les vérifications basiques pour mettre à jour les champs
+   * Mets Ã  jour les champs de l'objet en fonctions des donnÃ©es POST et FILES prÃ©sente.
+   * Effectue les vÃ©rifications basiques pour mettre Ã  jour les champs
    * Retourne une liste de codes d'erreur :
    * - vide : Pas d'erreur
    * -  1 : Code vide.
    * -  2 : Fichier DSP vide
    *
-   * @param array $post_data Donnée POST ($_POST)
-   * @param array $file_data Donnée FILES ($_FILES)
+   * @param array $post_data DonnÃ©e POST ($_POST)
+   * @param array $file_data DonnÃ©e FILES ($_FILES)
    */
   public function load_from_html_form($post_data, $file_data) {
     parent::load_from_html_form($post_data, $file_data);
@@ -207,7 +207,7 @@ LIMIT 0,1";
                 unset($params[$name]);
               }
             }
-            //Paramètres supplémentaires : ?param1=value1&param2=value2...
+            //ParamÃ¨tres supplÃ©mentaires : ?param1=value1&param2=value2...
             if(count($params)) {
               $rewrite_pattern .= "?";
             }
