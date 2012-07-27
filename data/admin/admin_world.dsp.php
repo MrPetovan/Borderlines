@@ -21,7 +21,9 @@
       <thead>
         <tr>
           <th>Sel.</th>
-          <th>Name</th>        </tr>
+          <th>Name</th>
+          <th>Size X</th>
+          <th>Size Y</th>        </tr>
       </thead>
       <tfoot>
         <tr>
@@ -36,6 +38,8 @@
           <td><input type="checkbox" name="world_id[]" value="'.$world->get_id().'"/></td>
           <td><a href="'.htmlentities_utf8(get_page_url('admin_world_view', true, array('id' => $world->get_id()))).'">'.$world->get_name().'</a></td>
 
+          <td>'.$world->get_size_x().'</td>
+          <td>'.$world->get_size_y().'</td>
           <td><a href="'.htmlentities_utf8(get_page_url('admin_world_mod', true, array('id' => $world->get_id()))).'"><img src="'.IMG.'img_html/pencil.png" alt="Modifier" title="Modifier"/></a></td>
         </tr>';
     }

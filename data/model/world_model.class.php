@@ -7,6 +7,8 @@
 class World_Model extends DBObject {
   // Champs BD
   protected $_name = null;
+  protected $_size_x = null;
+  protected $_size_y = null;
 
   public function __construct($id = null) {
     parent::__construct($id);
@@ -19,6 +21,12 @@ class World_Model extends DBObject {
   /* MUTATEURS */
   public function set_id($id) {
     if( is_numeric($id) && (int)$id == $id) $data = intval($id); else $data = null; $this->_id = $data;
+  }
+  public function set_size_x($size_x) {
+    if( is_numeric($size_x) && (int)$size_x == $size_x) $data = intval($size_x); else $data = null; $this->_size_x = $data;
+  }
+  public function set_size_y($size_y) {
+    if( is_numeric($size_y) && (int)$size_y == $size_y) $data = intval($size_y); else $data = null; $this->_size_y = $data;
   }
 
   /* FONCTIONS SQL */
@@ -51,6 +59,8 @@ class World_Model extends DBObject {
       <legend>Text fields</legend>
         '.HTMLHelper::genererInputHidden('id', $this->get_id()).'
         <p class="field">'.HTMLHelper::genererInputText('name', $this->get_name(), array(), "Name *").'</p>
+        <p class="field">'.HTMLHelper::genererInputText('size_x', $this->get_size_x(), array(), "Size X *").'</p>
+        <p class="field">'.HTMLHelper::genererInputText('size_y', $this->get_size_y(), array(), "Size Y *").'</p>
 
     </fieldset>';
 
@@ -67,6 +77,8 @@ class World_Model extends DBObject {
   public static function get_message_erreur($num_error) {
     switch($num_error) { 
       case 1 : $return = "Le champ <strong>Name</strong> est obligatoire."; break;
+      case 2 : $return = "Le champ <strong>Size X</strong> est obligatoire."; break;
+      case 3 : $return = "Le champ <strong>Size Y</strong> est obligatoire."; break;
       default: $return = "Erreur de saisie, veuillez vérifier les champs.";
     }
     return $return;
@@ -83,6 +95,8 @@ class World_Model extends DBObject {
     $return = array();
 
     $return[] = Member::check_compulsory($this->get_name(), 1);
+    $return[] = Member::check_compulsory($this->get_size_x(), 2, true);
+    $return[] = Member::check_compulsory($this->get_size_y(), 3, true);
 
     $return = array_unique($return);
     if(($true_key = array_search(true, $return, true)) !== false) {

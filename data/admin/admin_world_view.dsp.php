@@ -11,7 +11,15 @@
   <div class="texte_texte">
     <h3>Showing "<?php echo $world->name?>"</h3>
     <div class="informations formulaire">
-    </div>
+
+            <p class="field">
+              <span class="libelle">Size X</span>
+              <span class="value"><?php echo $world->size_x?></span>
+            </p>
+            <p class="field">
+              <span class="libelle">Size Y</span>
+              <span class="value"><?php echo $world->size_y?></span>
+            </p>    </div>
     <p><a href="<?php echo get_page_url('admin_world_mod', true, array('id' => $world->id))?>">Modifier cet objet World</a></p>
 <?php
   // CUSTOM

@@ -139,6 +139,80 @@
         <p><?php echo HTMLHelper::genererButton('action',  'set_territory_neighbour', array('type' => 'submit'), 'Ajouter un élément')?></p>
       </fieldset>
     </form>
+    <h4>Territory Player Troops</h4>
+<?php
+
+  $territory_player_troops_list = $territory->get_territory_player_troops_list();
+
+  if(count($territory_player_troops_list)) {
+?>
+    <table>
+      <thead>
+        <tr>
+          <th>Game Id</th>
+          <th>Turn</th>
+          <th>Player Id</th>
+          <th>Quantity</th>          <th>Action</th>
+        </tr>
+      </thead>
+      <tfoot>
+        <tr>
+          <td colspan="5"><?php echo count( $territory_player_troops_list )?> lignes</td>
+        </tr>
+      </tfoot>
+      <tbody>
+<?php
+      foreach( $territory_player_troops_list as $territory_player_troops ) {
+
+ 
+        $game_id_game = Game::instance( $territory_player_troops['game_id'] );
+        $player_id_player = Player::instance( $territory_player_troops['player_id'] );        echo '
+        <tr>
+        <td><a href="'.get_page_url('admin_game_view', true, array('id' => $game_id_game->id)).'">'.$game_id_game->name.'</a></td>
+        <td>'.$territory_player_troops['turn'].'</td>
+        <td><a href="'.get_page_url('admin_player_view', true, array('id' => $player_id_player->id)).'">'.$player_id_player->name.'</a></td>
+        <td>'.$territory_player_troops['quantity'].'</td>          <td>
+            <form action="'.get_page_url(PAGE_CODE, true, array('id' => $territory->id)).'" method="post">
+              '.HTMLHelper::genererInputHidden('id', $territory->id).'
+
+              '.HTMLHelper::genererInputHidden('game_id', $game_id_game->id).'
+              '.HTMLHelper::genererInputHidden('turn', $territory_player_troops['turn']).'
+              '.HTMLHelper::genererInputHidden('player_id', $player_id_player->id).'              '.HTMLHelper::genererButton('action',  'del_territory_player_troops', array('type' => 'submit'), 'Supprimer').'
+            </form>
+          </td>
+        </tr>';
+      }
+?>
+      </tbody>
+    </table>
+<?php
+  }else {
+    echo '<p>Il n\'y a pas d\'éléments à afficher</p>';
+  }
+
+  $liste_valeurs_game = Game::db_get_select_list();
+  $liste_valeurs_player = Player::db_get_select_list();?>
+    <form action="<?php echo get_page_url(PAGE_CODE, true, array('id' => $territory->id))?>" method="post" class="formulaire">
+      <?php echo HTMLHelper::genererInputHidden('id', $territory->id )?>
+      <fieldset>
+        <legend>Ajouter un élément</legend>
+        <p class="field">
+          <?php echo HTMLHelper::genererSelect('game_id', $liste_valeurs_game, null, array(), 'Game' )?><a href="<?php echo get_page_url('admin_game_mod')?>">Créer un objet Game</a>
+        </p>
+        <p class="field">
+          <?php echo HTMLHelper::genererInputText('turn', null, array(), 'Turn*' )?>
+           
+        </p>
+        <p class="field">
+          <?php echo HTMLHelper::genererSelect('player_id', $liste_valeurs_player, null, array(), 'Player' )?><a href="<?php echo get_page_url('admin_player_mod')?>">Créer un objet Player</a>
+        </p>
+        <p class="field">
+          <?php echo HTMLHelper::genererInputText('quantity', null, array(), 'Quantity*' )?>
+           
+        </p>
+        <p><?php echo HTMLHelper::genererButton('action',  'set_territory_player_troops', array('type' => 'submit'), 'Ajouter un élément')?></p>
+      </fieldset>
+    </form>
 <?php
   // CUSTOM
 
