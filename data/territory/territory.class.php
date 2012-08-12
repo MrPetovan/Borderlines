@@ -89,14 +89,10 @@ class Territory extends Territory_Model {
     return $return;
   }
 
-  public function addVertex( Vertex $vertex ) {
+  public function add_vertex( Vertex $vertex ) {
     $vertices = $this->vertices;
     $vertices[] = $vertex;
     $this->vertices = $vertices;
-  }
-
-  public function getVertex( $index ) {
-    return $this->vertices[ $index ];
   }
 
   public function contains( Vertex $vertex ) {
@@ -141,7 +137,7 @@ class Territory extends Territory_Model {
     return $return;
   }
 
-  public function getPerimeter() {
+  public function get_perimeter() {
     $return = null;
 
     if( count( $this->vertices ) >= 2 ) {
@@ -162,7 +158,7 @@ class Territory extends Territory_Model {
    * Calculates the area of any given non-crossing territory
    * @see http://www.mathopenref.com/coordterritoryarea2.html
    */
-  public function getArea() {
+  public function get_area() {
     $return = null;
     if( count( $this->vertices ) >= 3 ) {
       $areaVertices = $this->vertices;
@@ -183,7 +179,7 @@ class Territory extends Territory_Model {
    * Gets the coordinates of the centroid of the territory
    * @see http://stackoverflow.com/questions/2792443/finding-the-centroid-of-a-territory
    */
-  public function getCentroid() {
+  public function get_centroid() {
     $return = null;
 
     if( count( $this->vertices ) >= 3 ) {
@@ -249,7 +245,7 @@ class Territory extends Territory_Model {
         $currentTerritoryVertices = $currentTerritory->vertices;
         do {
           $newVertex = array_pop( $currentTerritoryVertices );
-          $territory->addVertex( $newVertex );
+          $territory->add_vertex( $newVertex );
         }while( $currentVertex != $newVertex );
         $currentTerritory = clone $territory;
 
@@ -270,7 +266,7 @@ class Territory extends Territory_Model {
           $return = $currentTerritory;
         }
       }else {
-        $currentTerritory->addVertex( $currentVertex );
+        $currentTerritory->add_vertex( $currentVertex );
 
         if( is_null( $lastVertex ) ) {
           // First vertex : we search every line from the vertex
@@ -313,6 +309,67 @@ DELETE FROM `".self::get_table_name()."`
 WHERE `world_id` = ".mysql_ureal_escape_string($world_id);
 
     return mysql_uquery($sql);
+  }
+
+  public function get_current_owner( $game_id, $turn = null ) {
+    $return = null;
+    /* @var $game Game */
+    $game = Game::instance( $game_id );
+
+    if( is_null( $turn ) ) {
+      $turn = $game->current_turn;
+    }
+
+    $player_territories = $game->get_territory_player_troops_list($turn, $this->id);
+
+    // Unclaimed territory
+    if( count( $player_territories ) == 0 ) {
+      $return = null;
+    }elseif( count( $player_territories ) == 1 ) {
+      $return = $player_territories[0]['player_id'];
+    }else {
+      $diplomacy = array();
+
+      $all_allies = true;
+
+      $diplomacy_list = $game->get_player_diplomacy_list( $current_turn );
+      foreach( $diplomacy_list as $diplomacy_item ) {
+        $diplomacy[ $diplomacy_item['from_player_id'] ][ $diplomacy_item['to_player_id'] ] = $diplomacy_item['status'];
+      }
+
+      foreach( $player_territories as $player_territory_from ) {
+        foreach( $player_territories as $player_territory_to ) {
+          $all_allies = ($diplomacy[ $player_territory_from['player_id'] ][ $player_territory_to['player_id'] ] == 'Ally');
+        }
+      }
+
+      if( $all_allies ) {
+        $last_owner = $this->get_current_owner($game_id, $turn - 1);
+
+        $troops = array();
+
+        foreach( $player_territories as $player_territory ) {
+          $troops[ $player_territory['player_id'] ] = $player_territory['quantity'];
+        }
+
+
+        if(array_search($last_owner, array_keys( $troops)) !== false) {
+          // Already captured territory
+          $return = $owner;
+        }else {
+          asort( $troops );
+          reset( $troops );
+          list( $player_id, $troops ) = each( $troops );
+
+          $return = $player_id;
+        }
+      }else {
+        // Contested territory
+        $return = null;
+      }
+    }
+
+    return $return;
   }
 
   // /CUSTOM
