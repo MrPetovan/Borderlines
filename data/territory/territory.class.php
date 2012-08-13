@@ -365,7 +365,7 @@ WHERE `world_id` = ".mysql_ureal_escape_string($world_id);
         }
       }else {
         // Contested territory
-        $return = null;
+        $return = false;
       }
     }
 

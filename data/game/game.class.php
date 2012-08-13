@@ -115,13 +115,31 @@ class Game extends Game_Model {
         $order_list[] = $class::instance( $order->get_id() );
       }
 
-      //Pre-execution (soldiers go to war)
-      foreach( $order_list as $order ) {
-        $order->pre_execute();
-      }
-      // Execution (soldiers return)
+      // Orders execution
       foreach( $order_list as $order ) {
         $order->execute();
+      }
+
+      $territories = Territory::db_get_by_world_id( $this->world_id );
+      // Updating territories ownership and replenishing troops and battle on contested territories
+      foreach( $territories as $territory ) {
+        /* @var $territory Territory */
+        $previous_owner = $territory->get_current_owner($this->id, $this->current_turn - 1 );
+        $new_owner = $territory->get_current_owner($this->id, $this->current_turn );
+
+        if( !is_null( $new_owner ) ) {
+          if( $new_owner === false ) {
+            $player_troops = $territory->get_territory_player_troops_list($this->id, $this->current_turn);
+
+            // Diplomacy checking and parties forming
+
+
+            // Battle
+
+
+            // Cleaning up
+          }
+        }
       }
 
       $this->updated = time();

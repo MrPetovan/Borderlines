@@ -158,26 +158,32 @@ class Move_Troops extends Player_Order {
     $return = '
 <form action="'.Page::get_page_url( 'order' ).'" method="post">
   <fieldset>
-    <legend>'.$title.'</legend>
-    '.HTMLHelper::genererInputHidden('url_return', Page::get_page_url( $params['page_code'], true, $page_params ) ).'
-    <p>'.HTMLHelper::genererInputText( 'parameters[count]', 0, array(), 'Invading army size', null ).'</p>';
-    if( isset( $params['from_territory'] ) ) {
-      $return .= '
+    <legend>'.$title.'</legend>';
+    if( count( $neighbour_list ) ) {
+      $return .= HTMLHelper::genererInputHidden('url_return', Page::get_page_url( $params['page_code'], true, $page_params ) ).'
+    <p>'.HTMLHelper::genererInputText( 'parameters[count]', 0, array(), 'Troop size', null ).'</p>';
+      if( isset( $params['from_territory'] ) ) {
+        $return .= '
     '.HTMLHelper::genererInputHidden('parameters[from_territory_id]', $params['from_territory']->id);
-    }else {
-      $return .= '
+      }else {
+        $return .= '
     <p>'.HTMLHelper::genererSelect( 'parameters[from_territory_id]', $neighbour_list, null, array(), 'Move from' ).'</p>';
-    }
-    if( isset( $params['to_territory'] ) ) {
-      $return .= '
+      }
+      if( isset( $params['to_territory'] ) ) {
+        $return .= '
     '.HTMLHelper::genererInputHidden('parameters[to_territory_id]', $params['to_territory']->id);
-    }else {
-      $return .= '
+      }else {
+        $return .= '
     <p>'.HTMLHelper::genererSelect( 'parameters[to_territory_id]', $neighbour_list, null, array(), 'Move to' ).'</p>';
-    }
+      }
 
     $return .= '
-    <p>'.HTMLHelper::genererButton( 'action', 'move_troops', array('type' => 'submit'), "March !" ).'</p>
+    <p>'.HTMLHelper::genererButton( 'action', 'move_troops', array('type' => 'submit'), "March !" ).'</p>';
+    }else {
+      $return .= '
+    <p>You don\'t have any troops in neighbouring territories</p>';
+    }
+    $return .= '
   </fieldset>
 </form>';
 
