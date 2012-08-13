@@ -1,11 +1,11 @@
 <?php
   $member = Member::instance( Member::get_current_user_id() );
-  
+
   // TODO : Create player page
   $player_list = Player::db_get_by_member_id( $member->get_id() );
   if( count( $player_list ) ) {
     $current_player = array_shift( $player_list );
-    
+
     // Game retrival
     if( $current_game = $current_player->last_game ) {
       // In game OR game ended
@@ -20,6 +20,11 @@
               }else {
                 $current_player->set_game_player( $current_game->id, $current_game->current_turn );
               }
+              break;
+            }
+            case 'change_diplomacy_status' : {
+              $current_player->set_player_diplomacy( $current_game->id, $current_game->current_turn, getValue('to_player_id'), getValue('new_status'));
+              break;
             }
           }
         }

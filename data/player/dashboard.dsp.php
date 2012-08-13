@@ -79,14 +79,17 @@
   <tr>
     <th>Player</th>
     <th>Status</th>
+    <th>Change</th>
   </tr>
 <?php
     foreach( $player_diplomacy_list as $player_diplomacy ) {
       $player = Player::instance( $player_diplomacy['to_player_id'] );
+      $new_status = $player_diplomacy['status'] == 'Enemy'?'Ally':'Enemy';
       echo '
   <tr>
     <td><a href="'.Page::get_url('show_player', array('id' => $player->id)).'">'.$player->name.'</a></td>
     <td>'.$player_diplomacy['status'].'</td>
+    <td><a href="'.Page::get_url( PAGE_CODE, array('action' => 'change_diplomacy_status', 'to_player_id' => $player->id, 'new_status' => $new_status)).'">Change</a></td>
   </tr>';
     }
 ?>
