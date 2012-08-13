@@ -59,7 +59,7 @@ class Attack extends Player_Order {
         
         $defender_losses = min( $soldiers_defending, $attacker_efficiency );
         
-        // Pas de défenseurs
+        // Pas de dÃ©fenseurs
         if( $soldiers_defending == 0 ) {
           $attacker_losses = 0;
           $territory_gained = min( $attacker_efficiency, $territory_defended );
