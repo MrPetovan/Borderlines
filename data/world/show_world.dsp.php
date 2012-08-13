@@ -33,7 +33,7 @@
       echo '
     <tr>
       <td><a href="'.get_page_url('show_territory', true, array('id' => $territory->id)).'">'.$territory->name.'</a></td>
-      <td>'.$territory->getArea().' km²</td>
+      <td>'.$territory->get_area().' km²</td>
     </tr>';
     }
 ?>

@@ -127,7 +127,7 @@ class World extends World_Model {
       }
     }
     foreach( $this->territories as $key => $area ) {
-      $centroid = $area->getCentroid();
+      $centroid = $area->get_centroid();
 
       $name = $area->name;
       $bbox = imagettfbbox( 10, 0, $font, $name );
