@@ -31,8 +31,6 @@ class Game extends Game_Model {
     $this->ended = null;
     $this->updated = null;
 
-
-
     Player_Order::db_truncate_by_game( $this->id );
     $this->del_player_resource_history();
     //$this->del_game_player();
@@ -40,7 +38,7 @@ class Game extends Game_Model {
     $world = new World();
     $world->name = $this->name;
     $world->save();
-    $world->initializeTerritories();
+    $world->initialize_territories();
 
     $this->world_id = $world->id;
 
@@ -55,11 +53,18 @@ class Game extends Game_Model {
 
     $player_list = Player::db_get_by_game( $this->id );
 
-    $resources = Resource::db_get_select_list();
+    $territories = Territory::db_get_by_world_id( $this->world_id );
+
+    shuffle( $territories );
+
     foreach( $player_list as $player ) {
-      foreach( $resources as $resource_id => $resource_name ) {
-        $this->set_player_resource_history( $player->id, $resource_id, $this->current_turn, guess_time( time(), GUESS_DATE_MYSQL), 1000, "Init ($resource_name)", null );
+      foreach( $player_list as $playerB ) {
+        $this->set_player_diplomacy( $this->current_turn, $player->id, $playerB->id, 'Enemy' );
       }
+
+      $starting_territory = array_pop( $territories );
+
+      $this->set_territory_player_troops($this->current_turn, $starting_territory->id, $player->id, 1000);
 
       $member = Member::instance( $player->member_id );
       if( php_mail($member->email, SITE_NAME." | Game started", $player->get_email_game_new_turn( $this ), true)) {

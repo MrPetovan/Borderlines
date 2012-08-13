@@ -19,7 +19,7 @@ class World extends World_Model {
     return $this->territories;
   }
 
-  public function initializeTerritories() {
+  public function initialize_territories() {
     $return = true;
 
     if( is_null( $this->id ) ) {
