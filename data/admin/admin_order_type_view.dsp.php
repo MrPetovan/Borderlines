@@ -17,8 +17,8 @@
               <span class="value"><?php echo $order_type->class_name?></span>
             </p>
             <p class="field">
-              <span class="libelle">Target Player</span>
-              <span class="value"><?php echo $tab_visible[$order_type->target_player]?></span>
+              <span class="libelle">Active</span>
+              <span class="value"><?php echo $tab_visible[$order_type->active]?></span>
             </p>    </div>
     <p><a href="<?php echo get_page_url('admin_order_type_mod', true, array('id' => $order_type->id))?>">Modifier cet objet Order Type</a></p>
 <?php

@@ -8,7 +8,7 @@ class Order_Type_Model extends DBObject {
   // Champs BD
   protected $_class_name = null;
   protected $_name = null;
-  protected $_target_player = null;
+  protected $_active = null;
 
   public function __construct($id = null) {
     parent::__construct($id);
@@ -17,15 +17,15 @@ class Order_Type_Model extends DBObject {
   /* ACCESSEURS */
   public static function get_table_name() { return "order_type"; }
 
-  public function get_target_player() { return $this->is_target_player(); }
-  public function is_target_player() { return ($this->_target_player == 1); }
+  public function get_active() { return $this->is_active(); }
+  public function is_active() { return ($this->_active == 1); }
 
   /* MUTATEURS */
   public function set_id($id) {
     if( is_numeric($id) && (int)$id == $id) $data = intval($id); else $data = null; $this->_id = $data;
   }
-  public function set_target_player($target_player) {
-    if($target_player) $data = 1; else $data = 0; $this->_target_player = $data;
+  public function set_active($active) {
+    if($active) $data = 1; else $data = 0; $this->_active = $data;
   }
 
   /* FONCTIONS SQL */
@@ -39,10 +39,10 @@ LIMIT 0,1";
 
     return self::sql_to_object($sql);
   }
-  public static function db_get_by_target_player($target_player) {
+  public static function db_get_by_active($active) {
     $sql = "
 SELECT `id` FROM `".self::get_table_name()."`
-WHERE `target_player` = ".mysql_ureal_escape_string($target_player);
+WHERE `active` = ".mysql_ureal_escape_string($active);
 
     return self::sql_to_list($sql);
   }
@@ -74,7 +74,7 @@ WHERE `target_player` = ".mysql_ureal_escape_string($target_player);
         '.HTMLHelper::genererInputHidden('id', $this->get_id()).'
         <p class="field">'.HTMLHelper::genererInputText('class_name', $this->get_class_name(), array(), "Class Name *").'</p>
         <p class="field">'.HTMLHelper::genererInputText('name', $this->get_name(), array(), "Name *").'</p>
-        <p class="field">'.HTMLHelper::genererInputCheckBox('target_player', '1', $this->get_target_player(), array('label_position' => 'right'), "Target Player" ).'</p>
+        <p class="field">'.HTMLHelper::genererInputCheckBox('active', '1', $this->get_active(), array('label_position' => 'right'), "Active" ).'</p>
 
     </fieldset>';
 
@@ -92,7 +92,7 @@ WHERE `target_player` = ".mysql_ureal_escape_string($target_player);
     switch($num_error) { 
       case 1 : $return = "Le champ <strong>Class Name</strong> est obligatoire."; break;
       case 2 : $return = "Le champ <strong>Name</strong> est obligatoire."; break;
-      case 3 : $return = "Le champ <strong>Target Player</strong> est obligatoire."; break;
+      case 3 : $return = "Le champ <strong>Active</strong> est obligatoire."; break;
       default: $return = "Erreur de saisie, veuillez vérifier les champs.";
     }
     return $return;
@@ -110,7 +110,7 @@ WHERE `target_player` = ".mysql_ureal_escape_string($target_player);
 
     $return[] = Member::check_compulsory($this->get_class_name(), 1);
     $return[] = Member::check_compulsory($this->get_name(), 2);
-    $return[] = Member::check_compulsory($this->get_target_player(), 3, true);
+    $return[] = Member::check_compulsory($this->get_active(), 3, true);
 
     $return = array_unique($return);
     if(($true_key = array_search(true, $return, true)) !== false) {

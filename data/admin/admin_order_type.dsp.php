@@ -23,7 +23,7 @@
           <th>Sel.</th>
           <th>Name</th>
           <th>Class Name</th>
-          <th>Target Player</th>        </tr>
+          <th>Active</th>        </tr>
       </thead>
       <tfoot>
         <tr>
@@ -39,7 +39,7 @@
           <td><a href="'.htmlentities_utf8(get_page_url('admin_order_type_view', true, array('id' => $order_type->get_id()))).'">'.$order_type->get_name().'</a></td>
 
           <td>'.$order_type->get_class_name().'</td>
-          <td>'.$tab_visible[$order_type->get_target_player()].'</td>
+          <td>'.$tab_visible[$order_type->get_active()].'</td>
           <td><a href="'.htmlentities_utf8(get_page_url('admin_order_type_mod', true, array('id' => $order_type->get_id()))).'"><img src="'.IMG.'img_html/pencil.png" alt="Modifier" title="Modifier"/></a></td>
         </tr>';
     }
