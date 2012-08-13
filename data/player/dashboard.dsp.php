@@ -1,6 +1,8 @@
 <?php
   $resource_list = Resource::db_get_all();
-  
+
+  /* @var $current_player Player */
+  /* @var $current_game Game */
 ?>
 <h2>Dashboard</h2>
 <p>Welcome <?php echo $current_player->get_name()?> !</p>
@@ -31,6 +33,9 @@
 ?>
 <p><a href="<?php echo Page::get_page_url('player_list')?>">Player list</a></p>
 <h4>Wall</h4>
+<form action="<?php echo Page::get_url('shout', array('game_id' => $current_game->id ))?>" method="post">
+  <p><input type="text" name="text" value=""/><button type="submit" name="action" value="shout">Say</button></p>
+</form>
 <div id="shoutwall">
 <?php
   $shouts = Shout::db_get_by_game_id( $current_game->id );
@@ -41,9 +46,28 @@
   }
 ?>
 </div>
-<form action="<?php echo Page::get_url('shout', array('game_id' => $current_game->id ))?>" method="post">
-  <p><input type="text" name="text" value=""/><button type="submit" name="action" value="shout">Say</button></p>
-</form>
+<h3>Territories</h3>
+<?php
+  $player_territories = $current_player->get_territory_player_troops_list($current_game->id, $current_game->current_turn );
+?>
+<table>
+  <tr>
+    <th>Territories</th>
+    <th>Troupes</th>
+    <th>Status</th>
+  </tr>
+<?php
+  foreach( $player_territories as $player_territory ) {
+    $territory = Territory::instance( $player_territory['territory_id'] );
+    echo '
+  <tr>
+    <td><a href="'.Page::get_url('show_territory', array('id' => $territory->id)).'">'.$territory->name.'</a></td>
+    <td class="num">'.$player_territory['quantity'].'</td>
+    <td>'.($territory->get_current_owner($current_game->id, $current_game->current_turn) == $current_player->id?'Stable':'Contested').'</td>
+  </tr>';
+  }
+?>
+</table>
 <h3>Resources</h3>
 <?php
     $sums = $current_player->get_resource_sum_list( $current_game->id );
@@ -174,9 +198,9 @@
 <?php
       foreach( Order_Type::db_get_all() as $order_type ) {
         $class = $order_type->class_name;
-        
+
         require_once(DATA.'order_type/'.$order_type->class_name.'.class.php');
-        
+
         echo $class::get_html_form( array('page_code' => PAGE_CODE, 'current_player' => $current_player ) );
       }
     }
