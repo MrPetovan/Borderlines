@@ -9,7 +9,7 @@ class Graph {
   // Two-dimensional array of every distance between vertices, computed during vertex generation
   public $distances = array();
 
-  public function addVertex( Vertex $vertex, $minDist = null, $maxDist = null ) {
+  public function add_vertex( Vertex $vertex, $minDist = null, $maxDist = null ) {
     $vertexCreationFlag = count( $this->vertices ) == 0;
     $distanceTemp = array();
 
@@ -71,14 +71,14 @@ class Graph {
 
   public function randomVertexGenerationSimple( $sizeX = 500, $sizeY = 500, $numVertices = 10 ) {
     for( ;$numVertices != 0; $numVertices--) {
-      $this->addVertex( new Vertex( rand(0, $sizeX - 1), rand(0, $sizeY - 1) ) );
+      $this->add_vertex( new Vertex( rand(0, $sizeX - 1), rand(0, $sizeY - 1) ) );
     }
   }
 
   public function randomVertexGenerationDisk( $sizeX, $minDist, $maxDist ) {
     $sizeY = $sizeX;
     // Initial vertex generation
-    $this->addVertex( new Vertex( round( $sizeX / 2 ), round( $sizeY / 2 ), '⊗' ) );
+    $this->add_vertex( new Vertex( round( $sizeX / 2 ), round( $sizeY / 2 ), '⊗' ) );
 
     $initialVertex = reset( $this->vertices );
 
@@ -98,7 +98,7 @@ class Graph {
       $vertexCreationFlag = false;
 
       if( Vertex::distance( $vertex, $initialVertex ) <= ($sizeX / 2) ) {
-        $vertexCreationFlag = $this->addVertex( $vertex, $minDist, $maxDist );
+        $vertexCreationFlag = $this->add_vertex( $vertex, $minDist, $maxDist );
       }
 
       if( $vertexCreationFlag ) {
