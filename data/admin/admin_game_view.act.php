@@ -68,6 +68,27 @@
           );
         }
         break;
+      case 'set_territory_owner':
+        if( $game->id ) {
+          $flag_set_territory_owner = $game->set_territory_owner(
+            ($value = getValue('territory_id')) == ''?null:$value,
+            ($value = getValue('turn')) == ''?null:$value,
+            ($value = getValue('owner_id')) == ''?null:$value
+          );
+          if( ! $flag_set_territory_owner ) {
+            Page::add_message( '$game->set_territory_owner : ' . mysql_error(), Page::PAGE_MESSAGE_ERROR );
+          }
+        }
+        break;
+      case 'del_territory_owner':
+        if( $game->id ) {
+          $flag_del_territory_owner = $game->del_territory_owner(
+            ($value = getValue('territory_id')) == ''?null:$value,
+            ($value = getValue('turn')) == ''?null:$value,
+            ($value = getValue('owner_id')) == ''?null:$value
+          );
+        }
+        break;
       case 'set_territory_player_troops':
         if( $game->id ) {
           $flag_set_territory_player_troops = $game->set_territory_player_troops(

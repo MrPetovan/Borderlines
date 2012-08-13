@@ -7,6 +7,7 @@
 class Game_Model extends DBObject {
   // Champs BD
   protected $_name = null;
+  protected $_world_id = null;
   protected $_current_turn = null;
   protected $_turn_interval = null;
   protected $_turn_limit = null;
@@ -34,6 +35,9 @@ class Game_Model extends DBObject {
   public function set_id($id) {
     if( is_numeric($id) && (int)$id == $id) $data = intval($id); else $data = null; $this->_id = $data;
   }
+  public function set_world_id($world_id) {
+    if( is_numeric($world_id) && (int)$world_id == $world_id) $data = intval($world_id); else $data = null; $this->_world_id = $data;
+  }
   public function set_current_turn($current_turn) {
     if( is_numeric($current_turn) && (int)$current_turn == $current_turn) $data = intval($current_turn); else $data = null; $this->_current_turn = $data;
   }
@@ -60,6 +64,13 @@ class Game_Model extends DBObject {
   /* FONCTIONS SQL */
 
 
+  public static function db_get_by_world_id($world_id) {
+    $sql = "
+SELECT `id` FROM `".self::get_table_name()."`
+WHERE `world_id` = ".mysql_ureal_escape_string($world_id);
+
+    return self::sql_to_list($sql);
+  }
   public static function db_get_by_created_by($created_by) {
     $sql = "
 SELECT `id` FROM `".self::get_table_name()."`
@@ -93,7 +104,14 @@ WHERE `created_by` = ".mysql_ureal_escape_string($created_by);
     <fieldset>
       <legend>Text fields</legend>
         '.HTMLHelper::genererInputHidden('id', $this->get_id()).'
-        <p class="field">'.HTMLHelper::genererInputText('name', $this->get_name(), array(), "Name *").'</p>
+        <p class="field">'.HTMLHelper::genererInputText('name', $this->get_name(), array(), "Name *").'</p>';
+      $option_list = array();
+      $world_list = World::db_get_all();
+      foreach( $world_list as $world)
+        $option_list[ $world->id ] = $world->name;
+
+      $return .= '
+      <p class="field">'.HTMLHelper::genererSelect('world_id', $option_list, $this->get_world_id(), array(), "World Id *").'<a href="'.get_page_url('admin_world_mod').'">Créer un objet World</a></p>
         <p class="field">'.HTMLHelper::genererInputText('current_turn', $this->get_current_turn(), array(), "Current Turn").'</p>
         <p class="field">'.HTMLHelper::genererInputText('turn_interval', $this->get_turn_interval(), array(), "Turn Interval *").'</p>
         <p class="field">'.HTMLHelper::genererInputText('turn_limit', $this->get_turn_limit(), array(), "Turn Limit *").'</p>
@@ -126,10 +144,11 @@ WHERE `created_by` = ".mysql_ureal_escape_string($created_by);
   public static function get_message_erreur($num_error) {
     switch($num_error) { 
       case 1 : $return = "Le champ <strong>Name</strong> est obligatoire."; break;
-      case 2 : $return = "Le champ <strong>Turn Interval</strong> est obligatoire."; break;
-      case 3 : $return = "Le champ <strong>Turn Limit</strong> est obligatoire."; break;
-      case 4 : $return = "Le champ <strong>Created</strong> est obligatoire."; break;
-      case 5 : $return = "Le champ <strong>Created By</strong> est obligatoire."; break;
+      case 2 : $return = "Le champ <strong>World Id</strong> est obligatoire."; break;
+      case 3 : $return = "Le champ <strong>Turn Interval</strong> est obligatoire."; break;
+      case 4 : $return = "Le champ <strong>Turn Limit</strong> est obligatoire."; break;
+      case 5 : $return = "Le champ <strong>Created</strong> est obligatoire."; break;
+      case 6 : $return = "Le champ <strong>Created By</strong> est obligatoire."; break;
       default: $return = "Erreur de saisie, veuillez vérifier les champs.";
     }
     return $return;
@@ -146,10 +165,11 @@ WHERE `created_by` = ".mysql_ureal_escape_string($created_by);
     $return = array();
 
     $return[] = Member::check_compulsory($this->get_name(), 1);
-    $return[] = Member::check_compulsory($this->get_turn_interval(), 2, true);
-    $return[] = Member::check_compulsory($this->get_turn_limit(), 3, true);
-    $return[] = Member::check_compulsory($this->get_created(), 4);
-    $return[] = Member::check_compulsory($this->get_created_by(), 5, true);
+    $return[] = Member::check_compulsory($this->get_world_id(), 2, true);
+    $return[] = Member::check_compulsory($this->get_turn_interval(), 3, true);
+    $return[] = Member::check_compulsory($this->get_turn_limit(), 4, true);
+    $return[] = Member::check_compulsory($this->get_created(), 5);
+    $return[] = Member::check_compulsory($this->get_created_by(), 6, true);
 
     $return = array_unique($return);
     if(($true_key = array_search(true, $return, true)) !== false) {
@@ -264,6 +284,46 @@ AND `resource_id` = '.mysql_ureal_escape_string($resource_id);
     if( ! is_null( $player_order_id )) $where .= '
 AND `player_order_id` = '.mysql_ureal_escape_string($player_order_id);
     $sql = 'DELETE FROM `player_resource_history`
+    WHERE `game_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
+
+    return mysql_uquery($sql);
+  }
+
+
+
+  public function get_territory_owner_list($territory_id = null, $turn = null, $owner_id = null) {
+    $where = '';
+    if( ! is_null( $territory_id )) $where .= '
+AND `territory_id` = '.mysql_ureal_escape_string($territory_id);
+    if( ! is_null( $turn )) $where .= '
+AND `turn` = '.mysql_ureal_escape_string($turn);
+    if( ! is_null( $owner_id )) $where .= '
+AND `owner_id` = '.mysql_ureal_escape_string($owner_id);
+
+    $sql = '
+SELECT `territory_id`, `game_id`, `turn`, `owner_id`
+FROM `territory_owner`
+WHERE `game_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
+    $res = mysql_uquery($sql);
+
+    return mysql_fetch_to_array($res);
+  }
+
+  public function set_territory_owner( $territory_id, $turn, $owner_id ) {
+    $sql = "REPLACE INTO `territory_owner` ( `territory_id`, `game_id`, `turn`, `owner_id` ) VALUES (".mysql_ureal_escape_string( $territory_id, $this->get_id(), $turn, $owner_id ).")";
+
+    return mysql_uquery($sql);
+  }
+
+  public function del_territory_owner( $territory_id = null, $turn = null, $owner_id = null ) {
+    $where = '';
+    if( ! is_null( $territory_id )) $where .= '
+AND `territory_id` = '.mysql_ureal_escape_string($territory_id);
+    if( ! is_null( $turn )) $where .= '
+AND `turn` = '.mysql_ureal_escape_string($turn);
+    if( ! is_null( $owner_id )) $where .= '
+AND `owner_id` = '.mysql_ureal_escape_string($owner_id);
+    $sql = 'DELETE FROM `territory_owner`
     WHERE `game_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
 
     return mysql_uquery($sql);

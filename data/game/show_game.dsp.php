@@ -31,32 +31,37 @@
 <?php }?>
   <p class="field">
     <span class="libelle">Created</span>
-    <span class="value"><?php echo guess_time($game->created, GUESS_DATE_FR)?>
+    <span class="value"><?php echo guess_time($game->created, GUESS_TIME_LOCALE)?>
     by <a href="<?php echo get_page_url('show_player', true, array('id' => $game->created_by ) )?>"><?php echo $creator->name?></a></span>
   </p>
 <?php if( $game->started ) {?>
   <p class="field">
     <span class="libelle">Started</span>
-    <span class="value"><?php echo guess_time($game->started, GUESS_DATE_FR)?></span>
+    <span class="value"><?php echo guess_time($game->started, GUESS_TIME_LOCALE)?></span>
   </p>
 <?php }?>
 <?php if( $game->updated && ! $game->ended ) {?>
   <p class="field">
     <span class="libelle">Updated</span>
-    <span class="value"><?php echo guess_time($game->updated, GUESS_DATE_FR)?></span>
+    <span class="value"><?php echo guess_time($game->updated, GUESS_TIME_LOCALE)?></span>
   </p>
 <?php }?>
 <?php if( $game->ended ) {?>
   <p class="field">
     <span class="libelle">Ended</span>
-    <span class="value"><?php echo guess_time($game->ended, GUESS_DATE_FR)?></span>
+    <span class="value"><?php echo guess_time($game->ended, GUESS_TIME_LOCALE)?></span>
   </p>
 <?php }elseif( $game->updated ) { ?>
   <p class="field">
     <span class="libelle">Next turn</span>
-    <span class="value"><?php echo guess_time( $game->updated + $game->turn_interval, GUESS_TIME_FR ) ?></span>
+    <span class="value"><?php echo guess_time( $game->updated + $game->turn_interval, GUESS_TIME_LOCALE ) ?></span>
   </p>
 <?php }?>
+<?php $world = World::instance($game->world_id);?>
+  <p class="field">
+    <span class="libelle">World</span>
+    <span class="value"><a href="<?php echo Page::get_url('show_world', array('id' => $world->id))?>"><?php echo $world->name?></a></span>
+  </p>
 </div>
 <h3>Players</h3>
 <?php
@@ -95,14 +100,14 @@
     echo '
 <p>No player yet</p>';
   }
-  
+
   $is_in_a_game = $current_player->get_current_game() != false;
   $is_playing_in = $is_in_a_game || $game->get_game_player_list( $current_player->id );
   if( !$game->started && !$is_playing_in ) {
     echo '
 <p><a href="'.Page::get_page_url(PAGE_CODE, false, array('action' => 'join', 'id' => $game->id)).'">Join this game</a></p>';
   }
-  
+
   if( is_admin() ) {
     echo '<p><a href="'.Page::get_url('admin_game_view', array('id' => $game->id )).'">Manage game</a></p>';
   }
