@@ -19,10 +19,10 @@ WHERE `member_id` = ".mysql_ureal_escape_string( $member_id );
 
     return self::sql_to_list( $sql );
   }
-  
+
   public function get_resource_sum_list( $game_id = null ) {
     $return = null;
-    
+
     if( !is_null( $game_id ) || !is_null( $game_id = $this->get_current_game_id() ) ) {
       $sql = '
 SELECT `resource`.`id`, IFNULL( SUM( `delta` ), 0 ) as `sum`
@@ -33,7 +33,7 @@ LEFT JOIN `player_resource_history` ON
   AND `game_id` = '.mysql_ureal_escape_string($game_id).'
 GROUP BY `resource`.`id`';
       $res = mysql_uquery( $sql );
-    
+
       $return = mysql_fetch_to_array( $res );
     }else {
       error_log('[Borderlines] '.__CLASS__.'->'.__FUNCTION__.' : $game_id not defined');
@@ -41,10 +41,10 @@ GROUP BY `resource`.`id`';
     }
     return $return;
   }
-  
+
   public function get_resource_sum( $resource_id, $turn = null, $game_id = null ) {
     $return = null;
-    
+
     if( !is_null( $game_id ) || !is_null( $game_id = $this->get_current_game_id() ) ) {
       $where = '';
       if( !is_null( $turn ) ) {
@@ -66,10 +66,10 @@ AND `resource_id` = '.mysql_ureal_escape_string($resource_id).$where;
     }
     return $return;
   }
-  
+
   public function get_resource_history( $game_id = null ) {
     $return = null;
-    
+
     if( !is_null( $game_id ) || !is_null( $game_id = $this->get_current_game_id() ) ) {
       $sql = '
 SELECT `player_id`, `resource_id`, `turn`, `datetime`, `delta`, `reason`, `player_order_id`
@@ -86,7 +86,7 @@ ORDER BY `turn` DESC, `datetime` DESC';
     }
     return $return;
   }
-  
+
   public function get_last_spied_value( $value_guid, $game_id = null ) {
     $return = null;
 
@@ -101,16 +101,16 @@ AND `masked_value` IS NOT NULL
 ORDER BY `turn` DESC
 LIMIT 0,1';
       $res = mysql_uquery($sql);
-      
+
       $return = mysql_fetch_assoc( $res );
     }else {
       error_log('[Borderlines] '.__CLASS__.'->'.__FUNCTION__.' : $game_id not defined');
       throw new Exception('[Borderlines] '.__CLASS__.'->'.__FUNCTION__.' : $game_id not defined');
     }
-    
+
     return $return;
   }
-  
+
   public function get_last_spy_date( $value_guid, $game_id = null ) {
     $return = null;
 
@@ -124,8 +124,8 @@ AND `value_guid` = '.mysql_ureal_escape_string( $value_guid ).'
 ORDER BY `datetime` DESC
 LIMIT 0,1';
 
-      $res = mysql_uquery($sql); 
-      
+      $res = mysql_uquery($sql);
+
       if( $row = mysql_fetch_row( $res ) ) {
         $return = $row[0];
       }
@@ -136,7 +136,7 @@ LIMIT 0,1';
 
     return $return;
   }
-  
+
   public function get_last_spy_turn( $value_guid, $game_id = null ) {
     $return = null;
 
@@ -150,8 +150,8 @@ AND `value_guid` = '.mysql_ureal_escape_string( $value_guid ).'
 ORDER BY `turn` DESC
 LIMIT 0,1';
 
-      $res = mysql_uquery($sql); 
-      
+      $res = mysql_uquery($sql);
+
       if( $row = mysql_fetch_row( $res ) ) {
         $return = $row[0];
       }
@@ -162,20 +162,20 @@ LIMIT 0,1';
 
     return $return;
   }
-  
+
   public function get_spied_value( $value_guid, $target_player, $real_value ) {
     $return = null;
-  
+
     if( !is_null( $game = $this->get_current_game() ) ) {
       // Check last spy date
       $last_turn = $this->get_last_spy_turn( $value_guid );
-      
+
       // If too old, refresh
       if( $game->current_turn > $last_turn ) {
         $spy1 = $this->get_resource_sum( 3 );
         $spy2 = $target_player->get_resource_sum( 3 );
         $value = spygame( $spy1, $spy2, $real_value );
-      
+
         $success = $this->set_player_spygame_value(
           $game->id,
           $value_guid,
@@ -191,10 +191,10 @@ LIMIT 0,1';
       error_log('[Borderlines] '.__CLASS__.'->'.__FUNCTION__.' : $game_id not defined');
       throw new Exception('[Borderlines] '.__CLASS__.'->'.__FUNCTION__.' : $game_id not defined');
     }
-      
+
     return $return;
   }
-  
+
   public function get_last_game() {
     $sql = '
 SELECT `id`
@@ -206,7 +206,7 @@ LIMIT 0,1';
 
     return Game::sql_to_object( $sql );
   }
-  
+
   public function get_current_game() {
     if( is_null( $this->current_game ) ) {
       $sql = '
@@ -219,25 +219,25 @@ LIMIT 0,1';
 
       $this->current_game = Game::sql_to_object( $sql );
     }
-    
+
     return $this->current_game;
   }
-  
+
   public function get_current_game_id() {
     $return = null;
-    
+
     $current_game = $this->get_current_game();
-    
+
     if( $current_game ) {
       $return = $current_game->id;
     }
-    
+
     return $return;
   }
 
   public static function db_get_leaderboard_list( $game_id ) {
     $return = null;
-    
+
 $sql = "
 SELECT `".self::get_table_name()."`.`id`
 FROM `".self::get_table_name()."`
@@ -251,7 +251,7 @@ ORDER BY SUM( `delta` ) DESC";
 
     return $return;
   }
-  
+
   public static function db_get_by_game( $game_id ) {
 
     $sql = '
@@ -263,7 +263,27 @@ WHERE `game_id` = '.mysql_ureal_escape_string($game_id);
 
     return $return;
   }
-  
+
+  public function get_last_player_diplomacy_list($game_id) {
+    $sql = '
+SELECT `game_id`, `turn`, `from_player_id`, `pd`.`to_player_id`, `status`
+FROM `player_diplomacy` pd
+JOIN (
+  SELECT `to_player_id`, MAX( `turn` ) AS `max_turn`
+  FROM `player_diplomacy`
+  WHERE `from_player_id` = '.mysql_ureal_escape_string($this->get_id()).'
+  AND `game_id` = '.mysql_ureal_escape_string($game_id).'
+  GROUP BY `to_player_id`
+) AS `pd_max`
+WHERE `from_player_id` = '.mysql_ureal_escape_string($this->get_id()).'
+AND `game_id` = '.mysql_ureal_escape_string($game_id).'
+AND `pd`.`to_player_id` = `pd_max`.`to_player_id`
+AND `turn` = `pd_max`.`max_turn`';
+    $res = mysql_uquery($sql);
+
+    return mysql_fetch_to_array($res);
+  }
+
   /**
    * Game new turn mail
    *

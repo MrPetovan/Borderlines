@@ -29,6 +29,7 @@
 <p>This game is over, check <a href="<?php echo Page::get_page_url('player_list', false, array('game_id' => $current_game->id))?>">the final scoreboard</a> !</p>
 <?php } ?>
 <?php
+  // If game started
   if( $current_game->started ) {
 ?>
 <p><a href="<?php echo Page::get_page_url('player_list')?>">Player list</a></p>
@@ -38,109 +39,60 @@
 </form>
 <div id="shoutwall">
 <?php
-  $shouts = Shout::db_get_by_game_id( $current_game->id );
-  foreach( array_reverse( $shouts ) as $shout ) {
-    $player = Player::instance($shout->shouter_id);
-    echo '
+    $shouts = Shout::db_get_by_game_id( $current_game->id );
+    foreach( array_reverse( $shouts ) as $shout ) {
+      $player = Player::instance($shout->shouter_id);
+      echo '
   <div class="shout"><strong>'.wash_utf8($player->name).'</strong>: '.wash_utf8($shout->text).'</div>';
-  }
+    }
 ?>
 </div>
 <h3>Territories</h3>
 <?php
-  $player_territories = $current_player->get_territory_player_troops_list($current_game->id, $current_game->current_turn );
+    $player_territories = $current_player->get_territory_player_troops_list($current_game->id, $current_game->current_turn );
 ?>
 <table>
   <tr>
     <th>Territories</th>
-    <th>Troupes</th>
+    <th>Area</th>
+    <th>Troops</th>
     <th>Status</th>
   </tr>
 <?php
-  foreach( $player_territories as $player_territory ) {
-    $territory = Territory::instance( $player_territory['territory_id'] );
-    echo '
+    foreach( $player_territories as $player_territory ) {
+      $territory = Territory::instance( $player_territory['territory_id'] );
+      echo '
   <tr>
     <td><a href="'.Page::get_url('show_territory', array('id' => $territory->id)).'">'.$territory->name.'</a></td>
+    <td class="num">'.$territory->get_area().' km²</td>
     <td class="num">'.$player_territory['quantity'].'</td>
     <td>'.($territory->get_current_owner($current_game->id, $current_game->current_turn) == $current_player->id?'Stable':'Contested').'</td>
   </tr>';
-  }
-?>
-</table>
-<h3>Resources</h3>
-<?php
-    $sums = $current_player->get_resource_sum_list( $current_game->id );
-?>
-<ul>
-<?php
-    foreach( $sums as $sum ) {
-      $resource = Resource::instance($sum['id']);
-      echo '
-  <li>'.$resource->get_name().' : '.$sum['sum'].'</li>';
     }
 ?>
-</ul>
-<h3>Resource history</h3>
+</table>
+<h3>Diplomacy</h3>
+<?php
+    $player_diplomacy_list = $current_player->get_last_player_diplomacy_list($current_game->id, $current_game->current_turn );
+?>
 <table>
-  <thead>
-    <tr>
-      <th rowspan="2">Turn</th>
-      <th rowspan="2">Event</th>
-      <th colspan="<?php echo count( $resource_list )?>">Resource</th>
-    </tr>
-    <tr>
+  <tr>
+    <th>Player</th>
+    <th>Status</th>
+  </tr>
 <?php
-    foreach( $resource_list as $resource ) {
+    foreach( $player_diplomacy_list as $player_diplomacy ) {
+      $player = Player::instance( $player_diplomacy['to_player_id'] );
       echo '
-      <th>'.$resource->get_name().'</th>';
-    }
-?>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-<?php
-    $history = $current_player->get_resource_history( $current_game->id );
-    $current_player_order_id = null;
-    $flag_first = true;
-    $resource_delta = array();
-    foreach( $resource_list as $resource ) {
-      $resource_delta[ $resource->id ] = 0;
-    }
-    $event_list = array();
-    $key = -1;
-    foreach( $history as $history_item ) {
-      $key = $history_item['turn'].'-'.$history_item['player_order_id'];
-
-      $event_list[ $key ]['reason'] = $history_item['reason'];
-      $event_list[ $key ]['turn'] = $history_item['turn'];
-      $event_list[ $key ]['datetime'] = $history_item['datetime'];
-      $event_list[ $key ]['resource_delta'][ $history_item['resource_id'] ] = $history_item['delta'];
-    }
-
-    foreach( $event_list as $event ) {
-      echo '
-    <tr>
-      <td class="date"><abbr title="'.$event['datetime'].'">'.$event['turn'].'</abbr></td>
-      <td>'.$event['reason'].'</td>';
-      foreach( $resource_list as $resource ) {
-        if( isset( $event['resource_delta'][ $resource->id ] ) ) {
-          $delta = $event['resource_delta'][ $resource->id ];
-          echo '
-      <td class="num">'. ($delta > 0?'+':'') . $delta .'</td>';
-        }else {
-          echo '
-      <td></td>';
-        }
-      }
-      echo '
-    </tr>';
+  <tr>
+    <td><a href="'.Page::get_url('show_player', array('id' => $player->id)).'">'.$player->name.'</a></td>
+    <td>'.$player_diplomacy['status'].'</td>
+  </tr>';
     }
 ?>
 </table>
-
 <?php
+    // If game started and not ended
     if( ! $current_game->has_ended() ) {
 ?>
 <h3>Orders</h3>
@@ -160,7 +112,7 @@
       foreach( $orders as $player_order ) {
         $order_type = Order_Type::instance( $player_order->order_type_id );
         $parameters = $player_order->parameters;
-        $param_string = '';
+        $param_string = array();
         foreach( $parameters as $key => $value ) {
           if( $key == 'player_id' ) {
             $player = Player::instance( $value );
@@ -187,22 +139,11 @@
 ?>
 </table>
 <?php
-  $turn_ready = array_shift( $current_player->get_game_player_list( $current_game->id ) );
-  if( $turn_ready['turn_ready'] <= $current_game->current_turn ) {
-    echo '<p><a href="'.Page::get_url(PAGE_CODE, array('action' => 'ready')).'">I\'m ready for the next turn</a></p>';
-  }else {
-    echo '<p><a href="'.Page::get_url(PAGE_CODE, array('action' => 'ready')).'">I\'m not ready for the next turn yet</a></p>';
-  }
-?>
-<h4>New order</h4>
-<?php
-      foreach( Order_Type::db_get_all() as $order_type ) {
-        $class = $order_type->class_name;
-
-        require_once(DATA.'order_type/'.$order_type->class_name.'.class.php');
-
-        echo $class::get_html_form( array('page_code' => PAGE_CODE, 'current_player' => $current_player ) );
+      $turn_ready = array_shift( $current_player->get_game_player_list( $current_game->id ) );
+      if( $turn_ready['turn_ready'] <= $current_game->current_turn ) {
+        echo '<p><a href="'.Page::get_url(PAGE_CODE, array('action' => 'ready')).'">I\'m ready for the next turn</a></p>';
+      }else {
+        echo '<p><a href="'.Page::get_url(PAGE_CODE, array('action' => 'ready')).'">I\'m not ready for the next turn yet</a></p>';
       }
     }
   }
-?>
