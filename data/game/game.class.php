@@ -127,17 +127,46 @@ class Game extends Game_Model {
         $previous_owner = $territory->get_current_owner($this->id, $this->current_turn - 1 );
         $new_owner = $territory->get_current_owner($this->id, $this->current_turn );
 
-        if( !is_null( $new_owner ) ) {
+        if( $new_owner !== null ) {
           if( $new_owner === false ) {
             $player_troops = $territory->get_territory_player_troops_list($this->id, $this->current_turn);
 
             // Diplomacy checking and parties forming
+            $diplomacy = array();
+            $attacks = array();
+            $losses = array();
+            foreach( $player_troops as $key => $row ) {
+              /* @var $player Player */
+              $player = Player::instance($row['player_id']);
+              foreach( $player->get_last_player_diplomacy_list($this->id) as $diplomacy_row ) {
+                $diplomacy[ $diplomacy_row['from_player_id'] ][ $diplomacy_row['to_player_id'] ] = $diplomacy_row['status'] == 'Ally';
 
+                if( $diplomacy_row['status'] != 'Ally' ) {
+                  $attacks[ $diplomacy_row['from_player_id'] ][] = $diplomacy_row['to_player_id'];
+                }
+              }
+              // Battle
+              $attacker_efficiency = (mt_gaussrand() * 0.1 + 1) * 0.1;
+              $attacker_damages = round($attacker_efficiency * $row['quantity']);
 
-            // Battle
-
+              // Damages spread between the opposing forces
+              foreach( $attacks[ $diplomacy_row['from_player_id'] ] as $attacked_player_id ) {
+                if( !isset( $losses[ $attacked_player_id ] ) ) $losses[ $attacked_player_id ] = 0;
+                $losses[ $attacked_player_id ] += round($attacker_damages / count( $attacks[ $diplomacy_row['from_player_id'] ] ) );
+              }
+            }
 
             // Cleaning up
+            foreach( $player_troops as $key => $row ) {
+
+              $row['quantity'] = max( 0, $row['quantity'] - $losses[ $row['player_id'] ] );
+
+              if( $row['quantity'] == 0 ) {
+                $this->del_territory_player_troops($this->current_turn, $row['territory_id'], $row['player_id']);
+              }else {
+                $this->set_territory_player_troops($this->current_turn, $row['territory_id'], $row['player_id'], $row['quantity']);
+              }
+            }
           }
         }
       }
