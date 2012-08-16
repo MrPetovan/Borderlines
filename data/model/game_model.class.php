@@ -251,6 +251,42 @@ AND `to_player_id` = '.mysql_ureal_escape_string($to_player_id);
 
 
 
+  public function get_player_history_list($player_id = null, $territory_id = null) {
+    $where = '';
+    if( ! is_null( $player_id )) $where .= '
+AND `player_id` = '.mysql_ureal_escape_string($player_id);
+    if( ! is_null( $territory_id )) $where .= '
+AND `territory_id` = '.mysql_ureal_escape_string($territory_id);
+
+    $sql = '
+SELECT `game_id`, `player_id`, `turn`, `datetime`, `reason`, `territory_id`
+FROM `player_history`
+WHERE `game_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
+    $res = mysql_uquery($sql);
+
+    return mysql_fetch_to_array($res);
+  }
+
+  public function set_player_history( $player_id, $turn, $datetime, $reason, $territory_id ) {
+    $sql = "REPLACE INTO `player_history` ( `game_id`, `player_id`, `turn`, `datetime`, `reason`, `territory_id` ) VALUES (".mysql_ureal_escape_string( $this->get_id(), $player_id, $turn, $datetime, $reason, $territory_id ).")";
+
+    return mysql_uquery($sql);
+  }
+
+  public function del_player_history( $player_id = null, $territory_id = null ) {
+    $where = '';
+    if( ! is_null( $player_id )) $where .= '
+AND `player_id` = '.mysql_ureal_escape_string($player_id);
+    if( ! is_null( $territory_id )) $where .= '
+AND `territory_id` = '.mysql_ureal_escape_string($territory_id);
+    $sql = 'DELETE FROM `player_history`
+    WHERE `game_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
+
+    return mysql_uquery($sql);
+  }
+
+
+
   public function get_player_resource_history_list($player_id = null, $resource_id = null, $player_order_id = null) {
     $where = '';
     if( ! is_null( $player_id )) $where .= '

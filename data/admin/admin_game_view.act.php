@@ -43,6 +43,28 @@
           );
         }
         break;
+      case 'set_player_history':
+        if( $game->id ) {
+          $flag_set_player_history = $game->set_player_history(
+            ($value = getValue('player_id')) == ''?null:$value,
+            ($value = getValue('turn')) == ''?null:$value,
+            ($value = getValue('datetime')) == ''?null:$value,
+            getValue('reason'),
+            ($value = getValue('territory_id')) == ''?null:$value
+          );
+          if( ! $flag_set_player_history ) {
+            Page::add_message( '$game->set_player_history : ' . mysql_error(), Page::PAGE_MESSAGE_ERROR );
+          }
+        }
+        break;
+      case 'del_player_history':
+        if( $game->id ) {
+          $flag_del_player_history = $game->del_player_history(
+            ($value = getValue('player_id')) == ''?null:$value,
+            ($value = getValue('territory_id')) == ''?null:$value
+          );
+        }
+        break;
       case 'set_player_resource_history':
         if( $game->id ) {
           $flag_set_player_resource_history = $game->set_player_resource_history(

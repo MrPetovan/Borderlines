@@ -3,7 +3,29 @@
 
   if(!is_null(getValue('action'))) {
     switch( getValue('action') ) {
-       case 'set_territory_criterion':
+       case 'set_player_history':
+        if( $territory->id ) {
+          $flag_set_player_history = $territory->set_player_history(
+            ($value = getValue('game_id')) == ''?null:$value,
+            ($value = getValue('player_id')) == ''?null:$value,
+            ($value = getValue('turn')) == ''?null:$value,
+            ($value = getValue('datetime')) == ''?null:$value,
+            getValue('reason')
+          );
+          if( ! $flag_set_player_history ) {
+            Page::add_message( '$territory->set_player_history : ' . mysql_error(), Page::PAGE_MESSAGE_ERROR );
+          }
+        }
+        break;
+      case 'del_player_history':
+        if( $territory->id ) {
+          $flag_del_player_history = $territory->del_player_history(
+            getValue('game_id'),
+            getValue('player_id')
+          );
+        }
+        break;
+      case 'set_territory_criterion':
         if( $territory->id ) {
           $flag_set_territory_criterion = $territory->set_territory_criterion(
             ($value = getValue('criterion_id')) == ''?null:$value,
