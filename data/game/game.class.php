@@ -135,36 +135,79 @@ class Game extends Game_Model {
             $diplomacy = array();
             $attacks = array();
             $losses = array();
-            foreach( $player_troops as $key => $row ) {
+            foreach( $player_troops as $key => $attacker_row ) {
+              $this->set_player_history(
+                $attacker_row['player_id'],
+                $this->current_turn,
+                time(),
+                "There's a battle for the control of this territory",
+                $territory->id
+              );
+
               /* @var $player Player */
-              $player = Player::instance($row['player_id']);
+              $player = Player::instance($attacker_row['player_id']);
               foreach( $player->get_last_player_diplomacy_list($this->id) as $diplomacy_row ) {
                 $diplomacy[ $diplomacy_row['from_player_id'] ][ $diplomacy_row['to_player_id'] ] = $diplomacy_row['status'] == 'Ally';
-
-                if( $diplomacy_row['status'] != 'Ally' ) {
-                  $attacks[ $diplomacy_row['from_player_id'] ][] = $diplomacy_row['to_player_id'];
-                }
               }
               // Battle
               $attacker_efficiency = (mt_gaussrand() * 0.1 + 1) * 0.1;
-              $attacker_damages = round($attacker_efficiency * $row['quantity']);
+              $attacker_damages = round($attacker_efficiency * $attacker_row['quantity']);
+
+              // Building the attacks directions
+              foreach( $player_troops as $defender_row ) {
+                if( ! $diplomacy[ $attacker_row['player_id'] ][ $defender_row['player_id'] ] ) {
+                  $attacks[ $attacker_row['player_id'] ][] = $defender_row['player_id'];
+                }
+              }
 
               // Damages spread between the opposing forces
-              foreach( $attacks[ $diplomacy_row['from_player_id'] ] as $attacked_player_id ) {
-                if( !isset( $losses[ $attacked_player_id ] ) ) $losses[ $attacked_player_id ] = 0;
-                $losses[ $attacked_player_id ] += round($attacker_damages / count( $attacks[ $diplomacy_row['from_player_id'] ] ) );
+              foreach( $attacks[ $attacker_row['player_id'] ] as $defender_player_id ) {
+                if( !isset( $losses[ $defender_player_id ][ $attacker_row['player_id'] ] ) ) {
+                  $losses[ $defender_player_id ][ $attacker_row['player_id'] ] = 0;
+                }
+                $losses[ $defender_player_id ][ $attacker_row['player_id'] ] =
+                  round($attacker_damages / count( $attacks[ $attacker_row['player_id'] ] ) );
               }
             }
 
             // Cleaning up
-            foreach( $player_troops as $key => $row ) {
+            foreach( $player_troops as $key => $player_row ) {
 
-              $row['quantity'] = max( 0, $row['quantity'] - $losses[ $row['player_id'] ] );
+              $new_quantity = max( 0, $player_row['quantity'] - array_sum( $losses[ $player_row['player_id'] ] ) );
 
-              if( $row['quantity'] == 0 ) {
-                $this->del_territory_player_troops($this->current_turn, $row['territory_id'], $row['player_id']);
+              foreach( $losses[ $player_row['player_id'] ] as $attacker_player_id => $damages ) {
+                $player = Player::instance($attacker_player_id);
+                if( $diplomacy[ $player_row['player_id'] ][ $attacker_player_id ] ) {
+                  $verb = 'killed';
+                }else {
+                  $verb = 'backstabbed';
+                }
+                $this->set_player_history(
+                  $player_row['player_id'],
+                  $this->current_turn,
+                  time(),
+                  $player->name . "'s troops ".$verb." ".$damages." of yours",
+                  $territory->id
+                );
+              }
+
+              if( $new_quantity == 0 ) {
+                $this->del_territory_player_troops($this->current_turn, $player_row['territory_id'], $player_row['player_id']);
+                $this->set_player_history(
+                  $player_row['player_id'],
+                  $this->current_turn,
+                  time(),
+                  "All of your ".$player_row['quantity']." troops have been killed",
+                  $territory->id
+                );
               }else {
-                $this->set_territory_player_troops($this->current_turn, $row['territory_id'], $row['player_id'], $row['quantity']);
+                $this->set_territory_player_troops($this->current_turn, $player_row['territory_id'], $player_row['player_id'], $new_quantity);
+                $this->set_player_history(
+                  $player_row['player_id'],
+                  $this->current_turn,
+                  time(),
+                  "You lost ".$losses[ $player_row['player_id'] ]." on ".$player_row['quantity']." troops in battle against ",
+                  $territory->id);
               }
             }
           }
