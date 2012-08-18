@@ -328,18 +328,26 @@ WHERE `world_id` = ".mysql_ureal_escape_string($world_id);
     }elseif( count( $player_territories ) == 1 ) {
       $return = $player_territories[0]['player_id'];
     }else {
-      $diplomacy = array();
-
       $all_allies = true;
 
-      $diplomacy_list = $game->get_player_diplomacy_list( $current_turn );
-      foreach( $diplomacy_list as $diplomacy_item ) {
-        $diplomacy[ $diplomacy_item['from_player_id'] ][ $diplomacy_item['to_player_id'] ] = $diplomacy_item['status'];
-      }
-
       foreach( $player_territories as $player_territory_from ) {
+        /* @var $player_from Player */
+        $player_from = Player::instance( $player_territory_from['player_id'] );
+
+        $player_diplomacy_list = $player_from->get_last_player_diplomacy_list($game_id);
+
+
         foreach( $player_territories as $player_territory_to ) {
-          $all_allies = ($diplomacy[ $player_territory_from['player_id'] ][ $player_territory_to['player_id'] ] == 'Ally');
+          foreach( $player_diplomacy_list as $key => $player_diplomacy ) {
+            if( $player_diplomacy['to_player_id'] == $player_territory_to['player_id'] ) {
+              if( $player_diplomacy['status'] == 'Enemy' ) {
+                $all_allies = false;
+                break 2;
+              }else {
+                break 1;
+              }
+            }
+          }
         }
       }
 
@@ -352,10 +360,9 @@ WHERE `world_id` = ".mysql_ureal_escape_string($world_id);
           $troops[ $player_territory['player_id'] ] = $player_territory['quantity'];
         }
 
-
         if(array_search($last_owner, array_keys( $troops)) !== false) {
           // Already captured territory
-          $return = $owner;
+          $return = $last_owner;
         }else {
           asort( $troops );
           reset( $troops );

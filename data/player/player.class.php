@@ -273,6 +273,7 @@ JOIN (
   FROM `player_diplomacy`
   WHERE `from_player_id` = '.mysql_ureal_escape_string($this->get_id()).'
   AND `game_id` = '.mysql_ureal_escape_string($game_id).'
+  AND `from_player_id` != `to_player_id`
   GROUP BY `to_player_id`
 ) AS `pd_max`
 WHERE `from_player_id` = '.mysql_ureal_escape_string($this->get_id()).'
