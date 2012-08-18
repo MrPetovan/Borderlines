@@ -59,7 +59,9 @@ class Game extends Game_Model {
 
     foreach( $player_list as $player ) {
       foreach( $player_list as $playerB ) {
-        $this->set_player_diplomacy( $this->current_turn, $player->id, $playerB->id, 'Enemy' );
+        if( $player != $playerB ) {
+          $this->set_player_diplomacy( $this->current_turn, $player->id, $playerB->id, 'Enemy' );
+        }
       }
 
       $starting_territory = array_pop( $territories );
@@ -98,6 +100,17 @@ class Game extends Game_Model {
       $this->current_turn++;
 
       $player_list = Player::db_get_by_game( $this->id );
+
+      // Duplicating troops record before moves
+      $player_troops_list = $this->get_territory_player_troops_list($this->current_turn - 1);
+      foreach( $player_troops_list as $player_troops_row ) {
+        $this->set_territory_player_troops(
+                $this->current_turn,
+                $player_troops_row['territory_id'],
+                $player_troops_row['player_id'],
+                $player_troops_row['quantity']
+        );
+      }
 
       /*foreach( $player_list as $player ) {
         $territory_gain = $player->get_resource_sum( 4 );
@@ -155,7 +168,8 @@ class Game extends Game_Model {
 
               // Building the attacks directions
               foreach( $player_troops as $defender_row ) {
-                if( ! $diplomacy[ $attacker_row['player_id'] ][ $defender_row['player_id'] ] ) {
+                if( $attacker_row['player_id'] != $defender_row['player_id'] &&
+                  ! $diplomacy[ $attacker_row['player_id'] ][ $defender_row['player_id'] ] ) {
                   $attacks[ $attacker_row['player_id'] ][] = $defender_row['player_id'];
                 }
               }
@@ -178,9 +192,9 @@ class Game extends Game_Model {
               foreach( $losses[ $player_row['player_id'] ] as $attacker_player_id => $damages ) {
                 $player = Player::instance($attacker_player_id);
                 if( $diplomacy[ $player_row['player_id'] ][ $attacker_player_id ] ) {
-                  $verb = 'killed';
-                }else {
                   $verb = 'backstabbed';
+                }else {
+                  $verb = 'killed';
                 }
                 $this->set_player_history(
                   $player_row['player_id'],
@@ -206,7 +220,7 @@ class Game extends Game_Model {
                   $player_row['player_id'],
                   $this->current_turn,
                   time(),
-                  "You lost ".$losses[ $player_row['player_id'] ]." on ".$player_row['quantity']." troops in battle against ",
+                  "You lost ".array_sum( $losses[ $player_row['player_id'] ] )." on ".$player_row['quantity']." troops in battle",
                   $territory->id);
               }
             }
@@ -264,8 +278,6 @@ WHERE `ended` IS NULL";
 
     return self::sql_to_list( $sql );
   }
-
-
 
   public function html_get_game_list_form() {
     $turn_interval_list = array(
