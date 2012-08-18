@@ -44,7 +44,7 @@ WHERE `member_id` = ".mysql_ureal_escape_string($member_id);
 
   public static function db_get_select_list( $with_null = false ) {
     $return = array();
-    
+
     if( $with_null ) {
         $return[ null ] = 'N/A';
     }
@@ -90,7 +90,7 @@ WHERE `member_id` = ".mysql_ureal_escape_string($member_id);
  * @return string
  */
   public static function get_message_erreur($num_error) {
-    switch($num_error) { 
+    switch($num_error) {
       case 1 : $return = "Le champ <strong>Member Id</strong> est obligatoire."; break;
       case 2 : $return = "Le champ <strong>Name</strong> est obligatoire."; break;
       default: $return = "Erreur de saisie, veuillez vérifier les champs.";
