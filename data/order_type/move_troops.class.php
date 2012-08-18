@@ -32,7 +32,6 @@ class Move_Troops extends Player_Order {
     $player = Player::instance( $this->player_id );
 
     $parameters = $this->parameters;
-//    var_debug($parameters);
     if( isset( $parameters['count'] ) && isset( $parameters['from_territory_id'] ) && isset( $parameters['to_territory_id'] ) ) {
 
       $from_territory = Territory::instance( $parameters['from_territory_id'] );
@@ -40,56 +39,39 @@ class Move_Troops extends Player_Order {
 
       if( $from_territory && $to_territory ) {
         $game_id = $player->current_game->id;
-        $from_turn = $player->current_game->current_turn - 1;
-        $to_turn = $player->current_game->current_turn;
+        $order_turn = $player->current_game->current_turn;
 
-        $from_troops_before = $player->get_territory_player_troops_list( $game_id, $from_turn, $from_territory->id );
+        $from_troops_before = $player->get_territory_player_troops_list( $game_id, $order_turn, $from_territory->id );
 
-        // If multiple leaving orders, we must take into account the last value of the next turn
-        $from_troops_after = $player->get_territory_player_troops_list( $game_id, $to_turn, $from_territory->id );
-//        var_debug( $from_troops_before, $from_troops_after );
-        if( count( $from_troops_after ) ) {
+        if( count( $from_troops_before ) ) {
           $from_troops_before = $from_troops_after[0]['quantity'];
-        }else {
-          $from_troops_before = $from_troops_before[0]['quantity'];
-          $player->set_territory_player_troops( $game_id, $to_turn, $from_territory->id, $from_troops_before );
-        }
 
-        $from_troops_after = max( $from_troops_before - $parameters['count'], 0 );
+          $from_troops_after = max( $from_troops_before - $parameters['count'], 0 );
 
-//        var_debug( $from_troops_after .' = '. $from_troops_before .' - '. $parameters['count'] );
+          // Correction in case of order error
+          $parameters['count'] = $from_troops_before - $from_troops_after;
 
-        if( $from_troops_after > 0 ) {
-          $player->set_territory_player_troops( $game_id, $to_turn, $from_territory->id, $from_troops_after );
-        }else {
-          $player->del_territory_player_troops( $game_id, $to_turn, $from_territory->id );
-        }
+          if( $from_troops_after > 0 ) {
+            $player->set_territory_player_troops( $game_id, $order_turn, $from_territory->id, $from_troops_after );
+          }else {
+            $player->del_territory_player_troops( $game_id, $order_turn, $from_territory->id );
+          }
 
+          $to_troops_before = $player->get_territory_player_troops_list( $game_id, $order_turn, $to_territory->id );
 
-        $to_troops_before = $player->get_territory_player_troops_list( $game_id, $from_turn, $to_territory->id );
-
-        // If multiple arriving orders, we must take into account the last computed value of the next turn
-        $to_troops_after = $player->get_territory_player_troops_list( $game_id, $to_turn, $to_territory->id );
-//        var_debug($to_troops_before, $to_troops_after);
-        if( count( $to_troops_after ) ) {
-          $to_troops_before = $to_troops_after[0]['quantity'];
-        }else {
           if( count( $to_troops_before ) ) {
             $to_troops_before = $to_troops_before[0]['quantity'];
           }else {
             $to_troops_before = 0;
           }
 
-          $player->set_territory_player_troops( $game_id, $to_turn, $to_territory->id, $to_troops_before );
-        }
-        $to_troops_after = $to_troops_before + $parameters['count'];
+          $to_troops_after = $to_troops_before + $parameters['count'];
 
-//        var_debug( $to_troops_after .' = '. $to_troops_before .' + '. $parameters['count'] );
-
-        if( $to_troops_after > 0 ) {
-          $player->set_territory_player_troops( $game_id, $to_turn, $to_territory->id, $to_troops_after );
-        }else {
-          $player->del_territory_player_troops( $game_id, $to_turn, $to_territory->id );
+          if( $to_troops_after > 0 ) {
+            $player->set_territory_player_troops( $game_id, $order_turn, $to_territory->id, $to_troops_after );
+          }elseif( count( $to_troops_before ) ) {
+            $player->del_territory_player_troops( $game_id, $order_turn, $to_territory->id );
+          }
         }
 
         $return = true;
