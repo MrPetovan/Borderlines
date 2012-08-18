@@ -94,6 +94,32 @@
     }
 ?>
 </table>
+<h3>Message history</h3>
+<?php
+    $player_history_list = $current_player->get_player_history_list($current_game->id);
+?>
+<table>
+  <tr>
+    <th>Turn</th>
+    <th>Reason</th>
+    <th>Territory</th>
+  </tr>
+<?php
+    foreach( $player_history_list as $player_history_row ) {
+      $territory = null;
+      if( $player_history_row['territory_id'] ) {
+        $territory = Territory::instance( $player_history_row['territory_id'] );
+      }
+      echo '
+  <tr>
+    <td>'.$player_history_row['turn'].'</td>
+    <td>'.$player_history_row['reason'].'</td>
+    <td>'.($territory?'<a href="'.Page::get_url('show_territory', array('id' => $territory->id)).'">'.$territory->name.'</a>':'').'</td>
+  </tr>';
+    }
+?>
+</table>
+
 <?php
     // If game started and not ended
     if( ! $current_game->has_ended() ) {
