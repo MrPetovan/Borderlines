@@ -311,69 +311,81 @@ WHERE `world_id` = ".mysql_ureal_escape_string($world_id);
     return mysql_uquery($sql);
   }
 
-  public function get_current_owner( $game_id, $turn = null ) {
+  public function get_current_owner( $game_id, $turn = null, $force = false ) {
     $return = null;
-    /* @var $game Game */
-    $game = Game::instance( $game_id );
 
-    if( is_null( $turn ) ) {
-      $turn = $game->current_turn;
-    }
+    $territory_owner_list = $this->get_territory_owner_list($game_id, $turn);
 
-    $player_territories = $game->get_territory_player_troops_list($turn, $this->id);
+    if( count( $territory_owner_list ) && $force === false ) {
+      $territory_owner_row = array_shift( $territory_owner_list );
 
-    // Unclaimed territory
-    if( count( $player_territories ) == 0 ) {
-      $return = null;
-    }elseif( count( $player_territories ) == 1 ) {
-      $return = $player_territories[0]['player_id'];
+      $return = $territory_owner_row['owner_id'];
     }else {
-      $all_allies = true;
 
-      foreach( $player_territories as $player_territory_from ) {
-        /* @var $player_from Player */
-        $player_from = Player::instance( $player_territory_from['player_id'] );
+      /* @var $game Game */
+      $game = Game::instance( $game_id );
 
-        $player_diplomacy_list = $player_from->get_last_player_diplomacy_list($game_id);
+      if( is_null( $turn ) ) {
+        $turn = $game->current_turn;
+      }
+
+      $player_territories = $game->get_territory_player_troops_list($turn, $this->id);
+
+      // Unclaimed territory
+      if( count( $player_territories ) == 0 ) {
+        $return = null;
+      }elseif( count( $player_territories ) == 1 ) {
+        $return = $player_territories[0]['player_id'];
+      }else {
+        $all_allies = true;
+
+        foreach( $player_territories as $player_territory_from ) {
+          /* @var $player_from Player */
+          $player_from = Player::instance( $player_territory_from['player_id'] );
+
+          $player_diplomacy_list = $player_from->get_last_player_diplomacy_list($game_id);
 
 
-        foreach( $player_territories as $player_territory_to ) {
-          foreach( $player_diplomacy_list as $key => $player_diplomacy ) {
-            if( $player_diplomacy['to_player_id'] == $player_territory_to['player_id'] ) {
-              if( $player_diplomacy['status'] == 'Enemy' ) {
-                $all_allies = false;
-                break 2;
-              }else {
-                break 1;
+          foreach( $player_territories as $player_territory_to ) {
+            foreach( $player_diplomacy_list as $key => $player_diplomacy ) {
+              if( $player_diplomacy['to_player_id'] == $player_territory_to['player_id'] ) {
+                if( $player_diplomacy['status'] == 'Enemy' ) {
+                  $all_allies = false;
+                  break 2;
+                }else {
+                  break 1;
+                }
               }
             }
           }
         }
-      }
 
-      if( $all_allies ) {
-        $last_owner = $this->get_current_owner($game_id, $turn - 1);
+        if( $all_allies ) {
+          $last_owner = $this->get_current_owner($game_id, $turn - 1);
 
-        $troops = array();
+          $troops = array();
 
-        foreach( $player_territories as $player_territory ) {
-          $troops[ $player_territory['player_id'] ] = $player_territory['quantity'];
-        }
+          foreach( $player_territories as $player_territory ) {
+            $troops[ $player_territory['player_id'] ] = $player_territory['quantity'];
+          }
 
-        if(array_search($last_owner, array_keys( $troops)) !== false) {
-          // Already captured territory
-          $return = $last_owner;
+          if(array_search($last_owner, array_keys( $troops)) !== false) {
+            // Already captured territory
+            $return = $last_owner;
+          }else {
+            asort( $troops );
+            reset( $troops );
+            list( $player_id, $troops ) = each( $troops );
+
+            $return = $player_id;
+          }
         }else {
-          asort( $troops );
-          reset( $troops );
-          list( $player_id, $troops ) = each( $troops );
-
-          $return = $player_id;
+          // Contested territory
+          $return = 0;
         }
-      }else {
-        // Contested territory
-        $return = false;
       }
+
+      $this->set_territory_owner_list($game_id, $turn, $return);
     }
 
     return $return;

@@ -112,12 +112,6 @@ class Game extends Game_Model {
         );
       }
 
-      /*foreach( $player_list as $player ) {
-        $territory_gain = $player->get_resource_sum( 4 );
-        $message = "Territory gain";
-        $this->set_player_resource_history( $player->id, 5, $this->current_turn - 1, guess_time( time(), GUESS_DATE_MYSQL ), $territory_gain, $message, null );
-      }*/
-
       $player_order_list = Player_Order::get_ready_orders( $this->id );
 
       $order_list = array();
@@ -134,14 +128,14 @@ class Game extends Game_Model {
       }
 
       $territories = Territory::db_get_by_world_id( $this->world_id );
-      // Updating territories ownership and replenishing troops and battle on contested territories
+      // Updating territories ownership and battle on contested territories
       foreach( $territories as $territory ) {
         /* @var $territory Territory */
         $previous_owner = $territory->get_current_owner($this->id, $this->current_turn - 1 );
         $new_owner = $territory->get_current_owner($this->id, $this->current_turn );
 
         if( $new_owner !== null ) {
-          if( $new_owner === false ) {
+          if( $new_owner === 0 ) {
             $player_troops = $territory->get_territory_player_troops_list($this->id, $this->current_turn);
 
             // Diplomacy checking and parties forming
@@ -224,6 +218,8 @@ class Game extends Game_Model {
                   $territory->id);
               }
             }
+
+            $territory->get_current_owner($this->id, $this->current_turn, true );
           }
         }
       }
