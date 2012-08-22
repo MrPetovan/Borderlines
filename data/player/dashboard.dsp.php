@@ -66,7 +66,7 @@
     <td><a href="'.Page::get_url('show_territory', array('id' => $territory->id)).'">'.$territory->name.'</a></td>
     <td class="num">'.$territory->get_area().' km²</td>
     <td class="num">'.$player_territory['quantity'].'</td>
-    <td>'.($territory->get_current_owner($current_game->id, $current_game->current_turn) == $current_player->id?'Stable':'Contested').'</td>
+    <td>'.($territory->get_owner($current_game->id, $current_game->current_turn) == $current_player->id?'Stable':'Contested').'</td>
   </tr>';
     }
 ?>
