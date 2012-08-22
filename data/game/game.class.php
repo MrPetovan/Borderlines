@@ -225,6 +225,8 @@ class Game extends Game_Model {
 
       $this->updated = time();
 
+      $player_list = Player::db_get_by_game($this->id);
+
       if( $this->current_turn == $this->turn_limit ) {
         $this->ended = time();
 
