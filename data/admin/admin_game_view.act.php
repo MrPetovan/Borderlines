@@ -95,7 +95,8 @@
           $flag_set_territory_owner = $game->set_territory_owner(
             ($value = getValue('territory_id')) == ''?null:$value,
             ($value = getValue('turn')) == ''?null:$value,
-            ($value = getValue('owner_id')) == ''?null:$value
+            ($value = getValue('owner_id')) == ''?null:$value,
+            ($value = getValue('contested')) == ''?null:$value
           );
           if( ! $flag_set_territory_owner ) {
             Page::add_message( '$game->set_territory_owner : ' . mysql_error(), Page::PAGE_MESSAGE_ERROR );

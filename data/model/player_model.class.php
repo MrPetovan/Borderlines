@@ -44,7 +44,7 @@ WHERE `member_id` = ".mysql_ureal_escape_string($member_id);
 
   public static function db_get_select_list( $with_null = false ) {
     $return = array();
-
+    
     if( $with_null ) {
         $return[ null ] = 'N/A';
     }
@@ -90,7 +90,7 @@ WHERE `member_id` = ".mysql_ureal_escape_string($member_id);
  * @return string
  */
   public static function get_message_erreur($num_error) {
-    switch($num_error) {
+    switch($num_error) { 
       case 1 : $return = "Le champ <strong>Member Id</strong> est obligatoire."; break;
       case 2 : $return = "Le champ <strong>Name</strong> est obligatoire."; break;
       default: $return = "Erreur de saisie, veuillez vérifier les champs.";
@@ -317,7 +317,7 @@ AND `game_id` = '.mysql_ureal_escape_string($game_id);
 AND `turn` = '.mysql_ureal_escape_string($turn);
 
     $sql = '
-SELECT `territory_id`, `game_id`, `turn`, `owner_id`
+SELECT `territory_id`, `game_id`, `turn`, `owner_id`, `contested`
 FROM `territory_owner`
 WHERE `owner_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
     $res = mysql_uquery($sql);
@@ -325,8 +325,8 @@ WHERE `owner_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
     return mysql_fetch_to_array($res);
   }
 
-  public function set_territory_owner( $territory_id, $game_id, $turn ) {
-    $sql = "REPLACE INTO `territory_owner` ( `territory_id`, `game_id`, `turn`, `owner_id` ) VALUES (".mysql_ureal_escape_string( $territory_id, $game_id, $turn, $this->get_id() ).")";
+  public function set_territory_owner( $territory_id, $game_id, $turn, $contested ) {
+    $sql = "REPLACE INTO `territory_owner` ( `territory_id`, `game_id`, `turn`, `owner_id`, `contested` ) VALUES (".mysql_ureal_escape_string( $territory_id, $game_id, $turn, $this->get_id(), $contested ).")";
 
     return mysql_uquery($sql);
   }
