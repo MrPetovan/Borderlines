@@ -44,7 +44,7 @@ class Move_Troops extends Player_Order {
         $from_troops_before = $player->get_territory_player_troops_list( $game_id, $order_turn, $from_territory->id );
 
         if( count( $from_troops_before ) ) {
-          $from_troops_before = $from_troops_after[0]['quantity'];
+          $from_troops_before = $from_troops_before[0]['quantity'];
 
           $from_troops_after = max( $from_troops_before - $parameters['count'], 0 );
 
