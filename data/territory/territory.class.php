@@ -361,7 +361,7 @@ WHERE `world_id` = ".mysql_ureal_escape_string($world_id);
     return $return;
   }
 
-  protected function compute_territory_owner( $game_id, $turn ) {
+  public function compute_territory_owner( $game_id, $turn ) {
     $player_territories = $this->get_territory_player_troops_list($game_id, $turn);
 
     $last_owner = $this->get_owner($game_id, $turn - 1);

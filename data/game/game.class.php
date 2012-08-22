@@ -133,13 +133,13 @@ class Game extends Game_Model {
         $new_owner = $territory->get_owner($this->id, $this->current_turn );
 
         if( $new_owner === null ) {
-          $player_troops = $territory->get_territory_player_troops_list($this->id, $this->current_turn);
-
-          if( count( $player_troops ) ) {
+          if( $territory->is_contested($this->id, $this->current_turn) ) {
             // Diplomacy checking and parties forming
             $diplomacy = array();
             $attacks = array();
             $losses = array();
+
+            $player_troops = $territory->get_territory_player_troops_list($this->id, $this->current_turn);
             foreach( $player_troops as $key => $attacker_row ) {
               $this->set_player_history(
                 $attacker_row['player_id'],
@@ -217,7 +217,8 @@ class Game extends Game_Model {
               }
             }
 
-            $territory->get_owner($this->id, $this->current_turn, true );
+            // Recalculating ownership after battle
+            $territory->compute_territory_owner($this->id, $this->current_turn );
           }
         }
       }
