@@ -99,8 +99,6 @@ class Game extends Game_Model {
     if( !$this->has_ended() ) {
       $this->current_turn++;
 
-      $player_list = Player::db_get_by_game( $this->id );
-
       // Duplicating troops record before moves
       $player_troops_list = $this->get_territory_player_troops_list($this->current_turn - 1);
       foreach( $player_troops_list as $player_troops_row ) {
@@ -131,13 +129,13 @@ class Game extends Game_Model {
       // Updating territories ownership and battle on contested territories
       foreach( $territories as $territory ) {
         /* @var $territory Territory */
-        $previous_owner = $territory->get_current_owner($this->id, $this->current_turn - 1 );
-        $new_owner = $territory->get_current_owner($this->id, $this->current_turn );
+        $previous_owner = $territory->get_owner($this->id, $this->current_turn - 1 );
+        $new_owner = $territory->get_owner($this->id, $this->current_turn );
 
-        if( $new_owner !== null ) {
-          if( $new_owner === 0 ) {
-            $player_troops = $territory->get_territory_player_troops_list($this->id, $this->current_turn);
+        if( $new_owner === null ) {
+          $player_troops = $territory->get_territory_player_troops_list($this->id, $this->current_turn);
 
+          if( count( $player_troops ) ) {
             // Diplomacy checking and parties forming
             $diplomacy = array();
             $attacks = array();
@@ -219,7 +217,7 @@ class Game extends Game_Model {
               }
             }
 
-            $territory->get_current_owner($this->id, $this->current_turn, true );
+            $territory->get_owner($this->id, $this->current_turn, true );
           }
         }
       }
