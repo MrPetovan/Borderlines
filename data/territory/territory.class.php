@@ -311,52 +311,71 @@ WHERE `world_id` = ".mysql_ureal_escape_string($world_id);
     return mysql_uquery($sql);
   }
 
-  public function get_owner( $game_id, $turn = null, $force = false ) {
+  public function get_owner( $game_id, $turn = null ) {
     $return = null;
 
-    /* @var $game Game */
-    $game = Game::instance( $game_id );
-
     if( is_null( $turn ) ) {
+      /* @var $game Game */
+      $game = Game::instance( $game_id );
+
       $turn = $game->current_turn;
     }
 
     $territory_owner_list = $this->get_territory_owner_list( $game_id, $turn );
 
-    if( count( $territory_owner_list ) && $force === false ) {
+    if( count( $territory_owner_list ) ) {
       $territory_owner_row = array_shift( $territory_owner_list );
-
-      $return = $territory_owner_row['owner_id'];
     }else {
-      $ownership_result = $this->compute_territory_owner( $game_id, $turn );
-
-      $return = $ownership_result['owner_id'];
+      $territory_owner_row = $this->compute_territory_owner( $game_id, $turn );
     }
+
+    $return = $territory_owner_row['owner_id'];
 
     return $return;
   }
 
-  public function is_contested( $game_id, $turn = null, $force = false ) {
+  public function is_contested( $game_id, $turn = null ) {
     $return = null;
 
-    /* @var $game Game */
-    $game = Game::instance( $game_id );
-
     if( is_null( $turn ) ) {
+      /* @var $game Game */
+      $game = Game::instance( $game_id );
+
       $turn = $game->current_turn;
     }
 
     $territory_owner_list = $this->get_territory_owner_list( $game_id, $turn );
 
-    if( count( $territory_owner_list ) && $force === false ) {
+    if( count( $territory_owner_list ) ) {
       $territory_owner_row = array_shift( $territory_owner_list );
-
-      $return = $territory_owner_row['contested'] == 1;
     }else {
-      $ownership_result = $this->compute_territory_owner( $game_id, $turn );
-
-      $return = $ownership_result['contested'] == 1;
+      $territory_owner_row = $this->compute_territory_owner( $game_id, $turn );
     }
+
+    $return = $territory_owner_row['contested'] == 1;
+
+    return $return;
+  }
+
+  public function is_capital( $game_id, $turn = null ) {
+    $return = null;
+
+    if( is_null( $turn ) ) {
+      /* @var $game Game */
+      $game = Game::instance( $game_id );
+
+      $turn = $game->current_turn;
+    }
+
+    $territory_owner_list = $this->get_territory_owner_list( $game_id, $turn );
+
+    if( count( $territory_owner_list ) ) {
+      $territory_owner_row = array_shift( $territory_owner_list );
+    }else {
+      $territory_owner_row = $this->compute_territory_owner( $game_id, $turn );
+    }
+
+    $return = $territory_owner_row['capital'] == 1;
 
     return $return;
   }
@@ -364,13 +383,16 @@ WHERE `world_id` = ".mysql_ureal_escape_string($world_id);
   public function compute_territory_owner( $game_id, $turn ) {
     $player_territories = $this->get_territory_player_troops_list($game_id, $turn);
 
-    $last_owner = $this->get_owner($game_id, $turn - 1);
-    $owner_id = $last_owner['owner_id'];
+    $last_owner_id = $this->get_owner($game_id, $turn - 1);
+
+    $territory_owner_list = $this->get_territory_owner_list( $game_id, $turn );
+    $is_capital = $territory_owner_list[0]['capital'];
+
     $is_contested = false;
 
     // Unclaimed territory or empty controlled territory
     if( count( $player_territories ) == 0 ) {
-      $owner_id = $last_owner;
+      $owner_id = $last_owner_id;
     }elseif( count( $player_territories ) == 1 ) {
       if( $owner_id === null ) {
         // Empty territory
@@ -417,9 +439,9 @@ WHERE `world_id` = ".mysql_ureal_escape_string($world_id);
           $troops[ $player_territory['player_id'] ] = $player_territory['quantity'];
         }
 
-        if(array_search($last_owner, array_keys( $troops)) !== false) {
+        if(array_search($last_owner_id, array_keys( $troops)) !== false) {
           // Already captured territory
-          $owner_id = $last_owner;
+          $owner_id = $last_owner_id;
         }else {
           // The player with most troops gets the territory
           asort( $troops );
@@ -434,9 +456,12 @@ WHERE `world_id` = ".mysql_ureal_escape_string($world_id);
       }
     }
 
-    $this->set_territory_owner($game_id, $turn, $owner_id, $is_contested?1:0);
+    // In case of changed owner, reset the capital state
+    $is_capital = $last_owner_id == $owner_id?$is_capital:0;
 
-    return array('owner_id' => $owner_id, 'contested' => $is_contested);
+    $this->set_territory_owner($game_id, $turn, $owner_id, $is_contested?1:0, $is_capital);
+
+    return array('owner_id' => $owner_id, 'contested' => $is_contested, 'capital' => $is_capital);
   }
 
   // /CUSTOM
