@@ -317,7 +317,7 @@ AND `game_id` = '.mysql_ureal_escape_string($game_id);
 AND `turn` = '.mysql_ureal_escape_string($turn);
 
     $sql = '
-SELECT `territory_id`, `game_id`, `turn`, `owner_id`, `contested`
+SELECT `territory_id`, `game_id`, `turn`, `owner_id`, `contested`, `capital`
 FROM `territory_owner`
 WHERE `owner_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
     $res = mysql_uquery($sql);
@@ -325,8 +325,8 @@ WHERE `owner_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
     return mysql_fetch_to_array($res);
   }
 
-  public function set_territory_owner( $territory_id, $game_id, $turn, $contested ) {
-    $sql = "REPLACE INTO `territory_owner` ( `territory_id`, `game_id`, `turn`, `owner_id`, `contested` ) VALUES (".mysql_ureal_escape_string( $territory_id, $game_id, $turn, $this->get_id(), $contested ).")";
+  public function set_territory_owner( $territory_id, $game_id, $turn, $contested, $capital ) {
+    $sql = "REPLACE INTO `territory_owner` ( `territory_id`, `game_id`, `turn`, `owner_id`, `contested`, `capital` ) VALUES (".mysql_ureal_escape_string( $territory_id, $game_id, $turn, $this->get_id(), $contested, $capital ).")";
 
     return mysql_uquery($sql);
   }

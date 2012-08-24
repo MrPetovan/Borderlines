@@ -430,12 +430,13 @@
           <th>Territory Id</th>
           <th>Game Id</th>
           <th>Turn</th>
-          <th>Contested</th>          <th>Action</th>
+          <th>Contested</th>
+          <th>Capital</th>          <th>Action</th>
         </tr>
       </thead>
       <tfoot>
         <tr>
-          <td colspan="5"><?php echo count( $territory_owner_list )?> lignes</td>
+          <td colspan="6"><?php echo count( $territory_owner_list )?> lignes</td>
         </tr>
       </tfoot>
       <tbody>
@@ -449,7 +450,8 @@
         <td><a href="'.get_page_url('admin_territory_view', true, array('id' => $territory_id_territory->id)).'">'.$territory_id_territory->name.'</a></td>
         <td><a href="'.get_page_url('admin_game_view', true, array('id' => $game_id_game->id)).'">'.$game_id_game->name.'</a></td>
         <td>'.$territory_owner['turn'].'</td>
-        <td>'.$territory_owner['contested'].'</td>          <td>
+        <td>'.$territory_owner['contested'].'</td>
+        <td>'.$territory_owner['capital'].'</td>          <td>
             <form action="'.get_page_url(PAGE_CODE, true, array('id' => $player->id)).'" method="post">
               '.HTMLHelper::genererInputHidden('id', $player->id).'
 
@@ -486,6 +488,10 @@
         </p>
         <p class="field">
           <?php echo HTMLHelper::genererInputText('contested', null, array(), 'Contested*' )?>
+           
+        </p>
+        <p class="field">
+          <?php echo HTMLHelper::genererInputText('capital', null, array(), 'Capital*' )?>
            
         </p>
         <p><?php echo HTMLHelper::genererButton('action',  'set_territory_owner', array('type' => 'submit'), 'Ajouter un élément')?></p>
