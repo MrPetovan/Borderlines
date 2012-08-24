@@ -383,18 +383,22 @@ WHERE `world_id` = ".mysql_ureal_escape_string($world_id);
   public function compute_territory_owner( $game_id, $turn ) {
     $player_territories = $this->get_territory_player_troops_list($game_id, $turn);
 
-    $last_owner_id = $this->get_owner($game_id, $turn - 1);
+    if( $turn > 1 ) {
+      $last_owner_id = $this->get_owner($game_id, $turn - 1);
 
-    $territory_owner_list = $this->get_territory_owner_list( $game_id, $turn );
-    $is_capital = $territory_owner_list[0]['capital'];
+      $territory_owner_list = $this->get_territory_owner_list( $game_id, $turn - 1 );
+      $is_capital = $territory_owner_list[0]['capital'] == 1;
+    }else {
+      $last_owner_id = null;
+      $is_capital = false;
+    }
 
     $is_contested = false;
+    // Default : ownership continues
+    $owner_id = $last_owner_id;
 
-    // Unclaimed territory or empty controlled territory
-    if( count( $player_territories ) == 0 ) {
-      $owner_id = $last_owner_id;
-    }elseif( count( $player_territories ) == 1 ) {
-      if( $owner_id === null ) {
+    if( count( $player_territories ) == 1 ) {
+      if( $last_owner_id === null ) {
         // Empty territory
         $owner_id = $player_territories[0]['player_id'];
       }else {
@@ -403,13 +407,14 @@ WHERE `world_id` = ".mysql_ureal_escape_string($world_id);
 
         // If invader marked the previous owner as enemy, he captures the territory
         foreach( $player_diplomacy_list as $player_diplomacy ) {
-          if( $player_diplomacy['to_player_id'] == $owner_id && $player_diplomacy['status'] == 'Enemy' ) {
+          if( $player_diplomacy['to_player_id'] == $last_owner_id && $player_diplomacy['status'] == 'Enemy' ) {
             $owner_id = $invader->id;
           }
         }
       }
     }else {
       $all_allies = true;
+      $all_allies_with_owner = true;
 
       foreach( $player_territories as $player_territory_from ) {
         /* @var $player_from Player */
@@ -417,38 +422,41 @@ WHERE `world_id` = ".mysql_ureal_escape_string($world_id);
 
         $player_diplomacy_list = $player_from->get_last_player_diplomacy_list($game_id);
 
-
         foreach( $player_territories as $player_territory_to ) {
           foreach( $player_diplomacy_list as $key => $player_diplomacy ) {
             if( $player_diplomacy['to_player_id'] == $player_territory_to['player_id'] ) {
               if( $player_diplomacy['status'] == 'Enemy' ) {
                 $all_allies = false;
-                break 2;
-              }else {
-                break 1;
               }
+            }
+          }
+        }
+        foreach( $player_diplomacy_list as $key => $player_diplomacy ) {
+          if( $player_diplomacy['to_player_id'] == $last_owner_id ) {
+            if( $player_diplomacy['status'] == 'Enemy' ) {
+              $all_allies_with_owner = false;
             }
           }
         }
       }
 
       if( $all_allies ) {
-        $troops = array();
+        if( !$all_allies_with_owner ) {
+          $troops = array();
 
-        foreach( $player_territories as $player_territory ) {
-          $troops[ $player_territory['player_id'] ] = $player_territory['quantity'];
-        }
+          foreach( $player_territories as $player_territory ) {
+            $troops[ $player_territory['player_id'] ] = $player_territory['quantity'];
+          }
 
-        if(array_search($last_owner_id, array_keys( $troops)) !== false) {
-          // Already captured territory
-          $owner_id = $last_owner_id;
-        }else {
-          // The player with most troops gets the territory
-          asort( $troops );
-          reset( $troops );
-          list( $player_id, $troops ) = each( $troops );
+          // Previous owner wiped out
+          if(!array_search($last_owner_id, array_keys( $troops)) !== false) {
+            // The player with most troops gets the territory
+            asort( $troops );
+            reset( $troops );
+            list( $player_id, $troops ) = each( $troops );
 
-          $owner_id = $player_id;
+            $owner_id = $player_id;
+          }
         }
       }else {
         // Contested territory
@@ -457,9 +465,9 @@ WHERE `world_id` = ".mysql_ureal_escape_string($world_id);
     }
 
     // In case of changed owner, reset the capital state
-    $is_capital = $last_owner_id == $owner_id?$is_capital:0;
+    $is_capital = $is_capital && ($last_owner_id != $owner_id);
 
-    $this->set_territory_owner($game_id, $turn, $owner_id, $is_contested?1:0, $is_capital);
+    $this->set_territory_owner($game_id, $turn, $owner_id, $is_contested?1:0, $is_capital?1:0);
 
     return array('owner_id' => $owner_id, 'contested' => $is_contested, 'capital' => $is_capital);
   }
