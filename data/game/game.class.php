@@ -67,6 +67,7 @@ class Game extends Game_Model {
       $starting_territory = array_pop( $territories );
 
       $this->set_territory_player_troops($this->current_turn, $starting_territory->id, $player->id, 1000);
+      $this->set_territory_owner($starting_territory->id, $this->current_turn, $player->id, 0, 1);
 
       $member = Member::instance( $player->member_id );
       if( php_mail($member->email, SITE_NAME." | Game started", $player->get_email_game_new_turn( $this ), true)) {
