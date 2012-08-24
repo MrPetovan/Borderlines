@@ -47,26 +47,60 @@
     }
 ?>
 </div>
-<h3>Territories</h3>
+<h3>Controlled territories</h3>
 <?php
-    $player_territories = $current_player->get_territory_player_troops_list($current_game->id, $current_game->current_turn );
+    $territory_owner_list = $current_player->get_territory_owner_list(null, $current_game->id, $current_game->current_turn );
 ?>
 <table>
   <tr>
     <th>Territories</th>
     <th>Area</th>
-    <th>Troops</th>
+    <th>Status</th>
+  </tr>
+<?php
+    foreach( $territory_owner_list as $territory_owner_row ) {
+      $territory = Territory::instance( $territory_owner_row['territory_id'] );
+      echo '
+  <tr>
+    <td><a href="'.Page::get_url('show_territory', array('id' => $territory->id)).'">'.$territory->name.'</a></td>
+    <td class="num">'.$territory->get_area().' km²</td>
+    <td>'.($territory->is_contested($current_game->id, $current_game->current_turn)?'Contested':'Stable').'</td>
+  </tr>';
+    }
+?>
+</table>
+<h3>Troops summary</h3>
+<?php
+    $player_territories = $current_player->get_territory_player_troops_list($current_game->id, $current_game->current_turn );
+?>
+<table>
+  <tr>
+    <th>Number</th>
+    <th>Territory</th>
+    <th>Owner</th>
     <th>Status</th>
   </tr>
 <?php
     foreach( $player_territories as $player_territory ) {
       $territory = Territory::instance( $player_territory['territory_id'] );
+
+      $owner_id = $territory->get_owner($current_game->id, $current_game->current_turn);
+      $owner = Player::instance( $owner_id );
       echo '
   <tr>
-    <td><a href="'.Page::get_url('show_territory', array('id' => $territory->id)).'">'.$territory->name.'</a></td>
-    <td class="num">'.$territory->get_area().' km²</td>
     <td class="num">'.$player_territory['quantity'].'</td>
-    <td>'.($territory->get_owner($current_game->id, $current_game->current_turn) == $current_player->id?'Stable':'Contested').'</td>
+    <td><a href="'.Page::get_url('show_territory', array('id' => $territory->id)).'">'.$territory->name.'</a></td>
+    <td>';
+
+      if( $owner == $current_player ) {
+        echo 'Yourself';
+      }else {
+        echo '<a href="'.Page::get_url('show_player', array('id' => $owner->id)).'">'.$owner->name.'</a>';
+      }
+
+      echo '
+    </td>
+    <td>'.($territory->is_contested($current_game->id, $current_game->current_turn)?'Contested':'Stable').'</td>
   </tr>';
     }
 ?>
