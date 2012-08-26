@@ -40,8 +40,9 @@ class Move_Troops extends Player_Order {
       if( $from_territory && $to_territory ) {
         $game_id = $player->current_game->id;
         $order_turn = $player->current_game->current_turn;
+        $next_turn = $player->current_game->current_turn + 1;
 
-        $from_troops_before = $player->get_territory_player_troops_list( $game_id, $order_turn, $from_territory->id );
+        $from_troops_before = $player->get_territory_player_troops_list( $game_id, $next_turn, $from_territory->id );
 
         if( count( $from_troops_before ) ) {
           $from_troops_before = $from_troops_before[0]['quantity'];
@@ -52,12 +53,12 @@ class Move_Troops extends Player_Order {
           $parameters['count'] = $from_troops_before - $from_troops_after;
 
           if( $from_troops_after > 0 ) {
-            $player->set_territory_player_troops( $game_id, $order_turn, $from_territory->id, $from_troops_after );
+            $player->set_territory_player_troops( $game_id, $next_turn, $from_territory->id, $from_troops_after );
           }else {
-            $player->del_territory_player_troops( $game_id, $order_turn, $from_territory->id );
+            $player->del_territory_player_troops( $game_id, $next_turn, $from_territory->id );
           }
 
-          $to_troops_before = $player->get_territory_player_troops_list( $game_id, $order_turn, $to_territory->id );
+          $to_troops_before = $player->get_territory_player_troops_list( $game_id, $next_turn, $to_territory->id );
 
           if( count( $to_troops_before ) ) {
             $to_troops_before = $to_troops_before[0]['quantity'];
@@ -68,9 +69,9 @@ class Move_Troops extends Player_Order {
           $to_troops_after = $to_troops_before + $parameters['count'];
 
           if( $to_troops_after > 0 ) {
-            $player->set_territory_player_troops( $game_id, $order_turn, $to_territory->id, $to_troops_after );
+            $player->set_territory_player_troops( $game_id, $next_turn, $to_territory->id, $to_troops_after );
           }elseif( count( $to_troops_before ) ) {
-            $player->del_territory_player_troops( $game_id, $order_turn, $to_territory->id );
+            $player->del_territory_player_troops( $game_id, $next_turn, $to_territory->id );
           }
         }
 
@@ -78,6 +79,7 @@ class Move_Troops extends Player_Order {
       }
     }
 
+    $this->turn_execution = $next_turn;
     $this->datetime_execution = time();
     $this->return = $return_code;
     $this->save();
