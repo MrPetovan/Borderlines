@@ -53,6 +53,7 @@
 ?>
 <table>
   <tr>
+    <th>Type</th>
     <th>Territories</th>
     <th>Area</th>
     <th>Status</th>
@@ -62,9 +63,10 @@
       $territory = Territory::instance( $territory_owner_row['territory_id'] );
       echo '
   <tr>
+    <td>'.($territory_owner_row['capital']?'Capital':'Province').'</td>
     <td><a href="'.Page::get_url('show_territory', array('id' => $territory->id)).'">'.$territory->name.'</a></td>
     <td class="num">'.$territory->get_area().' km²</td>
-    <td>'.($territory->is_contested($current_game->id, $current_game->current_turn)?'Contested':'Stable').'</td>
+    <td>'.($territory_owner_row['contested']?'Contested':'Stable').'</td>
   </tr>';
     }
 ?>
