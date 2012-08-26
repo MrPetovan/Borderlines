@@ -143,20 +143,27 @@
   // CUSTOM
 
   $list = Player_Order::get_ready_orders( $game->id );
-    
+
   $player_order_log = Player_Order::db_get_order_log( $game->id );
 
   if( $action = getValue('action') ) {
     switch( $action ) {
       case "reset" : {
         $game->reset();
-        
+
         Page::set_message('reset game OK');
+        break;
+      }
+      case "revert" : {
+        $turn = getValue('turn');
+        $game->revert( $turn );
+
+        Page::set_message('revert game to turn '.$turn.' OK');
         break;
       }
       case "start" : {
         $game->start();
-        
+
         Page::set_message('start game OK');
         break;
       }

@@ -79,6 +79,28 @@ class Game extends Game_Model {
     }
   }
 
+  public function revert($turn) {
+    $turn = max( 0, (int)$turn );
+
+    $sql = 'DELETE FROM `player_diplomacy` WHERE `game_id` = '.mysql_ureal_escape_string($this->id).' AND `turn` > '.mysql_ureal_escape_string($turn);
+    mysql_uquery($sql);
+    $sql = 'DELETE FROM `player_history` WHERE `game_id` = '.mysql_ureal_escape_string($this->id).' AND `turn` > '.mysql_ureal_escape_string($turn);
+    mysql_uquery($sql);
+    $sql = 'DELETE FROM `player_order` WHERE `game_id` = '.mysql_ureal_escape_string($this->id).' AND `turn_ordered` > '.mysql_ureal_escape_string($turn);
+    mysql_uquery($sql);
+    $sql = 'UPDATE `player_order` SET `datetime_execution` = NULL WHERE `game_id` = '.mysql_ureal_escape_string($this->id).' AND `turn_ordered` = '.mysql_ureal_escape_string($turn);
+    mysql_uquery($sql);
+    $sql = 'DELETE FROM `player_spygame_value` WHERE `game_id` = '.mysql_ureal_escape_string($this->id).' AND `turn` > '.mysql_ureal_escape_string($turn);
+    mysql_uquery($sql);
+    $sql = 'DELETE FROM `territory_owner` WHERE `game_id` = '.mysql_ureal_escape_string($this->id).' AND `turn` > '.mysql_ureal_escape_string($turn);
+    mysql_uquery($sql);
+    $sql = 'DELETE FROM `territory_player_troops` WHERE `game_id` = '.mysql_ureal_escape_string($this->id).' AND `turn` > '.mysql_ureal_escape_string($turn);
+    mysql_uquery($sql);
+
+    $this->current_turn = $turn;
+    $this->save();
+  }
+
   public function compute_auto() {
     $flag_turn_limit = $this->current_turn < $this->turn_limit;
     $flag_turn_interval = $this->updated + $this->turn_interval < time();
@@ -111,15 +133,7 @@ class Game extends Game_Model {
         );
       }
 
-      $player_order_list = Player_Order::get_ready_orders( $this->id );
-
-      $order_list = array();
-      foreach( $player_order_list as $order ) {
-        $order_type = Order_Type::instance( $order->get_order_type_id() );
-        $class = $order_type->get_class_name();
-        require_once ('data/order_type/'.strtolower( $class ).'.class.php');
-        $order_list[] = $class::instance( $order->get_id() );
-      }
+      $order_list = $this->get_ready_orders( 'move_troops' );
 
       // Orders execution
       foreach( $order_list as $order ) {
@@ -253,6 +267,33 @@ class Game extends Game_Model {
       $return = $this->save();
     }
     return $return;
+  }
+
+  public function get_ready_orders( $class_name = null ) {
+    $where = '';
+    if( ! is_null( $class_name )) {
+      $order_type = Order_Type::db_get_by_class_name( $class_name );
+      $where .= '
+AND `order_type_id` = '.mysql_ureal_escape_string($order_type->id);
+    }
+    $sql = "
+SELECT id
+FROM `".self::get_table_name()."`
+WHERE `game_id` = ".mysql_ureal_escape_string( $this->id )."
+AND `turn_scheduled` = ".mysql_ureal_escape_string( $this->current_turn )."
+AND `turn_executed` IS NULL
+".$where."
+ORDER BY `order_type_id`";
+
+    $order_list = array();
+    foreach( self::sql_to_list( $sql ) as $order ) {
+      $order_type = Order_Type::instance( $order->order_type_id );
+      $class = $order_type->class_name;
+      require_once ('data/order_type/'.strtolower( $class ).'.class.php');
+      $order_list[] = $class::instance( $order->id );
+    }
+
+    return $order_list;
   }
 
   public function db_get_ready_game_list() {
