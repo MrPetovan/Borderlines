@@ -120,13 +120,14 @@ class Game extends Game_Model {
   public function compute() {
     $return = false;
     if( !$this->has_ended() ) {
-      $this->current_turn++;
+      $current_turn = $this->current_turn;
+      $next_turn = $this->current_turn + 1;
 
       // Duplicating troops record before moves
-      $player_troops_list = $this->get_territory_player_troops_list($this->current_turn - 1);
+      $player_troops_list = $this->get_territory_player_troops_list($current_turn);
       foreach( $player_troops_list as $player_troops_row ) {
         $this->set_territory_player_troops(
-                $this->current_turn,
+                $next_turn,
                 $player_troops_row['territory_id'],
                 $player_troops_row['player_id'],
                 $player_troops_row['quantity']
@@ -144,20 +145,20 @@ class Game extends Game_Model {
       // Updating territories ownership and battle on contested territories
       foreach( $territories as $territory ) {
         /* @var $territory Territory */
-        $previous_owner = $territory->get_owner($this->id, $this->current_turn - 1 );
-        $new_owner = $territory->get_owner($this->id, $this->current_turn );
+        $previous_owner = $territory->get_owner($this->id, $current_turn );
+        $new_owner = $territory->get_owner($this->id, $next_turn );
 
-        if( $territory->is_contested($this->id, $this->current_turn) ) {
+        if( $territory->is_contested($this->id, $next_turn) ) {
           // Diplomacy checking and parties forming
           $diplomacy = array();
           $attacks = array();
           $losses = array();
 
-          $player_troops = $territory->get_territory_player_troops_list($this->id, $this->current_turn);
+          $player_troops = $territory->get_territory_player_troops_list($this->id, $next_turn);
           foreach( $player_troops as $key => $attacker_row ) {
             $this->set_player_history(
               $attacker_row['player_id'],
-              $this->current_turn,
+              $next_turn,
               time(),
               "There's a battle for the control of this territory",
               $territory->id
@@ -204,7 +205,7 @@ class Game extends Game_Model {
               }
               $this->set_player_history(
                 $player_row['player_id'],
-                $this->current_turn,
+                $next_turn,
                 time(),
                 $player->name . "'s troops ".$verb." ".$damages." of yours",
                 $territory->id
@@ -212,19 +213,19 @@ class Game extends Game_Model {
             }
 
             if( $new_quantity == 0 ) {
-              $this->del_territory_player_troops($this->current_turn, $player_row['territory_id'], $player_row['player_id']);
+              $this->del_territory_player_troops($next_turn, $player_row['territory_id'], $player_row['player_id']);
               $this->set_player_history(
                 $player_row['player_id'],
-                $this->current_turn,
+                $next_turn,
                 time(),
                 "All of your ".$player_row['quantity']." troops have been killed",
                 $territory->id
               );
             }else {
-              $this->set_territory_player_troops($this->current_turn, $player_row['territory_id'], $player_row['player_id'], $new_quantity);
+              $this->set_territory_player_troops($next_turn, $player_row['territory_id'], $player_row['player_id'], $new_quantity);
               $this->set_player_history(
                 $player_row['player_id'],
-                $this->current_turn,
+                $next_turn,
                 time(),
                 "You lost ".array_sum( $losses[ $player_row['player_id'] ] )." on ".$player_row['quantity']." troops in battle",
                 $territory->id);
@@ -232,10 +233,11 @@ class Game extends Game_Model {
           }
 
           // Recalculating ownership after battle
-          $territory->compute_territory_owner($this->id, $this->current_turn );
+          $territory->compute_territory_owner($this->id, $next_turn );
         }
       }
 
+      $this->current_turn++;
       $this->updated = time();
 
       $player_list = Player::db_get_by_game($this->id);
