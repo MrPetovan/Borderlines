@@ -383,7 +383,7 @@ WHERE `world_id` = ".mysql_ureal_escape_string($world_id);
   public function compute_territory_owner( $game_id, $turn ) {
     $player_territories = $this->get_territory_player_troops_list($game_id, $turn);
 
-    if( $turn > 1 ) {
+    if( $turn > 0 ) {
       $last_owner_id = $this->get_owner($game_id, $turn - 1);
 
       $territory_owner_list = $this->get_territory_owner_list( $game_id, $turn - 1 );
@@ -465,11 +465,13 @@ WHERE `world_id` = ".mysql_ureal_escape_string($world_id);
     }
 
     // In case of changed owner, reset the capital state
-    $is_capital = $is_capital && ($last_owner_id != $owner_id);
+    $is_capital = $is_capital && ($last_owner_id == $owner_id);
 
     $this->set_territory_owner($game_id, $turn, $owner_id, $is_contested?1:0, $is_capital?1:0);
 
-    return array('owner_id' => $owner_id, 'contested' => $is_contested, 'capital' => $is_capital);
+    $return = array('owner_id' => $owner_id, 'contested' => $is_contested, 'capital' => $is_capital);
+
+    return $return;
   }
 
   // /CUSTOM
