@@ -168,7 +168,7 @@
 <table>
   <tr>
     <th>Order Type</th>
-    <th>Order</th>
+    <th>Ordered</th>
     <th>Scheduled</th>
     <th>Parameters</th>
     <th>Action</th>
@@ -179,18 +179,23 @@
         $parameters = $player_order->parameters;
         $param_string = array();
         foreach( $parameters as $key => $value ) {
-          if( $key == 'player_id' ) {
+          if( strpos($key, 'player_id') !== false ) {
             $player = Player::instance( $value );
-            $value = $player->name;
+            $value = '<a href="'.Page::get_url('show_player', array('id' => $player->id)).'">'.$player->name.'</a>';
           }
-          $param_string[] = ucfirst( $key ).' : '.$value;
+          if( strpos($key, 'territory_id') !== false ) {
+            $territory = Territory::instance( $value );
+            $value = '<a href="'.Page::get_url('show_territory', array('id' => $territory->id)).'">'.$territory->name.'</a>';
+          }
+
+          $param_string[] = ucfirst( str_replace( '_id', '', $key ) ).' : '.$value;
         }
         $param_string = implode('<br/>', $param_string);
         echo '
   <tr>
     <td>'.$order_type->name .'</td>
-    <td>'.guess_time( $player_order->datetime_order, GUESS_TIME_LOCALE ) .'</td>
-    <td>'.guess_time( $player_order->datetime_scheduled, GUESS_TIME_LOCALE ) .'</td>
+    <td>'.$player_order->turn_ordered.'</td>
+    <td>'.$player_order->turn_scheduled.'</td>
     <td>'.$param_string.'</td>
     <td>
       <form action="'.Page::get_page_url('order').'" method="post">
