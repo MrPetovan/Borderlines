@@ -74,6 +74,17 @@
       'current_player' => $current_player,
       'from_territory' => $territory
     ));
+
+    $class = 'change_capital';
+
+    require_once(DATA.'order_type/'.$class.'.class.php');
+
+    echo $class::get_html_form( array(
+      'page_code' => PAGE_CODE,
+      'page_params' => array('id' => $territory->id ),
+      'current_player' => $current_player,
+      'territory' => $territory
+    ));
   }
 ?>
 <p><a href="<?php echo Page::get_url('show_world', array('id' => $territory->world_id ) )?>">Return to world map</a></p>
