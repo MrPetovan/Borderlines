@@ -237,6 +237,13 @@ class Game extends Game_Model {
         }
       }
 
+      $order_list = $this->get_ready_orders( 'change_capital' );
+
+      // Orders execution
+      foreach( $order_list as $order ) {
+        $order->execute();
+      }
+
       $this->current_turn++;
       $this->updated = time();
 
@@ -288,7 +295,7 @@ AND `turn_executed` IS NULL
 ORDER BY `order_type_id`";
 
     $order_list = array();
-    foreach( self::sql_to_list( $sql ) as $order ) {
+    foreach( Player_Order::sql_to_list( $sql ) as $order ) {
       $order_type = Order_Type::instance( $order->order_type_id );
       $class = $order_type->class_name;
       require_once ('data/order_type/'.strtolower( $class ).'.class.php');
