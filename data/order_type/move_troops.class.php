@@ -79,7 +79,7 @@ class Move_Troops extends Player_Order {
       }
     }
 
-    $this->turn_execution = $next_turn;
+    $this->turn_executed = $next_turn;
     $this->datetime_execution = time();
     $this->return = $return_code;
     $this->save();

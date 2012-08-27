@@ -40,7 +40,7 @@ AND `turn` = '.mysql_ureal_escape_string($player->current_game->current_turn + 1
 AND `territory_id` = '.mysql_ureal_escape_string($territory->id);
           mysql_uquery($sql);
 
-          $this->set_player_history(
+          $player->current_game->set_player_history(
             $player->id,
             $player->current_game->current_turn + 1,
             time(),
@@ -49,7 +49,7 @@ AND `territory_id` = '.mysql_ureal_escape_string($territory->id);
           );
           $return_code = 0;
         }else {
-          $this->set_player_history(
+          $player->current_game->set_player_history(
             $player->id,
             $player->current_game->current_turn + 1,
             time(),
@@ -66,7 +66,7 @@ AND `territory_id` = '.mysql_ureal_escape_string($territory->id);
     }
 
     $this->datetime_execution = time();
-    $this->turn_execution = $player->current_game->current_turn + 1;
+    $this->turn_executed = $player->current_game->current_turn + 1;
     $this->return = $return_code;
     $this->save();
 
@@ -120,7 +120,7 @@ AND `territory_id` = '.mysql_ureal_escape_string($territory->id);
       $return .= '
     <p>Moving your capital takes two turns, and may be cancelled if you don\'t own the territory</p>
     '.HTMLHelper::genererInputHidden('url_return', Page::get_page_url( $params['page_code'], true, $page_params ) );
-      if( isset( $params['from_territory'] ) ) {
+      if( isset( $params['territory'] ) ) {
         $return .= '
     '.HTMLHelper::genererInputHidden('parameters[territory_id]', $params['territory']->id);
       }else {
