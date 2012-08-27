@@ -280,7 +280,7 @@ AND `order_type_id` = '.mysql_ureal_escape_string($order_type->id);
     }
     $sql = "
 SELECT id
-FROM `".self::get_table_name()."`
+FROM `".Player_Order::get_table_name()."`
 WHERE `game_id` = ".mysql_ureal_escape_string( $this->id )."
 AND `turn_scheduled` = ".mysql_ureal_escape_string( $this->current_turn )."
 AND `turn_executed` IS NULL
