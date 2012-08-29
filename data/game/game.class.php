@@ -10,6 +10,10 @@ class Game extends Game_Model {
 
   // CUSTOM
 
+  const HOME_TROOPS_MAINTENANCE = 1;
+  const AWAY_TROOPS_MAINTENANCE = 2;
+  const RECRUIT_TROOPS_PRICE = 4;
+
   public function get_status_string() {
     $return = "Waiting for players";
     if( $this->has_ended() ) {
@@ -88,7 +92,7 @@ class Game extends Game_Model {
     mysql_uquery($sql);
     $sql = 'DELETE FROM `player_order` WHERE `game_id` = '.mysql_ureal_escape_string($this->id).' AND `turn_ordered` > '.mysql_ureal_escape_string($turn);
     mysql_uquery($sql);
-    $sql = 'UPDATE `player_order` SET `datetime_execution` = NULL WHERE `game_id` = '.mysql_ureal_escape_string($this->id).' AND `turn_ordered` = '.mysql_ureal_escape_string($turn);
+    $sql = 'UPDATE `player_order` SET `datetime_execution` = NULL, `turn_executed` = NULL WHERE `game_id` = '.mysql_ureal_escape_string($this->id).' AND `turn_ordered` = '.mysql_ureal_escape_string($turn);
     mysql_uquery($sql);
     $sql = 'DELETE FROM `player_spygame_value` WHERE `game_id` = '.mysql_ureal_escape_string($this->id).' AND `turn` > '.mysql_ureal_escape_string($turn);
     mysql_uquery($sql);
@@ -135,8 +139,6 @@ class Game extends Game_Model {
       }
 
       $order_list = $this->get_ready_orders( 'move_troops' );
-
-      // Orders execution
       foreach( $order_list as $order ) {
         $order->execute();
       }
@@ -238,16 +240,86 @@ class Game extends Game_Model {
       }
 
       $order_list = $this->get_ready_orders( 'change_capital' );
-
-      // Orders execution
       foreach( $order_list as $order ) {
         $order->execute();
       }
 
+      $player_list = Player::db_get_by_game($this->id);
+
+      // Revenues and recruit
+      foreach( $player_list as $player ) {
+        $capital_id = null;
+        $revenue = 0;
+        $territory_previous_owner_list = $player->get_territory_owner_list(null, $this->id, $current_turn);
+        foreach( $territory_previous_owner_list as $territory_owner_row ) {
+
+          if( !$territory_owner_row['contested'] ) {
+            $territory = Territory::instance($territory_owner_row['territory_id']);
+            $revenue += $territory->get_area();
+          }
+          if( $territory_owner_row['capital'] ) {
+            $capital_id = $territory_owner_row['territory_id'];
+          }
+        }
+
+        $revenue = round( $revenue );
+
+        $this->set_player_history(
+          $player->id,
+          $next_turn,
+          time(),
+          "You got a revenue of ".$revenue,
+          null);
+        $troops_maintenance = 0;
+        foreach( $player->get_territory_player_troops_list($this->id, $current_turn) as $territory_player_troops_row ) {
+          $is_home = true;
+
+          foreach( $territory_previous_owner_list as $territory_previous_owner_row ) {
+            if( $territory_previous_owner_row['territory_id'] == $territory_player_troops_row['territory_id']
+                && $territory_previous_owner_row['territory_id'] != $player->id) {
+              $is_home = false;
+              break;
+            }
+          }
+
+          if( $is_home ) {
+            $troops_maintenance += $territory_player_troops_row['quantity'] * self::HOME_TROOPS_MAINTENANCE;
+          }else {
+            $troops_maintenance += $territory_player_troops_row['quantity'] * self::AWAY_TROOPS_MAINTENANCE;
+          }
+        }
+
+        $this->set_player_history(
+          $player->id,
+          $next_turn,
+          time(),
+          "You spent ".$troops_maintenance." to maintain your troops",
+          null);
+
+        $recruit_budget = $revenue - $troops_maintenance;
+
+        if( $capital_id !== null ) {
+          $troops_recruited = floor( $recruit_budget / self::RECRUIT_TROOPS_PRICE );
+          $capital_territory_troops = array_pop( $player->get_territory_player_troops_list($this->id, $next_turn, $capital_id) );
+          $player->set_territory_player_troops($this->id, $next_turn, $capital_id, $capital_territory_troops['quantity'] + $troops_recruited);
+          $this->set_player_history(
+            $player->id,
+            $next_turn,
+            time(),
+            "You recruited ".$troops_recruited." new troops at your capital",
+            $capital_id);
+        }else {
+          $this->set_player_history(
+            $player->id,
+            $next_turn,
+            time(),
+            "You don't have any capital this turn, recruitement cancelled !",
+            $capital_id);
+        }
+      }
+
       $this->current_turn++;
       $this->updated = time();
-
-      $player_list = Player::db_get_by_game($this->id);
 
       if( $this->current_turn == $this->turn_limit ) {
         $this->ended = time();
