@@ -37,7 +37,7 @@
       echo '
         <tr>
           <td><input type="checkbox" name="order_type_id[]" value="'.$order_type->id.'"/></td>
-          <td><a href="'.htmlentities_utf8(Page::get_url('admin_order_type_view', true, array('id' => $order_type->id))).'">'.$order_type->get_name().'</a></td>
+          <td><a href="'.htmlentities_utf8(Page::get_url('admin_order_type_view', array('id' => $order_type->id))).'">'.$order_type->get_name().'</a></td>
 
           <td>'.$order_type->class_name.'</td>
           <td>'.$tab_visible[$order_type->active].'</td>

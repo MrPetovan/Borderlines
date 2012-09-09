@@ -125,7 +125,7 @@ WHERE `member_id` = ".mysql_ureal_escape_string($member_id);
 AND `conversation_id` = '.mysql_ureal_escape_string($conversation_id);
 
     $sql = '
-SELECT `conversation_id`, `player_id`
+SELECT `conversation_id`, `player_id`, `archived`, `left`
 FROM `conversation_player`
 WHERE `player_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
     $res = mysql_uquery($sql);
@@ -133,8 +133,8 @@ WHERE `player_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
     return mysql_fetch_to_array($res);
   }
 
-  public function set_conversation_player( $conversation_id ) {
-    $sql = "REPLACE INTO `conversation_player` ( `conversation_id`, `player_id` ) VALUES (".mysql_ureal_escape_string( $conversation_id, $this->get_id() ).")";
+  public function set_conversation_player( $conversation_id, $archived, $left ) {
+    $sql = "REPLACE INTO `conversation_player` ( `conversation_id`, `player_id`, `archived`, `left` ) VALUES (".mysql_ureal_escape_string( $conversation_id, $this->get_id(), $archived, $left ).")";
 
     return mysql_uquery($sql);
   }
@@ -176,6 +176,38 @@ WHERE `player_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
     if( ! is_null( $game_id )) $where .= '
 AND `game_id` = '.mysql_ureal_escape_string($game_id);
     $sql = 'DELETE FROM `game_player`
+    WHERE `player_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
+
+    return mysql_uquery($sql);
+  }
+
+
+
+  public function get_message_recipient_list($message_id = null) {
+    $where = '';
+    if( ! is_null( $message_id )) $where .= '
+AND `message_id` = '.mysql_ureal_escape_string($message_id);
+
+    $sql = '
+SELECT `message_id`, `player_id`, `read`
+FROM `message_recipient`
+WHERE `player_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
+    $res = mysql_uquery($sql);
+
+    return mysql_fetch_to_array($res);
+  }
+
+  public function set_message_recipient( $message_id, $read ) {
+    $sql = "REPLACE INTO `message_recipient` ( `message_id`, `player_id`, `read` ) VALUES (".mysql_ureal_escape_string( $message_id, $this->get_id(), $read ).")";
+
+    return mysql_uquery($sql);
+  }
+
+  public function del_message_recipient( $message_id = null ) {
+    $where = '';
+    if( ! is_null( $message_id )) $where .= '
+AND `message_id` = '.mysql_ureal_escape_string($message_id);
+    $sql = 'DELETE FROM `message_recipient`
     WHERE `player_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
 
     return mysql_uquery($sql);

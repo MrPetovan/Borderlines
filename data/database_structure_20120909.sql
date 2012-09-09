@@ -42,38 +42,12 @@ CREATE TABLE `conversation` (
   `game_id` int(11) DEFAULT NULL,
   `subject` varchar(250) NOT NULL,
   `created` datetime NOT NULL,
-  `archived` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `player_id` (`player_id`),
   KEY `game_id` (`game_id`),
   CONSTRAINT `conversation_ibfk_1` FOREIGN KEY (`player_id`) REFERENCES `player` (`id`) ON DELETE CASCADE,
   CONSTRAINT `conversation_ibfk_2` FOREIGN KEY (`game_id`) REFERENCES `game` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `conversation_message`
---
-
-DROP TABLE IF EXISTS `conversation_message`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `conversation_message` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `conversation_id` int(11) NOT NULL,
-  `sender_id` int(11) DEFAULT NULL,
-  `receiver_id` int(11) NOT NULL,
-  `text` text NOT NULL,
-  `created` datetime NOT NULL,
-  `read` datetime DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `conversation_id` (`conversation_id`),
-  KEY `sender_id` (`sender_id`),
-  KEY `receiver_id` (`receiver_id`),
-  CONSTRAINT `conversation_message_ibfk_1` FOREIGN KEY (`conversation_id`) REFERENCES `conversation` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `conversation_message_ibfk_2` FOREIGN KEY (`sender_id`) REFERENCES `player` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `conversation_message_ibfk_3` FOREIGN KEY (`receiver_id`) REFERENCES `player` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -86,10 +60,12 @@ DROP TABLE IF EXISTS `conversation_player`;
 CREATE TABLE `conversation_player` (
   `conversation_id` int(11) NOT NULL,
   `player_id` int(11) NOT NULL,
+  `archived` datetime DEFAULT NULL,
+  `left` datetime DEFAULT NULL,
   PRIMARY KEY (`conversation_id`,`player_id`),
   KEY `player_id` (`player_id`),
-  CONSTRAINT `conversation_player_ibfk_2` FOREIGN KEY (`player_id`) REFERENCES `player` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `conversation_player_ibfk_1` FOREIGN KEY (`conversation_id`) REFERENCES `conversation` (`id`) ON DELETE CASCADE
+  CONSTRAINT `conversation_player_ibfk_1` FOREIGN KEY (`conversation_id`) REFERENCES `conversation` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `conversation_player_ibfk_2` FOREIGN KEY (`player_id`) REFERENCES `player` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -187,6 +163,45 @@ CREATE TABLE `member` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `message`
+--
+
+DROP TABLE IF EXISTS `message`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `message` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `conversation_id` int(11) NOT NULL,
+  `player_id` int(11) DEFAULT NULL,
+  `text` text NOT NULL,
+  `created` datetime NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `conversation_id` (`conversation_id`),
+  KEY `sender_id` (`player_id`),
+  CONSTRAINT `message_ibfk_2` FOREIGN KEY (`player_id`) REFERENCES `player` (`id`),
+  CONSTRAINT `message_ibfk_1` FOREIGN KEY (`conversation_id`) REFERENCES `conversation` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `message_recipient`
+--
+
+DROP TABLE IF EXISTS `message_recipient`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `message_recipient` (
+  `message_id` int(11) NOT NULL,
+  `player_id` int(11) NOT NULL,
+  `read` datetime DEFAULT NULL,
+  PRIMARY KEY (`message_id`,`player_id`),
+  KEY `player_id` (`player_id`),
+  CONSTRAINT `message_recipient_ibfk_1` FOREIGN KEY (`message_id`) REFERENCES `message` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `message_recipient_ibfk_2` FOREIGN KEY (`player_id`) REFERENCES `player` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `order_type`
 --
 
@@ -222,7 +237,7 @@ CREATE TABLE `page` (
   `rewrite_pattern` varchar(255) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `code` (`code`)
-) ENGINE=InnoDB AUTO_INCREMENT=3822 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=4148 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -526,4 +541,4 @@ CREATE TABLE `world` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2012-09-09  1:32:28
+-- Dump completed on 2012-09-09 18:05:44

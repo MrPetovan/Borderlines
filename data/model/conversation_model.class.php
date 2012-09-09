@@ -10,7 +10,6 @@ class Conversation_Model extends DBObject {
   protected $_game_id = null;
   protected $_subject = null;
   protected $_created = null;
-  protected $_archived = null;
 
   public function __construct($id = null) {
     parent::__construct($id);
@@ -20,7 +19,6 @@ class Conversation_Model extends DBObject {
   public static function get_table_name() { return "conversation"; }
 
   public function get_created()    { return guess_time($this->_created);}
-  public function get_archived()    { return guess_time($this->_archived);}
 
   /* MUTATEURS */
   public function set_id($id) {
@@ -33,7 +31,6 @@ class Conversation_Model extends DBObject {
     if( is_numeric($game_id) && (int)$game_id == $game_id) $data = intval($game_id); else $data = null; $this->_game_id = $data;
   }
   public function set_created($date) { $this->_created = guess_time($date, GUESS_DATE_MYSQL);}
-  public function set_archived($date) { $this->_archived = guess_time($date, GUESS_DATE_MYSQL);}
 
   /* FONCTIONS SQL */
 
@@ -94,7 +91,6 @@ WHERE `game_id` = ".mysql_ureal_escape_string($game_id);
       <p class="field">'.HTMLHelper::genererSelect('game_id', $option_list, $this->get_game_id(), array(), "Game Id").'<a href="'.get_page_url('admin_game_mod').'">Créer un objet Game</a></p>
         <p class="field">'.HTMLHelper::genererInputText('subject', $this->get_subject(), array(), "Subject *").'</p>
         <p class="field">'.HTMLHelper::genererInputText('created', $this->get_created(), array(), "Created *").'</p>
-        <p class="field">'.HTMLHelper::genererInputText('archived', $this->get_archived(), array(), "Archived").'</p>
 
     </fieldset>';
 
@@ -146,7 +142,7 @@ WHERE `game_id` = ".mysql_ureal_escape_string($game_id);
 AND `player_id` = '.mysql_ureal_escape_string($player_id);
 
     $sql = '
-SELECT `conversation_id`, `player_id`
+SELECT `conversation_id`, `player_id`, `archived`, `left`
 FROM `conversation_player`
 WHERE `conversation_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
     $res = mysql_uquery($sql);
@@ -154,8 +150,8 @@ WHERE `conversation_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
     return mysql_fetch_to_array($res);
   }
 
-  public function set_conversation_player( $player_id ) {
-    $sql = "REPLACE INTO `conversation_player` ( `conversation_id`, `player_id` ) VALUES (".mysql_ureal_escape_string( $this->get_id(), $player_id ).")";
+  public function set_conversation_player( $player_id, $archived, $left ) {
+    $sql = "REPLACE INTO `conversation_player` ( `conversation_id`, `player_id`, `archived`, `left` ) VALUES (".mysql_ureal_escape_string( $this->get_id(), $player_id, $archived, $left ).")";
 
     return mysql_uquery($sql);
   }

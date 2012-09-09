@@ -1,27 +1,24 @@
 <?php
 /**
- * Classe Conversation_Message
+ * Classe Message
  *
  */
 
-class Conversation_Message_Model extends DBObject {
+class Message_Model extends DBObject {
   // Champs BD
   protected $_conversation_id = null;
-  protected $_sender_id = null;
-  protected $_receiver_id = null;
+  protected $_player_id = null;
   protected $_text = null;
   protected $_created = null;
-  protected $_read = null;
 
   public function __construct($id = null) {
     parent::__construct($id);
   }
 
   /* ACCESSEURS */
-  public static function get_table_name() { return "conversation_message"; }
+  public static function get_table_name() { return "message"; }
 
   public function get_created()    { return guess_time($this->_created);}
-  public function get_read()    { return guess_time($this->_read);}
 
   /* MUTATEURS */
   public function set_id($id) {
@@ -30,14 +27,10 @@ class Conversation_Message_Model extends DBObject {
   public function set_conversation_id($conversation_id) {
     if( is_numeric($conversation_id) && (int)$conversation_id == $conversation_id) $data = intval($conversation_id); else $data = null; $this->_conversation_id = $data;
   }
-  public function set_sender_id($sender_id) {
-    if( is_numeric($sender_id) && (int)$sender_id == $sender_id) $data = intval($sender_id); else $data = null; $this->_sender_id = $data;
-  }
-  public function set_receiver_id($receiver_id) {
-    if( is_numeric($receiver_id) && (int)$receiver_id == $receiver_id) $data = intval($receiver_id); else $data = null; $this->_receiver_id = $data;
+  public function set_player_id($player_id) {
+    if( is_numeric($player_id) && (int)$player_id == $player_id) $data = intval($player_id); else $data = null; $this->_player_id = $data;
   }
   public function set_created($date) { $this->_created = guess_time($date, GUESS_DATE_MYSQL);}
-  public function set_read($date) { $this->_read = guess_time($date, GUESS_DATE_MYSQL);}
 
   /* FONCTIONS SQL */
 
@@ -49,17 +42,10 @@ WHERE `conversation_id` = ".mysql_ureal_escape_string($conversation_id);
 
     return self::sql_to_list($sql);
   }
-  public static function db_get_by_sender_id($sender_id) {
+  public static function db_get_by_player_id($player_id) {
     $sql = "
 SELECT `id` FROM `".self::get_table_name()."`
-WHERE `sender_id` = ".mysql_ureal_escape_string($sender_id);
-
-    return self::sql_to_list($sql);
-  }
-  public static function db_get_by_receiver_id($receiver_id) {
-    $sql = "
-SELECT `id` FROM `".self::get_table_name()."`
-WHERE `receiver_id` = ".mysql_ureal_escape_string($receiver_id);
+WHERE `player_id` = ".mysql_ureal_escape_string($player_id);
 
     return self::sql_to_list($sql);
   }
@@ -71,7 +57,7 @@ WHERE `receiver_id` = ".mysql_ureal_escape_string($receiver_id);
         $return[ null ] = 'N/A';
     }
 
-    $object_list = Conversation_Message_Model::db_get_all();
+    $object_list = Message_Model::db_get_all();
     foreach( $object_list as $object ) $return[ $object->get_id() ] = $object->get_id();
 
     return $return;
@@ -102,11 +88,9 @@ WHERE `receiver_id` = ".mysql_ureal_escape_string($receiver_id);
         $option_list[ $player->id ] = $player->name;
 
       $return .= '
-      <p class="field">'.HTMLHelper::genererSelect('sender_id', $option_list, $this->get_sender_id(), array(), "Sender Id").'<a href="'.get_page_url('admin_player_mod').'">Créer un objet Player</a></p>
-        <p class="field">'.HTMLHelper::genererInputText('receiver_id', $this->get_receiver_id(), array(), "Receiver Id *").'</p>
+      <p class="field">'.HTMLHelper::genererSelect('player_id', $option_list, $this->get_player_id(), array(), "Player Id").'<a href="'.get_page_url('admin_player_mod').'">Créer un objet Player</a></p>
         <p class="field">'.HTMLHelper::genererInputText('text', $this->get_text(), array(), "Text *").'</p>
         <p class="field">'.HTMLHelper::genererInputText('created', $this->get_created(), array(), "Created *").'</p>
-        <p class="field">'.HTMLHelper::genererInputText('read', $this->get_read(), array(), "Read").'</p>
 
     </fieldset>';
 
@@ -123,9 +107,8 @@ WHERE `receiver_id` = ".mysql_ureal_escape_string($receiver_id);
   public static function get_message_erreur($num_error) {
     switch($num_error) { 
       case 1 : $return = "Le champ <strong>Conversation Id</strong> est obligatoire."; break;
-      case 2 : $return = "Le champ <strong>Receiver Id</strong> est obligatoire."; break;
-      case 3 : $return = "Le champ <strong>Text</strong> est obligatoire."; break;
-      case 4 : $return = "Le champ <strong>Created</strong> est obligatoire."; break;
+      case 2 : $return = "Le champ <strong>Text</strong> est obligatoire."; break;
+      case 3 : $return = "Le champ <strong>Created</strong> est obligatoire."; break;
       default: $return = "Erreur de saisie, veuillez vérifier les champs.";
     }
     return $return;
@@ -142,9 +125,8 @@ WHERE `receiver_id` = ".mysql_ureal_escape_string($receiver_id);
     $return = array();
 
     $return[] = Member::check_compulsory($this->get_conversation_id(), 1, true);
-    $return[] = Member::check_compulsory($this->get_receiver_id(), 2, true);
-    $return[] = Member::check_compulsory($this->get_text(), 3);
-    $return[] = Member::check_compulsory($this->get_created(), 4);
+    $return[] = Member::check_compulsory($this->get_text(), 2);
+    $return[] = Member::check_compulsory($this->get_created(), 3);
 
     $return = array_unique($return);
     if(($true_key = array_search(true, $return, true)) !== false) {
@@ -153,6 +135,38 @@ WHERE `receiver_id` = ".mysql_ureal_escape_string($receiver_id);
     if(count($return) == 0) $return = true;
     return $return;
   }
+
+  public function get_message_recipient_list($player_id = null) {
+    $where = '';
+    if( ! is_null( $player_id )) $where .= '
+AND `player_id` = '.mysql_ureal_escape_string($player_id);
+
+    $sql = '
+SELECT `message_id`, `player_id`, `read`
+FROM `message_recipient`
+WHERE `message_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
+    $res = mysql_uquery($sql);
+
+    return mysql_fetch_to_array($res);
+  }
+
+  public function set_message_recipient( $player_id, $read ) {
+    $sql = "REPLACE INTO `message_recipient` ( `message_id`, `player_id`, `read` ) VALUES (".mysql_ureal_escape_string( $this->get_id(), $player_id, $read ).")";
+
+    return mysql_uquery($sql);
+  }
+
+  public function del_message_recipient( $player_id = null ) {
+    $where = '';
+    if( ! is_null( $player_id )) $where .= '
+AND `player_id` = '.mysql_ureal_escape_string($player_id);
+    $sql = 'DELETE FROM `message_recipient`
+    WHERE `message_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
+
+    return mysql_uquery($sql);
+  }
+
+
 
 
 

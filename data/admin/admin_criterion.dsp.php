@@ -36,7 +36,7 @@
       echo '
         <tr>
           <td><input type="checkbox" name="criterion_id[]" value="'.$criterion->id.'"/></td>
-          <td><a href="'.htmlentities_utf8(Page::get_url('admin_criterion_view', true, array('id' => $criterion->id))).'">'.$criterion->get_name().'</a></td>
+          <td><a href="'.htmlentities_utf8(Page::get_url('admin_criterion_view', array('id' => $criterion->id))).'">'.$criterion->get_name().'</a></td>
 ';
       $category_temp = Category::instance( $criterion->category_id);
       echo '

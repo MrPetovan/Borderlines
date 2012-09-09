@@ -6,7 +6,9 @@
        case 'set_conversation_player':
         if( $player->id ) {
           $flag_set_conversation_player = $player->set_conversation_player(
-            ($value = getValue('conversation_id')) == ''?null:$value
+            ($value = getValue('conversation_id')) == ''?null:$value,
+            ($value = getValue('archived')) == ''?null:$value,
+            ($value = getValue('left')) == ''?null:$value
           );
           if( ! $flag_set_conversation_player ) {
             Page::add_message( '$player->set_conversation_player : ' . mysql_error(), Page::PAGE_MESSAGE_ERROR );
@@ -35,6 +37,24 @@
         if( $player->id ) {
           $flag_del_game_player = $player->del_game_player(
             ($value = getValue('game_id')) == ''?null:$value
+          );
+        }
+        break;
+      case 'set_message_recipient':
+        if( $player->id ) {
+          $flag_set_message_recipient = $player->set_message_recipient(
+            ($value = getValue('message_id')) == ''?null:$value,
+            ($value = getValue('read')) == ''?null:$value
+          );
+          if( ! $flag_set_message_recipient ) {
+            Page::add_message( '$player->set_message_recipient : ' . mysql_error(), Page::PAGE_MESSAGE_ERROR );
+          }
+        }
+        break;
+      case 'del_message_recipient':
+        if( $player->id ) {
+          $flag_del_message_recipient = $player->del_message_recipient(
+            ($value = getValue('message_id')) == ''?null:$value
           );
         }
         break;

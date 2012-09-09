@@ -37,7 +37,7 @@
       echo '
         <tr>
           <td><input type="checkbox" name="player_id[]" value="'.$player->id.'"/></td>
-          <td><a href="'.htmlentities_utf8(Page::get_url('admin_player_view', true, array('id' => $player->id))).'">'.$player->get_name().'</a></td>
+          <td><a href="'.htmlentities_utf8(Page::get_url('admin_player_view', array('id' => $player->id))).'">'.$player->get_name().'</a></td>
 ';
       $member_temp = Member::instance( $player->member_id);
       echo '

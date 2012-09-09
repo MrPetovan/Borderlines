@@ -36,7 +36,7 @@
       echo '
         <tr>
           <td><input type="checkbox" name="resource_id[]" value="'.$resource->id.'"/></td>
-          <td><a href="'.htmlentities_utf8(Page::get_url('admin_resource_view', true, array('id' => $resource->id))).'">'.$resource->get_name().'</a></td>
+          <td><a href="'.htmlentities_utf8(Page::get_url('admin_resource_view', array('id' => $resource->id))).'">'.$resource->get_name().'</a></td>
 
           <td>'.$tab_visible[$resource->public].'</td>
           <td><a href="'.htmlentities_utf8(Page::get_url('admin_resource_mod', array('id' => $resource->id))).'"><img src="'.IMG.'img_html/pencil.png" alt="Modifier" title="Modifier"/></a></td>

@@ -37,7 +37,7 @@
       echo '
         <tr>
           <td><input type="checkbox" name="world_id[]" value="'.$world->id.'"/></td>
-          <td><a href="'.htmlentities_utf8(Page::get_url('admin_world_view', true, array('id' => $world->id))).'">'.$world->get_name().'</a></td>
+          <td><a href="'.htmlentities_utf8(Page::get_url('admin_world_view', array('id' => $world->id))).'">'.$world->get_name().'</a></td>
 
           <td>'.$world->size_x.'</td>
           <td>'.$world->size_y.'</td>

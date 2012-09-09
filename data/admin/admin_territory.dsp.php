@@ -38,7 +38,7 @@
       echo '
         <tr>
           <td><input type="checkbox" name="territory_id[]" value="'.$territory->id.'"/></td>
-          <td><a href="'.htmlentities_utf8(Page::get_url('admin_territory_view', true, array('id' => $territory->id))).'">'.$territory->get_name().'</a></td>
+          <td><a href="'.htmlentities_utf8(Page::get_url('admin_territory_view', array('id' => $territory->id))).'">'.$territory->get_name().'</a></td>
 
           <td>'.$territory->capital_name.'</td>';
       $world_temp = World::instance( $territory->world_id);

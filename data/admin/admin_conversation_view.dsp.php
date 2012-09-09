@@ -41,10 +41,6 @@
             <p class="field">
               <span class="libelle">Created</span>
               <span class="value"><?php echo guess_time($conversation->created, GUESS_DATE_FR)?></span>
-            </p>
-            <p class="field">
-              <span class="libelle">Archived</span>
-              <span class="value"><?php echo guess_time($conversation->archived, GUESS_DATE_FR)?></span>
             </p>    </div>
     <p><a href="<?php echo get_page_url('admin_conversation_mod', true, array('id' => $conversation->id))?>">Modifier cet objet Conversation</a></p>
     <h4>Conversation Player</h4>
@@ -57,12 +53,14 @@
     <table>
       <thead>
         <tr>
-          <th>Player Id</th>          <th>Action</th>
+          <th>Player Id</th>
+          <th>Archived</th>
+          <th>Left</th>          <th>Action</th>
         </tr>
       </thead>
       <tfoot>
         <tr>
-          <td colspan="2"><?php echo count( $conversation_player_list )?> lignes</td>
+          <td colspan="4"><?php echo count( $conversation_player_list )?> lignes</td>
         </tr>
       </tfoot>
       <tbody>
@@ -72,7 +70,9 @@
  
         $player_id_player = Player::instance( $conversation_player['player_id'] );        echo '
         <tr>
-        <td><a href="'.get_page_url('admin_player_view', true, array('id' => $player_id_player->id)).'">'.$player_id_player->name.'</a></td>          <td>
+        <td><a href="'.get_page_url('admin_player_view', true, array('id' => $player_id_player->id)).'">'.$player_id_player->name.'</a></td>
+        <td>'.$conversation_player['archived'].'</td>
+        <td>'.$conversation_player['left'].'</td>          <td>
             <form action="'.get_page_url(PAGE_CODE, true, array('id' => $conversation->id)).'" method="post">
               '.HTMLHelper::genererInputHidden('id', $conversation->id).'
 
@@ -96,6 +96,14 @@
         <legend>Ajouter un élément</legend>
         <p class="field">
           <?php echo HTMLHelper::genererSelect('player_id', $liste_valeurs_player, null, array(), 'Player' )?><a href="<?php echo get_page_url('admin_player_mod')?>">Créer un objet Player</a>
+        </p>
+        <p class="field">
+          <?php echo HTMLHelper::genererInputText('archived', null, array(), 'Archived' )?>
+          <span><?php echo guess_time(time(), GUESS_TIME_MYSQL)?></span> 
+        </p>
+        <p class="field">
+          <?php echo HTMLHelper::genererInputText('left', null, array(), 'Left' )?>
+          <span><?php echo guess_time(time(), GUESS_TIME_MYSQL)?></span> 
         </p>
         <p><?php echo HTMLHelper::genererButton('action',  'set_conversation_player', array('type' => 'submit'), 'Ajouter un élément')?></p>
       </fieldset>
