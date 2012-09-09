@@ -15,7 +15,7 @@
   <div class="texte_texte">
     <h3>Liste des <?php echo $class_name ?>s</h3>
     '.nav_page(PAGE_CODE, $nb_total, $page_no, $nb_per_page).'
-    <form action="'.get_page_url(PAGE_CODE).'" method="post">
+    <form action="'.Page::get_url(PAGE_CODE).'" method="post">
     <table>
       <thead>
         <tr>
@@ -26,11 +26,12 @@ foreach( $table_columns as $column_name => $column_props ) {
     echo '
           <th>'.$column_props['Comment'].'</th>';
 } ?>
+
         </tr>
       </thead>
       <tfoot>
         <tr>
-          <td colspan="6">'.$nb_total.' éléments | <a href="'.get_page_url('admin_<?php echo $class_db_identifier?>_mod').'">Ajouter manuellement un objet <?php echo $class_name ?></a></td>
+          <td colspan="6">'.$nb_total.' éléments | <a href="'.Page::get_url('admin_<?php echo $class_db_identifier?>_mod').'">Ajouter manuellement un objet <?php echo $class_name ?></a></td>
         </tr>
       </tfoot>
       <tbody>';
@@ -38,38 +39,38 @@ foreach( $table_columns as $column_name => $column_props ) {
     foreach($tab as $<?php echo $class_db_identifier?>) {
       echo '
         <tr>
-          <td><input type="checkbox" name="<?php echo $class_db_identifier?>_id[]" value="'.$<?php echo $class_db_identifier?>->get_id().'"/></td>
-          <td><a href="'.htmlentities_utf8(get_page_url('admin_<?php echo $class_db_identifier?>_view', true, array('id' => $<?php echo $class_db_identifier?>->get_id()))).'">'.$<?php echo $class_db_identifier?>->get_<?php echo $name_field?>().'</a></td>
+          <td><input type="checkbox" name="<?php echo $class_db_identifier?>_id[]" value="'.$<?php echo $class_db_identifier?>->id.'"/></td>
+          <td><a href="'.htmlentities_utf8(Page::get_url('admin_<?php echo $class_db_identifier?>_view', true, array('id' => $<?php echo $class_db_identifier?>->id))).'">'.$<?php echo $class_db_identifier?>->get_<?php echo $name_field?>().'</a></td>
 <?php
 foreach( $table_columns as $column_name => $column_props ) {
   if( array_key_exists($column_name, $foreign_keys)) {
     $foreign_table = $foreign_keys[$column_name];
     echo "';
-      $".$foreign_table."_temp = ".to_camel_case($foreign_table, true)."::instance( $".$class_db_identifier."->get_".$column_name."());
+      $".$foreign_table."_temp = ".to_camel_case($foreign_table, true)."::instance( $".$class_db_identifier."->".$column_name.");
       echo '
-          <td>'.$".$foreign_table."_temp->get_name().'</td>";
+          <td>'.$".$foreign_table."_temp->name.'</td>";
   }elseif( $column_name != $name_field && $column_name != "id" )
     switch ($column_props['SimpleType']) {
       case 'varchar':
       case 'char':
       default:
         echo "
-          <td>'.$".$class_db_identifier."->get_".$column_name."().'</td>";
+          <td>'.$".$class_db_identifier."->".$column_name.".'</td>";
         break;
       case 'datetime':
       case 'time':
       case 'date':
         echo "
-          <td>'.guess_time($".$class_db_identifier."->get_".$column_name."(), GUESS_DATE_FR).'</td>";
+          <td>'.guess_time($".$class_db_identifier."->".$column_name.", GUESS_DATE_LOCALE).'</td>";
         break;
       case 'tinyint' :
         echo "
-          <td>'.\$tab_visible[$".$class_db_identifier."->get_".$column_name."()].'</td>";
+          <td>'.\$tab_visible[$".$class_db_identifier."->".$column_name."].'</td>";
         break;
     }
 } ?>
 
-          <td><a href="'.htmlentities_utf8(get_page_url('admin_<?php echo $class_db_identifier?>_mod', true, array('id' => $<?php echo $class_db_identifier?>->get_id()))).'"><img src="'.IMG.'img_html/pencil.png" alt="Modifier" title="Modifier"/></a></td>
+          <td><a href="'.htmlentities_utf8(Page::get_url('admin_<?php echo $class_db_identifier?>_mod', array('id' => $<?php echo $class_db_identifier?>->id))).'"><img src="'.IMG.'img_html/pencil.png" alt="Modifier" title="Modifier"/></a></td>
         </tr>';
     }
     echo '
