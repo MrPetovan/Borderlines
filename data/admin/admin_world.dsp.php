@@ -16,18 +16,19 @@
   <div class="texte_texte">
     <h3>Liste des Worlds</h3>
     '.nav_page(PAGE_CODE, $nb_total, $page_no, $nb_per_page).'
-    <form action="'.get_page_url(PAGE_CODE).'" method="post">
+    <form action="'.Page::get_url(PAGE_CODE).'" method="post">
     <table>
       <thead>
         <tr>
           <th>Sel.</th>
           <th>Name</th>
           <th>Size X</th>
-          <th>Size Y</th>        </tr>
+          <th>Size Y</th>
+        </tr>
       </thead>
       <tfoot>
         <tr>
-          <td colspan="6">'.$nb_total.' éléments | <a href="'.get_page_url('admin_world_mod').'">Ajouter manuellement un objet World</a></td>
+          <td colspan="6">'.$nb_total.' éléments | <a href="'.Page::get_url('admin_world_mod').'">Ajouter manuellement un objet World</a></td>
         </tr>
       </tfoot>
       <tbody>';
@@ -35,12 +36,12 @@
     foreach($tab as $world) {
       echo '
         <tr>
-          <td><input type="checkbox" name="world_id[]" value="'.$world->get_id().'"/></td>
-          <td><a href="'.htmlentities_utf8(get_page_url('admin_world_view', true, array('id' => $world->get_id()))).'">'.$world->get_name().'</a></td>
+          <td><input type="checkbox" name="world_id[]" value="'.$world->id.'"/></td>
+          <td><a href="'.htmlentities_utf8(Page::get_url('admin_world_view', true, array('id' => $world->id))).'">'.$world->get_name().'</a></td>
 
-          <td>'.$world->get_size_x().'</td>
-          <td>'.$world->get_size_y().'</td>
-          <td><a href="'.htmlentities_utf8(get_page_url('admin_world_mod', true, array('id' => $world->get_id()))).'"><img src="'.IMG.'img_html/pencil.png" alt="Modifier" title="Modifier"/></a></td>
+          <td>'.$world->size_x.'</td>
+          <td>'.$world->size_y.'</td>
+          <td><a href="'.htmlentities_utf8(Page::get_url('admin_world_mod', array('id' => $world->id))).'"><img src="'.IMG.'img_html/pencil.png" alt="Modifier" title="Modifier"/></a></td>
         </tr>';
     }
     echo '

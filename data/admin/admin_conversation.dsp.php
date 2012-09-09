@@ -16,7 +16,7 @@
   <div class="texte_texte">
     <h3>Liste des Conversations</h3>
     '.nav_page(PAGE_CODE, $nb_total, $page_no, $nb_per_page).'
-    <form action="'.get_page_url(PAGE_CODE).'" method="post">
+    <form action="'.Page::get_url(PAGE_CODE).'" method="post">
     <table>
       <thead>
         <tr>
@@ -25,11 +25,12 @@
           <th>Player Id</th>
           <th>Game Id</th>
           <th>Subject</th>
-          <th>Created</th>        </tr>
+          <th>Created</th>
+        </tr>
       </thead>
       <tfoot>
         <tr>
-          <td colspan="6">'.$nb_total.' éléments | <a href="'.get_page_url('admin_conversation_mod').'">Ajouter manuellement un objet Conversation</a></td>
+          <td colspan="6">'.$nb_total.' éléments | <a href="'.Page::get_url('admin_conversation_mod').'">Ajouter manuellement un objet Conversation</a></td>
         </tr>
       </tfoot>
       <tbody>';
@@ -37,18 +38,18 @@
     foreach($tab as $conversation) {
       echo '
         <tr>
-          <td><input type="checkbox" name="conversation_id[]" value="'.$conversation->get_id().'"/></td>
-          <td><a href="'.htmlentities_utf8(get_page_url('admin_conversation_view', true, array('id' => $conversation->get_id()))).'">'.$conversation->get_id().'</a></td>
+          <td><input type="checkbox" name="conversation_id[]" value="'.$conversation->id.'"/></td>
+          <td><a href="'.htmlentities_utf8(Page::get_url('admin_conversation_view', true, array('id' => $conversation->id))).'">'.$conversation->get_id().'</a></td>
 ';
-      $player_temp = Player::instance( $conversation->get_player_id());
+      $player_temp = Player::instance( $conversation->player_id);
       echo '
-          <td>'.$player_temp->get_name().'</td>';
-      $game_temp = Game::instance( $conversation->get_game_id());
+          <td>'.$player_temp->name.'</td>';
+      $game_temp = Game::instance( $conversation->game_id);
       echo '
-          <td>'.$game_temp->get_name().'</td>
-          <td>'.$conversation->get_subject().'</td>
-          <td>'.guess_time($conversation->get_created(), GUESS_DATE_FR).'</td>
-          <td><a href="'.htmlentities_utf8(get_page_url('admin_conversation_mod', true, array('id' => $conversation->get_id()))).'"><img src="'.IMG.'img_html/pencil.png" alt="Modifier" title="Modifier"/></a></td>
+          <td>'.$game_temp->name.'</td>
+          <td>'.$conversation->subject.'</td>
+          <td>'.guess_time($conversation->created, GUESS_DATE_LOCALE).'</td>
+          <td><a href="'.htmlentities_utf8(Page::get_url('admin_conversation_mod', array('id' => $conversation->id))).'"><img src="'.IMG.'img_html/pencil.png" alt="Modifier" title="Modifier"/></a></td>
         </tr>';
     }
     echo '

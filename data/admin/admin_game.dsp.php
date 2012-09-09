@@ -16,7 +16,7 @@
   <div class="texte_texte">
     <h3>Liste des Games</h3>
     '.nav_page(PAGE_CODE, $nb_total, $page_no, $nb_per_page).'
-    <form action="'.get_page_url(PAGE_CODE).'" method="post">
+    <form action="'.Page::get_url(PAGE_CODE).'" method="post">
     <table>
       <thead>
         <tr>
@@ -32,11 +32,12 @@
           <th>Started</th>
           <th>Updated</th>
           <th>Ended</th>
-          <th>Created By</th>        </tr>
+          <th>Created By</th>
+        </tr>
       </thead>
       <tfoot>
         <tr>
-          <td colspan="6">'.$nb_total.' éléments | <a href="'.get_page_url('admin_game_mod').'">Ajouter manuellement un objet Game</a></td>
+          <td colspan="6">'.$nb_total.' éléments | <a href="'.Page::get_url('admin_game_mod').'">Ajouter manuellement un objet Game</a></td>
         </tr>
       </tfoot>
       <tbody>';
@@ -44,25 +45,25 @@
     foreach($tab as $game) {
       echo '
         <tr>
-          <td><input type="checkbox" name="game_id[]" value="'.$game->get_id().'"/></td>
-          <td><a href="'.htmlentities_utf8(get_page_url('admin_game_view', true, array('id' => $game->get_id()))).'">'.$game->get_name().'</a></td>
+          <td><input type="checkbox" name="game_id[]" value="'.$game->id.'"/></td>
+          <td><a href="'.htmlentities_utf8(Page::get_url('admin_game_view', true, array('id' => $game->id))).'">'.$game->get_name().'</a></td>
 ';
-      $world_temp = World::instance( $game->get_world_id());
+      $world_temp = World::instance( $game->world_id);
       echo '
-          <td>'.$world_temp->get_name().'</td>
-          <td>'.$game->get_current_turn().'</td>
-          <td>'.$game->get_turn_interval().'</td>
-          <td>'.$game->get_turn_limit().'</td>
-          <td>'.$game->get_min_players().'</td>
-          <td>'.$game->get_max_players().'</td>
-          <td>'.guess_time($game->get_created(), GUESS_DATE_FR).'</td>
-          <td>'.guess_time($game->get_started(), GUESS_DATE_FR).'</td>
-          <td>'.guess_time($game->get_updated(), GUESS_DATE_FR).'</td>
-          <td>'.guess_time($game->get_ended(), GUESS_DATE_FR).'</td>';
-      $player_temp = Player::instance( $game->get_created_by());
+          <td>'.$world_temp->name.'</td>
+          <td>'.$game->current_turn.'</td>
+          <td>'.$game->turn_interval.'</td>
+          <td>'.$game->turn_limit.'</td>
+          <td>'.$game->min_players.'</td>
+          <td>'.$game->max_players.'</td>
+          <td>'.guess_time($game->created, GUESS_DATE_LOCALE).'</td>
+          <td>'.guess_time($game->started, GUESS_DATE_LOCALE).'</td>
+          <td>'.guess_time($game->updated, GUESS_DATE_LOCALE).'</td>
+          <td>'.guess_time($game->ended, GUESS_DATE_LOCALE).'</td>';
+      $player_temp = Player::instance( $game->created_by);
       echo '
-          <td>'.$player_temp->get_name().'</td>
-          <td><a href="'.htmlentities_utf8(get_page_url('admin_game_mod', true, array('id' => $game->get_id()))).'"><img src="'.IMG.'img_html/pencil.png" alt="Modifier" title="Modifier"/></a></td>
+          <td>'.$player_temp->name.'</td>
+          <td><a href="'.htmlentities_utf8(Page::get_url('admin_game_mod', array('id' => $game->id))).'"><img src="'.IMG.'img_html/pencil.png" alt="Modifier" title="Modifier"/></a></td>
         </tr>';
     }
     echo '

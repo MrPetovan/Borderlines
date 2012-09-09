@@ -16,18 +16,19 @@
   <div class="texte_texte">
     <h3>Liste des Players</h3>
     '.nav_page(PAGE_CODE, $nb_total, $page_no, $nb_per_page).'
-    <form action="'.get_page_url(PAGE_CODE).'" method="post">
+    <form action="'.Page::get_url(PAGE_CODE).'" method="post">
     <table>
       <thead>
         <tr>
           <th>Sel.</th>
           <th>Name</th>
           <th>Member Id</th>
-          <th>Active</th>        </tr>
+          <th>Active</th>
+        </tr>
       </thead>
       <tfoot>
         <tr>
-          <td colspan="6">'.$nb_total.' éléments | <a href="'.get_page_url('admin_player_mod').'">Ajouter manuellement un objet Player</a></td>
+          <td colspan="6">'.$nb_total.' éléments | <a href="'.Page::get_url('admin_player_mod').'">Ajouter manuellement un objet Player</a></td>
         </tr>
       </tfoot>
       <tbody>';
@@ -35,14 +36,14 @@
     foreach($tab as $player) {
       echo '
         <tr>
-          <td><input type="checkbox" name="player_id[]" value="'.$player->get_id().'"/></td>
-          <td><a href="'.htmlentities_utf8(get_page_url('admin_player_view', true, array('id' => $player->get_id()))).'">'.$player->get_name().'</a></td>
+          <td><input type="checkbox" name="player_id[]" value="'.$player->id.'"/></td>
+          <td><a href="'.htmlentities_utf8(Page::get_url('admin_player_view', true, array('id' => $player->id))).'">'.$player->get_name().'</a></td>
 ';
-      $member_temp = Member::instance( $player->get_member_id());
+      $member_temp = Member::instance( $player->member_id);
       echo '
-          <td>'.$member_temp->get_name().'</td>
-          <td>'.$tab_visible[$player->get_active()].'</td>
-          <td><a href="'.htmlentities_utf8(get_page_url('admin_player_mod', true, array('id' => $player->get_id()))).'"><img src="'.IMG.'img_html/pencil.png" alt="Modifier" title="Modifier"/></a></td>
+          <td>'.$member_temp->name.'</td>
+          <td>'.$tab_visible[$player->active].'</td>
+          <td><a href="'.htmlentities_utf8(Page::get_url('admin_player_mod', array('id' => $player->id))).'"><img src="'.IMG.'img_html/pencil.png" alt="Modifier" title="Modifier"/></a></td>
         </tr>';
     }
     echo '

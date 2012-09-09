@@ -16,7 +16,7 @@
   <div class="texte_texte">
     <h3>Liste des Shouts</h3>
     '.nav_page(PAGE_CODE, $nb_total, $page_no, $nb_per_page).'
-    <form action="'.get_page_url(PAGE_CODE).'" method="post">
+    <form action="'.Page::get_url(PAGE_CODE).'" method="post">
     <table>
       <thead>
         <tr>
@@ -25,11 +25,12 @@
           <th>Date Sent</th>
           <th>Shouter Id</th>
           <th>Text</th>
-          <th>Game Id</th>        </tr>
+          <th>Game Id</th>
+        </tr>
       </thead>
       <tfoot>
         <tr>
-          <td colspan="6">'.$nb_total.' éléments | <a href="'.get_page_url('admin_shout_mod').'">Ajouter manuellement un objet Shout</a></td>
+          <td colspan="6">'.$nb_total.' éléments | <a href="'.Page::get_url('admin_shout_mod').'">Ajouter manuellement un objet Shout</a></td>
         </tr>
       </tfoot>
       <tbody>';
@@ -37,18 +38,18 @@
     foreach($tab as $shout) {
       echo '
         <tr>
-          <td><input type="checkbox" name="shout_id[]" value="'.$shout->get_id().'"/></td>
-          <td><a href="'.htmlentities_utf8(get_page_url('admin_shout_view', true, array('id' => $shout->get_id()))).'">'.$shout->get_id().'</a></td>
+          <td><input type="checkbox" name="shout_id[]" value="'.$shout->id.'"/></td>
+          <td><a href="'.htmlentities_utf8(Page::get_url('admin_shout_view', true, array('id' => $shout->id))).'">'.$shout->get_id().'</a></td>
 
-          <td>'.guess_time($shout->get_date_sent(), GUESS_DATE_FR).'</td>';
-      $player_temp = Player::instance( $shout->get_shouter_id());
+          <td>'.guess_time($shout->date_sent, GUESS_DATE_LOCALE).'</td>';
+      $player_temp = Player::instance( $shout->shouter_id);
       echo '
-          <td>'.$player_temp->get_name().'</td>
-          <td>'.$shout->get_text().'</td>';
-      $game_temp = Game::instance( $shout->get_game_id());
+          <td>'.$player_temp->name.'</td>
+          <td>'.$shout->text.'</td>';
+      $game_temp = Game::instance( $shout->game_id);
       echo '
-          <td>'.$game_temp->get_name().'</td>
-          <td><a href="'.htmlentities_utf8(get_page_url('admin_shout_mod', true, array('id' => $shout->get_id()))).'"><img src="'.IMG.'img_html/pencil.png" alt="Modifier" title="Modifier"/></a></td>
+          <td>'.$game_temp->name.'</td>
+          <td><a href="'.htmlentities_utf8(Page::get_url('admin_shout_mod', array('id' => $shout->id))).'"><img src="'.IMG.'img_html/pencil.png" alt="Modifier" title="Modifier"/></a></td>
         </tr>';
     }
     echo '
