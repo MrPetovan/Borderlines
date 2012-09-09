@@ -1,5 +1,4 @@
 <?php
-  /* @var $game Game */
   $game = Game::instance( getValue('id') );
 
   if(!is_null(getValue('action'))) {
@@ -140,7 +139,7 @@
         break;
     }
   }
-
+  
   // CUSTOM
 
   $list = $game->get_ready_orders();

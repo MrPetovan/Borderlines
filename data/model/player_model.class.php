@@ -119,6 +119,38 @@ WHERE `member_id` = ".mysql_ureal_escape_string($member_id);
     return $return;
   }
 
+  public function get_conversation_player_list($conversation_id = null) {
+    $where = '';
+    if( ! is_null( $conversation_id )) $where .= '
+AND `conversation_id` = '.mysql_ureal_escape_string($conversation_id);
+
+    $sql = '
+SELECT `conversation_id`, `player_id`
+FROM `conversation_player`
+WHERE `player_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
+    $res = mysql_uquery($sql);
+
+    return mysql_fetch_to_array($res);
+  }
+
+  public function set_conversation_player( $conversation_id ) {
+    $sql = "REPLACE INTO `conversation_player` ( `conversation_id`, `player_id` ) VALUES (".mysql_ureal_escape_string( $conversation_id, $this->get_id() ).")";
+
+    return mysql_uquery($sql);
+  }
+
+  public function del_conversation_player( $conversation_id = null ) {
+    $where = '';
+    if( ! is_null( $conversation_id )) $where .= '
+AND `conversation_id` = '.mysql_ureal_escape_string($conversation_id);
+    $sql = 'DELETE FROM `conversation_player`
+    WHERE `player_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
+
+    return mysql_uquery($sql);
+  }
+
+
+
   public function get_game_player_list($game_id = null) {
     $where = '';
     if( ! is_null( $game_id )) $where .= '

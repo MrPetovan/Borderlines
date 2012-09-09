@@ -28,6 +28,59 @@
               <span class="value"><?php echo $tab_visible[$player->active]?></span>
             </p>    </div>
     <p><a href="<?php echo get_page_url('admin_player_mod', true, array('id' => $player->id))?>">Modifier cet objet Player</a></p>
+    <h4>Conversation Player</h4>
+<?php
+
+  $conversation_player_list = $player->get_conversation_player_list();
+
+  if(count($conversation_player_list)) {
+?>
+    <table>
+      <thead>
+        <tr>
+          <th>Conversation Id</th>          <th>Action</th>
+        </tr>
+      </thead>
+      <tfoot>
+        <tr>
+          <td colspan="2"><?php echo count( $conversation_player_list )?> lignes</td>
+        </tr>
+      </tfoot>
+      <tbody>
+<?php
+      foreach( $conversation_player_list as $conversation_player ) {
+
+ 
+        $conversation_id_conversation = Conversation::instance( $conversation_player['conversation_id'] );        echo '
+        <tr>
+        <td><a href="'.get_page_url('admin_conversation_view', true, array('id' => $conversation_id_conversation->id)).'">'.$conversation_id_conversation->id.'</a></td>          <td>
+            <form action="'.get_page_url(PAGE_CODE, true, array('id' => $player->id)).'" method="post">
+              '.HTMLHelper::genererInputHidden('id', $player->id).'
+
+              '.HTMLHelper::genererInputHidden('conversation_id', $conversation_id_conversation->id).'              '.HTMLHelper::genererButton('action',  'del_conversation_player', array('type' => 'submit'), 'Supprimer').'
+            </form>
+          </td>
+        </tr>';
+      }
+?>
+      </tbody>
+    </table>
+<?php
+  }else {
+    echo '<p>Il n\'y a pas d\'éléments à afficher</p>';
+  }
+
+  $liste_valeurs_conversation = Conversation::db_get_select_list();?>
+    <form action="<?php echo get_page_url(PAGE_CODE, true, array('id' => $player->id))?>" method="post" class="formulaire">
+      <?php echo HTMLHelper::genererInputHidden('id', $player->id )?>
+      <fieldset>
+        <legend>Ajouter un élément</legend>
+        <p class="field">
+          <?php echo HTMLHelper::genererSelect('conversation_id', $liste_valeurs_conversation, null, array(), 'Conversation' )?><a href="<?php echo get_page_url('admin_conversation_mod')?>">Créer un objet Conversation</a>
+        </p>
+        <p><?php echo HTMLHelper::genererButton('action',  'set_conversation_player', array('type' => 'submit'), 'Ajouter un élément')?></p>
+      </fieldset>
+    </form>
     <h4>Game Player</h4>
 <?php
 

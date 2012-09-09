@@ -3,7 +3,24 @@
 
   if(!is_null(getValue('action'))) {
     switch( getValue('action') ) {
-       case 'set_game_player':
+       case 'set_conversation_player':
+        if( $player->id ) {
+          $flag_set_conversation_player = $player->set_conversation_player(
+            ($value = getValue('conversation_id')) == ''?null:$value
+          );
+          if( ! $flag_set_conversation_player ) {
+            Page::add_message( '$player->set_conversation_player : ' . mysql_error(), Page::PAGE_MESSAGE_ERROR );
+          }
+        }
+        break;
+      case 'del_conversation_player':
+        if( $player->id ) {
+          $flag_del_conversation_player = $player->del_conversation_player(
+            ($value = getValue('conversation_id')) == ''?null:$value
+          );
+        }
+        break;
+      case 'set_game_player':
         if( $player->id ) {
           $flag_set_game_player = $player->set_game_player(
             ($value = getValue('game_id')) == ''?null:$value,
