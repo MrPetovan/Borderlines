@@ -16,7 +16,7 @@
   <div class="texte_texte">
     <h3>Liste des Conversation Messages</h3>
     '.nav_page(PAGE_CODE, $nb_total, $page_no, $nb_per_page).'
-    <form action="'.get_page_url(PAGE_CODE).'" method="post">
+    <form action="'.Page::get_url(PAGE_CODE).'" method="post">
     <table>
       <thead>
         <tr>
@@ -26,11 +26,13 @@
           <th>Sender Id</th>
           <th>Receiver Id</th>
           <th>Text</th>
-          <th>Created</th>        </tr>
+          <th>Created</th>
+          <th>Read</th>
+        </tr>
       </thead>
       <tfoot>
         <tr>
-          <td colspan="6">'.$nb_total.' éléments | <a href="'.get_page_url('admin_conversation_message_mod').'">Ajouter manuellement un objet Conversation Message</a></td>
+          <td colspan="6">'.$nb_total.' éléments | <a href="'.Page::get_url('admin_conversation_message_mod').'">Ajouter manuellement un objet Conversation Message</a></td>
         </tr>
       </tfoot>
       <tbody>';
@@ -38,19 +40,20 @@
     foreach($tab as $conversation_message) {
       echo '
         <tr>
-          <td><input type="checkbox" name="conversation_message_id[]" value="'.$conversation_message->get_id().'"/></td>
-          <td><a href="'.htmlentities_utf8(get_page_url('admin_conversation_message_view', true, array('id' => $conversation_message->get_id()))).'">'.$conversation_message->get_id().'</a></td>
+          <td><input type="checkbox" name="conversation_message_id[]" value="'.$conversation_message->id.'"/></td>
+          <td><a href="'.htmlentities_utf8(Page::get_url('admin_conversation_message_view', true, array('id' => $conversation_message->id))).'">'.$conversation_message->get_id().'</a></td>
 ';
-      $conversation_temp = Conversation::instance( $conversation_message->get_conversation_id());
+      $conversation_temp = Conversation::instance( $conversation_message->conversation_id);
       echo '
-          <td>'.$conversation_temp->get_name().'</td>
-          <td>'.$conversation_message->get_sender_id().'</td>';
-      $player_temp = Player::instance( $conversation_message->get_receiver_id());
+          <td>'.$conversation_temp->name.'</td>';
+      $player_temp = Player::instance( $conversation_message->sender_id);
       echo '
-          <td>'.$player_temp->get_name().'</td>
-          <td>'.$conversation_message->get_text().'</td>
-          <td>'.guess_time($conversation_message->get_created(), GUESS_DATE_FR).'</td>
-          <td><a href="'.htmlentities_utf8(get_page_url('admin_conversation_message_mod', true, array('id' => $conversation_message->get_id()))).'"><img src="'.IMG.'img_html/pencil.png" alt="Modifier" title="Modifier"/></a></td>
+          <td>'.$player_temp->name.'</td>
+          <td>'.$conversation_message->receiver_id.'</td>
+          <td>'.$conversation_message->text.'</td>
+          <td>'.guess_time($conversation_message->created, GUESS_DATE_LOCALE).'</td>
+          <td>'.guess_time($conversation_message->read, GUESS_DATE_LOCALE).'</td>
+          <td><a href="'.htmlentities_utf8(Page::get_url('admin_conversation_message_mod', array('id' => $conversation_message->id))).'"><img src="'.IMG.'img_html/pencil.png" alt="Modifier" title="Modifier"/></a></td>
         </tr>';
     }
     echo '

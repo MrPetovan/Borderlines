@@ -23,21 +23,21 @@
         <span class="value"><a href="<?php echo get_page_url('admin_conversation_view', true, array('id' => $conversation_message->conversation_id ) )?>"><?php echo $option_list[ $conversation_message->conversation_id ]?></a></span>
       </p>
 
-            <p class="field">
-              <span class="libelle">Sender Id</span>
-              <span class="value"><?php echo $conversation_message->sender_id?></span>
-            </p>
 <?php
-      $option_list = array();
+      $option_list = array(null => 'Pas de choix');
       $player_list = Player::db_get_all();
       foreach( $player_list as $player)
         $option_list[ $player->id ] = $player->name;
 ?>
       <p class="field">
-        <span class="libelle">Receiver Id</span>
-        <span class="value"><a href="<?php echo get_page_url('admin_player_view', true, array('id' => $conversation_message->receiver_id ) )?>"><?php echo $option_list[ $conversation_message->receiver_id ]?></a></span>
+        <span class="libelle">Sender Id</span>
+        <span class="value"><a href="<?php echo get_page_url('admin_player_view', true, array('id' => $conversation_message->sender_id ) )?>"><?php echo $option_list[ $conversation_message->sender_id ]?></a></span>
       </p>
 
+            <p class="field">
+              <span class="libelle">Receiver Id</span>
+              <span class="value"><?php echo $conversation_message->receiver_id?></span>
+            </p>
             <p class="field">
               <span class="libelle">Text</span>
               <span class="value"><?php echo $conversation_message->text?></span>
@@ -45,6 +45,10 @@
             <p class="field">
               <span class="libelle">Created</span>
               <span class="value"><?php echo guess_time($conversation_message->created, GUESS_DATE_FR)?></span>
+            </p>
+            <p class="field">
+              <span class="libelle">Read</span>
+              <span class="value"><?php echo guess_time($conversation_message->read, GUESS_DATE_FR)?></span>
             </p>    </div>
     <p><a href="<?php echo get_page_url('admin_conversation_message_mod', true, array('id' => $conversation_message->id))?>">Modifier cet objet Conversation Message</a></p>
 <?php

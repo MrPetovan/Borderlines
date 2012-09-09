@@ -11,6 +11,7 @@ class Conversation_Message_Model extends DBObject {
   protected $_receiver_id = null;
   protected $_text = null;
   protected $_created = null;
+  protected $_read = null;
 
   public function __construct($id = null) {
     parent::__construct($id);
@@ -20,6 +21,7 @@ class Conversation_Message_Model extends DBObject {
   public static function get_table_name() { return "conversation_message"; }
 
   public function get_created()    { return guess_time($this->_created);}
+  public function get_read()    { return guess_time($this->_read);}
 
   /* MUTATEURS */
   public function set_id($id) {
@@ -35,6 +37,7 @@ class Conversation_Message_Model extends DBObject {
     if( is_numeric($receiver_id) && (int)$receiver_id == $receiver_id) $data = intval($receiver_id); else $data = null; $this->_receiver_id = $data;
   }
   public function set_created($date) { $this->_created = guess_time($date, GUESS_DATE_MYSQL);}
+  public function set_read($date) { $this->_read = guess_time($date, GUESS_DATE_MYSQL);}
 
   /* FONCTIONS SQL */
 
@@ -92,17 +95,18 @@ WHERE `receiver_id` = ".mysql_ureal_escape_string($receiver_id);
         $option_list[ $conversation->id ] = $conversation->name;
 
       $return .= '
-      <p class="field">'.HTMLHelper::genererSelect('conversation_id', $option_list, $this->get_conversation_id(), array(), "Conversation Id *").'<a href="'.get_page_url('admin_conversation_mod').'">Créer un objet Conversation</a></p>
-        <p class="field">'.HTMLHelper::genererInputText('sender_id', $this->get_sender_id(), array(), "Sender Id").'</p>';
-      $option_list = array();
+      <p class="field">'.HTMLHelper::genererSelect('conversation_id', $option_list, $this->get_conversation_id(), array(), "Conversation Id *").'<a href="'.get_page_url('admin_conversation_mod').'">Créer un objet Conversation</a></p>';
+      $option_list = array(null => 'Pas de choix');
       $player_list = Player::db_get_all();
       foreach( $player_list as $player)
         $option_list[ $player->id ] = $player->name;
 
       $return .= '
-      <p class="field">'.HTMLHelper::genererSelect('receiver_id', $option_list, $this->get_receiver_id(), array(), "Receiver Id *").'<a href="'.get_page_url('admin_player_mod').'">Créer un objet Player</a></p>
+      <p class="field">'.HTMLHelper::genererSelect('sender_id', $option_list, $this->get_sender_id(), array(), "Sender Id").'<a href="'.get_page_url('admin_player_mod').'">Créer un objet Player</a></p>
+        <p class="field">'.HTMLHelper::genererInputText('receiver_id', $this->get_receiver_id(), array(), "Receiver Id *").'</p>
         <p class="field">'.HTMLHelper::genererInputText('text', $this->get_text(), array(), "Text *").'</p>
         <p class="field">'.HTMLHelper::genererInputText('created', $this->get_created(), array(), "Created *").'</p>
+        <p class="field">'.HTMLHelper::genererInputText('read', $this->get_read(), array(), "Read").'</p>
 
     </fieldset>';
 
