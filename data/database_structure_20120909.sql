@@ -42,11 +42,12 @@ CREATE TABLE `conversation` (
   `game_id` int(11) DEFAULT NULL,
   `subject` varchar(250) NOT NULL,
   `created` datetime NOT NULL,
+  `archived` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `player_id` (`player_id`),
   KEY `game_id` (`game_id`),
-  CONSTRAINT `conversation_ibfk_2` FOREIGN KEY (`game_id`) REFERENCES `game` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `conversation_ibfk_1` FOREIGN KEY (`player_id`) REFERENCES `player` (`id`) ON DELETE CASCADE
+  CONSTRAINT `conversation_ibfk_1` FOREIGN KEY (`player_id`) REFERENCES `player` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `conversation_ibfk_2` FOREIGN KEY (`game_id`) REFERENCES `game` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -221,7 +222,7 @@ CREATE TABLE `page` (
   `rewrite_pattern` varchar(255) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `code` (`code`)
-) ENGINE=InnoDB AUTO_INCREMENT=3786 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=3822 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -525,4 +526,4 @@ CREATE TABLE `world` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2012-09-09  1:15:03
+-- Dump completed on 2012-09-09  1:32:28

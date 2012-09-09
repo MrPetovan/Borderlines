@@ -41,6 +41,10 @@
             <p class="field">
               <span class="libelle">Created</span>
               <span class="value"><?php echo guess_time($conversation->created, GUESS_DATE_FR)?></span>
+            </p>
+            <p class="field">
+              <span class="libelle">Archived</span>
+              <span class="value"><?php echo guess_time($conversation->archived, GUESS_DATE_FR)?></span>
             </p>    </div>
     <p><a href="<?php echo get_page_url('admin_conversation_mod', true, array('id' => $conversation->id))?>">Modifier cet objet Conversation</a></p>
     <h4>Conversation Player</h4>

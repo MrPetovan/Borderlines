@@ -26,6 +26,7 @@
           <th>Game Id</th>
           <th>Subject</th>
           <th>Created</th>
+          <th>Archived</th>
         </tr>
       </thead>
       <tfoot>
@@ -49,6 +50,7 @@
           <td>'.$game_temp->name.'</td>
           <td>'.$conversation->subject.'</td>
           <td>'.guess_time($conversation->created, GUESS_DATE_LOCALE).'</td>
+          <td>'.guess_time($conversation->archived, GUESS_DATE_LOCALE).'</td>
           <td><a href="'.htmlentities_utf8(Page::get_url('admin_conversation_mod', array('id' => $conversation->id))).'"><img src="'.IMG.'img_html/pencil.png" alt="Modifier" title="Modifier"/></a></td>
         </tr>';
     }
