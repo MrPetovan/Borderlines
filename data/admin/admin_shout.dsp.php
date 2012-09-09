@@ -39,9 +39,9 @@
       echo '
         <tr>
           <td><input type="checkbox" name="shout_id[]" value="'.$shout->id.'"/></td>
-          <td><a href="'.htmlentities_utf8(Page::get_url('admin_shout_view', true, array('id' => $shout->id))).'">'.$shout->get_id().'</a></td>
+          <td><a href="'.htmlentities_utf8(Page::get_url('admin_shout_view', array('id' => $shout->id))).'">'.$shout->get_id().'</a></td>
 
-          <td>'.guess_time($shout->date_sent, GUESS_DATE_LOCALE).'</td>';
+          <td>'.guess_time($shout->date_sent, GUESS_TIME_LOCALE).'</td>';
       $player_temp = Player::instance( $shout->shouter_id);
       echo '
           <td>'.$player_temp->name.'</td>

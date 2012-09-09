@@ -35,7 +35,7 @@
       echo '
         <tr>
           <td><input type="checkbox" name="category_id[]" value="'.$category->id.'"/></td>
-          <td><a href="'.htmlentities_utf8(Page::get_url('admin_category_view', true, array('id' => $category->id))).'">'.$category->get_name().'</a></td>
+          <td><a href="'.htmlentities_utf8(Page::get_url('admin_category_view', array('id' => $category->id))).'">'.$category->get_name().'</a></td>
 
           <td><a href="'.htmlentities_utf8(Page::get_url('admin_category_mod', array('id' => $category->id))).'"><img src="'.IMG.'img_html/pencil.png" alt="Modifier" title="Modifier"/></a></td>
         </tr>';

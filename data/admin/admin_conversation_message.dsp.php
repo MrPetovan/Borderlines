@@ -41,7 +41,7 @@
       echo '
         <tr>
           <td><input type="checkbox" name="conversation_message_id[]" value="'.$conversation_message->id.'"/></td>
-          <td><a href="'.htmlentities_utf8(Page::get_url('admin_conversation_message_view', true, array('id' => $conversation_message->id))).'">'.$conversation_message->get_id().'</a></td>
+          <td><a href="'.htmlentities_utf8(Page::get_url('admin_conversation_message_view', array('id' => $conversation_message->id))).'">'.$conversation_message->get_id().'</a></td>
 ';
       $conversation_temp = Conversation::instance( $conversation_message->conversation_id);
       echo '
@@ -51,8 +51,8 @@
           <td>'.$player_temp->name.'</td>
           <td>'.$conversation_message->receiver_id.'</td>
           <td>'.$conversation_message->text.'</td>
-          <td>'.guess_time($conversation_message->created, GUESS_DATE_LOCALE).'</td>
-          <td>'.guess_time($conversation_message->read, GUESS_DATE_LOCALE).'</td>
+          <td>'.guess_time($conversation_message->created, GUESS_TIME_LOCALE).'</td>
+          <td>'.guess_time($conversation_message->read, GUESS_TIME_LOCALE).'</td>
           <td><a href="'.htmlentities_utf8(Page::get_url('admin_conversation_message_mod', array('id' => $conversation_message->id))).'"><img src="'.IMG.'img_html/pencil.png" alt="Modifier" title="Modifier"/></a></td>
         </tr>';
     }

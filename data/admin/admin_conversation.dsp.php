@@ -40,7 +40,7 @@
       echo '
         <tr>
           <td><input type="checkbox" name="conversation_id[]" value="'.$conversation->id.'"/></td>
-          <td><a href="'.htmlentities_utf8(Page::get_url('admin_conversation_view', true, array('id' => $conversation->id))).'">'.$conversation->get_id().'</a></td>
+          <td><a href="'.htmlentities_utf8(Page::get_url('admin_conversation_view', array('id' => $conversation->id))).'">'.$conversation->get_id().'</a></td>
 ';
       $player_temp = Player::instance( $conversation->player_id);
       echo '
@@ -49,8 +49,8 @@
       echo '
           <td>'.$game_temp->name.'</td>
           <td>'.$conversation->subject.'</td>
-          <td>'.guess_time($conversation->created, GUESS_DATE_LOCALE).'</td>
-          <td>'.guess_time($conversation->archived, GUESS_DATE_LOCALE).'</td>
+          <td>'.guess_time($conversation->created, GUESS_TIME_LOCALE).'</td>
+          <td>'.guess_time($conversation->archived, GUESS_TIME_LOCALE).'</td>
           <td><a href="'.htmlentities_utf8(Page::get_url('admin_conversation_mod', array('id' => $conversation->id))).'"><img src="'.IMG.'img_html/pencil.png" alt="Modifier" title="Modifier"/></a></td>
         </tr>';
     }

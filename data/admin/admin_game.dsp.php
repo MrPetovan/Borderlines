@@ -46,7 +46,7 @@
       echo '
         <tr>
           <td><input type="checkbox" name="game_id[]" value="'.$game->id.'"/></td>
-          <td><a href="'.htmlentities_utf8(Page::get_url('admin_game_view', true, array('id' => $game->id))).'">'.$game->get_name().'</a></td>
+          <td><a href="'.htmlentities_utf8(Page::get_url('admin_game_view', array('id' => $game->id))).'">'.$game->get_name().'</a></td>
 ';
       $world_temp = World::instance( $game->world_id);
       echo '
@@ -56,10 +56,10 @@
           <td>'.$game->turn_limit.'</td>
           <td>'.$game->min_players.'</td>
           <td>'.$game->max_players.'</td>
-          <td>'.guess_time($game->created, GUESS_DATE_LOCALE).'</td>
-          <td>'.guess_time($game->started, GUESS_DATE_LOCALE).'</td>
-          <td>'.guess_time($game->updated, GUESS_DATE_LOCALE).'</td>
-          <td>'.guess_time($game->ended, GUESS_DATE_LOCALE).'</td>';
+          <td>'.guess_time($game->created, GUESS_TIME_LOCALE).'</td>
+          <td>'.guess_time($game->started, GUESS_TIME_LOCALE).'</td>
+          <td>'.guess_time($game->updated, GUESS_TIME_LOCALE).'</td>
+          <td>'.guess_time($game->ended, GUESS_TIME_LOCALE).'</td>';
       $player_temp = Player::instance( $game->created_by);
       echo '
           <td>'.$player_temp->name.'</td>

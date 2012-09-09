@@ -46,7 +46,7 @@
       echo '
         <tr>
           <td><input type="checkbox" name="player_order_id[]" value="'.$player_order->id.'"/></td>
-          <td><a href="'.htmlentities_utf8(Page::get_url('admin_player_order_view', true, array('id' => $player_order->id))).'">'.$player_order->get_id().'</a></td>
+          <td><a href="'.htmlentities_utf8(Page::get_url('admin_player_order_view', array('id' => $player_order->id))).'">'.$player_order->get_id().'</a></td>
 ';
       $game_temp = Game::instance( $player_order->game_id);
       echo '
@@ -57,9 +57,9 @@
       $player_temp = Player::instance( $player_order->player_id);
       echo '
           <td>'.$player_temp->name.'</td>
-          <td>'.guess_time($player_order->datetime_order, GUESS_DATE_LOCALE).'</td>
-          <td>'.guess_time($player_order->datetime_scheduled, GUESS_DATE_LOCALE).'</td>
-          <td>'.guess_time($player_order->datetime_execution, GUESS_DATE_LOCALE).'</td>
+          <td>'.guess_time($player_order->datetime_order, GUESS_TIME_LOCALE).'</td>
+          <td>'.guess_time($player_order->datetime_scheduled, GUESS_TIME_LOCALE).'</td>
+          <td>'.guess_time($player_order->datetime_execution, GUESS_TIME_LOCALE).'</td>
           <td>'.$player_order->turn_ordered.'</td>
           <td>'.$player_order->turn_scheduled.'</td>
           <td>'.$player_order->turn_executed.'</td>

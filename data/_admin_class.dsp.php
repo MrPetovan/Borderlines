@@ -40,7 +40,7 @@ foreach( $table_columns as $column_name => $column_props ) {
       echo '
         <tr>
           <td><input type="checkbox" name="<?php echo $class_db_identifier?>_id[]" value="'.$<?php echo $class_db_identifier?>->id.'"/></td>
-          <td><a href="'.htmlentities_utf8(Page::get_url('admin_<?php echo $class_db_identifier?>_view', true, array('id' => $<?php echo $class_db_identifier?>->id))).'">'.$<?php echo $class_db_identifier?>->get_<?php echo $name_field?>().'</a></td>
+          <td><a href="'.htmlentities_utf8(Page::get_url('admin_<?php echo $class_db_identifier?>_view', array('id' => $<?php echo $class_db_identifier?>->id))).'">'.$<?php echo $class_db_identifier?>->get_<?php echo $name_field?>().'</a></td>
 <?php
 foreach( $table_columns as $column_name => $column_props ) {
   if( array_key_exists($column_name, $foreign_keys)) {
@@ -61,7 +61,7 @@ foreach( $table_columns as $column_name => $column_props ) {
       case 'time':
       case 'date':
         echo "
-          <td>'.guess_time($".$class_db_identifier."->".$column_name.", GUESS_DATE_LOCALE).'</td>";
+          <td>'.guess_time($".$class_db_identifier."->".$column_name.", GUESS_TIME_LOCALE).'</td>";
         break;
       case 'tinyint' :
         echo "
