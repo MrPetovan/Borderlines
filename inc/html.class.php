@@ -76,7 +76,11 @@
 
       return $return;
     }
-    
+
+    public static function button( $name = null, $valeur_defaut = null, $attributs = array(), $label_text = null ) {
+      return self::genererButton( $name, $valeur_defaut, $attributs, $label_text);
+    }
+
     public static function genererButton( $name = null, $valeur_defaut = null, $attributs = array(), $label_text = null )
     {
       $return = '';
