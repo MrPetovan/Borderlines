@@ -44,7 +44,7 @@ WHERE `member_id` = ".mysql_ureal_escape_string($member_id);
 
   public static function db_get_select_list( $with_null = false ) {
     $return = array();
-    
+
     if( $with_null ) {
         $return[ null ] = 'N/A';
     }
@@ -133,8 +133,8 @@ WHERE `player_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
     return mysql_fetch_to_array($res);
   }
 
-  public function set_conversation_player( $conversation_id, $archived, $left ) {
-    $sql = "REPLACE INTO `conversation_player` ( `conversation_id`, `player_id`, `archived`, `left` ) VALUES (".mysql_ureal_escape_string( $conversation_id, $this->get_id(), $archived, $left ).")";
+  public function set_conversation_player( $conversation_id, $archived = null, $left = null ) {
+    $sql = "REPLACE INTO `conversation_player` ( `conversation_id`, `player_id`, `archived`, `left` ) VALUES (".mysql_ureal_escape_string( $conversation_id, $this->get_id(), guess_time( $archived, GUESS_TIME_MYSQL ), guess_time( $left, GUESS_TIME_MYSQL ) ).")";
 
     return mysql_uquery($sql);
   }
@@ -197,8 +197,8 @@ WHERE `player_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
     return mysql_fetch_to_array($res);
   }
 
-  public function set_message_recipient( $message_id, $read ) {
-    $sql = "REPLACE INTO `message_recipient` ( `message_id`, `player_id`, `read` ) VALUES (".mysql_ureal_escape_string( $message_id, $this->get_id(), $read ).")";
+  public function set_message_recipient( $message_id, $read = null ) {
+    $sql = "REPLACE INTO `message_recipient` ( `message_id`, `player_id`, `read` ) VALUES (".mysql_ureal_escape_string( $message_id, $this->get_id(), guess_time( $read, GUESS_TIME_MYSQL ) ).")";
 
     return mysql_uquery($sql);
   }
@@ -271,8 +271,8 @@ WHERE `player_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
     return mysql_fetch_to_array($res);
   }
 
-  public function set_player_history( $game_id, $turn, $datetime, $reason, $territory_id ) {
-    $sql = "REPLACE INTO `player_history` ( `game_id`, `player_id`, `turn`, `datetime`, `reason`, `territory_id` ) VALUES (".mysql_ureal_escape_string( $game_id, $this->get_id(), $turn, $datetime, $reason, $territory_id ).")";
+  public function set_player_history( $game_id, $turn, $datetime, $reason, $territory_id = null ) {
+    $sql = "REPLACE INTO `player_history` ( `game_id`, `player_id`, `turn`, `datetime`, `reason`, `territory_id` ) VALUES (".mysql_ureal_escape_string( $game_id, $this->get_id(), $turn, guess_time( $datetime, GUESS_TIME_MYSQL ), $reason, $territory_id ).")";
 
     return mysql_uquery($sql);
   }
@@ -309,8 +309,8 @@ WHERE `player_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
     return mysql_fetch_to_array($res);
   }
 
-  public function set_player_resource_history( $game_id, $resource_id, $turn, $datetime, $delta, $reason, $player_order_id ) {
-    $sql = "REPLACE INTO `player_resource_history` ( `game_id`, `player_id`, `resource_id`, `turn`, `datetime`, `delta`, `reason`, `player_order_id` ) VALUES (".mysql_ureal_escape_string( $game_id, $this->get_id(), $resource_id, $turn, $datetime, $delta, $reason, $player_order_id ).")";
+  public function set_player_resource_history( $game_id, $resource_id, $turn, $datetime, $delta, $reason, $player_order_id = null ) {
+    $sql = "REPLACE INTO `player_resource_history` ( `game_id`, `player_id`, `resource_id`, `turn`, `datetime`, `delta`, `reason`, `player_order_id` ) VALUES (".mysql_ureal_escape_string( $game_id, $this->get_id(), $resource_id, $turn, guess_time( $datetime, GUESS_TIME_MYSQL ), $delta, $reason, $player_order_id ).")";
 
     return mysql_uquery($sql);
   }
@@ -349,8 +349,8 @@ WHERE `player_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
     return mysql_fetch_to_array($res);
   }
 
-  public function set_player_spygame_value( $game_id, $value_guid, $turn, $datetime, $real_value, $masked_value ) {
-    $sql = "REPLACE INTO `player_spygame_value` ( `game_id`, `player_id`, `value_guid`, `turn`, `datetime`, `real_value`, `masked_value` ) VALUES (".mysql_ureal_escape_string( $game_id, $this->get_id(), $value_guid, $turn, $datetime, $real_value, $masked_value ).")";
+  public function set_player_spygame_value( $game_id, $value_guid, $turn, $datetime, $real_value, $masked_value = null ) {
+    $sql = "REPLACE INTO `player_spygame_value` ( `game_id`, `player_id`, `value_guid`, `turn`, `datetime`, `real_value`, `masked_value` ) VALUES (".mysql_ureal_escape_string( $game_id, $this->get_id(), $value_guid, $turn, guess_time( $datetime, GUESS_TIME_MYSQL ), $real_value, $masked_value ).")";
 
     return mysql_uquery($sql);
   }

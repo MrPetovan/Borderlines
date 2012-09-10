@@ -52,7 +52,7 @@ WHERE `game_id` = ".mysql_ureal_escape_string($game_id);
 
   public static function db_get_select_list( $with_null = false ) {
     $return = array();
-    
+
     if( $with_null ) {
         $return[ null ] = 'N/A';
     }
@@ -150,8 +150,8 @@ WHERE `conversation_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
     return mysql_fetch_to_array($res);
   }
 
-  public function set_conversation_player( $player_id, $archived, $left ) {
-    $sql = "REPLACE INTO `conversation_player` ( `conversation_id`, `player_id`, `archived`, `left` ) VALUES (".mysql_ureal_escape_string( $this->get_id(), $player_id, $archived, $left ).")";
+  public function set_conversation_player( $player_id, $archived = null, $left = null ) {
+    $sql = "REPLACE INTO `conversation_player` ( `conversation_id`, `player_id`, `archived`, `left` ) VALUES (".mysql_ureal_escape_string( $this->get_id(), $player_id, guess_time( $archived, GUESS_TIME_MYSQL ), guess_time( $left, GUESS_TIME_MYSQL ) ).")";
 
     return mysql_uquery($sql);
   }

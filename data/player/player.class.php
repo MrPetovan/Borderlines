@@ -180,7 +180,7 @@ LIMIT 0,1';
           $game->id,
           $value_guid,
           $game->current_turn,
-          guess_time( time(), GUESS_TIME_MYSQL ),
+          time(),
           $real_value,
           $value
         );

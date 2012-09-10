@@ -96,7 +96,7 @@ WHERE `'.$column_name.'` = ".mysql_ureal_escape_string($'.$column_name.');
 
   public static function db_get_select_list( $with_null = false ) {
     $return = array();
-    
+
     if( $with_null ) {
         $return[ null ] = 'N/A';
     }
@@ -239,11 +239,17 @@ AND `'.$field.'` = \'.mysql_ureal_escape_string($'.$field.');';
 
       if( $field_name == $sub_table_field ) {
         $sql_insert[] = '$this->get_id()';
-
       }else {
-        $add_param_list[] = '$'.$field_name;
-        $sql_insert[] = '$'.$field_name;
-
+        if( $field['Null'] == 'NO' ) {
+          $add_param_list[] = '$'.$field_name;
+        }else {
+          $add_param_list[] = '$'.$field_name.' = null';
+        }
+        if( in_array($field['SimpleType'], array('time', 'timestamp', 'date', 'datetime'))) {
+          $sql_insert[] = 'guess_time( $'.$field_name.', GUESS_TIME_MYSQL )';
+        }else {
+          $sql_insert[] = '$'.$field_name;
+        }
       }
 
       if( in_array( $field_name, $sub_table_pk ) ) {
