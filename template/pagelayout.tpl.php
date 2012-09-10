@@ -16,6 +16,7 @@
         <ul>
           <li><a href="<?php echo Page::get_page_url('dashboard') ?>">Play</a></li>
           <li><a href="<?php echo Page::get_page_url('game_list') ?>">Games</a></li>
+          <li><a href="<?php echo Page::get_page_url('conversation_list') ?>">Conversations</a></li>
           <li><a href="<?php echo Page::get_page_url('mon-compte') ?>">Account</a></li>
           <li><a href="<?php echo Page::get_page_url('logout') ?>">Logout</a></li>
         </ul>
@@ -38,15 +39,15 @@
         </ul>
       </nav>
 <?php } ?>
-      
-      
+
+
     </header>
     <section id="main">
 <?php
   $messages['error'] = Page::get_message(Page::PAGE_MESSAGE_ERROR);
   $messages['warning'] = Page::get_message(Page::PAGE_MESSAGE_WARNING);
   $messages['notice'] = Page::get_message(Page::PAGE_MESSAGE_NOTICE);
-  
+
   if( count( $messages['error'] ) || count( $messages['warning'] ) || count( $messages['notice'] ) ) {
     echo '
       <div id="messages">';
