@@ -3,7 +3,7 @@
 
   $tab_visible = array('0' => 'Non', '1' => 'Oui');
 
-  $form_url = get_page_url($PAGE_CODE).'&id='.$order_type->id;
+  $form_url = get_page_url(PAGE_CODE).'&id='.$order_type->id;
   $PAGE_TITRE = 'Order Type : Showing "'.$order_type->name.'"';
 ?>
 <div class="texte_contenu">

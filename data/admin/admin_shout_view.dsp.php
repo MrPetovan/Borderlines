@@ -3,7 +3,7 @@
 
   $tab_visible = array('0' => 'Non', '1' => 'Oui');
 
-  $form_url = get_page_url($PAGE_CODE).'&id='.$shout->id;
+  $form_url = get_page_url(PAGE_CODE).'&id='.$shout->id;
   $PAGE_TITRE = 'Shout : Showing "'.$shout->id.'"';
 ?>
 <div class="texte_contenu">

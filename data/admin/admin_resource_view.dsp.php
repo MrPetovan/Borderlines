@@ -3,7 +3,7 @@
 
   $tab_visible = array('0' => 'Non', '1' => 'Oui');
 
-  $form_url = get_page_url($PAGE_CODE).'&id='.$resource->id;
+  $form_url = get_page_url(PAGE_CODE).'&id='.$resource->id;
   $PAGE_TITRE = 'Resource : Showing "'.$resource->name.'"';
 ?>
 <div class="texte_contenu">
@@ -90,19 +90,19 @@
         </p>
         <p class="field">
           <?php echo HTMLHelper::genererInputText('turn', null, array(), 'Turn*' )?>
-           
+          
         </p>
         <p class="field">
           <?php echo HTMLHelper::genererInputText('datetime', null, array(), 'Datetime*' )?>
-          <span><?php echo guess_time(time(), GUESS_TIME_MYSQL)?></span> 
+          <span><?php echo guess_time(time(), GUESS_TIME_MYSQL)?></span>
         </p>
         <p class="field">
           <?php echo HTMLHelper::genererInputText('delta', null, array(), 'Delta*' )?>
-           
+          
         </p>
         <p class="field">
           <?php echo HTMLHelper::genererInputText('reason', null, array(), 'Reason*' )?>
-           
+          
         </p>
         <p class="field">
           <?php echo HTMLHelper::genererSelect('player_order_id', $liste_valeurs_player_order, null, array(), 'Player Order' )?><a href="<?php echo get_page_url('admin_player_order_mod')?>">Créer un objet Player Order</a>

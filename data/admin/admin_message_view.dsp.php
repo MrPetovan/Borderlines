@@ -3,7 +3,7 @@
 
   $tab_visible = array('0' => 'Non', '1' => 'Oui');
 
-  $form_url = get_page_url($PAGE_CODE).'&id='.$message->id;
+  $form_url = get_page_url(PAGE_CODE).'&id='.$message->id;
   $PAGE_TITRE = 'Message : Showing "'.$message->id.'"';
 ?>
 <div class="texte_contenu">
@@ -97,7 +97,7 @@
         </p>
         <p class="field">
           <?php echo HTMLHelper::genererInputText('read', null, array(), 'Read' )?>
-          <span><?php echo guess_time(time(), GUESS_TIME_MYSQL)?></span> 
+          <span><?php echo guess_time(time(), GUESS_TIME_MYSQL)?></span>
         </p>
         <p><?php echo HTMLHelper::genererButton('action',  'set_message_recipient', array('type' => 'submit'), 'Ajouter un élément')?></p>
       </fieldset>

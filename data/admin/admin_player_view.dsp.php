@@ -3,7 +3,7 @@
 
   $tab_visible = array('0' => 'Non', '1' => 'Oui');
 
-  $form_url = get_page_url($PAGE_CODE).'&id='.$player->id;
+  $form_url = get_page_url(PAGE_CODE).'&id='.$player->id;
   $PAGE_TITRE = 'Player : Showing "'.$player->name.'"';
 ?>
 <div class="texte_contenu">
@@ -84,11 +84,11 @@
         </p>
         <p class="field">
           <?php echo HTMLHelper::genererInputText('archived', null, array(), 'Archived' )?>
-          <span><?php echo guess_time(time(), GUESS_TIME_MYSQL)?></span> 
+          <span><?php echo guess_time(time(), GUESS_TIME_MYSQL)?></span>
         </p>
         <p class="field">
           <?php echo HTMLHelper::genererInputText('left', null, array(), 'Left' )?>
-          <span><?php echo guess_time(time(), GUESS_TIME_MYSQL)?></span> 
+          <span><?php echo guess_time(time(), GUESS_TIME_MYSQL)?></span>
         </p>
         <p><?php echo HTMLHelper::genererButton('action',  'set_conversation_player', array('type' => 'submit'), 'Ajouter un élément')?></p>
       </fieldset>
@@ -147,7 +147,7 @@
         </p>
         <p class="field">
           <?php echo HTMLHelper::genererInputText('turn_ready', null, array(), 'Turn Ready*' )?>
-           
+          
         </p>
         <p><?php echo HTMLHelper::genererButton('action',  'set_game_player', array('type' => 'submit'), 'Ajouter un élément')?></p>
       </fieldset>
@@ -206,7 +206,7 @@
         </p>
         <p class="field">
           <?php echo HTMLHelper::genererInputText('read', null, array(), 'Read' )?>
-          <span><?php echo guess_time(time(), GUESS_TIME_MYSQL)?></span> 
+          <span><?php echo guess_time(time(), GUESS_TIME_MYSQL)?></span>
         </p>
         <p><?php echo HTMLHelper::genererButton('action',  'set_message_recipient', array('type' => 'submit'), 'Ajouter un élément')?></p>
       </fieldset>
@@ -271,15 +271,15 @@
         </p>
         <p class="field">
           <?php echo HTMLHelper::genererInputText('turn', null, array(), 'Turn*' )?>
-           
+          
         </p>
         <p class="field">
           <?php echo HTMLHelper::genererInputText('to_player_id', null, array(), 'To Player Id*' )?>
-           
+          
         </p>
         <p class="field">
           <?php echo HTMLHelper::genererInputText('status', null, array(), 'Status*' )?>
-           
+          
         </p>
         <p><?php echo HTMLHelper::genererButton('action',  'set_player_diplomacy', array('type' => 'submit'), 'Ajouter un élément')?></p>
       </fieldset>
@@ -347,15 +347,15 @@
         </p>
         <p class="field">
           <?php echo HTMLHelper::genererInputText('turn', null, array(), 'Turn*' )?>
-           
+          
         </p>
         <p class="field">
           <?php echo HTMLHelper::genererInputText('datetime', null, array(), 'Datetime*' )?>
-          <span><?php echo guess_time(time(), GUESS_TIME_MYSQL)?></span> 
+          <span><?php echo guess_time(time(), GUESS_TIME_MYSQL)?></span>
         </p>
         <p class="field">
           <?php echo HTMLHelper::genererInputText('reason', null, array(), 'Reason*' )?>
-           
+          
         </p>
         <p class="field">
           <?php echo HTMLHelper::genererSelect('territory_id', $liste_valeurs_territory, null, array(), 'Territory' )?><a href="<?php echo get_page_url('admin_territory_mod')?>">Créer un objet Territory</a>
@@ -436,19 +436,19 @@
         </p>
         <p class="field">
           <?php echo HTMLHelper::genererInputText('turn', null, array(), 'Turn*' )?>
-           
+          
         </p>
         <p class="field">
           <?php echo HTMLHelper::genererInputText('datetime', null, array(), 'Datetime*' )?>
-          <span><?php echo guess_time(time(), GUESS_TIME_MYSQL)?></span> 
+          <span><?php echo guess_time(time(), GUESS_TIME_MYSQL)?></span>
         </p>
         <p class="field">
           <?php echo HTMLHelper::genererInputText('delta', null, array(), 'Delta*' )?>
-           
+          
         </p>
         <p class="field">
           <?php echo HTMLHelper::genererInputText('reason', null, array(), 'Reason*' )?>
-           
+          
         </p>
         <p class="field">
           <?php echo HTMLHelper::genererSelect('player_order_id', $liste_valeurs_player_order, null, array(), 'Player Order' )?><a href="<?php echo get_page_url('admin_player_order_mod')?>">Créer un objet Player Order</a>
@@ -520,23 +520,23 @@
         </p>
         <p class="field">
           <?php echo HTMLHelper::genererInputText('value_guid', null, array(), 'Value Guid*' )?>
-           
+          
         </p>
         <p class="field">
           <?php echo HTMLHelper::genererInputText('turn', null, array(), 'Turn*' )?>
-           
+          
         </p>
         <p class="field">
           <?php echo HTMLHelper::genererInputText('datetime', null, array(), 'Datetime*' )?>
-          <span><?php echo guess_time(time(), GUESS_TIME_MYSQL)?></span> 
+          <span><?php echo guess_time(time(), GUESS_TIME_MYSQL)?></span>
         </p>
         <p class="field">
           <?php echo HTMLHelper::genererInputText('real_value', null, array(), 'Real Value*' )?>
-           
+          
         </p>
         <p class="field">
           <?php echo HTMLHelper::genererInputText('masked_value', null, array(), 'Masked Value' )?>
-           
+          
         </p>
         <p><?php echo HTMLHelper::genererButton('action',  'set_player_spygame_value', array('type' => 'submit'), 'Ajouter un élément')?></p>
       </fieldset>
@@ -608,15 +608,15 @@
         </p>
         <p class="field">
           <?php echo HTMLHelper::genererInputText('turn', null, array(), 'Turn*' )?>
-           
+          
         </p>
         <p class="field">
           <?php echo HTMLHelper::genererInputText('contested', null, array(), 'Contested*' )?>
-           
+          
         </p>
         <p class="field">
           <?php echo HTMLHelper::genererInputText('capital', null, array(), 'Capital*' )?>
-           
+          
         </p>
         <p><?php echo HTMLHelper::genererButton('action',  'set_territory_owner', array('type' => 'submit'), 'Ajouter un élément')?></p>
       </fieldset>
@@ -683,14 +683,14 @@
         </p>
         <p class="field">
           <?php echo HTMLHelper::genererInputText('turn', null, array(), 'Turn*' )?>
-           
+          
         </p>
         <p class="field">
           <?php echo HTMLHelper::genererSelect('territory_id', $liste_valeurs_territory, null, array(), 'Territory' )?><a href="<?php echo get_page_url('admin_territory_mod')?>">Créer un objet Territory</a>
         </p>
         <p class="field">
           <?php echo HTMLHelper::genererInputText('quantity', null, array(), 'Quantity*' )?>
-           
+          
         </p>
         <p><?php echo HTMLHelper::genererButton('action',  'set_territory_player_troops', array('type' => 'submit'), 'Ajouter un élément')?></p>
       </fieldset>

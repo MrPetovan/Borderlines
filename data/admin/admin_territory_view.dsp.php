@@ -3,7 +3,7 @@
 
   $tab_visible = array('0' => 'Non', '1' => 'Oui');
 
-  $form_url = get_page_url($PAGE_CODE).'&id='.$territory->id;
+  $form_url = get_page_url(PAGE_CODE).'&id='.$territory->id;
   $PAGE_TITRE = 'Territory : Showing "'.$territory->name.'"';
 ?>
 <div class="texte_contenu">
@@ -98,15 +98,15 @@
         </p>
         <p class="field">
           <?php echo HTMLHelper::genererInputText('turn', null, array(), 'Turn*' )?>
-           
+          
         </p>
         <p class="field">
           <?php echo HTMLHelper::genererInputText('datetime', null, array(), 'Datetime*' )?>
-          <span><?php echo guess_time(time(), GUESS_TIME_MYSQL)?></span> 
+          <span><?php echo guess_time(time(), GUESS_TIME_MYSQL)?></span>
         </p>
         <p class="field">
           <?php echo HTMLHelper::genererInputText('reason', null, array(), 'Reason*' )?>
-           
+          
         </p>
         <p><?php echo HTMLHelper::genererButton('action',  'set_player_history', array('type' => 'submit'), 'Ajouter un élément')?></p>
       </fieldset>
@@ -165,7 +165,7 @@
         </p>
         <p class="field">
           <?php echo HTMLHelper::genererInputText('percentage', null, array(), 'Percentage*' )?>
-           
+          
         </p>
         <p><?php echo HTMLHelper::genererButton('action',  'set_territory_criterion', array('type' => 'submit'), 'Ajouter un élément')?></p>
       </fieldset>
@@ -217,7 +217,7 @@
         <legend>Ajouter un élément</legend>
         <p class="field">
           <?php echo HTMLHelper::genererInputText('neighbour_id', null, array(), 'Neighbour Id*' )?>
-           
+          
         </p>
         <p><?php echo HTMLHelper::genererButton('action',  'set_territory_neighbour', array('type' => 'submit'), 'Ajouter un élément')?></p>
       </fieldset>
@@ -286,18 +286,18 @@
         </p>
         <p class="field">
           <?php echo HTMLHelper::genererInputText('turn', null, array(), 'Turn*' )?>
-           
+          
         </p>
         <p class="field">
           <?php echo HTMLHelper::genererSelect('owner_id', $liste_valeurs_player, null, array(), 'Player' )?><a href="<?php echo get_page_url('admin_player_mod')?>">Créer un objet Player</a>
         </p>
         <p class="field">
           <?php echo HTMLHelper::genererInputText('contested', null, array(), 'Contested*' )?>
-           
+          
         </p>
         <p class="field">
           <?php echo HTMLHelper::genererInputText('capital', null, array(), 'Capital*' )?>
-           
+          
         </p>
         <p><?php echo HTMLHelper::genererButton('action',  'set_territory_owner', array('type' => 'submit'), 'Ajouter un élément')?></p>
       </fieldset>
@@ -364,14 +364,14 @@
         </p>
         <p class="field">
           <?php echo HTMLHelper::genererInputText('turn', null, array(), 'Turn*' )?>
-           
+          
         </p>
         <p class="field">
           <?php echo HTMLHelper::genererSelect('player_id', $liste_valeurs_player, null, array(), 'Player' )?><a href="<?php echo get_page_url('admin_player_mod')?>">Créer un objet Player</a>
         </p>
         <p class="field">
           <?php echo HTMLHelper::genererInputText('quantity', null, array(), 'Quantity*' )?>
-           
+          
         </p>
         <p><?php echo HTMLHelper::genererButton('action',  'set_territory_player_troops', array('type' => 'submit'), 'Ajouter un élément')?></p>
       </fieldset>

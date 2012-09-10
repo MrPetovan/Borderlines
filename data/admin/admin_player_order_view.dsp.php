@@ -3,7 +3,7 @@
 
   $tab_visible = array('0' => 'Non', '1' => 'Oui');
 
-  $form_url = get_page_url($PAGE_CODE).'&id='.$player_order->id;
+  $form_url = get_page_url(PAGE_CODE).'&id='.$player_order->id;
   $PAGE_TITRE = 'Player Order : Showing "'.$player_order->id.'"';
 ?>
 <div class="texte_contenu">
@@ -154,19 +154,19 @@
         </p>
         <p class="field">
           <?php echo HTMLHelper::genererInputText('turn', null, array(), 'Turn*' )?>
-           
+          
         </p>
         <p class="field">
           <?php echo HTMLHelper::genererInputText('datetime', null, array(), 'Datetime*' )?>
-          <span><?php echo guess_time(time(), GUESS_TIME_MYSQL)?></span> 
+          <span><?php echo guess_time(time(), GUESS_TIME_MYSQL)?></span>
         </p>
         <p class="field">
           <?php echo HTMLHelper::genererInputText('delta', null, array(), 'Delta*' )?>
-           
+          
         </p>
         <p class="field">
           <?php echo HTMLHelper::genererInputText('reason', null, array(), 'Reason*' )?>
-           
+          
         </p>
         <p><?php echo HTMLHelper::genererButton('action',  'set_player_resource_history', array('type' => 'submit'), 'Ajouter un élément')?></p>
       </fieldset>

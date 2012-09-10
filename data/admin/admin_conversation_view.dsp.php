@@ -3,7 +3,7 @@
 
   $tab_visible = array('0' => 'Non', '1' => 'Oui');
 
-  $form_url = get_page_url($PAGE_CODE).'&id='.$conversation->id;
+  $form_url = get_page_url(PAGE_CODE).'&id='.$conversation->id;
   $PAGE_TITRE = 'Conversation : Showing "'.$conversation->id.'"';
 ?>
 <div class="texte_contenu">
@@ -99,11 +99,11 @@
         </p>
         <p class="field">
           <?php echo HTMLHelper::genererInputText('archived', null, array(), 'Archived' )?>
-          <span><?php echo guess_time(time(), GUESS_TIME_MYSQL)?></span> 
+          <span><?php echo guess_time(time(), GUESS_TIME_MYSQL)?></span>
         </p>
         <p class="field">
           <?php echo HTMLHelper::genererInputText('left', null, array(), 'Left' )?>
-          <span><?php echo guess_time(time(), GUESS_TIME_MYSQL)?></span> 
+          <span><?php echo guess_time(time(), GUESS_TIME_MYSQL)?></span>
         </p>
         <p><?php echo HTMLHelper::genererButton('action',  'set_conversation_player', array('type' => 'submit'), 'Ajouter un élément')?></p>
       </fieldset>
