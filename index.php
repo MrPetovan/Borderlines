@@ -74,7 +74,7 @@
 
   //Includes classes
   require_once('data/db_object.class.php');
-  
+
   require_once( DATA.'order_type/iorder.php');
   require_once( INC.'borderlines.inc.php');
 
@@ -92,17 +92,14 @@
     }
     if(isset($_GET[PARAM_PAGE])) {
       $PAGE_CODE = $_GET[PARAM_PAGE];
+      unset($_GET[PARAM_PAGE]);
     }else {
       $PAGE_CODE = PAGE_DEFAUT;
     }
 
-    if(isset($_POST) && count($_POST)) {
-      $flag_action = true;
-    }
     $CURRENT_PAGE = Page::db_get_page_by_code( $PAGE_CODE );
 
     if($CURRENT_PAGE) {
-
       //Origin & Mail
       $redirect = false;
 
@@ -115,7 +112,6 @@
 
         $_SESSION['origin'] = $_GET['origin'];
         unset($_GET['origin']);
-        unset($_GET[PARAM_PAGE]);
       }
       if(isset($_GET['email']) && !Member::get_logged_user()) {
         if($member = Member::db_get_membre_by_email($_GET['email'])) {
@@ -130,7 +126,6 @@
       if($redirect) {
         redirect(get_page_url($PAGE_CODE, true, $_GET));
       }
-
 
       //TPL
       if(!$CURRENT_PAGE->get_tpl()) {
@@ -153,11 +148,12 @@
     }else {
       $PAGE_CODE = PAGE_ERROR;
       $CURRENT_PAGE = Page::db_get_page_by_code( $PAGE_CODE );
-      $flag_action = false;
     }
   }
 
   $CURRENT_USER = Member::get_current_user();
+
+  setlocale( LC_TIME, 'en_US.UTF8');
 
   define('PAGE_CODE', $PAGE_CODE);
   // ACT
@@ -166,8 +162,6 @@
   }
 
   //DSP
-  // error_log('[Geo] index.php page='.$PAGE_CODE.' '.var_export($CURRENT_PAGE,true));
-
   if($CURRENT_PAGE->get_dsp()) {
     $PAGE_TITRE = '';
     $PAGE_CONTENU = '';
@@ -177,7 +171,6 @@
     $PAGE_CONTENU = ob_get_clean();
 
     include(TPL.$CURRENT_PAGE->get_tpl_file());
-
   }
 
   if(DEBUG_SQL){
