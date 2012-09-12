@@ -262,7 +262,8 @@ class Game extends Game_Model {
           }
         }
 
-        $ratio = -$area * 0.00002 + 2;
+        $ratio = -$area * 0.00002 + 3;
+        if( $ratio < 1 ) $ratio = 1;
 
         $revenue = round( $area * $ratio );
 
@@ -273,7 +274,8 @@ class Game extends Game_Model {
           "You got a revenue of ".$revenue,
           null);
         $troops_maintenance = 0;
-        foreach( $player->get_territory_player_troops_list($this->id, $current_turn) as $territory_player_troops_row ) {
+        $troops_list = $player->get_territory_player_troops_list($this->id, $current_turn);
+        foreach( $troops_list as $territory_player_troops_row ) {
           $is_home = true;
 
           foreach( $territory_previous_owner_list as $territory_previous_owner_row ) {
@@ -289,6 +291,41 @@ class Game extends Game_Model {
           }else {
             $troops_maintenance += $territory_player_troops_row['quantity'] * self::AWAY_TROOPS_MAINTENANCE;
           }
+        }
+
+        // Desertion
+        if( $troops_maintenance <= $revenue ) {
+          $this->set_player_history(
+            $player->id,
+            $next_turn,
+            time(),
+            "You spent ".$troops_maintenance." to maintain your troops",
+            null
+          );
+        }else {
+          $this->set_player_history(
+            $player->id,
+            $next_turn,
+            time(),
+            "Desertion ! You need to spend ".$troops_maintenance." to maintain your troops but you don't have enough revenue",
+            null
+          );
+          $ratio_desertion = 1 - $revenue / $troops_maintenance;
+          $troops_list = $player->get_territory_player_troops_list($this->id, $next_turn);
+          foreach( $troops_list as $troops_row ) {
+            $territory = Territory::instance($troops_row['territory_id']);
+            $deserters = floor( $troops_row['quantity'] * $ratio_desertion );
+            $player->set_territory_player_troops($this->id, $next_turn, $troops_row['territory_id'], $troops_row['quantity'] - $deserters);
+            $this->set_player_history(
+              $player->id,
+              $next_turn,
+              time(),
+              $deserters." troops deserted",
+              $troops_row['territory_id']
+            );
+          }
+
+          $troops_maintenance = $revenue;
         }
 
         $this->set_player_history(
@@ -309,14 +346,16 @@ class Game extends Game_Model {
             $next_turn,
             time(),
             "You recruited ".$troops_recruited." new troops at your capital",
-            $capital_id);
+            $capital_id
+          );
         }else {
           $this->set_player_history(
             $player->id,
             $next_turn,
             time(),
             "You don't have any capital this turn, recruitement cancelled !",
-            $capital_id);
+            null
+          );
         }
       }
 
