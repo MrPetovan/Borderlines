@@ -7,9 +7,18 @@
         break;
     }
   }
-  
+
   // CUSTOM
 
-  //Custom content
+  if(!is_null(getValue('action'))) {
+    switch( getValue('action') ) {
+      case 'generate': {
+        $world->initialize_territories();
+        break;
+      }
+       default:
+        break;
+    }
+  }
 
   // /CUSTOM

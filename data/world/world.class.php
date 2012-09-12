@@ -35,13 +35,13 @@ class World extends World_Model {
 
       $this->territories = Territory::find_in_graph( $graph );
 
-      foreach( $this->territories as $territory ) {
+      foreach( $this->get_territories() as $territory ) {
         $territory->world_id = $this->id;
         $territory->save();
       }
 
       $neighbour_array = array();
-      foreach( $this->territories as $territory ) {
+      foreach( $this->get_territories() as $territory ) {
         $vertices = $territory->vertices;
         $currentVertex = array_shift( $vertices );
         $vertices[] = $currentVertex;
@@ -110,7 +110,7 @@ class World extends World_Model {
     for($iw=1; $iw < $this->size_x / $divisor; $iw++){imageline($img, $iw * $divisor, 0, $iw * $divisor, $this->size_x, $white);}
     for($ih=1; $ih < $this->size_y / $divisor; $ih++){imageline($img, 0, $ih * $divisor, $this->size_x, $ih * $divisor, $white);}
 
-    foreach( $this->territories as $key => $area ) {
+    foreach( $this->get_territories() as $key => $area ) {
       $polygon = array();
       foreach( $area->vertices as $pointAire ) {
         $polygon[] = $pointAire->x;
@@ -118,7 +118,7 @@ class World extends World_Model {
       }
       imagefilledpolygon( $img, $polygon, count( $area->vertices ), $earth );
     }
-    foreach( $this->territories as $key => $area ) {
+    foreach( $this->get_territories() as $key => $area ) {
       $lastPoint = $area->vertices[ count( $area ) - 1 ];
       foreach( $area->vertices as $point ) {
         imageline($img, $lastPoint->x, $this->size_y - $lastPoint->y, $point->x, $this->size_y - $point->y, $sand);
@@ -126,7 +126,7 @@ class World extends World_Model {
         $lastPoint = $point;
       }
     }
-    foreach( $this->territories as $key => $area ) {
+    foreach( $this->get_territories() as $key => $area ) {
       $centroid = $area->get_centroid();
 
       $name = $area->name;
@@ -158,7 +158,7 @@ class World extends World_Model {
     if( $with_map ) {
       echo '
       <map name="world">';
-      foreach( $this->territories as $territory ) {
+      foreach( $this->get_territories() as $territory ) {
         $coords = array();
         foreach( $territory->vertices as $vertex ) {
           $coords[] = $vertex->x .','. ($this->size_y - $vertex->y);
