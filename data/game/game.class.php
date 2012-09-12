@@ -249,20 +249,22 @@ class Game extends Game_Model {
       // Revenues and recruit
       foreach( $player_list as $player ) {
         $capital_id = null;
-        $revenue = 0;
+        $area = 0;
         $territory_previous_owner_list = $player->get_territory_owner_list(null, $this->id, $current_turn);
         foreach( $territory_previous_owner_list as $territory_owner_row ) {
 
           if( !$territory_owner_row['contested'] ) {
             $territory = Territory::instance($territory_owner_row['territory_id']);
-            $revenue += $territory->get_area();
+            $area += $territory->get_area();
           }
           if( $territory_owner_row['capital'] ) {
             $capital_id = $territory_owner_row['territory_id'];
           }
         }
 
-        $revenue = round( $revenue );
+        $ratio = -$area * 0.00002 + 2;
+
+        $revenue = round( $area * $ratio );
 
         $this->set_player_history(
           $player->id,
