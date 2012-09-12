@@ -1,7 +1,6 @@
 <?php
   $PAGE_TITRE = 'World : Showing "'.$world->name.'"';
 
-  $territories = $world->territories;
 ?>
 <h2>Showing "<?php echo $world->name?>"</h2>
 <div class="informations formulaire">
