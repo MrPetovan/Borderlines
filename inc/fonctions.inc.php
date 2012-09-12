@@ -396,7 +396,7 @@ function guess_date($date, $return_flag = GUESS_DATE_TIMESTAMP) {
       $data_input = false;
     }
   }
-  
+
   if($data_input !== false) {
     $return = $date;
     if(isset($array_actions[$data_input][$return_flag])) {
@@ -923,7 +923,7 @@ function which_os ()
       $ret = urldecode(preg_replace('/((\%5C0+)|(\%00+))/i', '', urlencode($ret)));
     return !is_string($ret)? $ret : stripslashes($ret);
   }
-  
+
   /**
    * Generates a random gaussian number
    *
@@ -936,5 +936,18 @@ function which_os ()
       ( mt_rand() / $randmax * 2 - 1 ) +
       ( mt_rand() / $randmax * 2 - 1 );
   }
+
+  /*
+   * Convert an integer to a string of uppercase letters (A-Z, AA-ZZ, AAA-ZZZ, etc.)
+   *
+   * @see http://stackoverflow.com/questions/5554369/php-how-to-output-list-like-this-aa-ab-ac-all-the-way-to-zzzy-zzzz-zzzza
+   */
+  function num2alpha($n)
+  {
+      for($r = ""; $n >= 0; $n = intval($n / 26) - 1)
+          $r = chr($n%26 + 0x41) . $r;
+      return $r;
+  }
+
 
 ?>

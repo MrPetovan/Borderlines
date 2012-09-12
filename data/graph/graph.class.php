@@ -82,8 +82,6 @@ class Graph {
 
     $initialVertex = reset( $this->vertices );
 
-    for( $i = 65; $i < 91; $i++ ) $letters[] = chr( $i );
-    for( $i = 97; $i < 123; $i++ ) $letters[] = chr( $i );
     $i = 0;
 
     // Vertex creation procedure
@@ -93,7 +91,7 @@ class Graph {
       $x = rand(0, $sizeX - 1);
       $y = rand(0, $sizeY - 1);
 
-      $vertex = new Vertex( $x, $y, $letters[ $i ] );
+      $vertex = new Vertex( $x, $y, num2alpha( $i ) );
 
       $vertexCreationFlag = false;
 
