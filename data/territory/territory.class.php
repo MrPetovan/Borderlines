@@ -33,7 +33,9 @@ class Territory extends Territory_Model {
     fclose($fh);
 
     // header line
-    unset( $countries[ 0 ] );
+    $countries = array_reverse($countries);
+    array_pop( $countries );
+    $countries = array_reverse($countries);
 
     return self::get_random_name( $countries );
   }
