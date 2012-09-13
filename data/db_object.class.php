@@ -56,7 +56,7 @@
      */
     public static function instance( $id = null ) {
       $class = get_called_class ( );
-    
+
       if( !is_null( $id )) {
         //$array = debug_backtrace();
 
@@ -188,7 +188,7 @@
      */
     public static function db_exists($id){
       $return = false;
-      
+
       $sql = "SELECT * FROM `".static::get_table_name()."` WHERE `id` = ".mysql_ureal_escape_string($id);
 
       $res = mysql_uquery($sql);
@@ -283,7 +283,7 @@
       }
       return $return;
     }
-    
+
     /**
      * Standard database write function. Check object validity given flags,
      * create the object in database if it did not exist or update it if it
@@ -374,9 +374,9 @@ WHERE `id` = ".mysql_ureal_escape_string($this->get_id());
       if( !$include_inactive && property_exists( get_called_class(), '_active' ) ) {
         $where = 'WHERE `active` = 1';
       }
-      
+
       $sql = $sql."\n".$where."\n".$order_by;
-      
+
       if(!is_null($page) && is_numeric($page)) {
         $start = ($page - 1) * $limit;
         $sql .= "\n".'LIMIT '.$start.','.$limit;
@@ -384,15 +384,15 @@ WHERE `id` = ".mysql_ureal_escape_string($this->get_id());
 
       return static::sql_to_list( $sql );
     }
-    
+
     public static function db_count_all($include_inactive = false) {
       $sql = "SELECT COUNT(`id`) FROM `".static::get_table_name().'`';
-      
+
       $where = '';
       if( !$include_inactive && property_exists( get_called_class(), '_active' ) ) {
         $where = 'WHERE `active` = 1';
       }
-      
+
       $res = mysql_uquery($sql."\n".$where);
       return array_pop(mysql_fetch_row($res));
     }
@@ -561,10 +561,10 @@ WHERE `id` = ".mysql_ureal_escape_string($this->get_id());
       if(ini_get('magic_quote_gpc')) {
         $post_data = rstripslashes($post_data);
       }
-      
+
       foreach ($post_data as $name => $value) {
         $sql_name = '_'.$name;
-        
+
         if($name != "id" && property_exists( $this, $sql_name ) ) {
           $this->$name = $value;
         }
@@ -610,7 +610,7 @@ WHERE `id` = ".mysql_ureal_escape_string($this->get_id());
       return $return;
     }
 
-     
+
     /**
      * Vérifie la validité syntaxique d'une adresse email.
      *
