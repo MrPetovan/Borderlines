@@ -44,6 +44,10 @@
         <span class="value"><?php echo $member->get_email()?></span>
       </p>
       <p class="field">
+        <span class="libelle">Password</span>
+        <span class="value"><?php echo $member->get_password()?></span>
+      </p>
+      <p class="field">
         <span class="libelle">Date inscription</span>
         <span class="value"><?php echo guess_time($member->get_date_inscription(), GUESS_DATE_FR)?></span>
       </p>
