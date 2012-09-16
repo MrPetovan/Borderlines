@@ -8,7 +8,7 @@
   <h3>Map</h3>
 <?php
   //$world->initializeTerritories();
-  echo $world->drawImg(true);
+  echo $world->drawImg(true, $current_game->id);
 ?>
 <h3>Territories</h3>
 <?php
@@ -19,6 +19,7 @@
     <tr>
       <th>Name</th>
       <th>Area</th>
+      <th>Owner</th>
     </tr>
   </thead>
   <tfoot>
@@ -29,10 +30,16 @@
   <tbody>
 <?php
     foreach( $world->territories as $territory ) {
+      /* @var $territory Territory */
+      $owner_id = $territory->get_owner($current_game->id);
+      if( $owner_id != null ) {
+        $owner = Player::instance($owner_id);
+      }
       echo '
     <tr>
       <td><a href="'.get_page_url('show_territory', true, array('id' => $territory->id)).'">'.$territory->name.'</a></td>
       <td>'.$territory->get_area().' km²</td>
+      <td>'.($owner_id?'<a href="'.Page::get_url('show_player', array('id' => $owner->id)).'">'.$owner->name.'</a>':'Nobody').'</td>
     </tr>';
     }
 ?>

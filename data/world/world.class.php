@@ -79,7 +79,7 @@ class World extends World_Model {
     return $return;
   }
 
-  public function draw() {
+  public function draw( $game_id = null ) {
 
     $font = DIR_ROOT.'/style/arial.ttf';
 
@@ -87,7 +87,7 @@ class World extends World_Model {
     imagesavealpha($img, true);
 
     // Fill the image with transparent color
-    $color = imagecolorallocatealpha($img,0x00,0x00,0x00,127);
+    $transparent = imagecolorallocatealpha($img,0x00,0x00,0x00,127);
 
     $white = imagecolorallocate($img, 255, 255, 255);
     $red = imagecolorallocate($img, 255, 0, 0);
@@ -97,11 +97,25 @@ class World extends World_Model {
     $grey = imagecolorallocate($img, 211, 211, 211);
 
     $sand = imagecolorallocate($img, 255, 200, 0);
-    $earth = imagecolorallocate($img, 50, 21, 12);
+    //$earth = imagecolorallocate($img, 50, 21, 12);
     $earth = imagecolorallocate($img, 101, 159, 0);
 
     $marine = imagecolorallocate($img, 0, 100, 255);
     $sea = imagecolorallocate($img, 0, 161, 185);
+
+    $player_colors = array();
+    $players = array();
+    if( $game_id !== null ) {
+      /* @var $game Game */
+      $game = Game::instance($game_id);
+
+      foreach( $game->get_game_player_list() as $game_player_row ) {
+        $player = Player::instance($game_player_row['player_id']);
+        $color_array = toColorCode($player->name);
+        $player_colors[ $player->id ] = imagecolorallocate($img, $color_array['R'], $color_array['G'], $color_array['B']);
+        $players[] = $player;
+      }
+    }
 
     imagefill($img, 0, 0, $grey);
 
@@ -116,7 +130,16 @@ class World extends World_Model {
         $polygon[] = $pointAire->x;
         $polygon[] = $this->size_y - $pointAire->y;
       }
-      imagefilledpolygon( $img, $polygon, count( $area->vertices ), $earth );
+
+      $color = $white;
+      if( $game_id !== null ) {
+        $owner_id = $area->get_owner($game_id);
+        if( $owner_id ) {
+          $color = $player_colors[ $owner_id ];
+        }
+      }
+
+      imagefilledpolygon( $img, $polygon, count( $area->vertices ), $color );
     }
     foreach( $this->get_territories() as $key => $area ) {
       $lastPoint = $area->vertices[ count( $area ) - 1 ];
@@ -147,11 +170,32 @@ class World extends World_Model {
       }*/
     }
 
+    if( $game_id != null ) {
+      foreach( $players as $key => $player ) {
+        imagefilledpolygon( $img,
+          array(
+              5, $key * 15 + 5,
+              25, $key * 15 + 5,
+              25, $key * 15 + 15,
+              5, $key * 15 + 15
+          ),
+          4,
+          $player_colors[ $player->id ]
+        );
+
+        // Ajout d'ombres au texte
+        imagettftext($img, 10, 0, 30 + 1, $key * 15 + 15 +1, $grey, $font, $player->name);
+
+        // Ajout du texte
+        imagettftext($img, 10, 0, 30, $key * 15 + 15, $black, $font, $player->name);
+      }
+    }
+
     return $img;
   }
 
-  public function drawImg( $with_map = false ) {
-    $image = $this->draw( );
+  public function drawImg( $with_map = false, $game_id = null ) {
+    $image = $this->draw( $game_id );
     ob_start();
     imagepng($image);
     $imagevariable = ob_get_clean();
@@ -163,8 +207,16 @@ class World extends World_Model {
         foreach( $territory->vertices as $vertex ) {
           $coords[] = $vertex->x .','. ($this->size_y - $vertex->y);
         }
+        $owner_id = $territory->get_owner($current_game->id);
+        if( $owner_id != null ) {
+          $owner = Player::instance($owner_id);
+        }
         echo '
-        <area shape="polygon" coords="'.implode(',', $coords).'" href="'.Page::get_url('show_territory', array('id' => $territory->id)).'" title="'.$territory->name.'">';
+        <area
+          shape="polygon"
+          coords="'.implode(',', $coords).'"
+          href="'.Page::get_url('show_territory', array('id' => $territory->id)).'"
+          title="'.$territory->name.' ('.($owner_id?$owner->name:'Nobody').')" />';
       }
       echo '
       </map>

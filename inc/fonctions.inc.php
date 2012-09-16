@@ -953,5 +953,12 @@ function which_os ()
       return $r;
   }
 
-  
+  function toColorCode($string){
+    $checksum = md5($string);
+    return array(
+      "R" => hexdec(substr($checksum, 0, 2)),
+      "G" => hexdec(substr($checksum, 2, 2)),
+      "B" => hexdec(substr($checksum, 4, 2))
+    );
+  }
 ?>

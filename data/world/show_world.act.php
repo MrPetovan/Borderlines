@@ -5,6 +5,12 @@
   $player_list = Player::db_get_by_member_id( $member->id );
   $current_player = array_shift( $player_list );
 
+  if( $current_game = $current_player->current_game ) {
+    if( $current_game->world_id != getValue('id') ) {
+      Page::redirect(PAGE_CODE, array('id' => $current_game->word_id));
+    }
+  }
+
   $world = World::instance( getValue('id') );
 
   if( !$world->id ) {
