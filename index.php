@@ -164,7 +164,6 @@
   //DSP
   if($CURRENT_PAGE->get_dsp()) {
     $PAGE_TITRE = '';
-    $PAGE_CONTENU = '';
 
     ob_start();
     include($CURRENT_PAGE->get_dsp());
