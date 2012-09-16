@@ -81,7 +81,7 @@ WHERE `created_by` = ".mysql_ureal_escape_string($created_by);
 
   public static function db_get_select_list( $with_null = false ) {
     $return = array();
-    
+
     if( $with_null ) {
         $return[ null ] = 'N/A';
     }
@@ -267,8 +267,8 @@ WHERE `game_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
     return mysql_fetch_to_array($res);
   }
 
-  public function set_player_history( $player_id, $turn, $datetime, $reason, $territory_id ) {
-    $sql = "REPLACE INTO `player_history` ( `game_id`, `player_id`, `turn`, `datetime`, `reason`, `territory_id` ) VALUES (".mysql_ureal_escape_string( $this->get_id(), $player_id, $turn, $datetime, $reason, $territory_id ).")";
+  public function set_player_history( $player_id, $turn, $datetime, $reason, $territory_id = null ) {
+    $sql = "REPLACE INTO `player_history` ( `game_id`, `player_id`, `turn`, `datetime`, `reason`, `territory_id` ) VALUES (".mysql_ureal_escape_string( $this->get_id(), $player_id, $turn, guess_time( $datetime, GUESS_TIME_MYSQL ), $reason, $territory_id ).")";
 
     return mysql_uquery($sql);
   }
@@ -305,8 +305,8 @@ WHERE `game_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
     return mysql_fetch_to_array($res);
   }
 
-  public function set_player_resource_history( $player_id, $resource_id, $turn, $datetime, $delta, $reason, $player_order_id ) {
-    $sql = "REPLACE INTO `player_resource_history` ( `game_id`, `player_id`, `resource_id`, `turn`, `datetime`, `delta`, `reason`, `player_order_id` ) VALUES (".mysql_ureal_escape_string( $this->get_id(), $player_id, $resource_id, $turn, $datetime, $delta, $reason, $player_order_id ).")";
+  public function set_player_resource_history( $player_id, $resource_id, $turn, $datetime, $delta, $reason, $player_order_id = null ) {
+    $sql = "REPLACE INTO `player_resource_history` ( `game_id`, `player_id`, `resource_id`, `turn`, `datetime`, `delta`, `reason`, `player_order_id` ) VALUES (".mysql_ureal_escape_string( $this->get_id(), $player_id, $resource_id, $turn, guess_time( $datetime, GUESS_TIME_MYSQL ), $delta, $reason, $player_order_id ).")";
 
     return mysql_uquery($sql);
   }
@@ -345,7 +345,7 @@ WHERE `game_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
     return mysql_fetch_to_array($res);
   }
 
-  public function set_territory_owner( $territory_id, $turn, $owner_id, $contested, $capital ) {
+  public function set_territory_owner( $territory_id, $turn, $owner_id = null, $contested, $capital ) {
     $sql = "REPLACE INTO `territory_owner` ( `territory_id`, `game_id`, `turn`, `owner_id`, `contested`, `capital` ) VALUES (".mysql_ureal_escape_string( $territory_id, $this->get_id(), $turn, $owner_id, $contested, $capital ).")";
 
     return mysql_uquery($sql);

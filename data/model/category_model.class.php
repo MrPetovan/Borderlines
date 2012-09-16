@@ -27,7 +27,7 @@ class Category_Model extends DBObject {
 
   public static function db_get_select_list( $with_null = false ) {
     $return = array();
-    
+
     if( $with_null ) {
         $return[ null ] = 'N/A';
     }

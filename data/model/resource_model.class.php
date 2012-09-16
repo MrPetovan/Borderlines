@@ -33,7 +33,7 @@ class Resource_Model extends DBObject {
 
   public static function db_get_select_list( $with_null = false ) {
     $return = array();
-    
+
     if( $with_null ) {
         $return[ null ] = 'N/A';
     }
@@ -119,8 +119,8 @@ WHERE `resource_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
     return mysql_fetch_to_array($res);
   }
 
-  public function set_player_resource_history( $game_id, $player_id, $turn, $datetime, $delta, $reason, $player_order_id ) {
-    $sql = "REPLACE INTO `player_resource_history` ( `game_id`, `player_id`, `resource_id`, `turn`, `datetime`, `delta`, `reason`, `player_order_id` ) VALUES (".mysql_ureal_escape_string( $game_id, $player_id, $this->get_id(), $turn, $datetime, $delta, $reason, $player_order_id ).")";
+  public function set_player_resource_history( $game_id, $player_id, $turn, $datetime, $delta, $reason, $player_order_id = null ) {
+    $sql = "REPLACE INTO `player_resource_history` ( `game_id`, `player_id`, `resource_id`, `turn`, `datetime`, `delta`, `reason`, `player_order_id` ) VALUES (".mysql_ureal_escape_string( $game_id, $player_id, $this->get_id(), $turn, guess_time( $datetime, GUESS_TIME_MYSQL ), $delta, $reason, $player_order_id ).")";
 
     return mysql_uquery($sql);
   }

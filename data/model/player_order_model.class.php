@@ -85,7 +85,7 @@ WHERE `player_id` = ".mysql_ureal_escape_string($player_id);
 
   public static function db_get_select_list( $with_null = false ) {
     $return = array();
-    
+
     if( $with_null ) {
         $return[ null ] = 'N/A';
     }
@@ -209,7 +209,7 @@ WHERE `player_order_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
   }
 
   public function set_player_resource_history( $game_id, $player_id, $resource_id, $turn, $datetime, $delta, $reason ) {
-    $sql = "REPLACE INTO `player_resource_history` ( `game_id`, `player_id`, `resource_id`, `turn`, `datetime`, `delta`, `reason`, `player_order_id` ) VALUES (".mysql_ureal_escape_string( $game_id, $player_id, $resource_id, $turn, $datetime, $delta, $reason, $this->get_id() ).")";
+    $sql = "REPLACE INTO `player_resource_history` ( `game_id`, `player_id`, `resource_id`, `turn`, `datetime`, `delta`, `reason`, `player_order_id` ) VALUES (".mysql_ureal_escape_string( $game_id, $player_id, $resource_id, $turn, guess_time( $datetime, GUESS_TIME_MYSQL ), $delta, $reason, $this->get_id() ).")";
 
     return mysql_uquery($sql);
   }

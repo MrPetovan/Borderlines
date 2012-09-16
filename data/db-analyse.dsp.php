@@ -91,12 +91,24 @@
 
 
     // Gestion des clés étrangères non triviales
-    $sql_fk = "SELECT `COLUMN_NAME`, `REFERENCED_TABLE_NAME`
-FROM `information_schema`.`KEY_COLUMN_USAGE`
-WHERE `CONSTRAINT_SCHEMA` = ".mysql_ureal_escape_string(DB_BASE)."
-AND `TABLE_NAME` = ".mysql_ureal_escape_string($table_name)."
-AND `REFERENCED_COLUMN_NAME` = 'id'
-GROUP BY `REFERENCED_TABLE_NAME`";
+    $sql_fk = "
+SELECT k_c_u_column.`COLUMN_NAME`, k_c_u_column.`REFERENCED_TABLE_NAME`
+FROM (
+  SELECT `REFERENCED_TABLE_NAME`, `CONSTRAINT_SCHEMA`, `TABLE_NAME`, `REFERENCED_COLUMN_NAME`, MIN(`CONSTRAINT_NAME`) AS `MIN_CONSTRAINT_NAME`
+  FROM `information_schema`.`KEY_COLUMN_USAGE`
+  WHERE `CONSTRAINT_SCHEMA` = ".mysql_ureal_escape_string(DB_BASE)."
+  AND `TABLE_NAME` = ".mysql_ureal_escape_string($table_name)."
+  AND `REFERENCED_COLUMN_NAME` = 'id'
+  GROUP BY `REFERENCED_TABLE_NAME`
+) k_c_u_unique
+JOIN `information_schema`.`KEY_COLUMN_USAGE` k_c_u_column
+  ON k_c_u_column.`CONSTRAINT_SCHEMA` = k_c_u_unique.`CONSTRAINT_SCHEMA`
+  AND k_c_u_column.`TABLE_NAME` = k_c_u_unique.`TABLE_NAME`
+  AND k_c_u_column.`REFERENCED_TABLE_NAME` = k_c_u_unique.`REFERENCED_TABLE_NAME`
+  AND k_c_u_column.`REFERENCED_COLUMN_NAME` = k_c_u_unique.`REFERENCED_COLUMN_NAME`
+  AND k_c_u_column.`CONSTRAINT_NAME` = k_c_u_unique.`MIN_CONSTRAINT_NAME`
+ORDER BY `CONSTRAINT_NAME`";
+    var_debug( $sql_fk );
 
     $res_fk = mysql_uquery($sql_fk);
 
