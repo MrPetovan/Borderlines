@@ -56,10 +56,10 @@
           <td>'.$game->turn_limit.'</td>
           <td>'.$game->min_players.'</td>
           <td>'.$game->max_players.'</td>
-          <td>'.guess_time($game->created, GUESS_TIME_LOCALE).'</td>
-          <td>'.guess_time($game->started, GUESS_TIME_LOCALE).'</td>
-          <td>'.guess_time($game->updated, GUESS_TIME_LOCALE).'</td>
-          <td>'.guess_time($game->ended, GUESS_TIME_LOCALE).'</td>';
+          <td>'.guess_time($game->created, GUESS_DATETIME_LOCALE).'</td>
+          <td>'.guess_time($game->started, GUESS_DATETIME_LOCALE).'</td>
+          <td>'.guess_time($game->updated, GUESS_DATETIME_LOCALE).'</td>
+          <td>'.guess_time($game->ended, GUESS_DATETIME_LOCALE).'</td>';
       $player_temp = Player::instance( $game->created_by);
       echo '
           <td>'.$player_temp->name.'</td>

@@ -71,6 +71,7 @@
 ?>
 
 <?php
+
   // /CUSTOM
 ?>
     <p><a href="<?php echo get_page_url('admin_world')?>">Revenir à la liste des objets World</a></p>

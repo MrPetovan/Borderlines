@@ -61,7 +61,7 @@ foreach( $table_columns as $column_name => $column_props ) {
       case 'time':
       case 'date':
         echo "
-          <td>'.guess_time($".$class_db_identifier."->".$column_name.", GUESS_TIME_LOCALE).'</td>";
+          <td>'.guess_time($".$class_db_identifier."->".$column_name.", GUESS_DATETIME_LOCALE).'</td>";
         break;
       case 'tinyint' :
         echo "

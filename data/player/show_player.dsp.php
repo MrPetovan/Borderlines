@@ -22,7 +22,7 @@
         );
 
         $value = $spied['masked_value'];
-        
+
         echo '
   <li>'.$resource->get_name().' : '.(is_null( $value )?'N/C':$value).($spied['turn'] ?' (Turn '.$spied['turn'].')':'').'</li>';
       }
@@ -34,9 +34,9 @@
     foreach( Order_Type::db_get_all() as $order_type ) {
       if( $order_type->is_target_player() ) {
         $class = $order_type->class_name;
-      
+
         require_once(DATA.'order_type/'.$order_type->class_name.'.class.php');
-        
+
         echo $class::get_html_form( array('page_code' => PAGE_CODE, 'page_params' => array('id' => $player->id ), 'current_player' => $current_player, 'target_player' => $player ) );
       }
     }
@@ -111,8 +111,8 @@
         echo '
   <tr>
     <td>'.$order_type->name .'</td>
-    <td>'.guess_time( $player_order->datetime_order, GUESS_TIME_LOCALE ) .'</td>
-    <td>'.guess_time( $player_order->datetime_scheduled, GUESS_TIME_LOCALE ) .'</td>
+    <td>'.guess_time( $player_order->datetime_order, GUESS_DATETIME_LOCALE ) .'</td>
+    <td>'.guess_time( $player_order->datetime_scheduled, GUESS_DATETIME_LOCALE ) .'</td>
     <td>'.$param_string.'</td>
     <td>
       <form action="'.Page::get_page_url('order').'" method="post">

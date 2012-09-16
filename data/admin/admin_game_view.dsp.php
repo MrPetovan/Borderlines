@@ -45,19 +45,19 @@
             </p>
             <p class="field">
               <span class="libelle">Created</span>
-              <span class="value"><?php echo guess_time($game->created, GUESS_DATE_FR)?></span>
+              <span class="value"><?php echo guess_time($game->created, GUESS_DATETIME_LOCALE)?></span>
             </p>
             <p class="field">
               <span class="libelle">Started</span>
-              <span class="value"><?php echo guess_time($game->started, GUESS_DATE_FR)?></span>
+              <span class="value"><?php echo guess_time($game->started, GUESS_DATETIME_LOCALE)?></span>
             </p>
             <p class="field">
               <span class="libelle">Updated</span>
-              <span class="value"><?php echo guess_time($game->updated, GUESS_DATE_FR)?></span>
+              <span class="value"><?php echo guess_time($game->updated, GUESS_DATETIME_LOCALE)?></span>
             </p>
             <p class="field">
               <span class="libelle">Ended</span>
-              <span class="value"><?php echo guess_time($game->ended, GUESS_DATE_FR)?></span>
+              <span class="value"><?php echo guess_time($game->ended, GUESS_DATETIME_LOCALE)?></span>
             </p>
 <?php
       $option_list = array();

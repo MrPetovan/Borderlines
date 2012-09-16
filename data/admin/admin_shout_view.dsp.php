@@ -14,7 +14,7 @@
 
             <p class="field">
               <span class="libelle">Date Sent</span>
-              <span class="value"><?php echo guess_time($shout->date_sent, GUESS_DATE_FR)?></span>
+              <span class="value"><?php echo guess_time($shout->date_sent, GUESS_DATETIME_LOCALE)?></span>
             </p>
 <?php
       $option_list = array();

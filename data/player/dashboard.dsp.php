@@ -12,17 +12,17 @@
   <li>Turn : <?php echo $current_game->current_turn.'/'.$current_game->turn_limit ?></li>
   <li>Turn interval : <?php echo $current_game->turn_interval ?> seconds</li>
   <li>Status : <?php echo $current_game->status_string ?></li>
-  <li>Created : <?php echo guess_time( $current_game->created, GUESS_TIME_LOCALE ) ?></li>
+  <li>Created : <?php echo guess_time( $current_game->created, GUESS_DATETIME_LOCALE ) ?></li>
 <?php if( $current_game->started ) { ?>
-  <li>Started : <?php echo guess_time( $current_game->started, GUESS_TIME_LOCALE ) ?></li>
+  <li>Started : <?php echo guess_time( $current_game->started, GUESS_DATETIME_LOCALE ) ?></li>
 <?php } ?>
 <?php if( $current_game->updated ) { ?>
-  <li>Last turn : <?php echo guess_time( $current_game->updated, GUESS_TIME_LOCALE ) ?></li>
+  <li>Last turn : <?php echo guess_time( $current_game->updated, GUESS_DATETIME_LOCALE ) ?></li>
   <?php } ?>
 <?php if( $current_game->ended ) { ?>
-  <li>Ended : <?php echo guess_time( $current_game->ended, GUESS_TIME_LOCALE ) ?></li>
+  <li>Ended : <?php echo guess_time( $current_game->ended, GUESS_DATETIME_LOCALE ) ?></li>
 <?php }elseif( $current_game->updated ) { ?>
-  <li>Next turn : <?php echo guess_time( $current_game->updated + $current_game->turn_interval, GUESS_TIME_LOCALE ) ?></li>
+  <li>Next turn : <?php echo guess_time( $current_game->updated + $current_game->turn_interval, GUESS_DATETIME_LOCALE ) ?></li>
 <?php }?>
 </ul>
 <?php if( $current_game->has_ended() ) {?>
@@ -35,7 +35,7 @@
 <p><a href="<?php echo Page::get_page_url('player_list')?>">Player list</a></p>
 <h4>Wall</h4>
 <form action="<?php echo Page::get_url('shout', array('game_id' => $current_game->id ))?>" method="post">
-  <p><input type="text" name="text" value=""/><button type="submit" name="action" value="shout">Say</button></p>
+  <p><?php echo '['.guess_time(time(), GUESS_TIME_LOCALE).']'?> <strong><?php echo wash_utf8($current_player->name)?></strong> : <input type="text" name="text" size="80" value=""/><button type="submit" name="action" value="shout">Say</button></p>
 </form>
 <div id="shoutwall">
 <?php
@@ -43,7 +43,7 @@
     foreach( array_reverse( $shouts ) as $shout ) {
       $player = Player::instance($shout->shouter_id);
       echo '
-  <div class="shout"><strong>'.wash_utf8($player->name).'</strong>: '.wash_utf8($shout->text).'</div>';
+  <div class="shout">['.guess_time($shout->date_sent, GUESS_TIME_LOCALE).'] <strong>'.wash_utf8($player->name).'</strong>: '.wash_utf8($shout->text).'</div>';
     }
 ?>
 </div>
@@ -71,6 +71,7 @@
     }
 ?>
 </table>
+<p><a href="<?php echo Page::get_url('show_world', array('id' => $current_game->world_id))?>">Go to the world map</a></p>
 <h3>Troops summary</h3>
 <?php
     $player_territories = $current_player->get_territory_player_troops_list($current_game->id, $current_game->current_turn );

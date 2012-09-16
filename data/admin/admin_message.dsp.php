@@ -48,7 +48,7 @@
       echo '
           <td>'.$player_temp->name.'</td>
           <td>'.$message->text.'</td>
-          <td>'.guess_time($message->created, GUESS_TIME_LOCALE).'</td>
+          <td>'.guess_time($message->created, GUESS_DATETIME_LOCALE).'</td>
           <td><a href="'.htmlentities_utf8(Page::get_url('admin_message_mod', array('id' => $message->id))).'"><img src="'.IMG.'img_html/pencil.png" alt="Modifier" title="Modifier"/></a></td>
         </tr>';
     }

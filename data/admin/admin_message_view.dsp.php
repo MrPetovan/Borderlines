@@ -40,7 +40,7 @@
             </p>
             <p class="field">
               <span class="libelle">Created</span>
-              <span class="value"><?php echo guess_time($message->created, GUESS_DATE_FR)?></span>
+              <span class="value"><?php echo guess_time($message->created, GUESS_DATETIME_LOCALE)?></span>
             </p>    </div>
     <p><a href="<?php echo get_page_url('admin_message_mod', true, array('id' => $message->id))?>">Modifier cet objet Message</a></p>
     <h4>Message Recipient</h4>

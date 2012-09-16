@@ -417,7 +417,9 @@ function guess_date($date, $return_flag = GUESS_DATE_TIMESTAMP) {
 
 define("GUESS_TIME_TIMESTAMP", 1);
 define("GUESS_TIME_MYSQL", 2);
-define("GUESS_TIME_LOCALE", 3);
+define("GUESS_DATETIME_LOCALE", 3);
+define("GUESS_DATE_LOCALE", 4);
+define("GUESS_TIME_LOCALE", 5);
 /**
    * Teste timestamp, date mysql (YYYY-MM-DD HH:MM:SS) et date FR (JJ/MM/AAAA)
    * Retourne par défaut un timestamp (possiblement négatif), ou une date mysql ou une date FR
@@ -444,7 +446,9 @@ function guess_time($date, $return_flag = GUESS_TIME_TIMESTAMP) {
     switch($return_flag) {
       case GUESS_TIME_TIMESTAMP : $return = $timestamp; break;
       case GUESS_TIME_MYSQL     : $return = mysql_timestamp_to_mysql_date($timestamp); break;
-      case GUESS_TIME_LOCALE    : $return = strftime('%x %X', $timestamp); break;
+      case GUESS_DATETIME_LOCALE    : $return = strftime('%x %X', $timestamp); break;
+      case GUESS_DATE_LOCALE    : $return = strftime('%x', $timestamp); break;
+      case GUESS_TIME_LOCALE    : $return = strftime('%X', $timestamp); break;
     }
   }
   return $return;
@@ -949,5 +953,5 @@ function which_os ()
       return $r;
   }
 
-
+  
 ?>

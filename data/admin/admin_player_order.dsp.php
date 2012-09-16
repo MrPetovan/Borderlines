@@ -57,9 +57,9 @@
       $player_temp = Player::instance( $player_order->player_id);
       echo '
           <td>'.$player_temp->name.'</td>
-          <td>'.guess_time($player_order->datetime_order, GUESS_TIME_LOCALE).'</td>
-          <td>'.guess_time($player_order->datetime_scheduled, GUESS_TIME_LOCALE).'</td>
-          <td>'.guess_time($player_order->datetime_execution, GUESS_TIME_LOCALE).'</td>
+          <td>'.guess_time($player_order->datetime_order, GUESS_DATETIME_LOCALE).'</td>
+          <td>'.guess_time($player_order->datetime_scheduled, GUESS_DATETIME_LOCALE).'</td>
+          <td>'.guess_time($player_order->datetime_execution, GUESS_DATETIME_LOCALE).'</td>
           <td>'.$player_order->turn_ordered.'</td>
           <td>'.$player_order->turn_scheduled.'</td>
           <td>'.$player_order->turn_executed.'</td>

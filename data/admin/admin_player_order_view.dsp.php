@@ -47,15 +47,15 @@
 
             <p class="field">
               <span class="libelle">Datetime Order</span>
-              <span class="value"><?php echo guess_time($player_order->datetime_order, GUESS_DATE_FR)?></span>
+              <span class="value"><?php echo guess_time($player_order->datetime_order, GUESS_DATETIME_LOCALE)?></span>
             </p>
             <p class="field">
               <span class="libelle">Datetime Scheduled</span>
-              <span class="value"><?php echo guess_time($player_order->datetime_scheduled, GUESS_DATE_FR)?></span>
+              <span class="value"><?php echo guess_time($player_order->datetime_scheduled, GUESS_DATETIME_LOCALE)?></span>
             </p>
             <p class="field">
               <span class="libelle">Datetime Execution</span>
-              <span class="value"><?php echo guess_time($player_order->datetime_execution, GUESS_DATE_FR)?></span>
+              <span class="value"><?php echo guess_time($player_order->datetime_execution, GUESS_DATETIME_LOCALE)?></span>
             </p>
             <p class="field">
               <span class="libelle">Turn Ordered</span>

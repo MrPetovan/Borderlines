@@ -31,30 +31,30 @@
 <?php }?>
   <p class="field">
     <span class="libelle">Created</span>
-    <span class="value"><?php echo guess_time($game->created, GUESS_TIME_LOCALE)?>
+    <span class="value"><?php echo guess_time($game->created, GUESS_DATETIME_LOCALE)?>
     by <a href="<?php echo get_page_url('show_player', true, array('id' => $game->created_by ) )?>"><?php echo $creator->name?></a></span>
   </p>
 <?php if( $game->started ) {?>
   <p class="field">
     <span class="libelle">Started</span>
-    <span class="value"><?php echo guess_time($game->started, GUESS_TIME_LOCALE)?></span>
+    <span class="value"><?php echo guess_time($game->started, GUESS_DATETIME_LOCALE)?></span>
   </p>
 <?php }?>
 <?php if( $game->updated && ! $game->ended ) {?>
   <p class="field">
     <span class="libelle">Updated</span>
-    <span class="value"><?php echo guess_time($game->updated, GUESS_TIME_LOCALE)?></span>
+    <span class="value"><?php echo guess_time($game->updated, GUESS_DATETIME_LOCALE)?></span>
   </p>
 <?php }?>
 <?php if( $game->ended ) {?>
   <p class="field">
     <span class="libelle">Ended</span>
-    <span class="value"><?php echo guess_time($game->ended, GUESS_TIME_LOCALE)?></span>
+    <span class="value"><?php echo guess_time($game->ended, GUESS_DATETIME_LOCALE)?></span>
   </p>
 <?php }elseif( $game->updated ) { ?>
   <p class="field">
     <span class="libelle">Next turn</span>
-    <span class="value"><?php echo guess_time( $game->updated + $game->turn_interval, GUESS_TIME_LOCALE ) ?></span>
+    <span class="value"><?php echo guess_time( $game->updated + $game->turn_interval, GUESS_DATETIME_LOCALE ) ?></span>
   </p>
 <?php }?>
 <?php $world = World::instance($game->world_id);?>

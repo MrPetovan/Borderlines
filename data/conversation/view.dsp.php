@@ -37,7 +37,7 @@
     $sender = Player::instance($message_player->sender_id);
     if( $current_leave_time < $message_player->created ) :
 ?>
-  <p>On <?php echo guess_time($current_leave_time, GUESS_TIME_LOCALE)?>, <?php echo $leave_list[ $current_leave_time ]->name?> left</p>
+  <p>On <?php echo guess_time($current_leave_time, GUESS_DATETIME_LOCALE)?>, <?php echo $leave_list[ $current_leave_time ]->name?> left</p>
 <?php
       unset( $leave_list[ $current_leave_time ] );
       reset( $leave_list );
@@ -47,7 +47,7 @@
   <div>
     <p>
       <?php echo $message_player->read?'':'<strong>[Unread]</strong>'?>
-      On <?php echo guess_time($message_player->created, GUESS_TIME_LOCALE)?>,
+      On <?php echo guess_time($message_player->created, GUESS_DATETIME_LOCALE)?>,
       <a href="<?php echo Page::get_url('show_player', array('id' => $sender->id))?>"><?php echo $sender->name?></a>
       posted:
     </p>
@@ -58,7 +58,7 @@
   if( count( $leave_list ) ) {
     foreach( $leave_list as $current_leave_time => $player_left ) {
 ?>
-  <p>On <?php echo guess_time($current_leave_time, GUESS_TIME_LOCALE)?>, <?php echo $player_left->name?> left</p>
+  <p>On <?php echo guess_time($current_leave_time, GUESS_DATETIME_LOCALE)?>, <?php echo $player_left->name?> left</p>
 <?php
     }
   }
