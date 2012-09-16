@@ -52,7 +52,7 @@ WHERE `player_id` = ".mysql_ureal_escape_string($player_id);
 
   public static function db_get_select_list( $with_null = false ) {
     $return = array();
-    
+
     if( $with_null ) {
         $return[ null ] = 'N/A';
     }
@@ -150,8 +150,8 @@ WHERE `message_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
     return mysql_fetch_to_array($res);
   }
 
-  public function set_message_recipient( $player_id, $read ) {
-    $sql = "REPLACE INTO `message_recipient` ( `message_id`, `player_id`, `read` ) VALUES (".mysql_ureal_escape_string( $this->get_id(), $player_id, $read ).")";
+  public function set_message_recipient( $player_id, $read = null ) {
+    $sql = "REPLACE INTO `message_recipient` ( `message_id`, `player_id`, `read` ) VALUES (".mysql_ureal_escape_string( $this->get_id(), $player_id, guess_time( $read, GUESS_TIME_MYSQL ) ).")";
 
     return mysql_uquery($sql);
   }

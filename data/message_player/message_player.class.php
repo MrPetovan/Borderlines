@@ -60,4 +60,26 @@ AND m.`conversation_id` = '. mysql_ureal_escape_string($conversation_id);
     return $return;
   }
 
+  public static function db_get_unread_count($player_id, $game_id = null) {
+    $where = '';
+    if( $game_id !== null ) {
+      if( $game_id ) {
+        $where = '
+AND `game_id` IS NOT NULL';
+      }else {
+        $where = '
+AND `game_id` IS NULL';
+      }
+    }
+    $sql = '
+SELECT COUNT(DISTINCT m.`conversation_id`) AS `count`
+FROM `message_recipient` m_r
+JOIN `message` m ON m.`id` = m_r.`message_id`
+WHERE m_r.`read` IS NULL
+AND m_r.`player_id` = '.  mysql_ureal_escape_string($player_id).$where;
+    $res = mysql_uquery($sql);
+    $row = mysql_fetch_row($res);
+
+    return $row[0];
+  }
 }

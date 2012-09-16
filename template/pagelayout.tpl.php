@@ -16,7 +16,11 @@
         <ul>
           <li><a href="<?php echo Page::get_page_url('dashboard') ?>">Play</a></li>
           <li><a href="<?php echo Page::get_page_url('game_list') ?>">Games</a></li>
+          <?php if( $unread_count = Message_player::db_get_unread_count($current_player->id) ) :?>
+          <li><a href="<?php echo Page::get_page_url('conversation_list') ?>"><strong>Conversations (<?php echo $unread_count?>)</strong></a></li>
+          <?php else:?>
           <li><a href="<?php echo Page::get_page_url('conversation_list') ?>">Conversations</a></li>
+          <?php endif;?>
           <li><a href="<?php echo Page::get_page_url('mon-compte') ?>">Account</a></li>
           <li><a href="<?php echo Page::get_page_url('logout') ?>">Logout</a></li>
         </ul>

@@ -15,12 +15,20 @@
 <p>Go to:</p>
 <ul>
   <li>
+<?php if( $unread_count = Message_Player::db_get_unread_count($current_player->id, false)) :?>
+    <a href="<?php echo Page::get_url(PAGE_CODE, array('general' => 1))?>"><strong>General conversations (<?php echo $unread_count?>)</strong></a>
+<?php else:?>
     <a href="<?php echo Page::get_url(PAGE_CODE, array('general' => 1))?>">General conversations</a>
+<?php endif;?>
     (<a href="<?php echo Page::get_url(PAGE_CODE, array('archive' => 1, 'general' => 1))?>">Archive</a>)
   </li>
 <?php if( $game_id !== null ) :?>
   <li>
+  <?php if( $unread_count = Message_Player::db_get_unread_count($current_player->id, true)) :?>
+    <a href="<?php echo Page::get_url(PAGE_CODE)?>"><strong>Current game conversations (<?php echo $unread_count?>)</strong></a>
+  <?php else:?>
     <a href="<?php echo Page::get_url(PAGE_CODE)?>">Current game conversations</a>
+  <?php endif;?>
     (<a href="<?php echo Page::get_url(PAGE_CODE, array('archive' => 1))?>">Archive</a>)
   </li>
 <?php endif;?>
@@ -59,7 +67,7 @@
     if( count( $conversation_message_list ) ) {
       $last_message = array_pop( $conversation_message_list );
       $last_poster = Player::instance($last_message->sender_id);
-      $string = $last_poster->name.' at '.guess_time($last_message->created, GUESS_TIME_LOCALE);
+      $string = $last_poster->name.' at '.guess_time($last_message->created, GUESS_DATETIME_LOCALE);
     }else {
       $string = 'No message yet';
     }
@@ -68,7 +76,7 @@
         <td><input type="checkbox" name="conversation_id[]" value="<?php echo $conversation->id ?>"/></td>
         <td><?php echo $conversation->left?'(left)':implode(', ', $to)?></td>
         <td><a href="<?php echo Page::get_url('conversation_view', array('id' => $conversation->id))?>"><?php echo $conversation->subject?></a></td>
-        <td><?php echo guess_time( $conversation->get_created(), GUESS_TIME_LOCALE )?></td>
+        <td><?php echo guess_time( $conversation->get_created(), GUESS_DATETIME_LOCALE )?></td>
         <td><?php echo $string?></td>
       </tr>
 <?php
