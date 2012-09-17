@@ -84,7 +84,7 @@ AND `territory_id` = '.mysql_ureal_escape_string($territory->id);
    * - page_params (array) : Current page parameters where the form is displayed
    */
   public static function get_html_form( $params ) {
-    $title = 'Move your troops';
+    $title = 'Move your capital';
 
     /* @var $current_player Player */
     $current_player = $params['current_player'];
