@@ -116,11 +116,13 @@ class Move_Troops extends Player_Order {
 
     if( isset( $params['from_territory'] ) && !isset( $params['to_territory'] ) ) {
       $territory_neighbour_list = $params['from_territory']->get_territory_neighbour_list();
-
-      $neighbour_list = array();
-      foreach( $territory_neighbour_list as $neighbour_array ) {
-        $neighbour = Territory::instance( $neighbour_array['neighbour_id'] );
-        $neighbour_list[  $neighbour->id ] = $neighbour->name;
+      $troops = $params['current_player']->get_territory_player_troops_list( $game->id, $game->current_turn, $params['from_territory']->id);
+      if( count( $troops ) ) {
+        $neighbour_list = array();
+        foreach( $territory_neighbour_list as $neighbour_array ) {
+          $neighbour = Territory::instance( $neighbour_array['neighbour_id'] );
+          $neighbour_list[  $neighbour->id ] = $neighbour->name;
+        }
       }
     }
 
@@ -164,8 +166,13 @@ class Move_Troops extends Player_Order {
     $return .= '
     <p>'.HTMLHelper::genererButton( 'action', 'move_troops', array('type' => 'submit'), "March !" ).'</p>';
     }else {
-      $return .= '
+      if( isset( $troops ) ) {
+        $return .= '
+    <p>You don\'t have any troops in this territory</p>';
+      }else {
+        $return .= '
     <p>You don\'t have any troops in neighbouring territories</p>';
+      }
     }
     $return .= '
   </fieldset>
