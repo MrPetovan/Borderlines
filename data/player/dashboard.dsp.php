@@ -33,6 +33,16 @@
   if( $current_game->started ) {
 ?>
 <p><a href="<?php echo Page::get_page_url('player_list')?>">Player list</a></p>
+<?php
+    if( ! $current_game->has_ended() ) {
+      $turn_ready = array_shift( $current_player->get_game_player_list( $current_game->id ) );
+      if( $turn_ready['turn_ready'] <= $current_game->current_turn ) {
+        echo '<p>Status : Not ready for the next turn <a href="'.Page::get_url(PAGE_CODE, array('action' => 'ready')).'">Toggle</a></p>';
+      }else {
+        echo '<p>Status : Ready for the next turn <a href="'.Page::get_url(PAGE_CODE, array('action' => 'notready')).'">Toggle</a></p>';
+      }
+    }
+?>
 <h4>Wall</h4>
 <form action="<?php echo Page::get_url('shout', array('game_id' => $current_game->id ))?>" method="post">
   <p><?php echo '['.guess_time(time(), GUESS_TIME_LOCALE).']'?> <strong><?php echo wash_utf8($current_player->name)?></strong> : <input type="text" name="text" size="80" value=""/><button type="submit" name="action" value="shout">Say</button></p>
@@ -210,11 +220,10 @@
 ?>
 </table>
 <?php
-      $turn_ready = array_shift( $current_player->get_game_player_list( $current_game->id ) );
       if( $turn_ready['turn_ready'] <= $current_game->current_turn ) {
-        echo '<p><a href="'.Page::get_url(PAGE_CODE, array('action' => 'ready')).'">I\'m ready for the next turn</a></p>';
+        echo '<p>Status : Not ready for the next turn <a href="'.Page::get_url(PAGE_CODE, array('action' => 'ready')).'">Toggle</a></p>';
       }else {
-        echo '<p><a href="'.Page::get_url(PAGE_CODE, array('action' => 'ready')).'">I\'m not ready for the next turn yet</a></p>';
+        echo '<p>Status : Ready for the next turn <a href="'.Page::get_url(PAGE_CODE, array('action' => 'notready')).'">Toggle</a></p>';
       }
     }
   }

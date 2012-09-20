@@ -13,12 +13,11 @@
         if( $action = getValue('action') ) {
           switch( $action ) {
             case 'ready' : {
-              $turn_ready = array_shift( $current_player->get_game_player_list( $current_game->id ) );
-              if( $turn_ready['turn_ready'] <= $current_game->current_turn ) {
-                $current_player->set_game_player( $current_game->id, $current_game->current_turn + 1 );
-              }else {
-                $current_player->set_game_player( $current_game->id, $current_game->current_turn );
-              }
+              $current_player->set_game_player( $current_game->id, $current_game->current_turn + 1 );
+              break;
+            }
+            case 'notready' : {
+              $current_player->set_game_player( $current_game->id, $current_game->current_turn );
               break;
             }
             case 'change_diplomacy_status' : {
