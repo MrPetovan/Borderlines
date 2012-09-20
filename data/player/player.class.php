@@ -321,6 +321,20 @@ AND `turn` = `pd_max`.`max_turn`';
     return $return;
   }
 
+  public function get_email_new_conversation($conversation) {
+    /* @var $conversation Conversation */
+    $creator = Player::instance( $conversation->player_id );
+    $return = '
+      <td width="698" style="vertical-align:top; padding-left:80px; padding-right:80px; font-size: 14px; color:#444444;">
+        <p>Hi '.wash_utf8($this->name).',</p>
+        <p>'.wash_utf8($creator->name).' invited you to a conversation. To see the messages, follow this link :</p>
+        <p>'.Page::get_url('conversation_view', array('id' => $conversation->id)).'</p>
+        <p><span style="font-weight:bold;">Pour accéder à votre compte,</span> <a style="color:#F22A83;" href="'.get_page_url('mon-compte').'">cliquez sur ce lien</a>.</p>
+      </td>';
+
+    return $return;
+  }
+
   // /CUSTOM
 
 }
