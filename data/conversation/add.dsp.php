@@ -2,10 +2,14 @@
   include_once('data/static/html_functions.php');
 
   $form_url = get_page_url(PAGE_CODE);
-  $PAGE_TITRE = 'Conversation : Create';
+  if( $game_id === null ) {
+    $PAGE_TITRE = 'General Conversation : Create';
+  }else {
+    $PAGE_TITRE = 'Game Conversation : Create';
+  }
 
   $other_player_list = array();
-  if( $game_id === null ) {
+  if( $game_id !== null ) {
     $game_player_list = $current_player->current_game->get_game_player_list();
     foreach( $game_player_list as $game_player_row ) {
       $player = Player::instance($game_player_row['player_id']);
@@ -56,13 +60,13 @@
       <legend>Text fields</legend>
       <p class="field">
         <label for="subject">Subject *</label>
-        <input type="text" class="input_text" name="conversation[subject]" id="subject" value="<?php echo $conversation_mod->subject?>"/>
+        <input type="text" class="input_text" size="80" name="conversation[subject]" id="subject" value="<?php echo $conversation_mod->subject?>"/>
       </p>
-      <p><label for="text">Subject *</label></p>
-      <textarea name="message[text]" col="50" row="5" id="text"><?php echo $message_mod->text?></textarea>
+      <p><label for="text">Text</label></p>
+      <textarea name="message[text]" cols="80" rows="10" id="text"><?php echo $message_mod->text?></textarea>
     </fieldset>
     <p>
       <?php echo HTMLHelper::submit('conversation_submit', 'Launch conversation')?>
     </p>
   </form>
-  <p><a href="http://localhost/borderlines/?page=conversation_list">Revenir à la liste des objets Conversation</a></p>
+  <p><a href="<?php echo Page::get_url('conversation_list')?>">Return to conversation list</a></p>

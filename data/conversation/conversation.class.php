@@ -9,6 +9,9 @@ require_once( DATA."model/conversation_model.class.php" );
 class Conversation extends Conversation_Model {
 
   // CUSTOM
+  public function get_name() {
+    return $this->_subject;
+  }
 
   public function get_current_recipients() {
     $sql = '

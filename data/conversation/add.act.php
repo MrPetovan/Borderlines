@@ -53,6 +53,16 @@
         foreach( $recipient_list as $recipient_id ) {
           $conversation_mod->set_conversation_player($recipient_id);
           $message_mod->set_message_recipient($recipient_id);
+          /* @var $player Player */
+          $player = Player::instance($recipient_id);
+          $member = Member::instance( $player->member_id );
+
+          if( php_mail($member->email, SITE_NAME." | New conversation", $player->get_email_new_conversation( $conversation_mod ), true) ) {
+            Page::add_message("Message sent to ".$player->name);
+          }else {
+            Page::add_message("Message failed to ".$player->name, Page::PAGE_MESSAGE_WARNING);
+            Page::add_message(var_export( error_get_last(), 1 ), Page::PAGE_MESSAGE_WARNING);
+          }
         }
 
         Page::set_message( 'Record successfuly saved' );

@@ -4,10 +4,12 @@
   }else {
     $PAGE_TITRE = "Current ";
   }
-  if( $game_id === null ) {
+  if( getValue('general') ) {
     $PAGE_TITRE .= "general conversations";
+    $add_array = array('general' => getValue('general'));
   }else {
     $PAGE_TITRE .= "game conversations";
+    $add_array = array();
   }
   include_once('data/static/html_functions.php');
 ?>
@@ -38,15 +40,15 @@
     <thead>
       <tr>
         <th>Sel.</th>
-        <th>To</th>
         <th>Subject</th>
+        <th>To</th>
         <th>Created</th>
         <th>Last message</th>
       </tr>
     </thead>
     <tfoot>
       <tr>
-        <td colspan="6"><?php echo count($conversation_list)?> elements | <a href="<?php echo Page::get_url('conversation_add')?>">Open a new conversation</a></td>
+        <td colspan="6"><?php echo count($conversation_list)?> elements | <a href="<?php echo Page::get_url('conversation_add', $add_array)?>">Open a new conversation</a></td>
       </tr>
     </tfoot>
     <tbody>
@@ -64,18 +66,23 @@
     }
 
     $conversation_message_list = Message_Player::get_visible_by_player($conversation->id, $current_player->id);
+    $is_unread = false;
     if( count( $conversation_message_list ) ) {
       $last_message = array_pop( $conversation_message_list );
       $last_poster = Player::instance($last_message->sender_id);
       $string = $last_poster->name.' at '.guess_time($last_message->created, GUESS_DATETIME_LOCALE);
+
+      if( $last_message->read === null ) {
+        $is_unread = true;
+      }
     }else {
       $string = 'No message yet';
     }
 ?>
-      <tr>
+      <tr<?php echo $is_unread?' class="current"':''?>>
         <td><input type="checkbox" name="conversation_id[]" value="<?php echo $conversation->id ?>"/></td>
-        <td><?php echo $conversation->left?'(left)':implode(', ', $to)?></td>
         <td><a href="<?php echo Page::get_url('conversation_view', array('id' => $conversation->id))?>"><?php echo $conversation->subject?></a></td>
+        <td><?php echo $conversation->left?'(left)':implode(', ', $to)?></td>
         <td><?php echo guess_time( $conversation->get_created(), GUESS_DATETIME_LOCALE )?></td>
         <td><?php echo $string?></td>
       </tr>

@@ -30,14 +30,15 @@
 <?php
   ksort( $leave_list );
   reset( $leave_list );
+  var_debug( $leave_list );
   $current_leave_time = key( $leave_list );
   $message_player_list = Message_Player::get_visible_by_player($conversation->id, $current_player->id);
   Message_Player::set_read_by_conversation($conversation->id, $current_player->id);
   foreach( $message_player_list as $message_player ) :
     $sender = Player::instance($message_player->sender_id);
-    if( $current_leave_time < $message_player->created ) :
+    if( $current_leave_time && $current_leave_time < $message_player->created ) :
 ?>
-  <p>On <?php echo guess_time($current_leave_time, GUESS_DATETIME_LOCALE)?>, <?php echo $leave_list[ $current_leave_time ]->name?> left</p>
+  <p><strong>On <?php echo guess_time($current_leave_time, GUESS_DATETIME_LOCALE)?>, <?php echo $leave_list[ $current_leave_time ]->name?> left</strong></p>
 <?php
       unset( $leave_list[ $current_leave_time ] );
       reset( $leave_list );
@@ -45,11 +46,11 @@
     endif;
 ?>
   <div>
-    <p>
-      <?php echo $message_player->read?'':'<strong>[Unread]</strong>'?>
+    <p><strong>
+      <?php echo $message_player->read?'':'[Unread]'?>
       On <?php echo guess_time($message_player->created, GUESS_DATETIME_LOCALE)?>,
       <a href="<?php echo Page::get_url('show_player', array('id' => $sender->id))?>"><?php echo $sender->name?></a>
-      posted:
+      posted:</strong>
     </p>
     <p><?php echo nl2br($message_player->text, true)?></p>
   </div>
@@ -67,7 +68,7 @@
   <form action="<?php echo $form_url?>" method="post">
     <fieldset>
       <legend>Answer</legend>
-      <textarea name="message[text]"></textarea>
+      <textarea name="message[text]" cols="80" rows="10"></textarea>
       <p><?php echo HTMLHelper::submit('conversation_submit', 'Answer')?></p>
     </fieldset>
   </form>
