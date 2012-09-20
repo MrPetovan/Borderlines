@@ -2,7 +2,7 @@
   $PAGE_TITRE = "Accueil";
 ?>
 <div>
-    <h2>Welcome to Borderlines</h2>
+    <h2>Welcome to <?php echo SITE_NAME?></h2>
     <script type="text/javascript"><!--
     google_ad_client = "ca-pub-7252939869969808";
     /* Test Free Awesome */
