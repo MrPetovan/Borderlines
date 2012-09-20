@@ -8,7 +8,7 @@
   <h3>Map</h3>
 <?php
   //$world->initializeTerritories();
-  echo $world->drawImg(true, $current_game->id);
+  echo $world->drawImg(true, null, $current_game->id);
 ?>
 <h3>Territories</h3>
 <?php

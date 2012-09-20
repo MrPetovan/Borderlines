@@ -124,3 +124,6 @@ span.ko {
   color: #FF0000;
   font-weight: bold;
 }
+
+
+tr.current { font-weight: bold}
