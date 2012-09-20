@@ -326,14 +326,14 @@ class Game extends Game_Model {
           }
 
           $troops_maintenance = $revenue;
-        }
 
-        $this->set_player_history(
-          $player->id,
-          $next_turn,
-          time(),
-          "You spent ".$troops_maintenance." to maintain your troops",
-          null);
+          $this->set_player_history(
+            $player->id,
+            $next_turn,
+            time(),
+            "You spent ".$troops_maintenance." to maintain your troops",
+            null);
+        }
 
         $recruit_budget = $revenue - $troops_maintenance;
 
