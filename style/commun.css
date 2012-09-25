@@ -21,9 +21,11 @@ h2 {
   margin-bottom: 20px;
 }
 
+img { vertical-align: middle}
+
 /* Table */
-table .num,
-table .date {
+.num,
+.date {
   text-align: right
 }
 
