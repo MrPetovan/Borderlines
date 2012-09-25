@@ -80,6 +80,11 @@ class Graph {
     // Initial vertex generation
     $this->add_vertex( new Vertex( round( $sizeX / 2 ), round( $sizeY / 2 ), '⊗' ) );
 
+    $minAddX = round( $sizeX / 2 ) - $maxDist;
+    $minAddY = round( $sizeY / 2 ) - $maxDist;
+    $maxAddX = round( $sizeX / 2 ) + $maxDist;
+    $maxAddY = round( $sizeY / 2 ) + $maxDist;
+
     $initialVertex = reset( $this->vertices );
 
     $i = 0;
@@ -88,8 +93,8 @@ class Graph {
     $maxMissedVertices = 1000;
     $missedVertexCount = 0;
     while( $missedVertexCount < $maxMissedVertices ) {
-      $x = rand(0, $sizeX - 1);
-      $y = rand(0, $sizeY - 1);
+      $x = rand($minAddX, $maxAddX);
+      $y = rand($minAddY, $maxAddY);
 
       $vertex = new Vertex( $x, $y, num2alpha( $i ) );
 
@@ -100,6 +105,10 @@ class Graph {
       }
 
       if( $vertexCreationFlag ) {
+        $minAddX = max( 0, min( $minAddX, $x - $maxDist) );
+        $minAddY = max( 0, min( $minAddY, $y - $maxDist) );
+        $maxAddX = min( $sizeX - 1, max( $maxAddX, $x + $maxDist) );
+        $maxAddY = min( $sizeY - 1, max( $maxAddY, $y + $maxDist) );
         $missedVertexCount = 0;
         $i++;
       }else {
