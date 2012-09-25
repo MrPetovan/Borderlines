@@ -92,7 +92,7 @@ class Game extends Game_Model {
     mysql_uquery($sql);
     $sql = 'DELETE FROM `player_order` WHERE `game_id` = '.mysql_ureal_escape_string($this->id).' AND `turn_ordered` > '.mysql_ureal_escape_string($turn);
     mysql_uquery($sql);
-    $sql = 'UPDATE `player_order` SET `datetime_execution` = NULL, `turn_executed` = NULL WHERE `game_id` = '.mysql_ureal_escape_string($this->id).' AND `turn_ordered` = '.mysql_ureal_escape_string($turn);
+    $sql = 'UPDATE `player_order` SET `datetime_execution` = NULL, `turn_executed` = NULL WHERE `game_id` = '.mysql_ureal_escape_string($this->id).' AND `turn_scheduled` = '.mysql_ureal_escape_string($turn);
     mysql_uquery($sql);
     $sql = 'DELETE FROM `player_spygame_value` WHERE `game_id` = '.mysql_ureal_escape_string($this->id).' AND `turn` > '.mysql_ureal_escape_string($turn);
     mysql_uquery($sql);
@@ -248,7 +248,6 @@ class Game extends Game_Model {
 
       // Revenues and recruit
       foreach( $player_list as $player ) {
-        $capital_id = null;
         $area = 0;
         $territory_previous_owner_list = $player->get_territory_owner_list(null, $this->id, $current_turn);
         foreach( $territory_previous_owner_list as $territory_owner_row ) {
@@ -256,9 +255,6 @@ class Game extends Game_Model {
           if( !$territory_owner_row['contested'] ) {
             $territory = Territory::instance($territory_owner_row['territory_id']);
             $area += $territory->get_area();
-          }
-          if( $territory_owner_row['capital'] ) {
-            $capital_id = $territory_owner_row['territory_id'];
           }
         }
 
@@ -276,12 +272,11 @@ class Game extends Game_Model {
         $troops_maintenance = 0;
         $troops_list = $player->get_territory_player_troops_list($this->id, $current_turn);
         foreach( $troops_list as $territory_player_troops_row ) {
-          $is_home = true;
+          $is_home = false;
 
           foreach( $territory_previous_owner_list as $territory_previous_owner_row ) {
-            if( $territory_previous_owner_row['territory_id'] == $territory_player_troops_row['territory_id']
-                && $territory_previous_owner_row['territory_id'] != $player->id) {
-              $is_home = false;
+            if( $territory_previous_owner_row['territory_id'] == $territory_player_troops_row['territory_id'] ) {
+              $is_home = true;
               break;
             }
           }
@@ -337,6 +332,16 @@ class Game extends Game_Model {
 
         $recruit_budget = $revenue - $troops_maintenance;
 
+        // Is there a capital (after move) ?
+        $capital_id = null;
+        $territory_current_owner_list = $player->get_territory_owner_list(null, $this->id, $current_turn + 1);
+        foreach( $territory_current_owner_list as $territory_owner_row ) {
+          if( $territory_owner_row['capital'] ) {
+            $capital_id = $territory_owner_row['territory_id'];
+            break;
+          }
+        }
+
         if( $capital_id !== null ) {
           $troops_recruited = floor( $recruit_budget / self::RECRUIT_TROOPS_PRICE );
           $capital_territory_troops = array_pop( $player->get_territory_player_troops_list($this->id, $next_turn, $capital_id) );
@@ -377,7 +382,7 @@ class Game extends Game_Model {
       }else {
         foreach( $player_list as $player ) {
           $member = Member::instance( $player->member_id );
-          if( php_mail($member->email, SITE_NAME." | New turn", $player->get_email_game_new_turn( $this ), true)) {
+          if( php_mail($member->email, SITE_NAME." | Turn ".$this->current_turn." computed", $player->get_email_game_new_turn( $this ), true)) {
             Page::add_message("Message sent to ".$player->name);
           }else {
             Page::add_message("Message failed to ".$player->name, Page::PAGE_MESSAGE_WARNING);
