@@ -1,0 +1,91 @@
+/*
+    Document   : scramblednations.css
+    Created on : 22 sept. 2012, 17:53:54
+    Author     : Hypolite
+    Description:
+        Purpose of the stylesheet follows.
+*/
+
+body.clean {
+  background: none;
+}
+
+.dialog{
+  display: none;
+  position: absolute !important;
+  top: 200px;
+  left: 50%;
+  background-color: rgba(255, 255, 255, 0.9);
+}
+
+.dialog h4 {
+  background-color: #CCC;
+  padding: 10px;
+  cursor: move;
+  position: relative;
+}
+
+.dialog h4 a.close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  cursor: pointer;
+}
+
+.dialog .content {
+  border: 1px double #C0C0C0;
+  border-width: 0 3px 3px 0;
+  margin: 0 3px 3px 0;
+  padding: 0 5px 5px 5px;
+  width: 350px;
+  height: 600px;
+}
+.dialog .content iframe{
+  width: 100%;
+  height: 100%;
+}
+
+.ui-resizable-helper { border: 10px solid rgba(0,0,0,0.3); border-width: 0 10px 10px 0; }
+
+.ui-resizable-e {
+  cursor: e-resize;
+  width: 11px;
+  right: 0;
+  top: 0;
+  height: 100%;
+}
+
+.ui-resizable-s {
+  cursor: s-resize;
+  height: 11px;
+  width: 100%;
+  bottom: 0;
+  left: 0;
+}
+
+.ui-resizable-se {
+  cursor: se-resize;
+  width: 15px;
+  height: 15px;
+  right: 1px;
+  bottom: 1px;
+}
+
+.ui-resizable-handle {
+  position: absolute;
+  font-size: 0.1px;
+  display: block;
+}
+
+.archive .title th {
+  cursor: pointer;
+  background-color: #333333;
+  color: #FFFFFF;
+  border-bottom: 1px solid #FFFFFF;
+}
+
+#shoutwall {
+  height: 300px;
+  overflow-y: scroll;
+  margin-bottom: 10px;
+}
