@@ -138,7 +138,8 @@
           // Appelle __get
           return $this->$var;
         }else {
-          error_log('[Framework] __call:get : Class variable doesn\'t exist : '.$var);
+          $debug_backtrace = debug_backtrace();
+          error_log('[Framework] __call:get : Class variable doesn\'t exist : '.$var.' '. $debug_backtrace[2]['file']. ' ['. $debug_backtrace[2]['line'].']');
           throw new Exception('[Framework] __call:get : Class variable doesn\'t exist : '.$var);
           return null;
         }
@@ -152,7 +153,8 @@
           $this->$var = $value;
           $return = true;
         }else {
-          error_log('[Framework] __call:set : Class variable doesn\'t exist : '.$var);
+          $debug_backtrace = debug_backtrace();
+          error_log('[Framework] __call:set : Class variable doesn\'t exist : '.$var.' '. $debug_backtrace[2]['file']. ' ['. $debug_backtrace[2]['line'].']');
           throw new Exception('[Framework] __call:set : Class variable doesn\'t exist : '.$var);
           return null;
         }
