@@ -9,11 +9,11 @@
   <div id="page">
     <header>
       <h1><a href="<?php echo URL_ROOT?>"><?php echo SITE_NAME?></a></h1>
-      <p class="banner"><a href="http://www.aeriesguard.com/forum/Jeux-video/Borderlines-Alpha-fermee">Jeu en Alpha fermée</a></p>
-      <!--<p>Testeurs : rendez-vous sur <a href="http://www.aeriesguard.com/IRC">le canal IRC d'Aerie's Guard</a></p>-->
+      <p class="banner"><a href="http://www.aeriesguard.com/forum/Jeux-video/Borderlines-Alpha-fermee">Open Beta</a></p>
 <?php if(Member::get_current_user_id()) {?>
       <nav role="main">
         <ul>
+          <li>[ <?php echo guess_time(time(), GUESS_DATETIME_LOCALE)?> ]</li>
           <li><a href="<?php echo Page::get_page_url('dashboard') ?>">Play</a></li>
           <li><a href="<?php echo Page::get_page_url('game_list') ?>">Games</a></li>
           <?php if( $unread_count = Message_player::db_get_unread_count($current_player->id) ) :?>
@@ -47,27 +47,7 @@
 
     </header>
     <section id="main">
-<?php
-  $messages['error'] = Page::get_message(Page::PAGE_MESSAGE_ERROR);
-  $messages['warning'] = Page::get_message(Page::PAGE_MESSAGE_WARNING);
-  $messages['notice'] = Page::get_message(Page::PAGE_MESSAGE_NOTICE);
-
-  if( count( $messages['error'] ) || count( $messages['warning'] ) || count( $messages['notice'] ) ) {
-    echo '
-      <div id="messages">';
-    foreach( $messages as $message_class => $message_list ) {
-      if( $message_list ) {
-        echo '
-          <ul class="'.$message_class.'">
-            <li>'.implode('</li>
-            <li>', $message_list ).'</li>
-          </ul>';
-      }
-    }
-    echo '
-      </div>';
-  }
-?>
+<?php Page::display_messages();?>
       <div id="content" class="page-<?php echo get_current_page()?>">
 <?php echo $PAGE_CONTENU; ?>
       </div>

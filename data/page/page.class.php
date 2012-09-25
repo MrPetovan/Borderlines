@@ -55,7 +55,7 @@ class Page extends DBObject {
   public static function set_message( $message, $type = self::PAGE_MESSAGE_NOTICE ) {
     self::add_message( $message, $type );
   }
-  
+
   public static function add_message( $message, $type = self::PAGE_MESSAGE_NOTICE ) {
     $_SESSION['page']['message'][$type][] = $message;
   }
@@ -147,6 +147,28 @@ LIMIT 0,1";
     return $return;
   }
 
+  public static function display_messages() {
+    $messages['error'] = Page::get_message(Page::PAGE_MESSAGE_ERROR);
+    $messages['warning'] = Page::get_message(Page::PAGE_MESSAGE_WARNING);
+    $messages['notice'] = Page::get_message(Page::PAGE_MESSAGE_NOTICE);
+
+    if( count( $messages['error'] ) || count( $messages['warning'] ) || count( $messages['notice'] ) ) {
+      echo '
+        <div id="messages">';
+      foreach( $messages as $message_class => $message_list ) {
+        if( $message_list ) {
+          echo '
+            <ul class="'.$message_class.'">
+              <li>'.implode('</li>
+              <li>', $message_list ).'</li>
+            </ul>';
+        }
+      }
+      echo '
+        </div>';
+    }
+  }
+
   /**
    * Mets Ã  jour les champs de l'objet en fonctions des donnÃ©es POST et FILES prÃ©sente.
    * Effectue les vÃ©rifications basiques pour mettre Ã  jour les champs
@@ -180,7 +202,7 @@ LIMIT 0,1";
   public static function get_url($code_page, $params = array(), $root = true) {
     return self::get_page_url($code_page, $root, $params);
   }
-  
+
   /**
    * Retourne l'URL de la page selon son code
    *
@@ -224,7 +246,7 @@ LIMIT 0,1";
             $return .= "&";
           }
         }
-        
+
         if(count($params)) {
           //param1=value1&param2=value2...
           $params_url = array();
@@ -290,7 +312,7 @@ LIMIT 0,1";
       redirect($redirect);
     }
   }
-  
+
   public static function redirect( $page, $params = array()) {
     self::page_redirect($page, $params );
   }
