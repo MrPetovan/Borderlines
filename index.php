@@ -153,7 +153,10 @@
 
   $CURRENT_USER = Member::get_current_user();
 
-  setlocale( LC_TIME, 'en_US.UTF8');
+  //setlocale( LC_TIME, 'en_US.UTF8');
+  $locale = isset($_COOKIE['locale']) ? $_COOKIE['locale'] : $_SERVER['HTTP_ACCEPT_LANGUAGE'];
+  $locale = str_replace( '-', '_', array_pop( array_reverse( explode( ',', $locale) ) ) ).'.UTF8';
+  setlocale(LC_ALL, $locale );
 
   define('PAGE_CODE', $PAGE_CODE);
   // ACT
