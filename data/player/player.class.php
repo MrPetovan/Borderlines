@@ -285,6 +285,37 @@ AND `turn` = `pd_max`.`max_turn`';
     return mysql_fetch_to_array($res);
   }
 
+  public function get_territory_summary($game_id, $turn) {
+    $sql = '
+SELECT t_p_t.`territory_id`, `quantity`, `owner_id` , `contested`, `capital`
+FROM `territory_player_troops` t_p_t
+LEFT JOIN `territory_owner` t_o ON
+  t_o.`game_id` = t_p_t.`game_id`
+  AND t_o.`turn` = t_p_t.`turn`
+  AND t_o.`territory_id` = t_p_t.`territory_id`
+WHERE t_p_t.`game_id` = '.mysql_ureal_escape_string($game_id).'
+AND t_p_t.`turn` = '.mysql_ureal_escape_string($turn).'
+AND t_p_t.`player_id` = '.mysql_ureal_escape_string($this->get_id()).'
+UNION
+SELECT t_o.`territory_id`, 0, `owner_id`, `contested`, `capital`
+FROM `territory_owner` t_o
+WHERE NOT EXISTS (
+  SELECT "x"
+  FROM `territory_player_troops` t_p_t
+  WHERE t_p_t.`territory_id` = t_o.`territory_id`
+  AND t_p_t.`game_id` = t_o.`game_id`
+  AND t_p_t.`turn` = t_o.`turn`
+  AND t_p_t.`player_id` = t_o.`owner_id`
+)
+AND t_o.`game_id` = '.mysql_ureal_escape_string($game_id).'
+AND t_o.`turn` = '.mysql_ureal_escape_string($turn).'
+AND t_o.`owner_id` = '.mysql_ureal_escape_string($this->get_id()).'
+ORDER BY `territory_id`';
+    $res = mysql_uquery($sql);
+
+    return mysql_fetch_to_array($res);
+  }
+
   /**
    * Game new turn mail
    *
@@ -296,7 +327,7 @@ AND `turn` = `pd_max`.`max_turn`';
     $return = '
       <td width="698" style="vertical-align:top; padding-left:80px; padding-right:80px; font-size: 14px; color:#444444;">
         <p>Hi '.wash_utf8($this->name).',</p>
-        <p>Game "'.wash_utf8($game->name).'"\'s turn has been computed and is ready for you.</p>
+        <p>Game "'.wash_utf8($game->name).'"\'s turn '.$game->current_turn.' has been computed and is ready for you.</p>
         <p><a href="'.Page::get_url('dashboard').'">Play now</a></p>
       </td>';
 

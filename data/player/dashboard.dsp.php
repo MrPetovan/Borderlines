@@ -6,43 +6,79 @@
 ?>
 <h2>Dashboard</h2>
 <p>Welcome <?php echo $current_player->get_name()?> !</p>
-<h3>Current Game</h3>
-<ul>
-  <li>Name : <a href="<?php echo Page::get_page_url('show_game', false, array('id' => $current_game->id))?>"><?php echo $current_game->name ?></a></li>
-  <li>Turn : <?php echo $current_game->current_turn.'/'.$current_game->turn_limit ?></li>
-  <li>Turn interval : <?php echo $current_game->turn_interval ?> seconds</li>
-  <li>Status : <?php echo $current_game->status_string ?></li>
-  <li>Created : <?php echo guess_time( $current_game->created, GUESS_DATETIME_LOCALE ) ?></li>
+<div class="informations formulaire">
+  <p>
+    <span class="label"><?php echo __('Current game')?></span>
+    <span class="value"><a href="<?php echo Page::get_page_url('show_game', false, array('id' => $current_game->id))?>"><?php echo $current_game->name ?></a></span>
+  </p>
+  <p>
+    <span class="label"><?php echo __('Turn')?></span>
+    <span class="value num"><?php echo $current_game->current_turn.'/'.$current_game->turn_limit ?></span>
+  </p>
+  <p>
+    <span class="label"><?php echo __('Turn interval')?></span>
+    <span class="value num"><?php echo __('%s seconds', $current_game->turn_interval)?></span>
+  </p>
+  <p>
+    <span class="label"><?php echo __('Status')?></span>
+    <span class="value"><?php echo __($current_game->status_string)?></span>
+  </p>
+  <p>
+    <span class="label"><?php echo __('Created')?></span>
+    <span class="value"><?php echo guess_time( $current_game->created, GUESS_DATETIME_LOCALE )?></span>
+  </p>
+  <p>
+    <span class="label"><?php echo __('Created')?></span>
+    <span class="value"><?php echo guess_time( $current_game->created, GUESS_DATETIME_LOCALE )?></span>
+  </p>
 <?php if( $current_game->started ) { ?>
-  <li>Started : <?php echo guess_time( $current_game->started, GUESS_DATETIME_LOCALE ) ?></li>
+  <p>
+    <span class="label"><?php echo __('Started')?></span>
+    <span class="value"><?php echo guess_time( $current_game->started, GUESS_DATETIME_LOCALE )?></span>
+  </p>
 <?php } ?>
 <?php if( $current_game->updated ) { ?>
-  <li>Last turn : <?php echo guess_time( $current_game->updated, GUESS_DATETIME_LOCALE ) ?></li>
-  <?php } ?>
+  <p>
+    <span class="label"><?php echo __('Last turn')?></span>
+    <span class="value"><?php echo guess_time( $current_game->updated, GUESS_DATETIME_LOCALE )?></span>
+  </p>
+<?php } ?>
 <?php if( $current_game->ended ) { ?>
-  <li>Ended : <?php echo guess_time( $current_game->ended, GUESS_DATETIME_LOCALE ) ?></li>
+  <p>
+    <span class="label"><?php echo __('Ended')?></span>
+    <span class="value"><?php echo guess_time( $current_game->ended, GUESS_DATETIME_LOCALE )?></span>
+  </p>
 <?php }elseif( $current_game->updated ) { ?>
-  <li>Next turn : <?php echo guess_time( $current_game->updated + $current_game->turn_interval, GUESS_DATETIME_LOCALE ) ?></li>
-<?php }?>
-</ul>
+  <p>
+    <span class="label"><?php echo __('Next automatic turn')?></span>
+    <span class="value"><?php echo guess_time( $current_game->updated + $current_game->turn_interval, GUESS_DATETIME_LOCALE )?></span>
+  </p>
+<?php } ?>
 <?php if( $current_game->has_ended() ) {?>
 <p>This game is over, check <a href="<?php echo Page::get_page_url('player_list', false, array('game_id' => $current_game->id))?>">the final scoreboard</a> !</p>
+<?php }else {
+        $turn_ready = array_shift( $current_player->get_game_player_list( $current_game->id ) );?>
+  <p>
+    <span class="label"><?php echo __('Your turn status')?></span>
+    <span class="value">
+  <?php
+  if( $turn_ready['turn_ready'] <= $current_game->current_turn ) {
+    echo '<img src="'.IMG.'img_html/delete.png" alt="" /> Not ready for the next turn <a href="'.Page::get_url(PAGE_CODE, array('action' => 'ready')).'">Toggle</a>';
+  }else {
+    echo '<img src="'.IMG.'img_html/accept.png" alt="" /> Ready for the next turn <a href="'.Page::get_url(PAGE_CODE, array('action' => 'notready')).'">Toggle</a>';
+  } ?>
+    </span>
+  </p>
+
+
 <?php } ?>
+</div>
 <?php
   // If game started
   if( $current_game->started ) {
 ?>
-<p><a href="<?php echo Page::get_page_url('player_list')?>">Player list</a></p>
-<?php
-    if( ! $current_game->has_ended() ) {
-      $turn_ready = array_shift( $current_player->get_game_player_list( $current_game->id ) );
-      if( $turn_ready['turn_ready'] <= $current_game->current_turn ) {
-        echo '<p>Status : Not ready for the next turn <a href="'.Page::get_url(PAGE_CODE, array('action' => 'ready')).'">Toggle</a></p>';
-      }else {
-        echo '<p>Status : Ready for the next turn <a href="'.Page::get_url(PAGE_CODE, array('action' => 'notready')).'">Toggle</a></p>';
-      }
-    }
-?>
+
+<p><a href="<?php echo Page::get_url('show_world', array('id' => $current_game->world_id))?>">Go to the world map</a></p>
 <h4>Wall</h4>
 <form action="<?php echo Page::get_url('shout', array('game_id' => $current_game->id ))?>" method="post">
   <p><?php echo '['.guess_time(time(), GUESS_TIME_LOCALE).']'?> <strong><?php echo wash_utf8($current_player->name)?></strong> : <input type="text" name="text" size="80" value=""/><button type="submit" name="action" value="shout">Say</button></p>
@@ -57,67 +93,75 @@
     }
 ?>
 </div>
-<h3>Controlled territories</h3>
+<h3>Territory Summary</h3>
 <?php
-    $territory_owner_list = $current_player->get_territory_owner_list(null, $current_game->id, $current_game->current_turn );
+    $territory_summaries = array();
+    $territory_summaries[ $current_game->current_turn - 1 ] = $current_player->get_territory_summary($current_game->id, $current_game->current_turn - 1);
+    $territory_summaries[ $current_game->current_turn ] = $current_player->get_territory_summary($current_game->id, $current_game->current_turn);
 ?>
-<table>
-  <tr>
-    <th>Type</th>
-    <th>Territories</th>
-    <th>Area</th>
-    <th>Status</th>
-  </tr>
+<table class="accordion">
 <?php
-    foreach( $territory_owner_list as $territory_owner_row ) {
-      $territory = Territory::instance( $territory_owner_row['territory_id'] );
+
+    foreach( $territory_summaries as $turn => $territory_summary ) {
+      $is_current = $turn == $current_game->current_turn;
+
       echo '
-  <tr>
-    <td>'.($territory_owner_row['capital']?'Capital':'Province').'</td>
-    <td><a href="'.Page::get_url('show_territory', array('id' => $territory->id)).'">'.$territory->name.'</a></td>
-    <td class="num">'.$territory->get_area().' km²</td>
-    <td>'.($territory_owner_row['contested']?'Contested':'Stable').'</td>
-  </tr>';
+  <tbody class="archive'._($is_current?' current':'').'">
+    <tr class="title">
+      <th colspan="6">'.__('Turn %s', $turn).'</th>
+    </tr>
+    <tr>
+      <th>Territory</th>
+      <th>Owner</th>
+      <th>Type</th>
+      <th>Area</th>
+      <th>Status</th>
+      <th>Troops</th>
+    </tr>';
+
+      $total_troops = 0;
+      $total_territory = 0;
+      $total_contested = 0;
+      foreach( $territory_summary as $territory_row ) {
+        $territory = Territory::instance( $territory_row['territory_id'] );
+        $owner = Player::instance( $territory_row['owner_id'] );
+        $total_troops += $territory_row['quantity'];
+        if( $territory_row['contested'] ) {
+          $total_contested += $territory->area;
+        }
+        $total_territory += $territory->area;
+        echo '
+    <tr>
+      <td><a href="'.Page::get_url('show_territory', array('id' => $territory->id)).'">'.$territory->name.'</a></td>
+      <td>';
+        if( $owner == $current_player ) {
+          echo 'Yourself';
+        }else {
+          echo '<a href="'.Page::get_url('show_player', array('id' => $owner->id)).'">'.$owner->name.'</a>';
+        }
+        echo '
+      </td>
+      <td>'.($territory_row['capital']?'Capital':'Province').'</td>
+      <td class="num">'.l10n_number( $territory->area ).' km²</td>
+      <td>'.($territory_row['contested']?'<img src="'.IMG.'img_html/bomb.png" alt=""/> '.__('Contested'):'<img src="'.IMG.'img_html/accept.png" alt=""/> '.__('Stable')).'</td>
+      <td class="num">'.l10n_number( $territory_row['quantity'] ).' <img src="'.IMG.'img_html/helmet.png" alt="'.__('Troops').'" title="'.__('Troops').'"/></td>
+    </tr>';
+      }
+      echo '
+  </tbody>';
     }
 ?>
+  <tbody>
+    <tr>
+      <th colspan="2"></th>
+      <th><?php echo __('Total')?></th>
+      <td class="num"><?php echo l10n_number( $total_territory )?> km²</td>
+      <th><?php echo __('Total')?></th>
+      <td class="num"><?php echo l10n_number( $total_troops ).' <img src="'.IMG.'img_html/helmet.png" alt="'.__('Troops').'" title="'.__('Troops').'"/>' ?></td>
+    </tr>
+  </tbody>
 </table>
 <p><a href="<?php echo Page::get_url('show_world', array('id' => $current_game->world_id))?>">Go to the world map</a></p>
-<h3>Troops summary</h3>
-<?php
-    $player_territories = $current_player->get_territory_player_troops_list($current_game->id, $current_game->current_turn );
-?>
-<table>
-  <tr>
-    <th>Number</th>
-    <th>Territory</th>
-    <th>Owner</th>
-    <th>Status</th>
-  </tr>
-<?php
-    foreach( $player_territories as $player_territory ) {
-      $territory = Territory::instance( $player_territory['territory_id'] );
-
-      $owner_id = $territory->get_owner($current_game->id, $current_game->current_turn);
-      $owner = Player::instance( $owner_id );
-      echo '
-  <tr>
-    <td class="num">'.$player_territory['quantity'].'</td>
-    <td><a href="'.Page::get_url('show_territory', array('id' => $territory->id)).'">'.$territory->name.'</a></td>
-    <td>';
-
-      if( $owner == $current_player ) {
-        echo 'Yourself';
-      }else {
-        echo '<a href="'.Page::get_url('show_player', array('id' => $owner->id)).'">'.$owner->name.'</a>';
-      }
-
-      echo '
-    </td>
-    <td>'.($territory->is_contested($current_game->id, $current_game->current_turn)?'Contested':'Stable').'</td>
-  </tr>';
-    }
-?>
-</table>
 <h3>Diplomacy</h3>
 <?php
     $player_diplomacy_list = $current_player->get_last_player_diplomacy_list($current_game->id, $current_game->current_turn );
@@ -141,30 +185,154 @@
     }
 ?>
 </table>
+<h3>Economy</h3>
+<?php
+  $capital_id = null;
+  $area = 0;
+  $previous_turn = $current_game->current_turn - 1;
+  $territory_previous_owner_list = $current_player->get_territory_owner_list(null, $current_game->id, $previous_turn);
+  foreach( $territory_previous_owner_list as $territory_owner_row ) {
+
+    if( !$territory_owner_row['contested'] ) {
+      $territory = Territory::instance($territory_owner_row['territory_id']);
+      $area += $territory->get_area();
+    }
+    if( $territory_owner_row['capital'] ) {
+      $capital_id = $territory_owner_row['territory_id'];
+    }
+  }
+
+  $ratio = -$area * 0.00002 + 3;
+  if( $ratio < 1 ) $ratio = 1;
+
+  $revenue = round( $area * $ratio );
+
+  $troops_home = 0;
+  $troops_away = 0;
+  $troops_list = $current_player->get_territory_player_troops_list($current_game->id, $previous_turn + 1);
+  foreach( $troops_list as $territory_player_troops_row ) {
+    $is_home = false;
+
+    foreach( $territory_previous_owner_list as $territory_previous_owner_row ) {
+      if( $territory_previous_owner_row['territory_id'] == $territory_player_troops_row['territory_id'] ) {
+        $is_home = true;
+        break;
+      }
+    }
+
+    if( $is_home ) {
+      $troops_home += $territory_player_troops_row['quantity'];
+    }else {
+      $troops_away += $territory_player_troops_row['quantity'];
+    }
+  }
+
+  $troops_maintenance = $troops_home * Game::HOME_TROOPS_MAINTENANCE + $troops_away * Game::AWAY_TROOPS_MAINTENANCE;
+
+  $recruit_budget = $revenue - $troops_maintenance;
+
+  // Is there a capital (after move) ?
+  $capital_id = null;
+  $territory_current_owner_list = $current_player->get_territory_owner_list(null, $current_game->id, $previous_turn + 1);
+  foreach( $territory_current_owner_list as $territory_owner_row ) {
+    if( $territory_owner_row['capital'] ) {
+      $capital_id = $territory_owner_row['territory_id'];
+      break;
+    }
+  }
+  $troops_recruited = 0;
+  if( $capital_id !== null ) {
+    $troops_recruited = floor( $recruit_budget / Game::RECRUIT_TROOPS_PRICE );
+  }
+?>
+<div class="informations formulaire">
+  <p>
+    <span class="label">Total area of stable territory on turn <?php echo $previous_turn?></span>
+    <span class="value num"><?php echo l10n_number( round($area), 0 )?> km²</span>
+  </p>
+  <p>
+    <span class="label">Economy ratio</span>
+    <span class="value num"><?php echo l10n_number( $ratio, 12 )?></span>
+  </p>
+  <p>
+    <span class="label">Total revenue for turn <?php echo $previous_turn + 1?></span>
+    <span class="value num"><?php echo l10n_number( $revenue, 0 )?>  <img src="<?php echo IMG.'img_html/coins.png'?>" alt="" title="" /></span>
+  </p>
+  <p>
+    <span class="label">Troops home</span>
+    <span class="value num">
+      <?php echo l10n_number( $troops_home, 0 )?> <img src="<?php echo IMG.'img_html/helmet.png'?>" alt="Troops" title="Troops" />
+      @ <?php echo l10n_number( Game::HOME_TROOPS_MAINTENANCE, 0 )?> <img src="<?php echo IMG.'img_html/coins.png'?>" alt="" title="" />
+      = <?php echo l10n_number( $troops_home * Game::HOME_TROOPS_MAINTENANCE, 0 )?> <img src="<?php echo IMG.'img_html/coins.png'?>" alt="" title="" />
+    </span>
+  </p>
+  <p>
+    <span class="label">Troops away</span>
+    <span class="value num">
+      <?php echo l10n_number( $troops_away, 0 )?> <img src="<?php echo IMG.'img_html/helmet.png'?>" alt="Troops" title="Troops" />
+      @ <?php echo l10n_number( Game::AWAY_TROOPS_MAINTENANCE, 0)?> <img src="<?php echo IMG.'img_html/coins.png'?>" alt="" title="" />
+      = <?php echo l10n_number( $troops_away * Game::AWAY_TROOPS_MAINTENANCE, 0)?> <img src="<?php echo IMG.'img_html/coins.png'?>" alt="" title="" />
+    </span>
+  </p>
+  <p>
+    <span class="label">Total troops maintenance</span>
+    <span class="value num">
+      <?php echo l10n_number( $troops_maintenance, 0 )?> <img src="<?php echo IMG.'img_html/coins.png'?>" alt="" title="" />
+    </span>
+  </p>
+  <p>
+    <span class="label">Recruiting budget</span>
+    <span class="value num">
+      <?php echo l10n_number( $recruit_budget, 0 )?> <img src="<?php echo IMG.'img_html/coins.png'?>" alt="" title="" />
+    </span>
+  </p>
+  <p>
+    <span class="label">Total troops recruited</span>
+    <span class="value num">
+      <?php echo l10n_number( $troops_recruited, 0 )?> <img src="<?php echo IMG.'img_html/helmet.png'?>" alt="Troops" title="Troops" />
+      @ <?php echo l10n_number( Game::RECRUIT_TROOPS_PRICE, 0)?> <img src="<?php echo IMG.'img_html/coins.png'?>" alt="" title="" />
+    </span>
+  </p>
+</div>
 <h3>Message history</h3>
 <?php
     $player_history_list = $current_player->get_player_history_list($current_game->id);
 ?>
-<table>
-  <tr>
-    <th>Turn</th>
-    <th>Reason</th>
-    <th>Territory</th>
-  </tr>
+<table class="accordion">
 <?php
+    $current_turn = null;
     foreach( $player_history_list as $player_history_row ) {
+      if( $current_turn != $player_history_row['turn']) {
+        $is_current = $player_history_row['turn'] == $current_game->current_turn;
+
+        if( $current_turn !== null ) {
+          echo '
+  </tbody>';
+        }
+        echo '
+  <tbody class="archive'._($is_current?' current':'').'">
+    <tr class="title">
+      <th colspan="2">'.__('Turn %s', $player_history_row['turn']).'</th>
+    </tr>
+    <tr>
+      <th>Territory</th>
+      <th>Reason</th>
+    </tr>';
+
+        $current_turn = $player_history_row['turn'];
+      }
       $territory = null;
       if( $player_history_row['territory_id'] ) {
         $territory = Territory::instance( $player_history_row['territory_id'] );
       }
       echo '
-  <tr>
-    <td>'.$player_history_row['turn'].'</td>
-    <td>'.$player_history_row['reason'].'</td>
-    <td>'.($territory?'<a href="'.Page::get_url('show_territory', array('id' => $territory->id)).'">'.$territory->name.'</a>':'').'</td>
-  </tr>';
+    <tr>
+      <td>'.($territory?'<a href="'.Page::get_url('show_territory', array('id' => $territory->id)).'">'.$territory->name.'</a>':'').'</td>
+      <td>'.$player_history_row['reason'].'</td>
+    </tr>';
     }
 ?>
+  </tbody>
 </table>
 
 <?php
