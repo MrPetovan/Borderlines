@@ -58,7 +58,6 @@ h1 {
 #main {
   background: transparent url(../img/img_css/contenu_fond.png) top left repeat-y;
   padding: 0 5px 0 7px;
-  position: relative;
 }
 
 #content {
@@ -127,3 +126,28 @@ span.ko {
 
 
 tr.current { font-weight: bold}
+
+/* Formulaire deux colonnes */
+
+.formulaire .field label,
+.formulaire .field input,
+.formulaire span.label,
+.formulaire span.value {
+  display: inline-block;
+  line-height: 1em;
+}
+.formulaire p {
+  overflow: hidden;
+}
+.formulaire .radio_line label {display:inline; float: none;}
+.formulaire .field label,
+.formulaire span.label,
+.formulaire .field input.input_text { width: 40%; max-width: 200px;}
+.formulaire span.value { width: 55%; max-width: 300px;}
+.formulaire input.input_radio { margin: 0 5px;}
+.formulaire p.radio_line label,
+.formulaire p.label_right label { width: auto}
+
+/* Formulaire d'informations */
+.informations.formulaire span.value { font-weight: normal;}
+.informations.formulaire span.label { font-weight: bold;}
