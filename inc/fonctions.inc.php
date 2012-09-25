@@ -961,4 +961,24 @@ function which_os ()
       "B" => hexdec(substr($checksum, 4, 2))
     );
   }
+
+  function __($format, $args = null) {
+    if( $args !== null ) {
+      if( !is_array( $args ) ) {
+        $args = array_slice(func_get_args(), 1);
+      }
+    }
+
+    return vsprintf( $format, $args );
+  }
+
+  function l10n_number($number, $decimals = 0) {
+    $locale = localeconv();
+    return number_format(
+      $number,
+      $decimals,
+      $locale['decimal_point'],
+      $locale['thousands_sep']
+    );
+ }
 ?>
