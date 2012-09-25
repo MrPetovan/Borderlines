@@ -9,6 +9,7 @@ require_once( DATA."message/message.class.php" );
 class Message_Player extends Message {
 
   protected $_conversation_id = null;
+  protected $_message_id = null;
   protected $_sender_id = null;
   protected $_text = null;
   protected $_created = null;
@@ -72,14 +73,17 @@ AND `game_id` IS NULL';
       }
     }
     $sql = '
-SELECT COUNT(DISTINCT m.`conversation_id`) AS `count`
+SELECT IFNULL( COUNT(DISTINCT m.`conversation_id`), 0) AS `count`
 FROM `message_recipient` m_r
 JOIN `message` m ON m.`id` = m_r.`message_id`
 WHERE m_r.`read` IS NULL
 AND m_r.`player_id` = '.  mysql_ureal_escape_string($player_id).$where;
     $res = mysql_uquery($sql);
-    $row = mysql_fetch_row($res);
-
-    return $row[0];
+    if( $res ){
+      $count = array_pop( mysql_fetch_row($res) );
+    }else {
+      $count = 0;
+    }
+    return $count;
   }
 }

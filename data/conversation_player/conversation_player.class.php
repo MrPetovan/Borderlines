@@ -8,6 +8,7 @@ require_once( DATA."conversation/conversation.class.php" );
 
 class Conversation_Player extends Conversation {
 
+  protected $_conversation_id = null;
   protected $_player_id = null;
   protected $_game_id = null;
   protected $_subject = null;

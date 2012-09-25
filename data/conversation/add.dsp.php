@@ -4,8 +4,10 @@
   $form_url = get_page_url(PAGE_CODE);
   if( $game_id === null ) {
     $PAGE_TITRE = 'General Conversation : Create';
+    $add_array = array('general' => getValue('general'));
   }else {
     $PAGE_TITRE = 'Game Conversation : Create';
+    $add_array = array();
   }
 
   $other_player_list = array();
@@ -21,7 +23,7 @@
 
 ?>
   <h3><?php echo $PAGE_TITRE ?></h3>
-  <form class="formulaire" action="<?php echo Page::get_page_url(PAGE_CODE)?>" method="post">
+  <form class="formulaire" action="<?php echo Page::get_url(PAGE_CODE, $add_array)?>" method="post">
     <fieldset>
       <legend>To :</legend>
 <?php if( count( $recipient_list ) ) : ?>

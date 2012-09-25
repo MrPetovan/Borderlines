@@ -30,7 +30,6 @@
 <?php
   ksort( $leave_list );
   reset( $leave_list );
-  var_debug( $leave_list );
   $current_leave_time = key( $leave_list );
   $message_player_list = Message_Player::get_visible_by_player($conversation->id, $current_player->id);
   Message_Player::set_read_by_conversation($conversation->id, $current_player->id);
