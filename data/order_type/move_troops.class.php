@@ -114,11 +114,12 @@ class Move_Troops extends Player_Order {
       $page_params = $params['page_params'];
     }
 
+    $neighbour_list = array();
+
     if( isset( $params['from_territory'] ) && !isset( $params['to_territory'] ) ) {
       $territory_neighbour_list = $params['from_territory']->get_territory_neighbour_list();
       $troops = $params['current_player']->get_territory_player_troops_list( $game->id, $game->current_turn, $params['from_territory']->id);
       if( count( $troops ) ) {
-        $neighbour_list = array();
         foreach( $territory_neighbour_list as $neighbour_array ) {
           $neighbour = Territory::instance( $neighbour_array['neighbour_id'] );
           $neighbour_list[  $neighbour->id ] = $neighbour->name;
@@ -130,7 +131,6 @@ class Move_Troops extends Player_Order {
       $territory_neighbour_list = $params['to_territory']->get_territory_neighbour_list();
       $territory_occupied_list = $params['current_player']->get_territory_player_troops_list( $game->id, $game->current_turn );
 
-      $neighbour_list = array();
       foreach( $territory_neighbour_list as $neighbour_array ) {
         foreach( $territory_occupied_list as $territory_occupied_hash ) {
           if( $territory_occupied_hash['territory_id'] == $neighbour_array['neighbour_id'] ) {
