@@ -79,13 +79,24 @@ class World extends World_Model {
     return $return;
   }
 
-  public function draw( $territories = null, $game_id = null ) {
+  public function draw( $options = array() ) {
+    $defaults = array(
+        'territories' => null,
+        'game_id' => null,
+        'size_x' => $this->size_x,
+        'size_y' => $this->size_y,
+        'offset_x' => 0,
+        'offset_y' => 0
+    );
+
+    foreach( $defaults as $key => $value ) {
+      if( !isset($options[$key] ) ) $options[ $key ] = $value;
+    }
+
+    extract( $options );
+
     if( $territories === null ) {
       $territories = $this->get_territories();
-      $size_x = $this->size_x;
-      $size_y = $this->size_y;
-      $offset_x = 0;
-      $offset_y = 0;
     }else {
       $size_x = 0;
       $size_y = 0;
@@ -99,15 +110,15 @@ class World extends World_Model {
           $offset_y = min( $offset_y, $pointAire->y );
         }
       }
-      $size_x = $size_x - $offset_x + 20;
-      $size_y = $size_y - $offset_y + 20;
       $offset_x -= 10;
       $offset_y -= 10;
+      $size_x = $size_x + 10;
+      $size_y = $size_y + 10;
     }
 
     $font = DIR_ROOT.'/style/arial.ttf';
 
-    $img = imagecreatetruecolor($size_x,$size_y);
+    $img = imagecreatetruecolor($size_x - $offset_x, $size_y - $offset_y);
     imagesavealpha($img, true);
 
     // Fill the image with transparent color
@@ -146,14 +157,17 @@ class World extends World_Model {
 
     $divisor = 100;
 
-    for($iw=1; $iw < $size_x / $divisor; $iw++){imageline($img, $iw * $divisor, 0, $iw * $divisor, $size_x, $white);}
-    for($ih=1; $ih < $size_y / $divisor; $ih++){imageline($img, 0, $ih * $divisor, $size_x, $ih * $divisor, $white);}
+    $offset_grid_x = $offset_x % 100;
+    $offset_grid_y = $offset_y % 100;
+
+    for($iw=1; $iw < $size_x / $divisor; $iw++){imageline($img, $iw * $divisor - $offset_grid_x, 0, $iw * $divisor - $offset_grid_x, $size_x, $white);}
+    for($ih=1; $ih < $size_y / $divisor; $ih++){imageline($img, 0, $ih * $divisor - $offset_grid_y, $size_x, $ih * $divisor - $offset_grid_y, $white);}
 
     foreach( $territories as $key => $area ) {
       $polygon = array();
       foreach( $area->vertices as $pointAire ) {
         $polygon[] = $pointAire->x - $offset_x;
-        $polygon[] = $size_y - ($pointAire->y - $offset_y);
+        $polygon[] = self::y( $size_y, $offset_y, $pointAire->y );
       }
 
       $color = $white;
@@ -181,7 +195,7 @@ class World extends World_Model {
     foreach( $territories as $key => $area ) {
       $lastPoint = $area->vertices[ count( $area ) - 1 ];
       foreach( $area->vertices as $point ) {
-        imageline($img, $lastPoint->x - $offset_x, $size_y - ($lastPoint->y - $offset_y), $point->x - $offset_x, $size_y - ($point->y - $offset_y), $sand);
+        imageline($img, $lastPoint->x - $offset_x, self::y($size_y, $offset_y, $lastPoint->y), $point->x - $offset_x, self::y($size_y, $offset_y, $point->y), $sand);
 
         $lastPoint = $point;
       }
@@ -195,10 +209,10 @@ class World extends World_Model {
       $textwidth = $bbox[2] - $bbox[0];
 
       // Ajout d'ombres au texte
-      imagettftext($img, 10, 0, ($centroid->x - $offset_x - $textwidth / 2) + 1, $size_y - ($centroid->y - $offset_y + 1), $grey, $font, $name);
+      imagettftext($img, 10, 0, ($centroid->x - $offset_x - $textwidth / 2) + 1, self::y($size_y, $offset_y, $centroid->y + 1), $grey, $font, $name);
 
       // Ajout du texte
-      imagettftext($img, 10, 0, ($centroid->x - $offset_x - $textwidth / 2), $size_y - ($centroid->y - $offset_y), $black, $font, $name);
+      imagettftext($img, 10, 0, ($centroid->x - $offset_x - $textwidth / 2), self::y($size_y, $offset_y, $centroid->y), $black, $font, $name);
       /*foreach( $area->vertices as $vertex ) {
         // Ajout d'ombres au texte
         imagettftext($img, 15, 0, $vertex->x + 3, $size_y - ($vertex->y + 3), $grey, $font, $vertex);
@@ -231,18 +245,34 @@ class World extends World_Model {
     return $img;
   }
 
-  public function drawImg( $with_map = false, $territories = null, $game_id = null ) {
-    $image = $this->draw( $territories, $game_id );
+  public static function y($size_y, $offset_y, $y) {
+    return $size_y - $y;
+  }
+
+  public function drawImg( $options = array() ) {
+    $defaults = array(
+        'with_map' => false,
+        'territories' => null,
+        'game_id' => null,
+        'size_x' => $this->size_x,
+        'size_y' => $this->size_y,
+        'offset_x' => 0,
+        'offset_y' => 0
+    );
+
+    foreach( $defaults as $key => $value ) {
+      if( !isset($options[$key] ) ) $options[ $key ] = $value;
+    }
+
+    extract( $options );
+
+    $image = $this->draw( $options );
     ob_start();
     imagepng($image);
     $imagevariable = ob_get_clean();
 
     if( $territories === null ) {
       $territories = $this->get_territories();
-      $size_x = $this->size_x;
-      $size_y = $this->size_y;
-      $offset_x = 0;
-      $offset_y = 0;
     }else {
       $size_x = 0;
       $size_y = 0;
@@ -276,6 +306,7 @@ class World extends World_Model {
         }
         echo '
         <area
+          territory="'.$territory->id.'"
           shape="polygon"
           coords="'.implode(',', $coords).'"
           href="'.Page::get_url('show_territory', array('id' => $territory->id)).'"

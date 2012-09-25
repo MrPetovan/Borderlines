@@ -6,10 +6,10 @@
 <div class="informations formulaire">
 
   <h3>Map</h3>
-<?php
-  //$world->initializeTerritories();
-  echo $world->drawImg(true, null, $current_game->id);
-?>
+<?php echo $world->drawImg(array(
+  'with_map' => true,
+  'game_id' => $current_game->id
+));?>
 <h3>Territories</h3>
 <?php
   if(count($world->territories)) {
