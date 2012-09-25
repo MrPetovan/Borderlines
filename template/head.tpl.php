@@ -8,8 +8,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <link rel="stylesheet" type="text/css" href="<?php echo URL_ROOT ?>style/commun.css" media="all" />
     <link rel="stylesheet" type="text/css" href="<?php echo URL_ROOT ?>style/framework.css" media="all" />
-    <link rel="stylesheet" type="text/css" href="<?php echo URL_ROOT ?>style/jquery.cluetip.css" media="all" />
-    <link rel="stylesheet" type="text/css" href="<?php echo URL_ROOT ?>style/jquery.tooltip.css" media="all" />
+    <link rel="stylesheet" type="text/css" href="<?php echo URL_ROOT ?>style/scramblednations.css" media="all" />
 
     <!--[if IE 7]>
     <link rel="stylesheet" type="text/css" href="style/ie7.css" media="all" />
@@ -24,7 +23,7 @@
   if (is_dir($dir_js_path)) {
     if ($dir_js = opendir($dir_js_path)) {
       while (($file_js = readdir($dir_js)) !== false) {
-        if($file_js != '.' && $file_js != '..') {
+        if($file_js != '.' && $file_js != '..' && !is_dir($dir_js_path.$file_js)) {
           $js_array[] = URL_ROOT.$dir_js_name.'/'.$file_js;
         }
       }
