@@ -4,8 +4,8 @@
   /* @var $current_player Player */
   /* @var $current_game Game */
 ?>
-<h2>Dashboard</h2>
-<p>Welcome <?php echo $current_player->get_name()?> !</p>
+<h2><?php __('Dashboard')?></h2>
+<p><?php echo __('Welcome %s !', $current_player->get_name())?></p>
 <div class="informations formulaire">
   <p>
     <span class="label"><?php echo __('Current game')?></span>
@@ -78,7 +78,12 @@
   if( $current_game->started ) {
 ?>
 
-<p><a href="<?php echo Page::get_url('show_world', array('id' => $current_game->world_id))?>">Go to the world map</a></p>
+<p>
+  <a href="<?php echo Page::get_url('show_world', array('id' => $current_game->world_id))?>">
+    <img src="<?php echo IMG.'img_html/world.png'?>" alt=""/>
+    <?php echo __('Go to the world map')?>
+  </a>
+</p>
 <h4>Wall</h4>
 <form action="<?php echo Page::get_url('shout', array('game_id' => $current_game->id ))?>" method="post">
   <p><?php echo '['.guess_time(time(), GUESS_TIME_LOCALE).']'?> <strong><?php echo wash_utf8($current_player->name)?></strong> : <input type="text" name="text" size="80" value=""/><button type="submit" name="action" value="shout">Say</button></p>
@@ -106,17 +111,17 @@
       $is_current = $turn == $current_game->current_turn;
 
       echo '
-  <tbody class="archive'._($is_current?' current':'').'">
+  <tbody class="archive'.($is_current?' current':'').'">
     <tr class="title">
       <th colspan="6">'.__('Turn %s', $turn).'</th>
     </tr>
     <tr>
-      <th>Territory</th>
-      <th>Owner</th>
-      <th>Type</th>
-      <th>Area</th>
-      <th>Status</th>
-      <th>Troops</th>
+      <th>'.__('Territory').'</th>
+      <th>'.__('Owner').'</th>
+      <th>'.__('Type').'</th>
+      <th>'.__('Area').'</th>
+      <th>'.__('Status').'</th>
+      <th>'.__('Troops').'</th>
     </tr>';
 
       $total_troops = 0;
@@ -161,16 +166,21 @@
     </tr>
   </tbody>
 </table>
-<p><a href="<?php echo Page::get_url('show_world', array('id' => $current_game->world_id))?>">Go to the world map</a></p>
-<h3>Diplomacy</h3>
+<p>
+  <a href="<?php echo Page::get_url('show_world', array('id' => $current_game->world_id))?>">
+    <img src="<?php echo IMG.'img_html/world.png'?>" alt=""/>
+    <?php echo __('Go to the world map')?>
+  </a>
+</p>
+<h3><?php echo __('Diplomacy')?></h3>
 <?php
     $player_diplomacy_list = $current_player->get_last_player_diplomacy_list($current_game->id, $current_game->current_turn );
 ?>
 <table>
   <tr>
-    <th>Player</th>
-    <th>Status</th>
-    <th>Change</th>
+    <th><?php echo __('Player')?></th>
+    <th><?php echo __('Status')?></th>
+    <th><?php echo __('Change')?></th>
   </tr>
 <?php
     foreach( $player_diplomacy_list as $player_diplomacy ) {
@@ -179,17 +189,17 @@
       echo '
   <tr>
     <td><a href="'.Page::get_url('show_player', array('id' => $player->id)).'">'.$player->name.'</a></td>
-    <td>'.$player_diplomacy['status'].'</td>
-    <td><a href="'.Page::get_url( PAGE_CODE, array('action' => 'change_diplomacy_status', 'to_player_id' => $player->id, 'new_status' => $new_status)).'">Change</a></td>
+    <td>'.__($player_diplomacy['status']).'</td>
+    <td><a href="'.Page::get_url( PAGE_CODE, array('action' => 'change_diplomacy_status', 'to_player_id' => $player->id, 'new_status' => $new_status)).'">'.__('Change').'</a></td>
   </tr>';
     }
 ?>
 </table>
-<h3>Economy</h3>
+<h3><?php echo __('Economy')?></h3>
 <?php
   $capital_id = null;
   $area = 0;
-  $previous_turn = $current_game->current_turn - 1;
+  $previous_turn = $current_game->current_turn;
   $territory_previous_owner_list = $current_player->get_territory_owner_list(null, $current_game->id, $previous_turn);
   foreach( $territory_previous_owner_list as $territory_owner_row ) {
 
@@ -209,7 +219,7 @@
 
   $troops_home = 0;
   $troops_away = 0;
-  $troops_list = $current_player->get_territory_player_troops_list($current_game->id, $previous_turn + 1);
+  $troops_list = $current_player->get_territory_player_troops_list($current_game->id, $previous_turn);
   foreach( $troops_list as $territory_player_troops_row ) {
     $is_home = false;
 
@@ -233,7 +243,7 @@
 
   // Is there a capital (after move) ?
   $capital_id = null;
-  $territory_current_owner_list = $current_player->get_territory_owner_list(null, $current_game->id, $previous_turn + 1);
+  $territory_current_owner_list = $current_player->get_territory_owner_list(null, $current_game->id, $previous_turn);
   foreach( $territory_current_owner_list as $territory_owner_row ) {
     if( $territory_owner_row['capital'] ) {
       $capital_id = $territory_owner_row['territory_id'];
@@ -247,19 +257,19 @@
 ?>
 <div class="informations formulaire">
   <p>
-    <span class="label">Total area of stable territory on turn <?php echo $previous_turn?></span>
+    <span class="label"><?php echo __('Total area of stable territory on turn %s', $previous_turn)?></span>
     <span class="value num"><?php echo l10n_number( round($area), 0 )?> km²</span>
   </p>
   <p>
-    <span class="label">Economy ratio</span>
-    <span class="value num"><?php echo l10n_number( $ratio, 12 )?></span>
+    <span class="label"><?php echo __('Economy ratio')?></span>
+    <span class="value num"><?php echo l10n_number( $ratio, 2 )?></span>
   </p>
   <p>
-    <span class="label">Total revenue for turn <?php echo $previous_turn + 1?></span>
+    <span class="label"><?php echo __('Total revenue for turn %s', $previous_turn)?></span>
     <span class="value num"><?php echo l10n_number( $revenue, 0 )?>  <img src="<?php echo IMG.'img_html/coins.png'?>" alt="" title="" /></span>
   </p>
   <p>
-    <span class="label">Troops home</span>
+    <span class="label"><?php echo __('Troops home')?></span>
     <span class="value num">
       <?php echo l10n_number( $troops_home, 0 )?> <img src="<?php echo IMG.'img_html/helmet.png'?>" alt="Troops" title="Troops" />
       @ <?php echo l10n_number( Game::HOME_TROOPS_MAINTENANCE, 0 )?> <img src="<?php echo IMG.'img_html/coins.png'?>" alt="" title="" />
@@ -267,7 +277,7 @@
     </span>
   </p>
   <p>
-    <span class="label">Troops away</span>
+    <span class="label"><?php echo __('Troops away')?></span>
     <span class="value num">
       <?php echo l10n_number( $troops_away, 0 )?> <img src="<?php echo IMG.'img_html/helmet.png'?>" alt="Troops" title="Troops" />
       @ <?php echo l10n_number( Game::AWAY_TROOPS_MAINTENANCE, 0)?> <img src="<?php echo IMG.'img_html/coins.png'?>" alt="" title="" />
@@ -275,26 +285,26 @@
     </span>
   </p>
   <p>
-    <span class="label">Total troops maintenance</span>
+    <span class="label"><?php echo __('Total troops maintenance')?></span>
     <span class="value num">
       <?php echo l10n_number( $troops_maintenance, 0 )?> <img src="<?php echo IMG.'img_html/coins.png'?>" alt="" title="" />
     </span>
   </p>
   <p>
-    <span class="label">Recruiting budget</span>
+    <span class="label"><?php echo __('Recruiting budget')?></span>
     <span class="value num">
       <?php echo l10n_number( $recruit_budget, 0 )?> <img src="<?php echo IMG.'img_html/coins.png'?>" alt="" title="" />
     </span>
   </p>
   <p>
-    <span class="label">Total troops recruited</span>
+    <span class="label"><?php echo __('Total troops recruited')?></span>
     <span class="value num">
       <?php echo l10n_number( $troops_recruited, 0 )?> <img src="<?php echo IMG.'img_html/helmet.png'?>" alt="Troops" title="Troops" />
       @ <?php echo l10n_number( Game::RECRUIT_TROOPS_PRICE, 0)?> <img src="<?php echo IMG.'img_html/coins.png'?>" alt="" title="" />
     </span>
   </p>
 </div>
-<h3>Message history</h3>
+<h3><?php echo __('Message history')?></h3>
 <?php
     $player_history_list = $current_player->get_player_history_list($current_game->id);
 ?>
@@ -315,8 +325,8 @@
       <th colspan="2">'.__('Turn %s', $player_history_row['turn']).'</th>
     </tr>
     <tr>
-      <th>Territory</th>
-      <th>Reason</th>
+      <th>'.__('Territory').'</th>
+      <th>'.__('Reason').'</th>
     </tr>';
 
         $current_turn = $player_history_row['turn'];
@@ -339,18 +349,18 @@
     // If game started and not ended
     if( ! $current_game->has_ended() ) {
 ?>
-<h3>Orders</h3>
-<h4>Orders planned</h4>
+<h3><?php echo __('Orders')?></h3>
+<h4><?php echo __('Orders planned')?></h4>
 <?php
       $orders = Player_Order::db_get_planned_by_player_id( $current_player->id, $current_game->id );
 ?>
 <table>
   <tr>
-    <th>Order Type</th>
-    <th>Ordered</th>
-    <th>Scheduled</th>
-    <th>Parameters</th>
-    <th>Action</th>
+    <th><?php echo __('Order Type')?></th>
+    <th><?php echo __('Ordered')?></th>
+    <th><?php echo __('Scheduled')?></th>
+    <th><?php echo __('Parameters')?></th>
+    <th><?php echo __('Action')?></th>
   </tr>
 <?php
       foreach( $orders as $player_order ) {
@@ -366,8 +376,7 @@
             $territory = Territory::instance( $value );
             $value = '<a href="'.Page::get_url('show_territory', array('id' => $territory->id)).'">'.$territory->name.'</a>';
           }
-
-          $param_string[] = ucfirst( str_replace( '_id', '', $key ) ).' : '.$value;
+          $param_string[] = ucwords( str_replace( array('_id','_'), array('', ' '), $key ) ).' : '.$value;
         }
         $param_string = implode('<br/>', $param_string);
         echo '
@@ -380,7 +389,7 @@
       <form action="'.Page::get_page_url('order').'" method="post">
         '.HTMLHelper::genererInputHidden('url_return', Page::get_page_url( PAGE_CODE ) ).'
         '.HTMLHelper::genererInputHidden('id', $player_order->get_id() ).'
-        <button type="submit" name="action" value="cancel">Cancel</button>
+        <button type="submit" name="action" value="cancel">'.__('Cancel').'</button>
       </form>
     </td>
   </tr>';
@@ -389,9 +398,9 @@
 </table>
 <?php
       if( $turn_ready['turn_ready'] <= $current_game->current_turn ) {
-        echo '<p>Status : Not ready for the next turn <a href="'.Page::get_url(PAGE_CODE, array('action' => 'ready')).'">Toggle</a></p>';
+        echo '<p>'.__('Status').' : <img src="'.IMG.'img_html/delete.png" alt="" /> '.__('Not ready for the next turn').' <a href="'.Page::get_url(PAGE_CODE, array('action' => 'ready')).'">'.__('Toggle').'</a></p>';
       }else {
-        echo '<p>Status : Ready for the next turn <a href="'.Page::get_url(PAGE_CODE, array('action' => 'notready')).'">Toggle</a></p>';
+        echo '<p>'.__('Status').' : <img src="'.IMG.'img_html/accept.png" alt="" /> '.__('Ready for the next turn').' <a href="'.Page::get_url(PAGE_CODE, array('action' => 'notready')).'">'.__('Toggle').'</a></p>';
       }
     }
   }
