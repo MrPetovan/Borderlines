@@ -14,6 +14,7 @@
     switch( getValue('action') ) {
       case 'generate': {
         $world->initialize_territories();
+        Page::redirect(PAGE_CODE, array('id' => $world->id));
         break;
       }
        default:
