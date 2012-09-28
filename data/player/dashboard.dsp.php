@@ -69,7 +69,7 @@
   } ?>
     </span>
   </p>
-
+<p><a href="<?php echo Page::get_url('game_over', array('id' => $current_game->id))?>"><img src="<?php echo IMG.'img_html/door_open.png'?>" alt="" /> <?php echo __('Quit game') ?></a></p>
 
 <?php } ?>
 </div>

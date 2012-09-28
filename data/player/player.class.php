@@ -20,6 +20,16 @@ WHERE `member_id` = ".mysql_ureal_escape_string( $member_id );
     return self::sql_to_list( $sql );
   }
 
+  public static function get_current( Member $member ) {
+    $return = null;
+    $player_list = Player::db_get_by_member_id( $member->get_id() );
+    if( count( $player_list ) ) {
+      $return = array_shift( $player_list );
+    }
+
+    return $return;
+  }
+
   public function get_resource_sum_list( $game_id = null ) {
     $return = null;
 
@@ -214,6 +224,7 @@ SELECT `id`
 FROM `'.Game::get_table_name().'`
 JOIN `game_player` ON `game_id` = `id`
 WHERE `player_id` = '.mysql_ureal_escape_string($this->get_id()).'
+AND `turn_leave` IS NULL
 AND `ended` IS NULL
 LIMIT 0,1';
 
@@ -252,12 +263,23 @@ ORDER BY SUM( `delta` ) DESC";
     return $return;
   }
 
-  public static function db_get_by_game( $game_id ) {
+  public static function db_get_by_game( $game_id, $active = null ) {
+    $where = '';
+    if( $active === true ) {
+      $where = '
+AND `turn_leave` IS NULL';
+    }elseif( $active === false ) {
+      $where = '
+AND `turn_leave` IS NOT NULL';
+    }elseif( is_numeric( $active ) ) {
+      $where = '
+AND `turn_leave` = '.  mysql_ureal_escape_string($active);
+    }
 
     $sql = '
 SELECT `player_id` as `id`
 FROM `game_player`
-WHERE `game_id` = '.mysql_ureal_escape_string($game_id);
+WHERE `game_id` = '.mysql_ureal_escape_string($game_id).$where;
 
     $return = self::sql_to_list( $sql );
 

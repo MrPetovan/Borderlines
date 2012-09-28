@@ -138,6 +138,16 @@ class Game extends Game_Model {
         );
       }
 
+      // Removing quitting players
+      $leaving_players = Player::db_get_by_game($this->id, $current_turn);
+      foreach( $leaving_players as $player ) {
+        $this->del_territory_player_troops($next_turn, null, $player->id);
+        foreach( Player_Order::db_get_planned_by_player_id($player->id, $this->id) as $order ) {
+          /* @var $order Player_Order */
+          $order->cancel();
+        }
+      }
+
       $order_list = $this->get_ready_orders( 'move_troops' );
       foreach( $order_list as $order ) {
         $order->execute();
@@ -239,12 +249,19 @@ class Game extends Game_Model {
         }
       }
 
+      $leaving_players = Player::db_get_by_game($this->id, $current_turn);
+      foreach( $leaving_players as $player ) {
+        foreach( $this->get_territory_owner_list(null, $next_turn, $player->id) as $territory_owner) {
+          $this->set_territory_owner($territory_owner['territory_id'], $next_turn, null, 0, 0);
+        }
+      }
+
       $order_list = $this->get_ready_orders( 'change_capital' );
       foreach( $order_list as $order ) {
         $order->execute();
       }
 
-      $player_list = Player::db_get_by_game($this->id);
+      $player_list = Player::db_get_by_game($this->id, true);
 
       // Revenues and recruit
       foreach( $player_list as $player ) {

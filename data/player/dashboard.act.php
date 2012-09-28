@@ -1,10 +1,8 @@
 <?php
-  $member = Member::instance( Member::get_current_user_id() );
+  $member = Member::get_current_user();
+  $current_player = Player::get_current( $member );
 
-  $player_list = Player::db_get_by_member_id( $member->get_id() );
-  if( count( $player_list ) ) {
-    $current_player = array_shift( $player_list );
-
+  if( $current_player ) {
     // Game retrival
     if( $current_game = $current_player->last_game ) {
       // In game OR game ended
