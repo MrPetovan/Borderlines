@@ -108,8 +108,6 @@ JOIN `information_schema`.`KEY_COLUMN_USAGE` k_c_u_column
   AND k_c_u_column.`REFERENCED_COLUMN_NAME` = k_c_u_unique.`REFERENCED_COLUMN_NAME`
   AND k_c_u_column.`CONSTRAINT_NAME` = k_c_u_unique.`MIN_CONSTRAINT_NAME`
 ORDER BY `CONSTRAINT_NAME`";
-    var_debug( $sql_fk );
-
     $res_fk = mysql_uquery($sql_fk);
 
     while($row_fk = mysql_fetch_row($res_fk)) {
