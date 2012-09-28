@@ -185,7 +185,7 @@ WHERE `created_by` = ".mysql_ureal_escape_string($created_by);
 AND `player_id` = '.mysql_ureal_escape_string($player_id);
 
     $sql = '
-SELECT `game_id`, `player_id`, `turn_ready`
+SELECT `game_id`, `player_id`, `turn_ready`, `turn_leave`
 FROM `game_player`
 WHERE `game_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
     $res = mysql_uquery($sql);
@@ -193,8 +193,8 @@ WHERE `game_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
     return mysql_fetch_to_array($res);
   }
 
-  public function set_game_player( $player_id, $turn_ready ) {
-    $sql = "REPLACE INTO `game_player` ( `game_id`, `player_id`, `turn_ready` ) VALUES (".mysql_ureal_escape_string( $this->get_id(), $player_id, $turn_ready ).")";
+  public function set_game_player( $player_id, $turn_ready, $turn_leave = null ) {
+    $sql = "REPLACE INTO `game_player` ( `game_id`, `player_id`, `turn_ready`, `turn_leave` ) VALUES (".mysql_ureal_escape_string( $this->get_id(), $player_id, $turn_ready, $turn_leave ).")";
 
     return mysql_uquery($sql);
   }

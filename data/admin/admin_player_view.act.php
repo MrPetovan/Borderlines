@@ -26,7 +26,8 @@
         if( $player->id ) {
           $flag_set_game_player = $player->set_game_player(
             ($value = getValue('game_id')) == ''?null:$value,
-            ($value = getValue('turn_ready')) == ''?null:$value
+            ($value = getValue('turn_ready')) == ''?null:$value,
+            ($value = getValue('turn_leave')) == ''?null:$value
           );
           if( ! $flag_set_game_player ) {
             Page::add_message( '$player->set_game_player : ' . mysql_error(), Page::PAGE_MESSAGE_ERROR );

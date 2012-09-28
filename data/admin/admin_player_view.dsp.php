@@ -104,12 +104,13 @@
       <thead>
         <tr>
           <th>Game Id</th>
-          <th>Turn Ready</th>          <th>Action</th>
+          <th>Turn Ready</th>
+          <th>Turn Leave</th>          <th>Action</th>
         </tr>
       </thead>
       <tfoot>
         <tr>
-          <td colspan="3"><?php echo count( $game_player_list )?> lignes</td>
+          <td colspan="4"><?php echo count( $game_player_list )?> lignes</td>
         </tr>
       </tfoot>
       <tbody>
@@ -120,7 +121,8 @@
         $game_id_game = Game::instance( $game_player['game_id'] );        echo '
         <tr>
         <td><a href="'.get_page_url('admin_game_view', true, array('id' => $game_id_game->id)).'">'.$game_id_game->name.'</a></td>
-        <td>'.$game_player['turn_ready'].'</td>          <td>
+        <td>'.$game_player['turn_ready'].'</td>
+        <td>'.$game_player['turn_leave'].'</td>          <td>
             <form action="'.get_page_url(PAGE_CODE, true, array('id' => $player->id)).'" method="post">
               '.HTMLHelper::genererInputHidden('id', $player->id).'
 
@@ -147,6 +149,10 @@
         </p>
         <p class="field">
           <?php echo HTMLHelper::genererInputText('turn_ready', null, array(), 'Turn Ready*' )?>
+          
+        </p>
+        <p class="field">
+          <?php echo HTMLHelper::genererInputText('turn_leave', null, array(), 'Turn Leave' )?>
           
         </p>
         <p><?php echo HTMLHelper::genererButton('action',  'set_game_player', array('type' => 'submit'), 'Ajouter un élément')?></p>
