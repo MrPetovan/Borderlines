@@ -66,16 +66,17 @@ AND m.`conversation_id` = '. mysql_ureal_escape_string($conversation_id);
     if( $game_id !== null ) {
       if( $game_id ) {
         $where = '
-AND `game_id` IS NOT NULL';
+AND c.`game_id` IS NOT NULL';
       }else {
         $where = '
-AND `game_id` IS NULL';
+AND c.`game_id` IS NULL';
       }
     }
     $sql = '
 SELECT IFNULL( COUNT(DISTINCT m.`conversation_id`), 0) AS `count`
 FROM `message_recipient` m_r
 JOIN `message` m ON m.`id` = m_r.`message_id`
+JOIN `conversation` c ON c.`id` = m.`conversation_id`
 WHERE m_r.`read` IS NULL
 AND m_r.`player_id` = '.  mysql_ureal_escape_string($player_id).$where;
     $res = mysql_uquery($sql);
