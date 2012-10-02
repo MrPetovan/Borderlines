@@ -30,6 +30,8 @@
   define('DATA', DIR_ROOT.'data/');
   // PATH du répertoire d'inclusions
   define('INC', DIR_ROOT.'inc/');
+  // PATH du répertoire de librairies
+  define('LIB', DIR_ROOT.'lib/');
   // PATH du répertoire des templates
   define('TPL', DIR_ROOT.'template/');
   // URL du répertoire des images
@@ -41,6 +43,12 @@
 
   // Constante de debug SQL général
   define('DEBUG_SQL', false);
+
+  set_include_path(implode(PATH_SEPARATOR, array(
+    INC,
+    LIB,
+    get_include_path(),
+  )));
 
   // Suppression des antislashes
   if (get_magic_quotes_gpc()) {
@@ -161,7 +169,7 @@
   define('PAGE_CODE', $PAGE_CODE);
   // ACT
   if($CURRENT_PAGE->get_act()) {
-    include($CURRENT_PAGE->get_act());
+    require($CURRENT_PAGE->get_act());
   }
 
   //DSP
@@ -169,10 +177,10 @@
     $PAGE_TITRE = '';
 
     ob_start();
-    include($CURRENT_PAGE->get_dsp());
+    require($CURRENT_PAGE->get_dsp());
     $PAGE_CONTENU = ob_get_clean();
 
-    include(TPL.$CURRENT_PAGE->get_tpl_file());
+    require(TPL.$CURRENT_PAGE->get_tpl_file());
   }
 
   if(DEBUG_SQL){
