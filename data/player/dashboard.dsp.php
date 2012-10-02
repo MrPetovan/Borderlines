@@ -131,10 +131,12 @@
         $territory = Territory::instance( $territory_row['territory_id'] );
         $owner = Player::instance( $territory_row['owner_id'] );
         $total_troops += $territory_row['quantity'];
-        if( $territory_row['contested'] ) {
-          $total_contested += $territory->area;
+        if( $owner == $current_player ) {
+          if( $territory_row['contested'] ) {
+            $total_contested += $territory->area;
+          }
+          $total_territory += $territory->area;
         }
-        $total_territory += $territory->area;
         echo '
     <tr>
       <td><a href="'.Page::get_url('show_territory', array('id' => $territory->id)).'">'.$territory->name.'</a></td>
@@ -320,7 +322,7 @@
   </tbody>';
         }
         echo '
-  <tbody class="archive'._($is_current?' current':'').'">
+  <tbody class="archive'.__($is_current?' current':'').'">
     <tr class="title">
       <th colspan="2">'.__('Turn %s', $player_history_row['turn']).'</th>
     </tr>
