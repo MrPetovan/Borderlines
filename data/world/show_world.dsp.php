@@ -52,4 +52,3 @@
   }
 
 ?>
-<p><a href="<?php echo get_page_url('world_list')?>">Return to world list</a></p>
