@@ -4,7 +4,12 @@
   // TODO : Create player page
   $player_list = Player::db_get_by_member_id( $member->id );
   $current_player = array_shift( $player_list );
-  $current_game = $current_player->current_game;
+
+  if( is_admin() && ( $game_id = getValue('game_id') ) ) {
+    $current_game = Game::instance( $game_id );
+  }else {
+    $current_game = $current_player->current_game;
+  }
 
   $territory = Territory::instance( getValue('id') );
 

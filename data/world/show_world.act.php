@@ -5,13 +5,21 @@
   $player_list = Player::db_get_by_member_id( $member->id );
   $current_player = array_shift( $player_list );
 
-  if( $current_game = $current_player->current_game ) {
-    if( $current_game->world_id != getValue('id') ) {
-      Page::redirect(PAGE_CODE, array('id' => $current_game->word_id));
+  if( is_admin() && ( $game_id = getValue('game_id') ) ) {
+    $current_game = Game::instance( $game_id );
+  }else {
+    $current_game = $current_player->current_game;
+  }
+
+  if( ! $world_id = getValue('id') ) {
+    if( $current_game ) {
+      $world_id = $current_game->world_id;
+    }else {
+      Page::redirect('game_list');
     }
   }
 
-  $world = World::instance( getValue('id') );
+  $world = World::instance( $world_id );
 
   if( !$world->id ) {
     Page::add_message('Unknown world', Page::PAGE_MESSAGE_ERROR);
