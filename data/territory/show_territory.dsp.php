@@ -109,7 +109,7 @@
   </tbody>';
         }
         echo '
-  <tbody class="archive'._($is_current?' current':'').'">
+  <tbody class="archive'.__($is_current?' current':'').'">
     <tr class="title">
       <th colspan="2">'.__('Turn %s', $territory_player_troops['turn']).'</th>
     </tr>';
@@ -199,34 +199,29 @@
 <p><?php echo __("You don't have planned any order in this territory")?>
 <?php endif;?>
 <?php
-    $class = 'move_troops';
+    echo Player_Order::get_html_form_by_class(
+      'move_troops',
+      array('current_player' => $current_player, 'from_territory' => $territory),
+      array('id' => $territory->id )
+    );
 
-    require_once(DATA.'order_type/'.$class.'.class.php');
+    echo Player_Order::get_html_form_by_class(
+      'move_troops',
+      array('current_player' => $current_player, 'to_territory' => $territory),
+      array('id' => $territory->id )
+    );
 
-    echo $class::get_html_form( array(
-      'page_code' => PAGE_CODE,
-      'page_params' => array('id' => $territory->id ),
-      'current_player' => $current_player,
-      'to_territory' => $territory
-    ));
+    echo Player_Order::get_html_form_by_class(
+      'give_troops',
+      array('current_player' => $current_player, 'from_territory' => $territory),
+      array('id' => $territory->id )
+    );
 
-    echo $class::get_html_form( array(
-      'page_code' => PAGE_CODE,
-      'page_params' => array('id' => $territory->id ),
-      'current_player' => $current_player,
-      'from_territory' => $territory
-    ));
-
-    $class = 'change_capital';
-
-    require_once(DATA.'order_type/'.$class.'.class.php');
-
-    echo $class::get_html_form( array(
-      'page_code' => PAGE_CODE,
-      'page_params' => array('id' => $territory->id ),
-      'current_player' => $current_player,
-      'territory' => $territory
-    ));
+    echo Player_Order::get_html_form_by_class(
+      'change_capital',
+      array('current_player' => $current_player, 'territory' => $territory),
+      array('id' => $territory->id )
+    );
   }
 ?>
 <?php if( !$is_ajax ) :?>
