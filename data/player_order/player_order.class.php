@@ -81,6 +81,21 @@ ORDER BY `datetime_execution` DESC, `".self::get_table_name()."`.`player_id`";
     return $return;
   }
 
+  public static function get_html_form_by_class( $class, $order_params = array(), $page_params = array(), $page_code = PAGE_CODE ) {
+
+    require_once(DATA.'order_type/'.$class.'.class.php');
+
+    $options = array_merge(
+      array(
+        'page_code' => $page_code,
+        'page_params' => $page_params
+      ),
+      $order_params
+    );
+
+    return $class::get_html_form( $options );
+  }
+
   public static function get_html_form( $params ) {}
 
   // /CUSTOM

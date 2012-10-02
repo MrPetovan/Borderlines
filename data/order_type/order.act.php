@@ -7,7 +7,7 @@
     if( $action == "cancel" ) {
       if( $player_order_id = getValue('id') ) {
         $player_order = Player_Order::instance( $player_order_id );
-        
+
         if( $player_order && $current_player->get_id() == $player_order->get_player_id() ) {
           $order_type = Order_Type::instance( $player_order->order_type_id );
           $class = $order_type->class_name;
@@ -17,7 +17,7 @@
             Page::set_message('Order successfuly canceled');
           }else {
             Page::set_message( 'Error while canceling order', Page::PAGE_MESSAGE_ERROR );
-          }          
+          }
         }else {
           Page::set_message( 'Error while canceling order', Page::PAGE_MESSAGE_ERROR );
         }
@@ -27,14 +27,14 @@
     }else {
       $order_type = Order_Type::db_get_by_class_name( $action );
       require_once(DATA.'order_type/'.$action.'.class.php');
-      
+
       $player_order = $action::instance();
-      
+
       $player_order->plan( $order_type, $current_player, getValue('parameters') );
-      
+
       // TODO : Check parameters
       // $player_order->check();
-      
+
       if( $player_order->save() ) {
         Page::set_message( 'Order successfully saved' );
       }else {
