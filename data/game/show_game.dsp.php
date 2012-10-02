@@ -66,8 +66,6 @@
 <h3>Players</h3>
 <?php
 
-  $game_player_list = $game->get_game_player_list();
-
   if(count($game_player_list)) {
 ?>
 <table>
@@ -75,21 +73,32 @@
     <tr>
       <th>Player</th>
       <th>Turn Ready</th>
+      <th>Controlled territory</th>
+      <th>Total troops</th>
     </tr>
   </thead>
   <tfoot>
     <tr>
-      <td colspan="3"><?php echo count( $game_player_list ).($game->max_players?'/'.$game->max_players:'')?> players</td>
+      <td colspan="4"><?php echo count( $game_player_list ).($game->max_players?'/'.$game->max_players:'')?> players</td>
     </tr>
   </tfoot>
   <tbody>
 <?php
-    foreach( $game_player_list as $game_player ) {
-      $player_id_player = Player::instance( $game_player['player_id'] );
+    foreach( $game_player_list as $game_player_row ) {
+      $player_id_player = Player::instance( $game_player_row['player_id'] );
       echo '
     <tr>
-      <td><a href="'.get_page_url('show_player', true, array('id' => $player_id_player->id)).'">'.$player_id_player->name.'</a></td>
-      <td>'.$game_player['turn_ready'].'</td>
+      <td><a href="'.get_page_url('show_player', true, array('id' => $player_id_player->id)).'">'.$player_id_player->name.'</a></td>';
+      if( $game_player_row['turn_leave'] ) {
+        echo '
+      <td colspan="3">'.__('Left the game on turn %s', $game_player_row['turn_leave']).'</td>';
+      }else {
+        echo '
+      <td class="num">'.$game_player_row['turn_ready'].'</td>
+      <td class="num">'.l10n_number( $player_area[ $game_player_row['player_id'] ] ).' km²</td>
+      <td class="num">'.l10n_number( $player_troops[ $game_player_row['player_id'] ] ).' <img src="'.IMG.'img_html/helmet.png" alt="Troops" title="Troops"/></td>';
+      }
+      echo '
     </tr>';
     }
 ?>
