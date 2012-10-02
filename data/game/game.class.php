@@ -12,7 +12,7 @@ class Game extends Game_Model {
 
   const HOME_TROOPS_MAINTENANCE = 1;
   const AWAY_TROOPS_MAINTENANCE = 2;
-  const RECRUIT_TROOPS_PRICE = 4;
+  const RECRUIT_TROOPS_PRICE = 10;
 
   public function get_status_string() {
     $return = "Waiting for players";
@@ -146,6 +146,11 @@ class Game extends Game_Model {
           /* @var $order Player_Order */
           $order->cancel();
         }
+      }
+
+      $order_list = $this->get_ready_orders( 'give_troops' );
+      foreach( $order_list as $order ) {
+        $order->execute();
       }
 
       $order_list = $this->get_ready_orders( 'move_troops' );
