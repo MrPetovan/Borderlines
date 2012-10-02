@@ -1,0 +1,3 @@
+[submodule "lib/php-voronoi"]
+	path = lib/php-voronoi
+	url = git://github.com/sroze/PHP-Voronoi-algorithm.git
