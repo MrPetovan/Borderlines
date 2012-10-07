@@ -162,9 +162,27 @@
   $CURRENT_USER = Member::get_current_user();
 
   //setlocale( LC_TIME, 'en_US.UTF8');
-  $locale = isset($_COOKIE['locale']) ? $_COOKIE['locale'] : $_SERVER['HTTP_ACCEPT_LANGUAGE'];
-  $locale = str_replace( '-', '_', array_pop( array_reverse( explode( ',', $locale) ) ) ).'.UTF8';
-  setlocale(LC_ALL, $locale );
+  if( isset($_POST['setlocale']) ) {
+    $locale = $_POST['locale'];
+  }else {
+    $locale = isset($_COOKIE['locale']) ? $_COOKIE['locale'] : $_SERVER['HTTP_ACCEPT_LANGUAGE'];
+    $locale = str_replace( '-', '_', array_pop( array_reverse( explode( ',', $locale) ) ) );
+  }
+
+  if( !in_array( $locale, $locale_array = explode(',', LOCALES ) ) ) {
+    $locale = $locale_array[0];
+  }
+
+  setcookie("locale", $locale, time() + 30 * 24 * 3600);
+
+  define('LOCALE', $locale);
+
+  if( is_file(DIR_ROOT. 'lang' . DIRECTORY_SEPARATOR . $locale . DIRECTORY_SEPARATOR . 'translation.inc.php')) {
+    include DIR_ROOT. 'lang' . DIRECTORY_SEPARATOR . $locale . DIRECTORY_SEPARATOR . 'translation.inc.php';
+    //include DIR_ROOT. 'lang' . DIRECTORY_SEPARATOR . $locale . DIRECTORY_SEPARATOR . 'static.inc.php';
+  }
+
+  setlocale(LC_ALL, $locale . '.UTF8' );
 
   define('PAGE_CODE', $PAGE_CODE);
   // ACT

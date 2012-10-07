@@ -963,10 +963,15 @@ function which_os ()
   }
 
   function __($format, $args = null) {
+    global $i10n_replacements;
     if( $args !== null ) {
       if( !is_array( $args ) ) {
         $args = array_slice(func_get_args(), 1);
       }
+    }
+
+    if( isset( $i10n_replacements[ $format ] ) && $i10n_replacements[ $format ] !== null ) {
+      $format = $i10n_replacements[ $format ];
     }
 
     return vsprintf( $format, $args );

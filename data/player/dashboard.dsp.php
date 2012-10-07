@@ -4,7 +4,7 @@
   /* @var $current_player Player */
   /* @var $current_game Game */
 ?>
-<h2><?php __('Dashboard')?></h2>
+<h2><?php echo __('Dashboard')?></h2>
 <p><?php echo __('Welcome %s !', $current_player->get_name())?></p>
 <div class="informations formulaire">
   <p>

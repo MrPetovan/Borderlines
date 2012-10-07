@@ -53,7 +53,18 @@
       </div>
     </section>
     <footer>
-      <p>&copy; Hypolite</p>
+
+      <form action="<?php echo Page::get_url(PAGE_CODE, $_GET)?>" method="post">
+        <p>2012<?php echo date('Y') != 2012?' - '.date('Y'):''?> &copy; Hypolite |
+          <?php echo __('Change language:')?>
+          <select name="locale">
+            <?php foreach( explode(',', LOCALES) as $locale ) :?>
+            <option value="<?php echo $locale?>"<?php echo $locale == LOCALE?' selected="selected"':''?>><?php echo __($locale)?></option>
+            <?php endforeach;?>
+          </select>
+          <button type="submit" name="setlocale" value="1">Set</button>
+        </p>
+      </form>
     </footer>
 <?php
   if(DEBUG_SQL) {
