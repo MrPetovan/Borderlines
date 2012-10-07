@@ -1,30 +1,49 @@
 <?php
-  $PAGE_TITRE = 'World : Showing "'.$world->name.'"';
+  $PAGE_TITRE = __('World : Showing "%s"', $world->name );
 
+  $is_current_turn = $turn == $current_game->current_turn;
 ?>
-<h2>Showing "<?php echo $world->name?>"</h2>
-<div class="informations formulaire">
 
-  <h3>Map</h3>
+<?php if( $is_current_turn ) :?>
+<h2><?php echo __('Showing "%s"', $world->name)?></h2>
+<?php else :?>
+<h2><?php echo __('Showing "%s" on turn %s', $world->name, $turn)?></h2>
+<?php endif;?>
+
+<ul>
+<?php for( $i = 0; $i <= $current_game->current_turn; $i ++ ) :?>
+  <li>
+      <?php if( $i == $turn ) : ?>
+    <span><?php echo __('Turn %s', $i)?></span>
+      <?php else:?>
+    <a href="<?php echo Page::get_url('show_world', array('id' => $current_game->world_id, 'game_id' => $current_game->id, 'turn' => $i))?>">
+        <?php echo __('Turn %s', $i)?>
+    </a>
+      <?php endif;?>
+  </li>
+<?php endfor;?>
+</ul>
+
+<h3><?php echo __('Map')?></h3>
 <?php echo $world->drawImg(array(
   'with_map' => true,
-  'game_id' => $current_game->id
+  'game_id' => $current_game->id,
+  'turn' => $turn
 ));?>
-<h3>Territories</h3>
-<?php
-  if(count($world->territories)) {
-?>
+
+<h3><?php echo __('Territories')?></h3>
+<?php if(count($world->territories)) :?>
 <table>
   <thead>
     <tr>
-      <th>Name</th>
-      <th>Area</th>
-      <th>Owner</th>
+      <th><?php echo __('Name')?></th>
+      <th><?php echo __('Area')?></th>
+      <th><?php echo __('Owner')?></th>
     </tr>
   </thead>
   <tfoot>
     <tr>
-      <td colspan="3"><?php echo count( $world->territories )?> territories</td>
+      <td colspan="3"><?php echo __('%s territories', count( $world->territories ))?></td>
     </tr>
   </tfoot>
   <tbody>
@@ -38,17 +57,16 @@
       echo '
     <tr>
       <td><a href="'.get_page_url('show_territory', true, array('id' => $territory->id)).'">'.$territory->name.'</a></td>
-      <td>'.$territory->get_area().' km²</td>
-      <td>'.($owner_id?'<a href="'.Page::get_url('show_player', array('id' => $owner->id)).'">'.$owner->name.'</a>':'Nobody').'</td>
+      <td>'.l10n_number( $territory->get_area() ).' km²</td>
+      <td>'.($owner_id?'<a href="'.Page::get_url('show_player', array('id' => $owner->id)).'">'.$owner->name.'</a>':__('Nobody')).'</td>
     </tr>';
     }
 ?>
   </tbody>
 </table>
-<?php
-  }else {
-    echo '
-<p>No territories yet</p>';
-  }
 
-?>
+<?php else: ?>
+
+<p><?php echo __('No territories yet')?></p>
+
+<?php endif; //if(count($world->territories))?>

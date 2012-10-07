@@ -11,6 +11,11 @@
     $current_game = $current_player->current_game;
   }
 
+  $turn = getValue('turn');
+  if( $turn === null ) {
+    $turn = $current_game->current_turn;
+  }
+
   $territory = Territory::instance( getValue('id') );
 
   if( !$territory->id ) {

@@ -19,6 +19,11 @@
     }
   }
 
+  $turn = getValue('turn');
+  if( $turn === null ) {
+    $turn = $current_game->current_turn;
+  }
+
   $world = World::instance( $world_id );
 
   if( !$world->id ) {

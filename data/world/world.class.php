@@ -10,6 +10,8 @@ class World extends World_Model {
 
   // CUSTOM
 
+  const TILE_DIR = 'cache/world/';
+
   protected $territories = null;
 
   public function get_territories() {
@@ -29,9 +31,13 @@ class World extends World_Model {
     if( $return ) {
       Territory::db_remove_by_world_id( $this->id );
 
+      foreach (glob(DIR_ROOT . self::TILE_DIR . '/tile_'.$this->id.'*') as $removeFile) {
+        unlink($removeFile);
+      }
+
       $graph = new Graph();
-      $graph->randomVertexGenerationDisk( $this->size_x, 100, 120 );
-      $graph->randomNoncrossingEdgeGeneration( 2, 200 );
+      $graph->randomVertexGenerationDisk( $this->size_x, 100, 110 );
+      $graph->randomNoncrossingEdgeGeneration( 2, 150 );
 
       $this->territories = Territory::find_in_graph( $graph );
 
@@ -83,10 +89,12 @@ class World extends World_Model {
     $defaults = array(
         'territories' => null,
         'game_id' => null,
+        'turn' => null,
         'size_x' => $this->size_x,
         'size_y' => $this->size_y,
         'offset_x' => 0,
-        'offset_y' => 0
+        'offset_y' => 0,
+        'ratio' => 1
     );
 
     foreach( $defaults as $key => $value ) {
@@ -118,7 +126,7 @@ class World extends World_Model {
 
     $font = DIR_ROOT.'/style/arial.ttf';
 
-    $img = imagecreatetruecolor($size_x - $offset_x, $size_y - $offset_y);
+    $img = imagecreatetruecolor(($size_x - $offset_x) * $ratio, ($size_y - $offset_y) * $ratio);
     imagesavealpha($img, true);
 
     // Fill the image with transparent color
@@ -160,19 +168,19 @@ class World extends World_Model {
     $offset_grid_x = $offset_x % 100;
     $offset_grid_y = $offset_y % 100;
 
-    for($iw=1; $iw < $size_x / $divisor; $iw++){imageline($img, $iw * $divisor - $offset_grid_x, 0, $iw * $divisor - $offset_grid_x, $size_x, $white);}
-    for($ih=1; $ih < $size_y / $divisor; $ih++){imageline($img, 0, $ih * $divisor - $offset_grid_y, $size_x, $ih * $divisor - $offset_grid_y, $white);}
+    for($iw=1; $iw < $size_x / $divisor; $iw++){imageline($img, ($iw * $divisor - $offset_grid_x) * $ratio, 0, ($iw * $divisor - $offset_grid_x) * $ratio, $size_x * $ratio, $white);}
+    for($ih=1; $ih < $size_y / $divisor; $ih++){imageline($img, 0, ($ih * $divisor - $offset_grid_y) * $ratio, $size_x * $ratio, ($ih * $divisor - $offset_grid_y) * $ratio, $white);}
 
     foreach( $territories as $key => $area ) {
       $polygon = array();
       foreach( $area->vertices as $pointAire ) {
-        $polygon[] = $pointAire->x - $offset_x;
-        $polygon[] = self::y( $size_y, $offset_y, $pointAire->y );
+        $polygon[] = ($pointAire->x - $offset_x) * $ratio;
+        $polygon[] = self::y( $size_y, $offset_y, $pointAire->y ) * $ratio;
       }
 
       $color = $white;
       if( $game_id !== null ) {
-        $owner_id = $area->get_owner($game_id);
+        $owner_id = $area->get_owner($game_id, $turn);
         if( $owner_id ) {
           $color = $player_colors[ $owner_id ];
         }
@@ -181,10 +189,10 @@ class World extends World_Model {
       imagefilledpolygon( $img, $polygon, count( $area->vertices ), $color );
 
       if( $game_id !== null ) {
-        if( $area->is_capital($game_id) ) {
+        if( $area->is_capital($game_id, $turn) ) {
           imagefilledpolygon( $img, $polygon, count( $area->vertices ), $veil );
         }
-        if( $area->is_contested($game_id) ) {
+        if( $area->is_contested($game_id, $turn) ) {
           $tile_contested = imagecreatefrompng( DIR_ROOT.'img/img_css/conflict.png');
           imagesettile($img, $tile_contested);
           imagefilledpolygon( $img, $polygon, count( $area->vertices ), IMG_COLOR_TILED );
@@ -195,7 +203,7 @@ class World extends World_Model {
     foreach( $territories as $key => $area ) {
       $lastPoint = $area->vertices[ count( $area ) - 1 ];
       foreach( $area->vertices as $point ) {
-        imageline($img, $lastPoint->x - $offset_x, self::y($size_y, $offset_y, $lastPoint->y), $point->x - $offset_x, self::y($size_y, $offset_y, $point->y), $sand);
+        imageline($img, ($lastPoint->x - $offset_x) * $ratio, self::y($size_y, $offset_y, $lastPoint->y) * $ratio, ($point->x - $offset_x) * $ratio, self::y($size_y, $offset_y, $point->y) * $ratio, $sand);
 
         $lastPoint = $point;
       }
@@ -209,10 +217,10 @@ class World extends World_Model {
       $textwidth = $bbox[2] - $bbox[0];
 
       // Ajout d'ombres au texte
-      imagettftext($img, 10, 0, ($centroid->x - $offset_x - $textwidth / 2) + 1, self::y($size_y, $offset_y, $centroid->y + 1), $grey, $font, $name);
+      imagettftext($img, 10, 0, ($centroid->x - $offset_x - $textwidth / 2) * $ratio + 1, self::y($size_y, $offset_y, $centroid->y ) * $ratio + 1, $grey, $font, $name);
 
       // Ajout du texte
-      imagettftext($img, 10, 0, ($centroid->x - $offset_x - $textwidth / 2), self::y($size_y, $offset_y, $centroid->y), $black, $font, $name);
+      imagettftext($img, 10, 0, ($centroid->x - $offset_x - $textwidth / 2) * $ratio, self::y($size_y, $offset_y, $centroid->y) * $ratio, $black, $font, $name);
       /*foreach( $area->vertices as $vertex ) {
         // Ajout d'ombres au texte
         imagettftext($img, 15, 0, $vertex->x + 3, $size_y - ($vertex->y + 3), $grey, $font, $vertex);
@@ -254,6 +262,7 @@ class World extends World_Model {
         'with_map' => false,
         'territories' => null,
         'game_id' => null,
+        'turn' => null,
         'size_x' => $this->size_x,
         'size_y' => $this->size_y,
         'offset_x' => 0,
@@ -300,7 +309,7 @@ class World extends World_Model {
         foreach( $territory->vertices as $vertex ) {
           $coords[] = ( $vertex->x - $offset_x ) .','. ($size_y - ($vertex->y - $offset_y));
         }
-        $owner_id = $territory->get_owner($game_id);
+        $owner_id = $territory->get_owner($game_id, $turn);
         if( $owner_id != null ) {
           $owner = Player::instance($owner_id);
         }
@@ -311,8 +320,8 @@ class World extends World_Model {
           coords="'.implode(',', $coords).'"
           href="'.Page::get_url('show_territory', array('id' => $territory->id)).'"
           title="'.$territory->name.' ('.($owner_id?$owner->name:'Nobody').')'.
-                  ($territory->is_capital($game_id)?' [Capital]':'').
-                  ($territory->is_contested($game_id)?' <Contested>':'').
+                  ($territory->is_capital($game_id, $turn)?' [Capital]':'').
+                  ($territory->is_contested($game_id, $turn)?' <Contested>':'').
                 '" />';
       }
       echo '
