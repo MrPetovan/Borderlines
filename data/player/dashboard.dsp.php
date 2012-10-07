@@ -79,7 +79,7 @@
 ?>
 
 <p>
-  <a href="<?php echo Page::get_url('show_world', array('id' => $current_game->world_id))?>">
+  <a href="<?php echo Page::get_url('show_world', array('game_id' => $current_game->id))?>">
     <img src="<?php echo IMG.'img_html/world.png'?>" alt=""/>
     <?php echo __('Go to the world map')?>
   </a>
@@ -169,7 +169,7 @@
   </tbody>
 </table>
 <p>
-  <a href="<?php echo Page::get_url('show_world', array('id' => $current_game->world_id))?>">
+  <a href="<?php echo Page::get_url('show_world', array('game_id' => $current_game->id))?>">
     <img src="<?php echo IMG.'img_html/world.png'?>" alt=""/>
     <?php echo __('Go to the world map')?>
   </a>
