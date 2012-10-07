@@ -71,6 +71,8 @@
   require_once(INC.'db.inc.php');
   // Fonctions générales
   require_once(INC.'fonctions.inc.php');
+  // i18n functions
+  require_once(INC.'i18n.inc.php');
   // Fonctions liées aux pages
   require_once(INC.'page.inc.php');
   // Fonctions système de fichier
@@ -177,10 +179,7 @@
 
   define('LOCALE', $locale);
 
-  if( is_file(DIR_ROOT. 'lang' . DIRECTORY_SEPARATOR . $locale . DIRECTORY_SEPARATOR . 'translation.inc.php')) {
-    include DIR_ROOT. 'lang' . DIRECTORY_SEPARATOR . $locale . DIRECTORY_SEPARATOR . 'translation.inc.php';
-    //include DIR_ROOT. 'lang' . DIRECTORY_SEPARATOR . $locale . DIRECTORY_SEPARATOR . 'static.inc.php';
-  }
+  $i18n_replacements = load_translations( $locale );
 
   setlocale(LC_ALL, $locale . '.UTF8' );
 
