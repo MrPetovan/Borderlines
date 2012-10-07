@@ -32,7 +32,12 @@
     $player_troops[ $territory_player_troops_row['player_id'] ] += $territory_player_troops_row['quantity'];
   }
   $territory_owner_list = $game->get_territory_owner_list(null, $game->current_turn);
+
   foreach( $territory_owner_list as $territory_owner_row ) {
     $territory = Territory::instance( $territory_owner_row['territory_id'] );
-    $player_area[ $territory_owner_row['owner_id'] ] += $territory->area;
+    if( isset( $player_area[ $territory_owner_row['owner_id'] ] )) {
+      $player_area[ $territory_owner_row['owner_id'] ] += $territory->area;
+    }else {
+      $player_area[ $territory_owner_row['owner_id'] ] = $territory->area;
+    }
   }
