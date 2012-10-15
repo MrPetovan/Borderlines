@@ -55,12 +55,15 @@ ORDER BY `datetime_execution` DESC, `".self::get_table_name()."`.`player_id`";
     return mysql_fetch_to_array( $res );
   }
 
-  public function plan( Order_Type $order_type, Player $player, $params ) {
+  public function plan( Order_Type $order_type, Player $player, $params = array(), $turn = null ) {
+    if( is_null( $turn ) ) {
+      $turn = $player->current_game->current_turn;
+    }
     $this->order_type_id = $order_type->id;
     $this->player_id = $player->id;
     $this->game_id = $player->current_game->id;
-    $this->turn_ordered = $player->current_game->current_turn;
-    $this->turn_scheduled = $player->current_game->current_turn;
+    $this->turn_ordered = $turn;
+    $this->turn_scheduled = $turn;
     $this->datetime_order = time();
     $this->datetime_scheduled = time();
     $this->parameters = $params;
@@ -97,6 +100,48 @@ ORDER BY `datetime_execution` DESC, `".self::get_table_name()."`.`player_id`";
   }
 
   public static function get_html_form( $params ) {}
+
+  public static function factory($order_type_id, $id = null) {
+    $order_type = Order_Type::instance( $order_type_id );
+    $class = $order_type->class_name;
+    return self::factory_by_class($class, $id);
+  }
+
+  public static function factory_by_class($class, $id = null) {
+    require_once(DATA.'order_type/'.$class.'.class.php');
+    return $class::instance($id);
+  }
+
+
+  /**
+     * Fonction retournant une liste d'objets en fonction d'une requête SQL
+     *
+     * La requête doit contenir un champ "id".
+     *
+     * @param $sql string Requête SQL à exécuter
+     * @param $class string Classe des objets à créer
+     * @return array Tableau des objets
+     * @static
+     */
+    protected static function sql_to_list($sql) {
+      $res = mysql_uquery($sql);
+
+      if($res) {
+        $return = array();
+        while($data = mysql_fetch_assoc($res)) {
+          if( isset( $data['order_type_id'] ) ) {
+            $return[$data['id']] = self::factory( $data['order_type_id'], $data['id'] );
+          }else {
+            $return[$data['id']] = self::instance( $data['id'] );
+          }
+        }
+        mysql_free_result($res);
+      }else {
+        $return = false;
+      }
+
+      return $return;
+    }
 
   // /CUSTOM
 
