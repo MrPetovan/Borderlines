@@ -60,7 +60,7 @@
 <?php $world = World::instance($game->world_id);?>
   <p class="field">
     <span class="libelle"><?php echo __('World')?></span>
-    <span class="value"><a href="<?php echo Page::get_url('show_world', array('id' => $world->id))?>"><?php echo $world->name?></a></span>
+    <span class="value"><a href="<?php echo Page::get_url('show_world', array('game_id' => $game->id))?>"><?php echo $world->name?></a></span>
   </p>
 </div>
 <h3><?php echo __('Players')?></h3>
