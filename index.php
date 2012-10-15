@@ -164,11 +164,15 @@
   $CURRENT_USER = Member::get_current_user();
 
   //setlocale( LC_TIME, 'en_US.UTF8');
+  $locale = null;
   if( isset($_POST['setlocale']) ) {
     $locale = $_POST['locale'];
   }else {
-    $locale = isset($_COOKIE['locale']) ? $_COOKIE['locale'] : $_SERVER['HTTP_ACCEPT_LANGUAGE'];
-    $locale = str_replace( '-', '_', array_pop( array_reverse( explode( ',', $locale) ) ) );
+    if( isset($_COOKIE['locale']) ) {
+      $locale = $_COOKIE['locale'];
+    }elseif( isset( $_SERVER['HTTP_ACCEPT_LANGUAGE'] )) {
+      $locale = str_replace( '-', '_', array_pop( array_reverse( explode( ',', $_SERVER['HTTP_ACCEPT_LANGUAGE']) ) ) );
+    }
   }
 
   if( !in_array( $locale, $locale_array = explode(',', LOCALES ) ) ) {
