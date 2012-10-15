@@ -22,10 +22,8 @@
   }
 
   echo '
-  <div class="texte_contenu">';
-    admin_menu(PAGE_CODE);
-
-    echo '<div class="texte_texte">
+  <div class="texte_contenu">
+    <div class="texte_texte">
       <h3>'.$PAGE_TITRE.'</h3>
       '.$html_msg.'
       <form class="formulaire" action="'.$form_url.'" method="post">

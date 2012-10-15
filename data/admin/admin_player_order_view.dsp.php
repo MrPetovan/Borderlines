@@ -7,7 +7,6 @@
   $PAGE_TITRE = 'Player Order : Showing "'.$player_order->id.'"';
 ?>
 <div class="texte_contenu">
-<?php echo admin_menu(PAGE_CODE);?>
   <div class="texte_texte">
     <h3>Showing "<?php echo $player_order->id?>"</h3>
     <div class="informations formulaire">

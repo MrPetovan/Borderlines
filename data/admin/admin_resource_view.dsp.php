@@ -7,7 +7,6 @@
   $PAGE_TITRE = 'Resource : Showing "'.$resource->name.'"';
 ?>
 <div class="texte_contenu">
-<?php echo admin_menu(PAGE_CODE);?>
   <div class="texte_texte">
     <h3>Showing "<?php echo $resource->name?>"</h3>
     <div class="informations formulaire">

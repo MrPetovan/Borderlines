@@ -8,16 +8,12 @@
   $nb_total = Shout::db_count_all(true);
 
     echo '
-<div class="texte_contenu">';
-
-	admin_menu(PAGE_CODE);
-
-	echo '
+<div class="texte_contenu">
   <div class="texte_texte">
     <h3>Liste des Shouts</h3>
     '.nav_page(PAGE_CODE, $nb_total, $page_no, $nb_per_page).'
     <form action="'.Page::get_url(PAGE_CODE).'" method="post">
-    <table>
+    <table class="table table-condensed table-striped table-hover">
       <thead>
         <tr>
           <th>Sel.</th>

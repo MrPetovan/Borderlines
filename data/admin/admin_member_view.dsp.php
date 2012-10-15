@@ -23,7 +23,6 @@
   </div>
 </div>-->
 <div class="texte_contenu">
-<?php echo admin_menu(PAGE_CODE);?>
   <div class="texte_texte">
     <h3>Consultation des données pour "<?php echo $member->get_prenom().' '.$member->get_nom()?>"</h3>
     <div class="informations formulaire">

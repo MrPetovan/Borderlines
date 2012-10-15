@@ -145,9 +145,9 @@ ORDER BY `CONSTRAINT_NAME`";
   }
 
   $sql = "REPLACE INTO `page` (`code`, `act`, `dsp`, `login_required`, `admin_required`, `tpl`, `rewrite_pattern`) VALUES
-  ('admin_CLASS', 'data/admin/admin_CLASS.act.php', 'data/admin/admin_CLASS.dsp.php', 1, 1, '', ''),
-  ('admin_CLASS_view', 'data/admin/admin_CLASS_view.act.php', 'data/admin/admin_CLASS_view.dsp.php', 1, 1, '', '{page}/{id}.html'),
-  ('admin_CLASS_mod', 'data/admin/admin_CLASS_mod.act.php', 'data/admin/admin_CLASS_mod.dsp.php', 1, 1, '', '')
+  ('admin_CLASS', 'data/admin/admin_CLASS.act.php', 'data/admin/admin_CLASS.dsp.php', 1, 1, 'pagelayout_admin.tpl.php', ''),
+  ('admin_CLASS_view', 'data/admin/admin_CLASS_view.act.php', 'data/admin/admin_CLASS_view.dsp.php', 1, 1, 'pagelayout_admin.tpl.php', '{page}/{id}.html'),
+  ('admin_CLASS_mod', 'data/admin/admin_CLASS_mod.act.php', 'data/admin/admin_CLASS_mod.dsp.php', 1, 1, 'pagelayout_admin.tpl.php', '')
   ";
 
   $processed_classes = array_diff( $php_classes_ord, $reserved_class_list );

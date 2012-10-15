@@ -7,7 +7,6 @@
   $PAGE_TITRE = 'Category : Showing "'.$category->name.'"';
 ?>
 <div class="texte_contenu">
-<?php echo admin_menu(PAGE_CODE);?>
   <div class="texte_texte">
     <h3>Showing "<?php echo $category->name?>"</h3>
     <div class="informations formulaire">

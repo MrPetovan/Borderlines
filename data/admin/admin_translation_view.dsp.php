@@ -7,7 +7,6 @@
   $PAGE_TITRE = 'Translation : Showing "'.$translation->id.'"';
 ?>
 <div class="texte_contenu">
-<?php echo admin_menu(PAGE_CODE);?>
   <div class="texte_texte">
     <h3>Showing "<?php echo $translation->id?>"</h3>
     <div class="informations formulaire">

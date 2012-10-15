@@ -7,7 +7,6 @@
   $PAGE_TITRE = 'Conversation : Showing "'.$conversation->id.'"';
 ?>
 <div class="texte_contenu">
-<?php echo admin_menu(PAGE_CODE);?>
   <div class="texte_texte">
     <h3>Showing "<?php echo $conversation->id?>"</h3>
     <div class="informations formulaire">

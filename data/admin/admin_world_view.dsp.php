@@ -7,7 +7,6 @@
   $PAGE_TITRE = 'World : Showing "'.$world->name.'"';
 ?>
 <div class="texte_contenu">
-<?php echo admin_menu(PAGE_CODE);?>
   <div class="texte_texte">
     <h3>Showing "<?php echo $world->name?>"</h3>
     <div class="informations formulaire">
@@ -25,10 +24,20 @@
   // CUSTOM
 ?>
      <h3>Map</h3>
-<?php
-  //$world->initializeTerritories();
-  echo $world->drawImg(true);
-?>
+     <!--<iframe width="256" height="256" style="border:none" src="<?php echo Page::get_url('world_get_tile', array('w' => $world->id, 'x' => 0, 'y' => 0, 'z' => 1, 'force' => true))?>"></iframe><iframe width="256" height="256" style="border:none" src="<?php echo Page::get_url('world_get_tile', array('w' => $world->id, 'x' => 1, 'y' => 0, 'z' => 1, 'force' => true))?>"></iframe>
+     <br/>
+     <iframe width="256" height="256" style="border:none" src="<?php echo Page::get_url('world_get_tile', array('w' => $world->id, 'x' => 0, 'y' => 1, 'z' => 1, 'force' => true))?>"></iframe><iframe width="256" height="256" style="border:none" src="<?php echo Page::get_url('world_get_tile', array('w' => $world->id, 'x' => 1, 'y' => 1, 'z' => 1, 'force' => true))?>"></iframe>-->
+     <svg id="map"/>
+     <script type="text/javascript">
+  var po = org.polymaps;
+  var map = po.map()
+    .container(document.getElementById('map'))
+    .add(po.image().url('<?php echo Page::get_url('world_get_tile', array('w' => $world->id, 'x' => '{X}', 'y' => '{Y}', 'z' => '{Z}'))?>'))
+    .add(po.interact())
+    .center({lat: 36, lon:-169})
+    .zoom(3);
+     </script>
+<p><a href="<?php echo get_page_url('admin_world_view', true, array('id' => $world->id, 'action' => 'generate'))?>">Regenerate territories</a></p>
 <h3>Territories</h3>
 <?php
   if(count($world->territories)) {

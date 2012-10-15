@@ -7,7 +7,6 @@
   $PAGE_TITRE = 'Order Type : Showing "'.$order_type->name.'"';
 ?>
 <div class="texte_contenu">
-<?php echo admin_menu(PAGE_CODE);?>
   <div class="texte_texte">
     <h3>Showing "<?php echo $order_type->name?>"</h3>
     <div class="informations formulaire">

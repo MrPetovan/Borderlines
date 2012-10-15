@@ -6,7 +6,6 @@
   $PAGE_TITRE = '<?php echo $class_name ?> : Showing "'.$<?php echo $class_db_identifier ?>-><?php echo $name_field?>.'"';
 ?>
 <div class="texte_contenu">
-<_?php echo admin_menu(PAGE_CODE);?>
   <div class="texte_texte">
     <h3>Showing "<_?php echo $<?php echo $class_db_identifier ?>-><?php echo $name_field?>?>"</h3>
     <div class="informations formulaire">

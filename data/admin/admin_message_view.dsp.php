@@ -7,7 +7,6 @@
   $PAGE_TITRE = 'Message : Showing "'.$message->id.'"';
 ?>
 <div class="texte_contenu">
-<?php echo admin_menu(PAGE_CODE);?>
   <div class="texte_texte">
     <h3>Showing "<?php echo $message->id?>"</h3>
     <div class="informations formulaire">

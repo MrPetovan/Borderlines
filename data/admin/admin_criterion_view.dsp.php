@@ -7,7 +7,6 @@
   $PAGE_TITRE = 'Criterion : Showing "'.$criterion->name.'"';
 ?>
 <div class="texte_contenu">
-<?php echo admin_menu(PAGE_CODE);?>
   <div class="texte_texte">
     <h3>Showing "<?php echo $criterion->name?>"</h3>
     <div class="informations formulaire">
