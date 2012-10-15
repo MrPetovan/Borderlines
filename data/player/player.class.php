@@ -22,11 +22,27 @@ WHERE `member_id` = ".mysql_ureal_escape_string( $member_id );
 
   public static function get_current( Member $member ) {
     $return = null;
-    $player_list = Player::db_get_by_member_id( $member->get_id() );
+    $player_list = Player::db_get_by_member_id( $member->id );
     if( count( $player_list ) ) {
       $return = array_shift( $player_list );
     }
 
+    return $return;
+  }
+
+  public function can_create_game() {
+    $return = is_admin();
+    if( !$return ) {
+      $sql = '
+SELECT COUNT(*)
+FROM `game`
+WHERE `created_by` = '.$this->id.'
+AND `ended` IS NULL';
+      $res = mysql_uquery($sql);
+      $count = array_pop( mysql_fetch_row($res) );
+
+      $return = $count == 0;
+    }
     return $return;
   }
 
@@ -369,6 +385,25 @@ ORDER BY `territory_id`';
         <p>Hi '.wash_utf8($this->name).',</p>
         <p>Game "'.wash_utf8($game->name).'" has ended !</p>
         <p><a href="'.Page::get_url('dashboard').'">Check the leaderboard</a></p>
+      </td>';
+
+    return $return;
+  }
+
+  /**
+   * Game canceled mail
+   *
+   * @see php_mail
+   * @param string $game Current game
+   * @return string
+   */
+  public function get_email_game_cancel( $game ) {
+    $return = '
+      <td width="698" style="vertical-align:top; padding-left:80px; padding-right:80px; font-size: 14px; color:#444444;">
+        <p>Hi '.wash_utf8($this->name).',</p>
+        <p>Game "'.wash_utf8($game->name).'" has been canceled by its creator</p>
+        <p>You can already join another game on the game list.</p>
+        <p><a href="'.Page::get_url('game_list').'">Go to the game list</a></p>
       </td>';
 
     return $return;
