@@ -12,10 +12,10 @@
           case 'disabled':
           case 'readonly':
           case 'checked':
-           $result = $result.' '.$attr_name.'="'.$attr_name.'"';
+            $result = $result.' '.$attr_name.'="'.$attr_name.'"';
             break;
           default:
-            $result = $result.' '.$attr_name.'="'.$attributs[$attr_name].'"';
+            $result = $result.' '.$attr_name.'="'.wash_utf8( $attributs[$attr_name] ).'"';
             break;
         }
       }
