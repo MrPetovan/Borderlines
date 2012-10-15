@@ -12,15 +12,15 @@
           $player_order = Player_Order::factory($player_order->order_type_id, $player_order->id);
 
           if( $player_order->cancel() ) {
-            Page::set_message('Order successfuly canceled');
+            Page::set_message( __('Order successfuly canceled') );
           }else {
-            Page::set_message( 'Error while canceling order', Page::PAGE_MESSAGE_ERROR );
+            Page::set_message( __('Error while canceling order'), Page::PAGE_MESSAGE_ERROR );
           }
         }else {
-          Page::set_message( 'Error while canceling order', Page::PAGE_MESSAGE_ERROR );
+          Page::set_message( __('Error while canceling order'), Page::PAGE_MESSAGE_ERROR );
         }
       }else {
-        Page::set_message( 'Error while canceling order', Page::PAGE_MESSAGE_ERROR );
+        Page::set_message( __('Error while canceling order'), Page::PAGE_MESSAGE_ERROR );
       }
     }else {
       $order_type = Order_Type::db_get_by_class_name($action);
@@ -33,9 +33,9 @@
       // $player_order->check();
 
       if( $player_order->save() ) {
-        Page::set_message( 'Order successfully saved' );
+        Page::set_message( __('Order successfully saved') );
       }else {
-        Page::set_message( 'Error while saving order', Page::PAGE_MESSAGE_ERROR );
+        Page::set_message( __('Error while saving order'), Page::PAGE_MESSAGE_ERROR );
       }
     }
 
