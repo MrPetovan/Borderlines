@@ -7,6 +7,9 @@
 
   session_start();
 
+  ini_set('display_errors', 1);
+  error_reporting(E_ALL);
+
   /**
    * Détermination des PATH et URL absolus pour être utilisés dans tout le site
    *
