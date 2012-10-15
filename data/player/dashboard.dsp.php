@@ -27,10 +27,6 @@
     <span class="label"><?php echo __('Created')?></span>
     <span class="value"><?php echo guess_time( $current_game->created, GUESS_DATETIME_LOCALE )?></span>
   </p>
-  <p>
-    <span class="label"><?php echo __('Created')?></span>
-    <span class="value"><?php echo guess_time( $current_game->created, GUESS_DATETIME_LOCALE )?></span>
-  </p>
 <?php if( $current_game->started ) { ?>
   <p>
     <span class="label"><?php echo __('Started')?></span>
@@ -63,10 +59,10 @@
     <span class="value">
   <?php
   if( $turn_ready['turn_ready'] <= $current_game->current_turn ) {
-    echo '<img src="'.IMG.'img_html/delete.png" alt="" /> Not ready for the next turn <a href="'.Page::get_url(PAGE_CODE, array('action' => 'ready')).'">Toggle</a>';
-  }else {
-    echo '<img src="'.IMG.'img_html/accept.png" alt="" /> Ready for the next turn <a href="'.Page::get_url(PAGE_CODE, array('action' => 'notready')).'">Toggle</a>';
-  } ?>
+        echo '<img src="'.IMG.'img_html/delete.png" alt="" /> '.__('Not ready for the next turn').' <a href="'.Page::get_url(PAGE_CODE, array('action' => 'ready')).'">'.__('Toggle').'</a></p>';
+      }else {
+        echo '<img src="'.IMG.'img_html/accept.png" alt="" /> '.__('Ready for the next turn').' <a href="'.Page::get_url(PAGE_CODE, array('action' => 'notready')).'">'.__('Toggle').'</a></p>';
+      } ?>
     </span>
   </p>
 <p><a href="<?php echo Page::get_url('game_over', array('id' => $current_game->id))?>"><img src="<?php echo IMG.'img_html/door_open.png'?>" alt="" /> <?php echo __('Quit game') ?></a></p>
@@ -84,7 +80,7 @@
     <?php echo __('Go to the world map')?>
   </a>
 </p>
-<h4>Wall</h4>
+<h4><?php echo __('Wall')?></h4>
 <form action="<?php echo Page::get_url('shout', array('game_id' => $current_game->id ))?>" method="post">
   <p><?php echo '['.guess_time(time(), GUESS_TIME_LOCALE).']'?> <strong><?php echo wash_utf8($current_player->name)?></strong> : <input type="text" name="text" size="80" value=""/><button type="submit" name="action" value="shout">Say</button></p>
 </form>
@@ -383,7 +379,7 @@
         $param_string = implode('<br/>', $param_string);
         echo '
   <tr>
-    <td>'.$order_type->name .'</td>
+    <td>'.__( $order_type->name ).'</td>
     <td>'.$player_order->turn_ordered.'</td>
     <td>'.$player_order->turn_scheduled.'</td>
     <td>'.$param_string.'</td>
