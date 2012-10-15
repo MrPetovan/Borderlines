@@ -1,5 +1,4 @@
   $PAGE_TITRE = "Administration des <?php echo $class_name ?>s";
-  include_once('data/static/html_functions.php');
 
   $page_no = getValue('p', 1);
   $nb_per_page = NB_PER_PAGE;

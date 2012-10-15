@@ -1,6 +1,4 @@
 <?php
-  include_once('data/static/html_functions.php');
-
   if(isset($_GET['id'])) {
     $id = $_GET['id'];
     $member = new Member($id);

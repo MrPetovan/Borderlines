@@ -1,5 +1,4 @@
 <?php
-  include_once('data/static/html_functions.php');
 
   if(!isset($player_mod)) {
     $player_mod = Player::instance( getValue('id') );

@@ -1,5 +1,4 @@
 <?php
-  include_once('data/static/html_functions.php');
 
   if(!isset($territory_mod)) {
     $territory_mod = Territory::instance( getValue('id') );

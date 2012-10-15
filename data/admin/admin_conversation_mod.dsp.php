@@ -1,5 +1,4 @@
 <?php
-  include_once('data/static/html_functions.php');
 
   if(!isset($conversation_mod)) {
     $conversation_mod = Conversation::instance( getValue('id') );

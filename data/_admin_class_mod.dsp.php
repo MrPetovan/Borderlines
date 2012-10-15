@@ -1,4 +1,3 @@
-  include_once('data/static/html_functions.php');
 
   if(!isset($<?php echo $class_db_identifier ?>_mod)) {
     $<?php echo $class_db_identifier ?>_mod = <?php echo $class_php_identifier ?>::instance( getValue('id') );

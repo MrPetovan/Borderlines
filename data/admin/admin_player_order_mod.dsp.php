@@ -1,5 +1,4 @@
 <?php
-  include_once('data/static/html_functions.php');
 
   if(!isset($player_order_mod)) {
     $player_order_mod = Player_Order::instance( getValue('id') );

@@ -1,5 +1,4 @@
 <?php
-  include_once('data/static/html_functions.php');
 
   if(!isset($category_mod)) {
     $category_mod = Category::instance( getValue('id') );

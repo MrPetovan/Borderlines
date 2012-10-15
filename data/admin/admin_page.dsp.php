@@ -1,6 +1,5 @@
 <?php
   $PAGE_TITRE = "Administration des pages";
-  include_once('data/static/html_functions.php');
   $tab = Page::db_get_all();
 
     echo '

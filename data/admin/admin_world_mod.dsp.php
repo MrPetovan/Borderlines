@@ -1,5 +1,4 @@
 <?php
-  include_once('data/static/html_functions.php');
 
   if(!isset($world_mod)) {
     $world_mod = World::instance( getValue('id') );

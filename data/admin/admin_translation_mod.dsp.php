@@ -1,5 +1,4 @@
 <?php
-  include_once('data/static/html_functions.php');
 
   if(!isset($translation_mod)) {
     $translation_mod = Translation::instance( getValue('id') );

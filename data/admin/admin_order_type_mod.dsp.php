@@ -1,5 +1,4 @@
 <?php
-  include_once('data/static/html_functions.php');
 
   if(!isset($order_type_mod)) {
     $order_type_mod = Order_Type::instance( getValue('id') );

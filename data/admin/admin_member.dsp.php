@@ -1,6 +1,5 @@
 <?php
   $PAGE_TITRE = "Administration des utilisateurs";
-  include_once('data/static/html_functions.php');
 
   if(isset($_GET['p'])) {
     $page = $_GET['p'];

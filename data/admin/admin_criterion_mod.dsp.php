@@ -1,5 +1,4 @@
 <?php
-  include_once('data/static/html_functions.php');
 
   if(!isset($criterion_mod)) {
     $criterion_mod = Criterion::instance( getValue('id') );

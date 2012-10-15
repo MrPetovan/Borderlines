@@ -1,5 +1,4 @@
 <?php
-  include_once('data/static/html_functions.php');
 
   if(!isset($shout_mod)) {
     $shout_mod = Shout::instance( getValue('id') );

@@ -1,5 +1,4 @@
 <?php
-  include_once('data/static/html_functions.php');
 
   if(!isset($message_mod)) {
     $message_mod = Message::instance( getValue('id') );

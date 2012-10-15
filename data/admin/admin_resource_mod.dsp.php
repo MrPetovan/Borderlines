@@ -1,5 +1,4 @@
 <?php
-  include_once('data/static/html_functions.php');
 
   if(!isset($resource_mod)) {
     $resource_mod = Resource::instance( getValue('id') );

@@ -1,5 +1,4 @@
 <?php
-  include_once('data/static/html_functions.php');
 
   $tab_visible = array('0' => 'Non', '1' => 'Oui');
 

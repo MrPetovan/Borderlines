@@ -1,7 +1,4 @@
 <?php
-
-  include_once('data/static/html_functions.php');
-
   if(!isset($member_mod)) {
     if(isset($_GET['id'])) {
       $id = $_GET['id'];
