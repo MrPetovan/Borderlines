@@ -650,7 +650,11 @@ function php_mail($address, $subject, $body, $html_template = false, $debug = fa
     if($debug) {
       var_dump($body);
     }else {
-      return $mail->Send();
+      if( PROD ) {
+        return $mail->Send();
+      }else {
+        return true;
+      }
     }
   }
 }
@@ -835,16 +839,17 @@ function which_os ()
     $nb_page = ceil($nb_total / $nb_per_page);
 
     $return = '
-    <ul class="nav">';
+    <div class="pagination">
+      <ul class="nav">';
 
     if($nb_page == 1 || $current_page == 1) {
       $return .= '
-      <li><a href="#" class="inactive" onclick="return false">&lt; &lt;</a></li>
-      <li><a href="#" class="inactive" onclick="return false">&lt;</a></li>';
+        <li class="disabled"><span>&lt; &lt;</span></li>
+        <li class="disabled"><span>&lt;</span></li>';
     }else {
       $return .= '
-      <li><a href="'.get_page_url($codepage, true, array('p' => 1, 'nb_per_page' => $nb_per_page)).'">&lt; &lt;</a></li>
-      <li><a href="'.get_page_url($codepage, true, array('p' => $current_page - 1, 'nb_per_page' => $nb_per_page)).'">&lt;</a></li>';
+        <li><a href="'.get_page_url($codepage, true, array('p' => 1, 'nb_per_page' => $nb_per_page)).'">&lt; &lt;</a></li>
+        <li><a href="'.get_page_url($codepage, true, array('p' => $current_page - 1, 'nb_per_page' => $nb_per_page)).'">&lt;</a></li>';
     }
 
     if($nb_page > NB_VISIBLE_LINKS) {
@@ -862,21 +867,22 @@ function which_os ()
         $j = $current_page - ceil(NB_VISIBLE_LINKS / 2) + $i;
       }
       $return .= '
-      <li><a href="'.get_page_url($codepage, true, array('p' => $j, 'nb_per_page' => $nb_per_page)).'"'.($j == $current_page?' class="inactive"':'').'>'.$j.'</a></li>';
+        <li'.($j == $current_page?' class="active"':'').'><a href="'.get_page_url($codepage, true, array('p' => $j, 'nb_per_page' => $nb_per_page)).'">'.$j.'</a></li>';
     }
 
     if($nb_page == 1 || $current_page == $nb_page) {
       $return .= '
-      <li><a href="#" class="inactive" onclick="return false">&gt;</a></li>
-      <li><a href="#" class="inactive" onclick="return false">&gt; &gt;</a></li>';
+        <li class="disabled"><span>&gt;</span></li>
+        <li class="disabled"><span>&gt; &gt;</span></li>';
     }else {
       $return .= '
-      <li><a href="'.get_page_url($codepage, true, array('p' => $current_page + 1, 'nb_per_page' => $nb_per_page)).'">&gt;</a></li>
-      <li><a href="'.get_page_url($codepage, true, array('p' => $nb_page, 'nb_per_page' => $nb_per_page)).'">&gt; &gt;</a></li>';
+        <li><a href="'.get_page_url($codepage, true, array('p' => $current_page + 1, 'nb_per_page' => $nb_per_page)).'">&gt;</a></li>
+        <li><a href="'.get_page_url($codepage, true, array('p' => $nb_page, 'nb_per_page' => $nb_per_page)).'">&gt; &gt;</a></li>';
     }
 
     $return .= '
-    </ul>';
+      </ul>
+    </div>';
 
     return $return;
   }
