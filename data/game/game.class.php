@@ -90,9 +90,9 @@ class Game extends Game_Model {
     mysql_uquery($sql);
     $sql = 'DELETE FROM `player_history` WHERE `game_id` = '.mysql_ureal_escape_string($this->id).' AND `turn` > '.mysql_ureal_escape_string($turn);
     mysql_uquery($sql);
-    $sql = 'DELETE FROM `player_order` WHERE `game_id` = '.mysql_ureal_escape_string($this->id).' AND `turn_ordered` > '.mysql_ureal_escape_string($turn);
-    mysql_uquery($sql);
-    $sql = 'UPDATE `player_order` SET `datetime_execution` = NULL, `turn_executed` = NULL WHERE `game_id` = '.mysql_ureal_escape_string($this->id).' AND `turn_scheduled` = '.mysql_ureal_escape_string($turn);
+    //$sql = 'DELETE FROM `player_order` WHERE `game_id` = '.mysql_ureal_escape_string($this->id).' AND `turn_ordered` > '.mysql_ureal_escape_string($turn);
+    //mysql_uquery($sql);
+    $sql = 'UPDATE `player_order` SET `datetime_execution` = NULL, `turn_executed` = NULL WHERE `game_id` = '.mysql_ureal_escape_string($this->id).' AND `turn_scheduled` >= '.mysql_ureal_escape_string($turn);
     mysql_uquery($sql);
     $sql = 'DELETE FROM `player_spygame_value` WHERE `game_id` = '.mysql_ureal_escape_string($this->id).' AND `turn` > '.mysql_ureal_escape_string($turn);
     mysql_uquery($sql);
@@ -139,13 +139,9 @@ class Game extends Game_Model {
       }
 
       // Removing quitting players
-      $leaving_players = Player::db_get_by_game($this->id, $current_turn);
-      foreach( $leaving_players as $player ) {
-        $this->del_territory_player_troops($next_turn, null, $player->id);
-        foreach( Player_Order::db_get_planned_by_player_id($player->id, $this->id) as $order ) {
-          /* @var $order Player_Order */
-          $order->cancel();
-        }
+      $order_list = $this->get_ready_orders( 'quit_game' );
+      foreach( $order_list as $order ) {
+        $order->execute();
       }
 
       $order_list = $this->get_ready_orders( 'give_troops' );
@@ -254,13 +250,6 @@ class Game extends Game_Model {
         }
       }
 
-      $leaving_players = Player::db_get_by_game($this->id, $current_turn);
-      foreach( $leaving_players as $player ) {
-        foreach( $this->get_territory_owner_list(null, $next_turn, $player->id) as $territory_owner) {
-          $this->set_territory_owner($territory_owner['territory_id'], $next_turn, null, 0, 0);
-        }
-      }
-
       $order_list = $this->get_ready_orders( 'change_capital' );
       foreach( $order_list as $order ) {
         $order->execute();
@@ -366,7 +355,8 @@ class Game extends Game_Model {
 
         if( $capital_id !== null ) {
           $troops_recruited = floor( $recruit_budget / self::RECRUIT_TROOPS_PRICE );
-          $capital_territory_troops = array_pop( $player->get_territory_player_troops_list($this->id, $next_turn, $capital_id) );
+          $territory_player_troops_list = $player->get_territory_player_troops_list($this->id, $next_turn, $capital_id);
+          $capital_territory_troops = array_pop( $territory_player_troops_list );
           $player->set_territory_player_troops($this->id, $next_turn, $capital_id, $capital_territory_troops['quantity'] + $troops_recruited);
           $this->set_player_history(
             $player->id,
@@ -389,31 +379,35 @@ class Game extends Game_Model {
       $this->current_turn++;
       $this->updated = time();
 
-      if( $this->current_turn == $this->turn_limit ) {
-        $this->ended = time();
+      $return = $this->save();
 
-        foreach( $player_list as $player ) {
-          $member = Member::instance( $player->member_id );
-          if( php_mail($member->email, SITE_NAME." | Game ended", $player->get_email_game_end( $this ), true) ) {
-            Page::add_message("Message sent to ".$player->name);
-          }else {
-            Page::add_message("Message failed to ".$player->name, Page::PAGE_MESSAGE_WARNING);
-            Page::add_message(var_export( error_get_last(), 1 ), Page::PAGE_MESSAGE_WARNING);
+      if( $return ) {
+        if( $this->current_turn == $this->turn_limit ) {
+          $this->ended = time();
+
+          foreach( $player_list as $player ) {
+            $member = Member::instance( $player->member_id );
+            if( php_mail($member->email, SITE_NAME." | Game ended", $player->get_email_game_end( $this ), true) ) {
+              Page::add_message( __("Message sent to %s", $player->name) );
+            }else {
+              Page::add_message( __("Message failed to %s", $player->name) , Page::PAGE_MESSAGE_WARNING);
+              Page::add_message(var_export( error_get_last(), 1 ), Page::PAGE_MESSAGE_WARNING);
+            }
           }
-        }
-      }else {
-        foreach( $player_list as $player ) {
-          $member = Member::instance( $player->member_id );
-          if( php_mail($member->email, SITE_NAME." | Turn ".$this->current_turn." computed", $player->get_email_game_new_turn( $this ), true)) {
-            Page::add_message("Message sent to ".$player->name);
-          }else {
-            Page::add_message("Message failed to ".$player->name, Page::PAGE_MESSAGE_WARNING);
-            Page::add_message(var_export( error_get_last(), 1 ), Page::PAGE_MESSAGE_WARNING);
+
+          $this->save();
+        }else {
+          foreach( $player_list as $player ) {
+            $member = Member::instance( $player->member_id );
+            if( php_mail($member->email, SITE_NAME." | Turn ".$this->current_turn." computed", $player->get_email_game_new_turn( $this ), true)) {
+              Page::add_message( __("Message sent to %s", $player->name) );
+            }else {
+              Page::add_message( __("Message failed to %s", $player->name) , Page::PAGE_MESSAGE_WARNING);
+              Page::add_message(var_export( error_get_last(), 1 ), Page::PAGE_MESSAGE_WARNING);
+            }
           }
         }
       }
-
-      $return = $this->save();
     }
     return $return;
   }
@@ -426,7 +420,7 @@ class Game extends Game_Model {
 AND `order_type_id` = '.mysql_ureal_escape_string($order_type->id);
     }
     $sql = "
-SELECT id
+SELECT `id`, `order_type_id`
 FROM `".Player_Order::get_table_name()."`
 WHERE `game_id` = ".mysql_ureal_escape_string( $this->id )."
 AND `turn_scheduled` = ".mysql_ureal_escape_string( $this->current_turn )."
@@ -434,15 +428,7 @@ AND `turn_executed` IS NULL
 ".$where."
 ORDER BY `order_type_id`";
 
-    $order_list = array();
-    foreach( Player_Order::sql_to_list( $sql ) as $order ) {
-      $order_type = Order_Type::instance( $order->order_type_id );
-      $class = $order_type->class_name;
-      require_once ('data/order_type/'.strtolower( $class ).'.class.php');
-      $order_list[] = $class::instance( $order->id );
-    }
-
-    return $order_list;
+    return Player_Order::sql_to_list( $sql );
   }
 
   public function db_get_ready_game_list() {
@@ -475,14 +461,14 @@ WHERE `ended` IS NULL";
 
     $return = '
     <fieldset>
-      <legend>Create a game !</legend>
+      <legend>'.__('Create a game !').'</legend>
       '.HTMLHelper::genererInputHidden('id', $this->get_id()).'
-      <p class="field">'.HTMLHelper::genererInputText('name', $this->get_name(), array(), "Name*").'</p>
-      <p class="field">'.HTMLHelper::genererSelect('turn_interval', $turn_interval_list, $this->get_turn_interval(), array(), "Turn Interval*").'</p>
-      <p class="field">'.HTMLHelper::genererSelect('world_id', World::db_get_select_list(), $this->world_id, array(), "World*").'</p>
-      <p class="field">'.HTMLHelper::genererInputText('turn_limit', $this->get_turn_limit(), array('title' => 'Game will stop after a fixed amount of turns'), "Turn Limit*").'</p>
-      <p class="field">'.HTMLHelper::genererInputText('min_players', $this->get_min_players(), array('title' => 'Number of players required to automatically launch the game'), "Minimum nb of players").'</p>
-      <p class="field">'.HTMLHelper::genererInputText('max_players', $this->get_max_players(), array(), "Maximum nb of players").'</p>
+      <p class="field">'.HTMLHelper::genererInputText('name', $this->get_name(), array(), __('Name').'*').'</p>
+      <p class="field">'.HTMLHelper::genererSelect('turn_interval', $turn_interval_list, $this->get_turn_interval(), array(), __('Turn Interval').'*').'</p>
+      <p class="field">'.HTMLHelper::genererSelect('world_id', World::db_get_select_list(), $this->world_id, array(), __('World').'*').'</p>
+      <p class="field">'.HTMLHelper::genererInputText('turn_limit', $this->get_turn_limit(), array('title' => __('Game will stop after a fixed amount of turns')), __('Turn Limit').'*').'</p>
+      <p class="field">'.HTMLHelper::genererInputText('min_players', $this->get_min_players(), array('title' => __('Number of players required to automatically launch the game')), __('Minimum nb of players')).'</p>
+      <p class="field">'.HTMLHelper::genererInputText('max_players', $this->get_max_players(), array(), __('Maximum nb of players')).'</p>
     </fieldset>';
 
     return $return;
