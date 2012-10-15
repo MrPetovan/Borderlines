@@ -135,7 +135,7 @@
   </tbody>
 </table>
 
-<?php if( $turn == $current_game->current_turn ) :?>
+<?php if( $is_current_turn ) :?>
 
 <h3><?php echo __('Planned movements')?></h3>
 <?php
@@ -207,6 +207,7 @@
 </table>
 <?php }else{?>
 <p><?php echo __("You don't have planned any order in this territory")?>
+<?php } ?>
 <?php
     echo Player_Order::get_html_form_by_class(
       'move_troops',
@@ -231,7 +232,6 @@
       array('current_player' => $current_player, 'territory' => $territory),
       array('id' => $territory->id )
     );
-  }
 ?>
 
 <?php endif; //if( $turn == $current_game->current_turn )?>
