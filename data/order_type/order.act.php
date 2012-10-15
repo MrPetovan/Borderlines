@@ -8,11 +8,9 @@
       if( $player_order_id = getValue('id') ) {
         $player_order = Player_Order::instance( $player_order_id );
 
-        if( $player_order && $current_player->get_id() == $player_order->get_player_id() ) {
-          $order_type = Order_Type::instance( $player_order->order_type_id );
-          $class = $order_type->class_name;
-          require_once(DATA.'order_type/'.$class.'.class.php');
-          $player_order = $class::instance($player_order->get_id());
+        if( $player_order && $current_player->id == $player_order->player_id ) {
+          $player_order = Player_Order::factory($player_order->order_type_id, $player_order->id);
+
           if( $player_order->cancel() ) {
             Page::set_message('Order successfuly canceled');
           }else {
@@ -25,10 +23,9 @@
         Page::set_message( 'Error while canceling order', Page::PAGE_MESSAGE_ERROR );
       }
     }else {
-      $order_type = Order_Type::db_get_by_class_name( $action );
-      require_once(DATA.'order_type/'.$action.'.class.php');
+      $order_type = Order_Type::db_get_by_class_name($action);
 
-      $player_order = $action::instance();
+      $player_order = Player_Order::factory_by_class($action);
 
       $player_order->plan( $order_type, $current_player, getValue('parameters') );
 
