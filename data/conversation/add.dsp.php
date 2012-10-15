@@ -1,6 +1,4 @@
 <?php
-  include_once('data/static/html_functions.php');
-
   $form_url = get_page_url(PAGE_CODE);
   if( $game_id === null ) {
     $PAGE_TITRE = 'General Conversation : Create';

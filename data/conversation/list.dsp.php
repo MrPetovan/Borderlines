@@ -11,7 +11,6 @@
     $PAGE_TITRE .= "game conversations";
     $add_array = array();
   }
-  include_once('data/static/html_functions.php');
 ?>
 <h3><?php echo $PAGE_TITRE?> list</h3>
 <p>Go to:</p>

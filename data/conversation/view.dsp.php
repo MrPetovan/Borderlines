@@ -1,6 +1,4 @@
 <?php
-  include_once('data/static/html_functions.php');
-
   $tab_visible = array('0' => 'Non', '1' => 'Oui');
 
   $form_url = get_page_url(PAGE_CODE).'&id='.$conversation->id;
