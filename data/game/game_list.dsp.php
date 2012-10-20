@@ -1,6 +1,7 @@
 <table>
   <tr>
     <th><?php echo __('Game')?></th>
+    <th><?php echo __('World')?></th>
     <th><?php echo __('Status')?></th>
     <th><?php echo __('Turn')?></th>
     <th><?php echo __('Players')?></th>
@@ -14,9 +15,11 @@
     $current_game = $current_player->current_game;
 
     $player = Player::instance( $game->created_by );
+    $world = World::instance( $game->world_id );
     echo '
   <tr>
-    <td><a href="'.Page::get_page_url('show_game', false, array('id' => $game->id)).'">'.$game->name.'</a></td>
+    <td><a href="'.Page::get_url('show_game', array('id' => $game->id)).'">'.$game->name.'</a></td>
+    <td><a href="'.Page::get_url('show_world', array('game_id' => $game->id)).'">'.$world->name.'</a></td>
     <td>'.$game->status_string.'</td>
     <td>'.$game->current_turn.'/'.$game->turn_limit.'</td>
     <td>'.count( $game->get_game_player_list() ).'</td>
