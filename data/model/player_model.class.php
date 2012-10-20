@@ -9,6 +9,7 @@ class Player_Model extends DBObject {
   protected $_member_id = null;
   protected $_name = null;
   protected $_active = null;
+  protected $_created = null;
 
   public function __construct($id = null) {
     parent::__construct($id);
@@ -19,6 +20,7 @@ class Player_Model extends DBObject {
 
   public function get_active() { return $this->is_active(); }
   public function is_active() { return ($this->_active == 1); }
+  public function get_created()    { return guess_time($this->_created);}
 
   /* MUTATEURS */
   public function set_id($id) {
@@ -30,6 +32,7 @@ class Player_Model extends DBObject {
   public function set_active($active) {
     if($active) $data = 1; else $data = 0; $this->_active = $data;
   }
+  public function set_created($date) { $this->_created = guess_time($date, GUESS_DATE_MYSQL);}
 
   /* FONCTIONS SQL */
 
@@ -76,6 +79,7 @@ WHERE `member_id` = ".mysql_ureal_escape_string($member_id);
       <p class="field">'.HTMLHelper::genererSelect('member_id', $option_list, $this->get_member_id(), array(), "Member Id *").'<a href="'.get_page_url('admin_member_mod').'">Créer un objet Member</a></p>
         <p class="field">'.HTMLHelper::genererInputText('name', $this->get_name(), array(), "Name *").'</p>
         <p class="field">'.HTMLHelper::genererInputCheckBox('active', '1', $this->get_active(), array('label_position' => 'right'), "Active" ).'</p>
+        <p class="field">'.HTMLHelper::genererInputText('created', $this->get_created(), array(), "Created *").'</p>
 
     </fieldset>';
 
@@ -93,6 +97,7 @@ WHERE `member_id` = ".mysql_ureal_escape_string($member_id);
     switch($num_error) { 
       case 1 : $return = "Le champ <strong>Member Id</strong> est obligatoire."; break;
       case 2 : $return = "Le champ <strong>Name</strong> est obligatoire."; break;
+      case 3 : $return = "Le champ <strong>Created</strong> est obligatoire."; break;
       default: $return = "Erreur de saisie, veuillez vérifier les champs.";
     }
     return $return;
@@ -110,6 +115,7 @@ WHERE `member_id` = ".mysql_ureal_escape_string($member_id);
 
     $return[] = Member::check_compulsory($this->get_member_id(), 1, true);
     $return[] = Member::check_compulsory($this->get_name(), 2);
+    $return[] = Member::check_compulsory($this->get_created(), 3);
 
     $return = array_unique($return);
     if(($true_key = array_search(true, $return, true)) !== false) {

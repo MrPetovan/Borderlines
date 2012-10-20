@@ -24,6 +24,10 @@
             <p class="field">
               <span class="libelle">Active</span>
               <span class="value"><?php echo $tab_visible[$player->active]?></span>
+            </p>
+            <p class="field">
+              <span class="libelle">Created</span>
+              <span class="value"><?php echo guess_time($player->created, GUESS_DATETIME_LOCALE)?></span>
             </p>    </div>
     <p><a href="<?php echo get_page_url('admin_player_mod', true, array('id' => $player->id))?>">Modifier cet objet Player</a></p>
     <h4>Conversation Player</h4>
