@@ -2,6 +2,8 @@
   $PAGE_TITRE = __('World : Showing "%s"', $world->name );
 
   $is_current_turn = $turn == $current_game->current_turn;
+
+  /* @var $world World */
 ?>
 
 <?php if( $is_current_turn ) :?>
@@ -25,12 +27,29 @@
 </ul>
 
 <h3><?php echo __('Map')?></h3>
-<?php echo $world->drawImg(array(
-  'with_map' => true,
-  'game_id' => $current_game->id,
-  'turn' => $turn
-));?>
+<?php
+  if( $world->size_x > 968 ) {
+?>
+<svg id="map"/>
+     <script type="text/javascript">
+  var po = org.polymaps;
+  var map = po.map()
+    .container(document.getElementById('map'))
+    .add(po.image().url('<?php echo Page::get_url('world_get_tile', array('w' => $world->id, 'x' => '{X}', 'y' => '{Y}', 'z' => '{Z}'))?>'))
+    .add(po.interact())
+    .center({lat: 36, lon:-169})
+    .zoom(3);
+     </script>
+<?php
+  }else {
 
+    echo $world->drawImg(array(
+      'with_map' => true,
+      'game_id' => $current_game->id,
+      'turn' => $turn
+    ));
+  }
+?>
 <h3><?php echo __('Territories')?></h3>
 <?php if(count($world->territories)) :?>
 <table>
