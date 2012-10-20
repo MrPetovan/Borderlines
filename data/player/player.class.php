@@ -358,15 +358,15 @@ ORDER BY `territory_id`';
    * Game new turn mail
    *
    * @see php_mail
-   * @param string $game Current game
+   * @param Game $game Current game
    * @return string
    */
-  public function get_email_game_new_turn( $game ) {
+  public function get_email_game_new_turn( Game $game ) {
     $return = '
       <td width="698" style="vertical-align:top; padding-left:80px; padding-right:80px; font-size: 14px; color:#444444;">
-        <p>Hi '.wash_utf8($this->name).',</p>
-        <p>Game "'.wash_utf8($game->name).'"\'s turn '.$game->current_turn.' has been computed and is ready for you.</p>
-        <p><a href="'.Page::get_url('dashboard').'">Play now</a></p>
+        <p>'.__('Hi %s,',wash_utf8($this->name)).'</p>
+        <p>'.__('Game "%s"\'s turn %s has been computed and is ready for you.', wash_utf8($game->name), $game->current_turn).'</p>
+        <p><a href="'.Page::get_url('dashboard').'">'.__('Play now').'</a></p>
       </td>';
 
     return $return;
@@ -376,15 +376,15 @@ ORDER BY `territory_id`';
    * Game ended mail
    *
    * @see php_mail
-   * @param string $game Current game
+   * @param Game $game Current game
    * @return string
    */
-  public function get_email_game_end( $game ) {
+  public function get_email_game_end( Game $game ) {
     $return = '
       <td width="698" style="vertical-align:top; padding-left:80px; padding-right:80px; font-size: 14px; color:#444444;">
-        <p>Hi '.wash_utf8($this->name).',</p>
-        <p>Game "'.wash_utf8($game->name).'" has ended !</p>
-        <p><a href="'.Page::get_url('dashboard').'">Check the leaderboard</a></p>
+        <p>'.__('Hi %s,',wash_utf8($this->name)).'</p>
+        <p>'.__('Game "%s" has ended !', wash_utf8($game->name)).'</p>
+        <p><a href="'.Page::get_url('show_game', array('id' => $game->id)).'">'.__('Check the leaderboard').'</a></p>
       </td>';
 
     return $return;
@@ -400,10 +400,10 @@ ORDER BY `territory_id`';
   public function get_email_game_cancel( $game ) {
     $return = '
       <td width="698" style="vertical-align:top; padding-left:80px; padding-right:80px; font-size: 14px; color:#444444;">
-        <p>Hi '.wash_utf8($this->name).',</p>
-        <p>Game "'.wash_utf8($game->name).'" has been canceled by its creator</p>
-        <p>You can already join another game on the game list.</p>
-        <p><a href="'.Page::get_url('game_list').'">Go to the game list</a></p>
+        <p>'.__('Hi %s,',wash_utf8($this->name)).'</p>
+        <p>'.__('Game "%s" has been canceled by its creator', wash_utf8($game->name)).'</p>
+        <p>'.__('You can already join another game on the game list.').'</p>
+        <p><a href="'.Page::get_url('game_list').'">'.__('Go to the game list').'</a></p>
       </td>';
 
     return $return;
@@ -414,10 +414,9 @@ ORDER BY `territory_id`';
     $creator = Player::instance( $conversation->player_id );
     $return = '
       <td width="698" style="vertical-align:top; padding-left:80px; padding-right:80px; font-size: 14px; color:#444444;">
-        <p>Hi '.wash_utf8($this->name).',</p>
-        <p>'.wash_utf8($creator->name).' invited you to a conversation. To see the messages, follow this link :</p>
-        <p>'.Page::get_url('conversation_view', array('id' => $conversation->id)).'</p>
-        <p><span style="font-weight:bold;">Pour accéder à votre compte,</span> <a style="color:#F22A83;" href="'.get_page_url('mon-compte').'">cliquez sur ce lien</a>.</p>
+        <p>'.__('Hi %s,',wash_utf8($this->name)).'</p>
+        <p>'.__('%s invited you to a conversation.', wash_utf8($creator->name)).'</p>
+        <p><a href="'.Page::get_url('conversation_view', array('id' => $conversation->id)).'">'.__('See the messages').'</a></p>
       </td>';
 
     return $return;
