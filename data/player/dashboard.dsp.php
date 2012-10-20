@@ -51,7 +51,7 @@
   </p>
 <?php } ?>
 <?php if( $current_game->has_ended() ) {?>
-<p>This game is over, check <a href="<?php echo Page::get_page_url('player_list', false, array('game_id' => $current_game->id))?>">the final scoreboard</a> !</p>
+<p><?php echo __('This game is over, check <a href="%s">the final scoreboard</a> !', Page::get_url('show_game', array('id' => $current_game->id)))?></p>
 <?php }else {
         $turn_ready = array_shift( $current_player->get_game_player_list( $current_game->id ) );?>
   <p>
