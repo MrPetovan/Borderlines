@@ -1,147 +1,49 @@
-<h2>Player  <?php echo $player->get_name()?></h2>
 <?php
-  if( $current_game == $player_current_game ) {
+  $PAGE_TITRE = __('Player : Showing "%s"', $game->name);
 ?>
-<h3>Intelligence report</h3>
-<h4>Ressources</h4>
-<?php
-    $resources = Resource::db_get_all();
-?>
-<ul>
-<?php
-    foreach( $resources as $resource ) {
-      if( $resource->is_public() ) {
-        $value = $player->get_resource_sum( $resource->get_id() );
-        echo '
-  <li>'.$resource->get_name().' : '.(is_null( $value )?'N/C':$value).'</li>';
-      }else {
-        $spied = $current_player->get_spied_value(
-          'player'.$player->get_id().'-resource'.$resource->get_id(),
-          $player,
-          $player->get_resource_sum( $resource->get_id() )
-        );
-
-        $value = $spied['masked_value'];
-
-        echo '
-  <li>'.$resource->get_name().' : '.(is_null( $value )?'N/C':$value).($spied['turn'] ?' (Turn '.$spied['turn'].')':'').'</li>';
-      }
-    }
-?>
-</ul>
-<h3>Orders</h3>
-<?php
-    foreach( Order_Type::db_get_all() as $order_type ) {
-      if( $order_type->is_target_player() ) {
-        $class = $order_type->class_name;
-
-        require_once(DATA.'order_type/'.$order_type->class_name.'.class.php');
-
-        echo $class::get_html_form( array('page_code' => PAGE_CODE, 'page_params' => array('id' => $player->id ), 'current_player' => $current_player, 'target_player' => $player ) );
-      }
-    }
-    if( is_admin() ) {
-?>
-<h3>Resources</h3>
-<?php
-  $sums = $player->get_resource_sum_list();
-?>
-<ul>
-<?php
-      foreach( $sums as $sum ) {
-        $resource = Resource::instance($sum['id']);
-        echo '
-  <li>'.$resource->get_name().' : '.$sum['sum'].'</li>';
-      }
-?>
-</ul>
-<h3>Resource history</h3>
+<h2><?php echo __('Player %s', $player->name)?></h2>
+<div class="informations formulaire">
+  <p class="field">
+    <span class="label"><?php echo __('Joined')?></span>
+    <span class="value"><?php echo guess_time($player->created, GUESS_DATETIME_LOCALE)?></span>
+  </p>
+  <p class="field">
+    <span class="label"><?php echo __('Status')?></span>
+    <span class="value"><?php echo guess_time($player->created, GUESS_DATETIME_LOCALE)?></span>
+  </p>
+</div>
+<h3><?php echo __('Games')?></h3>
 <table>
   <thead>
     <tr>
-      <th>Turn</th>
-      <th>Date</th>
-      <th>Event</th>
-      <th>Changes</th>
-      <th>Resource</th>
+      <th><?php echo __('Game')?></th>
+      <th><?php echo __('Number of players')?></th>
+      <th><?php echo __('Territory gain')?></th>
     </tr>
   </thead>
-  <tbody>
-<?php
-      $history = $player->get_resource_history();
-      foreach( $history as $event ) {
-        $resource = Resource::instance($event['resource_id']);
-        echo '
+  <tfoot>
     <tr>
-      <td class="date">'.$event['turn'].'</td>
-      <td class="date">'.guess_time( $event['datetime'], GUESS_DATE_FR ).'</td>
-      <td>'.$event['reason'].'</td>
-      <td class="num">'. ($event['delta'] > 0?'+':'') . $event['delta'] .'</td>
-      <td>'. $resource->get_name() .'</td>
-    </tr>';
-      }
+      <td></td>
+      <td><?php echo __('Total area')?></td>
+      <td><?php echo l10n_number( array_sum( $game_player_area ) )?> km²</td>
+    </tr>
+  </tfoot>
+  <tbody>
+<?php foreach( $game_player_list as $game_player_row ):
+  $game = Game::instance($game_player_row['game_id']);
+  $game_player_count = count( $game->get_game_player_list() );
 ?>
+    <tr>
+      <td><a href="<?php echo Page::get_url('show_game', array('id' => $game->id))?>"><?php echo $game->name?></a></td>
+      <td><?php echo l10n_number($game_player_count)?></td>
+      <td>
+     <?php if( $game_player_area[ $game->id ] !== null ) {
+       echo l10n_number($game_player_area[ $game->id ]).' km²';
+     }else {
+       echo __('Game running');
+     }?>
+      </td>
+    </tr>
+<?php endforeach;?>
+  </tbody>
 </table>
-<h3>Orders</h3>
-<h4>Orders planned</h4>
-<?php
-  $orders = Player_Order::db_get_planned_by_player_id( $player->get_id(), $player->current_game->id );
-?>
-<table>
-  <tr>
-    <th>Order Type</th>
-    <th>Order</th>
-    <th>Scheduled</th>
-    <th>Parameters</th>
-    <th>Action</th>
-  </tr>
-<?php
-      foreach( $orders as $player_order ) {
-        $order_type = Order_Type::instance( $player_order->order_type_id );
-        $parameters = $player_order->parameters;
-        $param_string = '';
-        foreach( $parameters as $key => $value ) {
-          if( $key == 'player_id' ) {
-            $player = Player::instance( $value );
-            $value = $player->name;
-          }
-          $param_string[] = ucfirst( $key ).' : '.$value;
-        }
-        $param_string = implode('<br/>', $param_string);
-        echo '
-  <tr>
-    <td>'.$order_type->name .'</td>
-    <td>'.guess_time( $player_order->datetime_order, GUESS_DATETIME_LOCALE ) .'</td>
-    <td>'.guess_time( $player_order->datetime_scheduled, GUESS_DATETIME_LOCALE ) .'</td>
-    <td>'.$param_string.'</td>
-    <td>
-      <form action="'.Page::get_page_url('order').'" method="post">
-        '.HTMLHelper::genererInputHidden('url_return', Page::get_page_url( PAGE_CODE ) ).'
-        '.HTMLHelper::genererInputHidden('id', $player_order->get_id() ).'
-        <button type="submit" name="action" value="cancel">Cancel</button>
-      </form>
-    </td>
-  </tr>';
-      }
-?>
-</table>
-<?php
-    }// is_admin
-  }else {
-?>
-    <h3>Resources at the end of game <?php echo $player_current_game->name ?></h3>
-<?php
-  $sums = $player->get_resource_sum_list($player_current_game->id);
-?>
-<ul>
-<?php
-      foreach( $sums as $sum ) {
-        $resource = Resource::instance($sum['id']);
-        echo '
-  <li>'.$resource->get_name().' : '.$sum['sum'].'</li>';
-      }
-?>
-</ul>
-<?php
-  }
-?>

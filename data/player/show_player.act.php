@@ -1,37 +1,45 @@
 <?php
-  $member = Member::instance( Member::get_current_user_id() );
-  $player_list = Player::db_get_by_member_id( $member->get_id() );
-  $current_player = array_shift( $player_list );
-  
+  $member = Member::get_current_user();
+  $current_player = Player::get_current($member);
+
   if( !is_null( $player_id = getValue('id' ) ) && is_numeric( $player_id ) ) {
-    if( $current_player->get_id() == $player_id ) {
-      Page::page_redirect( 'dashboard' );
-    }else {
-      $player = Player::instance( $player_id );
-      if( !$player ) {
-        Page::add_message( "This player doesn't exist", Page::PAGE_MESSAGE_ERROR );
-        Page::page_redirect( 'player_list' );
-      }
+    /* @var $player Player */
+    $player = Player::instance( $player_id );
+    if( !$player ) {
+      Page::add_message( __('Unknown player'), Page::PAGE_MESSAGE_ERROR );
+      Page::page_redirect( 'player_list' );
     }
   }else {
     Page::page_redirect( 'player_list' );
   }
-  
-  if( $game_id = getValue('game_id') ) {
-    $player_current_game = Game::instance( $game_id );
-    
-    if( !$player_current_game ) {
-      Page::add_message( "This game doesn't exist", Page::PAGE_MESSAGE_ERROR );
-      Page::page_redirect( 'player_list' );
+
+  $game_player_list = $player->get_game_player_list();
+  $game_player_area = array();
+  foreach( $game_player_list as $game_player_row ) {
+    $game = Game::instance( $game_player_row['game_id'] );
+    if( $game_player_row['turn_leave'] ) {
+      $turn = 0;
+      $modifier = -1;
+    }elseif($game->has_ended()) {
+      $turn = $game->current_turn;
+      $modifier = 1;
+    }else {
+      $turn = null;
+      $modifier = 0;
     }
-  }else {
-    $player_current_game = $player->get_last_game();
+    if( $turn !== null ) {
+      $game_player_area[ $game->id ] = 0;
+      $territory_owner_list = $player->get_territory_owner_list(null, $game->id, $turn);
+      foreach( $territory_owner_list as $territory_owner_row ) {
+        if( $territory_owner_row['owner_id'] ) {
+          $territory = Territory::instance( $territory_owner_row['territory_id'] );
+
+          $game_player_area[ $game->id ] += $modifier * $territory->area;
+        }
+      }
+    }else {
+      $game_player_area[ $game->id ] = null;
+    }
   }
-  
-  $current_game = $current_player->get_current_game();
-  
-  // Cases :
-  // - Show public profile (game-independant)
-  // - Spy (must be in the same running game)
-  // - Show past game result (game must have ended)
+
 ?>
