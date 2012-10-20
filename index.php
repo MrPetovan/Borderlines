@@ -7,6 +7,8 @@
 
   session_start();
 
+  ob_start();
+
   /**
    * Détermination des PATH et URL absolus pour être utilisés dans tout le site
    *
@@ -185,7 +187,7 @@
 
   $i18n_replacements = load_translations( $locale );
 
-  setlocale(LC_ALL, $locale . '.UTF8' );
+  setlocale(LC_ALL, $locale . '.utf8' );
 
   define('PAGE_CODE', $PAGE_CODE);
   // ACT
@@ -197,9 +199,10 @@
   if($CURRENT_PAGE->get_dsp()) {
     $PAGE_TITRE = '';
 
+    $PAGE_CONTENU = ob_get_clean();
     ob_start();
     require($CURRENT_PAGE->get_dsp());
-    $PAGE_CONTENU = ob_get_clean();
+    $PAGE_CONTENU = $PAGE_CONTENU . ob_get_clean();
 
     require(TPL.$CURRENT_PAGE->get_tpl_file());
   }
