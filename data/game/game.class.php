@@ -212,7 +212,13 @@ class Game extends Game_Model {
             foreach( $losses[ $player_row['player_id'] ] as $attacker_player_id => $damages ) {
               $player = Player::instance($attacker_player_id);
               if( $diplomacy[ $player_row['player_id'] ][ $attacker_player_id ] ) {
-                $verb = 'backstabbed';
+                $this->set_player_history(
+                  $player_row['player_id'],
+                  $next_turn,
+                  time(),
+                  $player->name . "'s troops backstabbed yours !",
+                  $territory->id
+                );
               }else {
                 $verb = 'killed';
               }
@@ -220,7 +226,7 @@ class Game extends Game_Model {
                 $player_row['player_id'],
                 $next_turn,
                 time(),
-                $player->name . "'s troops ".$verb." ".$damages." of yours",
+                $player->name . "'s troops inflicted ".$damages." damages to yours",
                 $territory->id
               );
             }
