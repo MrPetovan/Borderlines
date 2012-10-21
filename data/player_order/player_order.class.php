@@ -68,7 +68,7 @@ ORDER BY `datetime_execution` DESC, `".self::get_table_name()."`.`player_id`";
     $this->datetime_scheduled = time();
     $this->parameters = $params;
 
-    $this->save();
+    return $this->save();
   }
 
   public function pre_execute() {}

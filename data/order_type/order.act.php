@@ -27,12 +27,7 @@
 
       $player_order = Player_Order::factory_by_class($action);
 
-      $player_order->plan( $order_type, $current_player, getValue('parameters') );
-
-      // TODO : Check parameters
-      // $player_order->check();
-
-      if( $player_order->save() ) {
+      if( $player_order->plan( $order_type, $current_player, getValue('parameters') ) ) {
         Page::set_message( __('Order successfully saved') );
       }else {
         Page::set_message( __('Error while saving order'), Page::PAGE_MESSAGE_ERROR );
