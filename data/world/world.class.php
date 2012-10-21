@@ -12,6 +12,9 @@ class World extends World_Model {
 
   const TILE_DIR = 'cache/world/';
 
+  public function get_generation_parameters()        { return unserialize($this->_generation_parameters);}
+  public function set_generation_parameters($params) { $this->_generation_parameters = serialize($params);}
+
   protected $territories = null;
 
   public function get_territories() {
@@ -35,19 +38,18 @@ class World extends World_Model {
         unlink($removeFile);
       }
 
-      $graph = new Graph();
-      $graph->randomVertexGenerationDisk( $this->size_x, 100, 110 );
-      $graph->randomNoncrossingEdgeGeneration( 2, 150 );
+      $method = $this->generation_method;
+      $territories = $this->$method();
 
-      $this->territories = Territory::find_in_graph( $graph );
+      $this->territories = $territories;
 
-      foreach( $this->get_territories() as $territory ) {
+      foreach( $this->territories as $territory ) {
         $territory->world_id = $this->id;
         $territory->save();
       }
 
       $neighbour_array = array();
-      foreach( $this->get_territories() as $territory ) {
+      foreach( $this->territories as $territory ) {
         $vertices = $territory->vertices;
         $currentVertex = array_shift( $vertices );
         $vertices[] = $currentVertex;
@@ -61,15 +63,39 @@ class World extends World_Model {
       foreach( $neighbour_array as $startVertexGuid => $array ) {
         foreach( $array as $endVertexGuid => $neighbours ) {
           if( count( $neighbours ) == 2 ) {
-
             $neighbours[0]->set_territory_neighbour( $neighbours[1]->id );
             $neighbours[1]->set_territory_neighbour( $neighbours[0]->id );
           }
         }
       }
-
-      //var_dump( $this->territories );
     }
+    return $return;
+  }
+
+  public function territory_generation_simple() {
+    $return = null;
+
+    $defaults = array(
+        'minVertexDist' => 100,
+        'maxVertexDist' => 110,
+        'relationNumber' => 2,
+        'maxEdgeDist' => 150
+    );
+
+    $options = $this->generation_params;
+
+    foreach( $defaults as $key => $value ) {
+      if( !isset($options[$key] ) ) $options[ $key ] = $value;
+    }
+
+    $graph = new Graph();
+    $graph->randomVertexGenerationDisk( $this->size_x, $minVertexDist, $maxVertexDist );
+    $graph->randomNoncrossingEdgeGeneration( $relationNumber, $maxEdgeDist );
+
+    $return = Territory::find_in_graph( $graph );
+
+    unset( $graph );
+
     return $return;
   }
 
