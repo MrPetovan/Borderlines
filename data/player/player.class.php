@@ -46,71 +46,20 @@ AND `ended` IS NULL';
     return $return;
   }
 
-  public function get_resource_sum_list( $game_id = null ) {
-    $return = null;
+  public function get_game_player_list($game_id = null) {
+    $where = '';
+    if( ! is_null( $game_id )) $where .= '
+AND g_p.`game_id` = '.mysql_ureal_escape_string($game_id);
 
-    if( !is_null( $game_id ) || !is_null( $game_id = $this->get_current_game_id() ) ) {
-      $sql = '
-SELECT `resource`.`id`, IFNULL( SUM( `delta` ), 0 ) as `sum`
-FROM `resource`
-LEFT JOIN `player_resource_history` ON
-  `resource_id` = `resource`.`id`
-  AND `player_id` = '.mysql_ureal_escape_string($this->get_id()).'
-  AND `game_id` = '.mysql_ureal_escape_string($game_id).'
-GROUP BY `resource`.`id`';
-      $res = mysql_uquery( $sql );
+    $sql = '
+SELECT g_p.`game_id`, g_p.`player_id`, g_p.`turn_ready`, g_p.`turn_leave`
+FROM `game_player` g_p
+JOIN `game` g ON g.`id` = g_p.`game_id`
+WHERE g.`version` = "world"
+AND g_p.`player_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
+    $res = mysql_uquery($sql);
 
-      $return = mysql_fetch_to_array( $res );
-    }else {
-      error_log('[Borderlines] '.__CLASS__.'->'.__FUNCTION__.' : $game_id not defined');
-      throw new Exception('[Borderlines] '.__CLASS__.'->'.__FUNCTION__.' : $game_id not defined');
-    }
-    return $return;
-  }
-
-  public function get_resource_sum( $resource_id, $turn = null, $game_id = null ) {
-    $return = null;
-
-    if( !is_null( $game_id ) || !is_null( $game_id = $this->get_current_game_id() ) ) {
-      $where = '';
-      if( !is_null( $turn ) ) {
-        $where = '
-AND `turn` <= '.mysql_ureal_escape_string( $turn );
-      }
-      $sql = '
-SELECT IFNULL( SUM( `delta` ), 0 )
-FROM `player_resource_history`
-WHERE `player_id` = '.mysql_ureal_escape_string($this->get_id()).'
-AND `game_id` = '.mysql_ureal_escape_string($game_id).'
-AND `resource_id` = '.mysql_ureal_escape_string($resource_id).$where;
-      $res = mysql_uquery( $sql );
-      $row = mysql_fetch_row( $res );
-      $return = array_shift( $row );
-    }else {
-      error_log('[Borderlines] '.__CLASS__.'->'.__FUNCTION__.' : $game_id not defined');
-      throw new Exception('[Borderlines] '.__CLASS__.'->'.__FUNCTION__.' : $game_id not defined');
-    }
-    return $return;
-  }
-
-  public function get_resource_history( $game_id = null ) {
-    $return = null;
-
-    if( !is_null( $game_id ) || !is_null( $game_id = $this->get_current_game_id() ) ) {
-      $sql = '
-SELECT `player_id`, `resource_id`, `turn`, `datetime`, `delta`, `reason`, `player_order_id`
-FROM `player_resource_history`
-WHERE `player_id` = '.mysql_ureal_escape_string($this->get_id()).'
-AND `game_id` = '.mysql_ureal_escape_string($game_id).'
-ORDER BY `turn` DESC, `datetime` DESC';
-      $res = mysql_uquery($sql);
-
-      $return = mysql_fetch_to_array($res);
-    }else {
-      error_log('[Borderlines] '.__CLASS__.'->'.__FUNCTION__.' : $game_id not defined');
-      throw new Exception('[Borderlines] '.__CLASS__.'->'.__FUNCTION__.' : $game_id not defined');
-    }
-    return $return;
+    return mysql_fetch_to_array($res);
   }
 
   public function get_last_spied_value( $value_guid, $game_id = null ) {
@@ -262,23 +211,6 @@ LIMIT 0,1';
     return $return;
   }
 
-  public static function db_get_leaderboard_list( $game_id ) {
-    $return = null;
-
-$sql = "
-SELECT `".self::get_table_name()."`.`id`
-FROM `".self::get_table_name()."`
-JOIN `player_resource_history` ON `".self::get_table_name()."`.`id` = `player_resource_history`.`player_id`
-JOIN `game_player` ON `game_player`.`player_id` = `".self::get_table_name()."`.`id` AND `game_player`.`game_id` = `player_resource_history`.`game_id`
-WHERE `player_resource_history`.`game_id` = ".mysql_ureal_escape_string( $game_id )."
-AND `player_resource_history`.`resource_id` = 4
-GROUP BY `".self::get_table_name()."`.`id`
-ORDER BY SUM( `delta` ) DESC";
-    $return = self::sql_to_list( $sql );
-
-    return $return;
-  }
-
   public static function db_get_by_game( $game_id, $active = null ) {
     $where = '';
     if( $active === true ) {
@@ -353,6 +285,49 @@ ORDER BY `territory_id`';
 
     return mysql_fetch_to_array($res);
   }
+
+  /**
+   * Either returns the complete array of all territory gain (or losses) of a player
+   * Or the sum of all thoses gains/losses
+   *
+   * Note : Current game area value is null
+   *
+   * @param bool $sum
+   * @return array|float
+   */
+  public function get_game_player_area( $sum = false ) {
+    $return = null;
+    $game_player_list = $this->get_game_player_list();
+    $game_player_area = array();
+    foreach( $game_player_list as $game_player_row ) {
+      $game = Game::instance( $game_player_row['game_id'] );
+      $game_player_area[ $game->id ] = null;
+      if($game->has_ended()) {
+        $first_territory = array_pop( $this->get_territory_owner_list(null, $game->id, 0) );
+        $territory = Territory::instance( $first_territory['territory_id'] );
+
+        $game_player_area[ $game->id ] = -1 * $territory->area;
+
+        if( !$game_player_row['turn_leave'] ) {
+          $territory_owner_list = $this->get_territory_owner_list(null, $game->id, $game->current_turn);
+          foreach( $territory_owner_list as $territory_owner_row ) {
+            if( $territory_owner_row['owner_id'] ) {
+              $territory = Territory::instance( $territory_owner_row['territory_id'] );
+
+              $game_player_area[ $game->id ] += $territory->area;
+            }
+          }
+        }
+      }
+    }
+    if( $sum ) {
+      $return = array_sum( $game_player_area );
+    }else {
+      $return = $game_player_area;
+    }
+    return $return;
+  }
+
 
   /**
    * Game new turn mail
