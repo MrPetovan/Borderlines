@@ -1,12 +1,27 @@
 <?php
 class Change_Capital extends Player_Order {
   public function plan( Order_Type $order_type, Player $player, $params ) {
-    parent::plan( $order_type, $player, $params );
+    $return = null;
+    $has_already_been_ordered = false;
 
-    // Executes the turn after ordered
-    $this->turn_scheduled = $player->current_game->current_turn + 1;
+    $orders = Player_Order::db_get_planned_by_player_id( $player->id, $player->current_game->id );
+    foreach( $orders as $player_order ) {
+      if( $order_type->id == $player_order->order_type_id ) {
+        $has_already_been_ordered = true;
+      }
+    }
+    if(! $has_already_been_ordered ) {
+      parent::plan( $order_type, $player, $params );
 
-    return $this->save();
+      // Executes the turn after ordered
+      $this->turn_scheduled = $player->current_game->current_turn + 1;
+
+      $return = $this->save();
+    }else {
+      $return = false;
+    }
+
+    return $return;
   }
 
   public function execute() {
