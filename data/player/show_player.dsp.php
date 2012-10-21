@@ -1,16 +1,16 @@
 <?php
-  $PAGE_TITRE = __('Player : Showing "%s"', $game->name);
+  $PAGE_TITRE = __('Player : Showing "%s"', $player->name);
 ?>
 <h2><?php echo __('Player %s', $player->name)?></h2>
 <div class="informations formulaire">
-  <p class="field">
+  <!--<p class="field">
     <span class="label"><?php echo __('Joined')?></span>
     <span class="value"><?php echo guess_time($player->created, GUESS_DATETIME_LOCALE)?></span>
   </p>
   <p class="field">
     <span class="label"><?php echo __('Status')?></span>
     <span class="value"><?php echo guess_time($player->created, GUESS_DATETIME_LOCALE)?></span>
-  </p>
+  </p>-->
 </div>
 <h3><?php echo __('Games')?></h3>
 <table>
