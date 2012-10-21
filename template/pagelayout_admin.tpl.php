@@ -49,9 +49,8 @@
   </div>
 
   <div class="container">
-
+    <?php Page::display_messages();?>
     <?php echo $PAGE_CONTENU; ?>
-
   </div>
 
   <script type="text/javascript" src="<?php echo URL_ROOT.'js/bootstrap.min.js'?>"></script>
