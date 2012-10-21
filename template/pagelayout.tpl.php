@@ -17,12 +17,13 @@
         <ul>
           <li>[ <?php echo guess_time(time(), GUESS_DATETIME_LOCALE)?> ]</li>
           <li><a href="<?php echo Page::get_page_url('dashboard') ?>"><?php echo __('Play')?></a></li>
-          <li><a href="<?php echo Page::get_page_url('game_list') ?>"><?php echo __('Games')?></a></li>
           <?php if( $unread_count = Message_player::db_get_unread_count($current_player->id) ) :?>
           <li><a href="<?php echo Page::get_page_url('conversation_list') ?>"><strong><?php echo __('Conversations')?> (<?php echo $unread_count?>)</strong></a></li>
           <?php else:?>
           <li><a href="<?php echo Page::get_page_url('conversation_list') ?>"><?php echo __('Conversations')?></a></li>
           <?php endif;?>
+          <li><a href="<?php echo Page::get_page_url('game_list') ?>"><?php echo __('Games')?></a></li>
+          <li><a href="<?php echo Page::get_page_url('player_list') ?>"><?php echo __('Players')?></a></li>
           <li><a href="<?php echo Page::get_page_url('mon-compte') ?>"><?php echo __('Account')?></a></li>
           <li><a href="<?php echo Page::get_page_url('logout') ?>"><?php echo __('Logout')?></a></li>
         </ul>
@@ -30,10 +31,10 @@
 <?php }else {?>
       <form id="form_login" action="<?php echo get_page_url('login')?>" method="post">
         <p>
-          <input type="text" name="email" value="Entrez votre email" onclick="if(this.value = 'Entrez votre email') this.value = ''" />
+          <input type="text" name="email" value="" placeholder="<?php echo __('Email')?>" />
         </p>
         <p>
-          <input type="password" name="pass" value="12345678" onclick="if(this.value = '12345678') this.value = ''"/>
+          <input type="password" name="pass" placeholder="<?php echo __('Password')?>"/>
         </p>
         <button type="submit" name="submit_login" value="Ok"><?php echo __('Sign in')?></button>
       </form>
