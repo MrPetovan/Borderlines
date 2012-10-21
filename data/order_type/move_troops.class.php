@@ -23,7 +23,7 @@ class Move_Troops extends Player_Order {
     return $this->save();
   }
 
-  public function execute() {
+  public function execute( array &$intermediate_troops_array ) {
     $return = false;
 
     $return_code = -1;
@@ -42,12 +42,14 @@ class Move_Troops extends Player_Order {
         $order_turn = $player->current_game->current_turn;
         $next_turn = $player->current_game->current_turn + 1;
 
-        $from_troops_before = $player->get_territory_player_troops_list( $game_id, $next_turn, $from_territory->id );
+        //$from_troops_before = $player->get_territory_player_troops_list( $game_id, $next_turn, $from_territory->id );
 
-        if( count( $from_troops_before ) ) {
-          $from_troops_before = $from_troops_before[0]['quantity'];
+        if( isset( $intermediate_troops_array[ $from_territory->id ][ $player->id ] ) && $intermediate_troops_array[ $from_territory->id ][ $player->id ] > 0 ) {
+          $from_troops_before = $intermediate_troops_array[ $from_territory->id ][ $player->id ];
 
           $from_troops_after = max( $from_troops_before - $parameters['count'], 0 );
+
+          $intermediate_troops_array[ $from_territory->id ][ $player->id ] = $from_troops_after;
 
           // Correction in case of order error
           $parameters['count'] = $from_troops_before - $from_troops_after;
@@ -70,13 +72,21 @@ class Move_Troops extends Player_Order {
 
           if( $to_troops_after > 0 ) {
             $player->set_territory_player_troops( $game_id, $next_turn, $to_territory->id, $to_troops_after );
-          }elseif( count( $to_troops_before ) ) {
+          }else {
             $player->del_territory_player_troops( $game_id, $next_turn, $to_territory->id );
           }
+          $return = true;
+        }else {
+          // No troops available for move
+          $return_code = 3;
         }
-
-        $return = true;
+      }else {
+        // Unexisting territories
+        $return_code = 2;
       }
+    }else {
+      // Missing parameters
+      $return_code = 1;
     }
 
     $this->turn_executed = $next_turn;

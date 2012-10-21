@@ -10,9 +10,21 @@ class Game extends Game_Model {
 
   // CUSTOM
 
-  const HOME_TROOPS_MAINTENANCE = 1;
-  const AWAY_TROOPS_MAINTENANCE = 2;
-  const RECRUIT_TROOPS_PRICE = 10;
+  public function get_parameters() {
+    $defaults = array(
+        'HOME_TROOPS_MAINTENANCE' => 1,
+        'AWAY_TROOPS_MAINTENANCE' => 2,
+        'RECRUIT_TROOPS_PRICE' => 10
+    );
+
+    $options = unserialize($this->_parameters);
+
+    foreach( $defaults as $key => $value ) {
+      if( !isset($options[$key] ) ) $options[ $key ] = $value;
+    }
+    return $options;
+  }
+  public function set_parameters($params) { $this->_parameters = serialize($params);}
 
   public function get_status_string() {
     $return = "Waiting for players";
@@ -127,14 +139,17 @@ class Game extends Game_Model {
       $current_turn = $this->current_turn;
       $next_turn = $this->current_turn + 1;
 
+      $options = $this->get_parameters();
+
       // Duplicating troops record before moves
       $player_troops_list = $this->get_territory_player_troops_list($current_turn);
       foreach( $player_troops_list as $player_troops_row ) {
+        $intermediate_troops_array[ $player_troops_row['territory_id'] ][ $player_troops_row['player_id'] ] = $player_troops_row['quantity'];
         $this->set_territory_player_troops(
-                $next_turn,
-                $player_troops_row['territory_id'],
-                $player_troops_row['player_id'],
-                $player_troops_row['quantity']
+          $next_turn,
+          $player_troops_row['territory_id'],
+          $player_troops_row['player_id'],
+          $player_troops_row['quantity']
         );
       }
 
@@ -151,7 +166,7 @@ class Game extends Game_Model {
 
       $order_list = $this->get_ready_orders( 'move_troops' );
       foreach( $order_list as $order ) {
-        $order->execute();
+        $order->execute( $intermediate_troops_array );
       }
 
       $territories = Territory::db_get_by_world_id( $this->world_id );
@@ -299,9 +314,9 @@ class Game extends Game_Model {
           }
 
           if( $is_home ) {
-            $troops_maintenance += $territory_player_troops_row['quantity'] * self::HOME_TROOPS_MAINTENANCE;
+            $troops_maintenance += $territory_player_troops_row['quantity'] * $options['HOME_TROOPS_MAINTENANCE'];
           }else {
-            $troops_maintenance += $territory_player_troops_row['quantity'] * self::AWAY_TROOPS_MAINTENANCE;
+            $troops_maintenance += $territory_player_troops_row['quantity'] * $options['AWAY_TROOPS_MAINTENANCE'];
           }
         }
 
@@ -360,7 +375,7 @@ class Game extends Game_Model {
         }
 
         if( $capital_id !== null ) {
-          $troops_recruited = floor( $recruit_budget / self::RECRUIT_TROOPS_PRICE );
+          $troops_recruited = floor( $recruit_budget / $options['RECRUIT_TROOPS_PRICE'] );
           $territory_player_troops_list = $player->get_territory_player_troops_list($this->id, $next_turn, $capital_id);
           $capital_territory_troops = array_pop( $territory_player_troops_list );
           $player->set_territory_player_troops($this->id, $next_turn, $capital_id, $capital_territory_troops['quantity'] + $troops_recruited);
