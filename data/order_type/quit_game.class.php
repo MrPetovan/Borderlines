@@ -1,5 +1,23 @@
 <?php
 class Quit_Game extends Player_Order {
+  public function plan( Order_Type $order_type, Player $player ) {
+    $return = null;
+    $has_already_been_ordered = false;
+
+    $orders = Player_Order::db_get_planned_by_player_id( $player->id, $player->current_game->id );
+    foreach( $orders as $player_order ) {
+      if( $order_type->id == $player_order->order_type_id ) {
+        $has_already_been_ordered = true;
+      }
+    }
+    if(! $has_already_been_ordered ) {
+      $return = parent::plan( $order_type, $player );
+    }else {
+      $return = false;
+    }
+
+    return $return;
+  }
 
   public function execute() {
     $return = false;
@@ -23,7 +41,11 @@ class Quit_Game extends Player_Order {
     }
 
     foreach( $current_game->get_territory_owner_list(null, $next_turn, $player->id) as $territory_owner) {
-      $current_game->set_territory_owner($territory_owner['territory_id'], $next_turn, null, 0, 0);
+      $territory = Territory::instance($territory_owner['territory_id']);
+      $ownership_array = $territory->compute_territory_owner($current_game->id, $next_turn );
+      if( $ownership_array['owner_id'] == $player->id ) {
+        $current_game->set_territory_owner($territory_owner['territory_id'], $next_turn, null, 0, 0);
+      }
     }
 
     $game_player = array_pop( $current_game->get_game_player_list( $player->id ) );
