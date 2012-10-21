@@ -7,12 +7,14 @@
 class Game_Model extends DBObject {
   // Champs BD
   protected $_name = null;
+  protected $_version = null;
   protected $_world_id = null;
   protected $_current_turn = null;
   protected $_turn_interval = null;
   protected $_turn_limit = null;
   protected $_min_players = null;
   protected $_max_players = null;
+  protected $_parameters = null;
   protected $_created = null;
   protected $_started = null;
   protected $_updated = null;
@@ -104,7 +106,8 @@ WHERE `created_by` = ".mysql_ureal_escape_string($created_by);
     <fieldset>
       <legend>Text fields</legend>
         '.HTMLHelper::genererInputHidden('id', $this->get_id()).'
-        <p class="field">'.HTMLHelper::genererInputText('name', $this->get_name(), array(), "Name *").'</p>';
+        <p class="field">'.HTMLHelper::genererInputText('name', $this->get_name(), array(), "Name *").'</p>
+        <p class="field">'.HTMLHelper::genererInputText('version', $this->get_version(), array(), "Version").'</p>';
       $option_list = array();
       $world_list = World::db_get_all();
       foreach( $world_list as $world)
@@ -117,6 +120,7 @@ WHERE `created_by` = ".mysql_ureal_escape_string($created_by);
         <p class="field">'.HTMLHelper::genererInputText('turn_limit', $this->get_turn_limit(), array(), "Turn Limit *").'</p>
         <p class="field">'.HTMLHelper::genererInputText('min_players', $this->get_min_players(), array(), "Min Players").'</p>
         <p class="field">'.HTMLHelper::genererInputText('max_players', $this->get_max_players(), array(), "Max Players").'</p>
+        <p class="field">'.HTMLHelper::genererInputText('parameters', $this->get_parameters(), array(), "Parameters").'</p>
         <p class="field">'.HTMLHelper::genererInputText('created', $this->get_created(), array(), "Created *").'</p>
         <p class="field">'.HTMLHelper::genererInputText('started', $this->get_started(), array(), "Started").'</p>
         <p class="field">'.HTMLHelper::genererInputText('updated', $this->get_updated(), array(), "Updated").'</p>

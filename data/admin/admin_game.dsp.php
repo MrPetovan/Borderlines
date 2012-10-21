@@ -17,12 +17,14 @@
         <tr>
           <th>Sel.</th>
           <th>Name</th>
+          <th>Version</th>
           <th>World Id</th>
           <th>Current Turn</th>
           <th>Turn Interval</th>
           <th>Turn Limit</th>
           <th>Min Players</th>
           <th>Max Players</th>
+          <th>Parameters</th>
           <th>Created</th>
           <th>Started</th>
           <th>Updated</th>
@@ -42,7 +44,8 @@
         <tr>
           <td><input type="checkbox" name="game_id[]" value="'.$game->id.'"/></td>
           <td><a href="'.htmlentities_utf8(Page::get_url('admin_game_view', array('id' => $game->id))).'">'.$game->get_name().'</a></td>
-';
+
+          <td>'.$game->version.'</td>';
       $world_temp = World::instance( $game->world_id);
       echo '
           <td>'.$world_temp->name.'</td>
@@ -51,6 +54,7 @@
           <td>'.$game->turn_limit.'</td>
           <td>'.$game->min_players.'</td>
           <td>'.$game->max_players.'</td>
+          <td>'.$game->parameters.'</td>
           <td>'.guess_time($game->created, GUESS_DATETIME_LOCALE).'</td>
           <td>'.guess_time($game->started, GUESS_DATETIME_LOCALE).'</td>
           <td>'.guess_time($game->updated, GUESS_DATETIME_LOCALE).'</td>

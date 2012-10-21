@@ -9,6 +9,9 @@ class World_Model extends DBObject {
   protected $_name = null;
   protected $_size_x = null;
   protected $_size_y = null;
+  protected $_generation_method = null;
+  protected $_generation_parameters = null;
+  protected $_created = null;
 
   public function __construct($id = null) {
     parent::__construct($id);
@@ -17,6 +20,7 @@ class World_Model extends DBObject {
   /* ACCESSEURS */
   public static function get_table_name() { return "world"; }
 
+  public function get_created()    { return guess_time($this->_created);}
 
   /* MUTATEURS */
   public function set_id($id) {
@@ -28,6 +32,7 @@ class World_Model extends DBObject {
   public function set_size_y($size_y) {
     if( is_numeric($size_y) && (int)$size_y == $size_y) $data = intval($size_y); else $data = null; $this->_size_y = $data;
   }
+  public function set_created($date) { $this->_created = guess_time($date, GUESS_DATE_MYSQL);}
 
   /* FONCTIONS SQL */
 
@@ -61,6 +66,9 @@ class World_Model extends DBObject {
         <p class="field">'.HTMLHelper::genererInputText('name', $this->get_name(), array(), "Name *").'</p>
         <p class="field">'.HTMLHelper::genererInputText('size_x', $this->get_size_x(), array(), "Size X *").'</p>
         <p class="field">'.HTMLHelper::genererInputText('size_y', $this->get_size_y(), array(), "Size Y *").'</p>
+        <p class="field">'.HTMLHelper::genererInputText('generation_method', $this->get_generation_method(), array(), "Generation Method").'</p>
+        <p class="field">'.HTMLHelper::genererInputText('generation_parameters', $this->get_generation_parameters(), array(), "Generation Parameters").'</p>
+        <p class="field">'.HTMLHelper::genererInputText('created', $this->get_created(), array(), "Created *").'</p>
 
     </fieldset>';
 
@@ -79,6 +87,7 @@ class World_Model extends DBObject {
       case 1 : $return = "Le champ <strong>Name</strong> est obligatoire."; break;
       case 2 : $return = "Le champ <strong>Size X</strong> est obligatoire."; break;
       case 3 : $return = "Le champ <strong>Size Y</strong> est obligatoire."; break;
+      case 4 : $return = "Le champ <strong>Created</strong> est obligatoire."; break;
       default: $return = "Erreur de saisie, veuillez vérifier les champs.";
     }
     return $return;
@@ -97,6 +106,7 @@ class World_Model extends DBObject {
     $return[] = Member::check_compulsory($this->get_name(), 1);
     $return[] = Member::check_compulsory($this->get_size_x(), 2, true);
     $return[] = Member::check_compulsory($this->get_size_y(), 3, true);
+    $return[] = Member::check_compulsory($this->get_created(), 4);
 
     $return = array_unique($return);
     if(($true_key = array_search(true, $return, true)) !== false) {

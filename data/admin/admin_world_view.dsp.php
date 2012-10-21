@@ -17,6 +17,18 @@
             <p class="field">
               <span class="libelle">Size Y</span>
               <span class="value"><?php echo $world->size_y?></span>
+            </p>
+            <p class="field">
+              <span class="libelle">Generation Method</span>
+              <span class="value"><?php echo $world->generation_method?></span>
+            </p>
+            <p class="field">
+              <span class="libelle">Generation Parameters</span>
+              <span class="value"><?php echo $world->generation_parameters?></span>
+            </p>
+            <p class="field">
+              <span class="libelle">Created</span>
+              <span class="value"><?php echo guess_time($world->created, GUESS_DATETIME_LOCALE)?></span>
             </p>    </div>
     <p><a href="<?php echo get_page_url('admin_world_mod', true, array('id' => $world->id))?>">Modifier cet objet World</a></p>
 <?php

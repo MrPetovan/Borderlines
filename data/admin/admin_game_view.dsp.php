@@ -10,6 +10,10 @@
     <h3>Showing "<?php echo $game->name?>"</h3>
     <div class="informations formulaire">
 
+            <p class="field">
+              <span class="libelle">Version</span>
+              <span class="value"><?php echo $game->version?></span>
+            </p>
 <?php
       $option_list = array();
       $world_list = World::db_get_all();
@@ -40,6 +44,10 @@
             <p class="field">
               <span class="libelle">Max Players</span>
               <span class="value"><?php echo $game->max_players?></span>
+            </p>
+            <p class="field">
+              <span class="libelle">Parameters</span>
+              <span class="value"><?php echo $game->parameters?></span>
             </p>
             <p class="field">
               <span class="libelle">Created</span>
