@@ -5,11 +5,8 @@
   $player_list = Player::db_get_by_member_id( $member->id );
   $current_player = array_shift( $player_list );
 
-  if( is_admin() && ( $game_id = getValue('game_id') ) ) {
-    $current_game = Game::instance( $game_id );
-  }else {
-    $current_game = $current_player->current_game;
-  }
+  $game_id = getValue('game_id');
+  $current_game = Game::instance( $game_id );
 
   if( ! $world_id = getValue('id') ) {
     if( $current_game ) {
