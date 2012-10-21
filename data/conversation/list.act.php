@@ -1,19 +1,7 @@
 <?php
-  $member = Member::instance( Member::get_current_user_id() );
-  $player_list = Player::db_get_by_member_id( $member->get_id() );
-
-  $game_id = null;
-
-  if( count( $player_list ) ) {
-    $current_player = array_shift( $player_list );
-    // Game retrival
-    if( $current_game = $current_player->current_game ) {
-      $game_id = $current_player->current_game->id;
-    }
-  }else {
-    // No player created
-    Page::redirect( 'create_player' );
-  }
+  $member = Member::get_current_user();
+  $current_player = Player::get_current( $member );
+  $current_game = $current_player->current_game;
 
   if(isset($_POST['submit'])) {
     if(isset($_POST['action'])) {
@@ -52,4 +40,4 @@
     }
   }
 
-  $conversation_list = Conversation_Player::db_get_by_game($current_player->id, getValue('general')?null:$game_id, getValue('archive', false));
+  $conversation_list = Conversation_Player::db_get_by_game($current_player->id, getValue('general')?null:true, getValue('archive', false));

@@ -18,9 +18,14 @@ class Conversation_Player extends Conversation {
   protected $_left = null;
 
 
+  public static function get_table_name() { return 'conversation_player';}
+
   public function db_get_by_game($player_id, $game_id = null, $archived = false) {
     $where = '';
-    if( $game_id !== null ) {
+    if( $game_id === true ) {
+      $where .= '
+AND c.`game_id` IS NOT NULL';
+    }elseif( is_numeric( $game_id ) ) {
       $where .= '
 AND c.`game_id` = '.mysql_ureal_escape_string($game_id);
     }else {
@@ -37,9 +42,10 @@ AND c_p.`archived` IS NULL';
 
     $sql = '
 SELECT *
-FROM `'.self::get_table_name().'` c
-JOIN `conversation_player` c_p ON c_p.`conversation_id` = c.`id`
-WHERE c_p.`player_id` = '.mysql_ureal_escape_string($player_id).$where;
+FROM `'.parent::get_table_name().'` c
+JOIN `'.self::get_table_name().'` c_p ON c_p.`conversation_id` = c.`id`
+WHERE c_p.`player_id` = '.mysql_ureal_escape_string($player_id).$where.'
+ORDER BY c.`game_id` DESC, c.`id` DESC';
 
     return self::sql_to_list($sql);
   }
