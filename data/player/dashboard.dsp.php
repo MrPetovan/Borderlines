@@ -235,7 +235,9 @@
     }
   }
 
-  $troops_maintenance = $troops_home * Game::HOME_TROOPS_MAINTENANCE + $troops_away * Game::AWAY_TROOPS_MAINTENANCE;
+  $options = $current_game->get_parameters();
+
+  $troops_maintenance = $troops_home * $options['HOME_TROOPS_MAINTENANCE'] + $troops_away * $options['AWAY_TROOPS_MAINTENANCE'];
 
   $recruit_budget = $revenue - $troops_maintenance;
 
@@ -250,7 +252,7 @@
   }
   $troops_recruited = 0;
   if( $capital_id !== null ) {
-    $troops_recruited = floor( $recruit_budget / Game::RECRUIT_TROOPS_PRICE );
+    $troops_recruited = floor( $recruit_budget / $options['RECRUIT_TROOPS_PRICE'] );
   }
 ?>
 <div class="informations formulaire">
@@ -270,16 +272,16 @@
     <span class="label"><?php echo __('Troops home')?></span>
     <span class="value num">
       <?php echo l10n_number( $troops_home, 0 )?> <img src="<?php echo IMG.'img_html/helmet.png'?>" alt="Troops" title="Troops" />
-      @ <?php echo l10n_number( Game::HOME_TROOPS_MAINTENANCE, 0 )?> <img src="<?php echo IMG.'img_html/coins.png'?>" alt="" title="" />
-      = <?php echo l10n_number( $troops_home * Game::HOME_TROOPS_MAINTENANCE, 0 )?> <img src="<?php echo IMG.'img_html/coins.png'?>" alt="" title="" />
+      @ <?php echo l10n_number( $options['HOME_TROOPS_MAINTENANCE'], 0 )?> <img src="<?php echo IMG.'img_html/coins.png'?>" alt="" title="" />
+      = <?php echo l10n_number( $troops_home * $options['HOME_TROOPS_MAINTENANCE'], 0 )?> <img src="<?php echo IMG.'img_html/coins.png'?>" alt="" title="" />
     </span>
   </p>
   <p>
     <span class="label"><?php echo __('Troops away')?></span>
     <span class="value num">
       <?php echo l10n_number( $troops_away, 0 )?> <img src="<?php echo IMG.'img_html/helmet.png'?>" alt="Troops" title="Troops" />
-      @ <?php echo l10n_number( Game::AWAY_TROOPS_MAINTENANCE, 0)?> <img src="<?php echo IMG.'img_html/coins.png'?>" alt="" title="" />
-      = <?php echo l10n_number( $troops_away * Game::AWAY_TROOPS_MAINTENANCE, 0)?> <img src="<?php echo IMG.'img_html/coins.png'?>" alt="" title="" />
+      @ <?php echo l10n_number( $options['AWAY_TROOPS_MAINTENANCE'], 0)?> <img src="<?php echo IMG.'img_html/coins.png'?>" alt="" title="" />
+      = <?php echo l10n_number( $troops_away * $options['AWAY_TROOPS_MAINTENANCE'], 0)?> <img src="<?php echo IMG.'img_html/coins.png'?>" alt="" title="" />
     </span>
   </p>
   <p>
@@ -298,7 +300,7 @@
     <span class="label"><?php echo __('Total troops recruited')?></span>
     <span class="value num">
       <?php echo l10n_number( $troops_recruited, 0 )?> <img src="<?php echo IMG.'img_html/helmet.png'?>" alt="Troops" title="Troops" />
-      @ <?php echo l10n_number( Game::RECRUIT_TROOPS_PRICE, 0)?> <img src="<?php echo IMG.'img_html/coins.png'?>" alt="" title="" />
+      @ <?php echo l10n_number( $options['RECRUIT_TROOPS_PRICE'], 0)?> <img src="<?php echo IMG.'img_html/coins.png'?>" alt="" title="" />
     </span>
   </p>
 </div>
