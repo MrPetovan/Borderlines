@@ -39,6 +39,8 @@
         $translation->context = PAGE_CODE;
 
         $success = $translation->save();
+
+        $i18n_replacements[ $format ] = $format;
       }
     }
 
