@@ -11,14 +11,18 @@
   if( ! $world_id = getValue('id') ) {
     if( $current_game ) {
       $world_id = $current_game->world_id;
+
+      $turn = getValue('turn');
+      if( $turn === null ) {
+        $turn = $current_game->current_turn;
+      }
+
+      $params = array('game_id' => $current_game->id, 'turn' => $turn);
     }else {
       Page::redirect('game_list');
     }
-  }
-
-  $turn = getValue('turn');
-  if( $turn === null ) {
-    $turn = $current_game->current_turn;
+  }else {
+    $params = array('id' => $world_id);
   }
 
   $world = World::instance( $world_id );
@@ -27,3 +31,11 @@
     Page::add_message('Unknown world', Page::PAGE_MESSAGE_ERROR);
     Page::redirect('world_list');
   }
+
+  $sort_field = getValue('sort_field', 'name');
+  $sort_direction = getValue('sort_direction', 1);
+
+  $params['sort_field'] = $sort_field;
+  $params['sort_direction'] = $sort_direction;
+
+  $territory_list = Territory::get_by_world($world, $current_game, $turn, $sort_field, $sort_direction);
