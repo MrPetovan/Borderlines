@@ -238,21 +238,17 @@ class World extends World_Model {
       $centroid = $area->get_centroid();
 
       $name = $area->name;
-      $bbox = imagettfbbox( 10, 0, $font, $name );
-      //var_dump( $bbox );
+
+      $font_size = min( max( 7, 10 * $ratio), 12 );
+
+      $bbox = imagettfbbox( $font_size, 0, $font, $name );
       $textwidth = $bbox[2] - $bbox[0];
 
       // Ajout d'ombres au texte
-      imagettftext($img, 10, 0, ($centroid->x - $offset_x - $textwidth / 2) * $ratio + 1, self::y($size_y, $offset_y, $centroid->y ) * $ratio + 1, $grey, $font, $name);
+      imagettftext($img, $font_size, 0, (($centroid->x - $offset_x) * $ratio - $textwidth / 2) + 1, self::y($size_y, $offset_y, $centroid->y ) * $ratio + 1, $grey, $font, $name);
 
       // Ajout du texte
-      imagettftext($img, 10, 0, ($centroid->x - $offset_x - $textwidth / 2) * $ratio, self::y($size_y, $offset_y, $centroid->y) * $ratio, $black, $font, $name);
-      /*foreach( $area->vertices as $vertex ) {
-        // Ajout d'ombres au texte
-        imagettftext($img, 15, 0, $vertex->x + 3, $size_y - ($vertex->y + 3), $grey, $font, $vertex);
-        // Ajout du texte
-        imagettftext($img, 15, 0, $vertex->x + 2, $size_y - ($vertex->y + 2), $black, $font, $vertex);
-      }*/
+      imagettftext($img, $font_size, 0, (($centroid->x - $offset_x) * $ratio - $textwidth / 2), self::y($size_y, $offset_y, $centroid->y) * $ratio, $black, $font, $name);
     }
 
     if( $game_id != null ) {
@@ -292,7 +288,8 @@ class World extends World_Model {
         'size_x' => $this->size_x,
         'size_y' => $this->size_y,
         'offset_x' => 0,
-        'offset_y' => 0
+        'offset_y' => 0,
+        'ratio' => 1
     );
 
     foreach( $defaults as $key => $value ) {
@@ -333,7 +330,7 @@ class World extends World_Model {
       foreach( $territories as $territory ) {
         $coords = array();
         foreach( $territory->vertices as $vertex ) {
-          $coords[] = ( $vertex->x - $offset_x ) .','. ($size_y - ($vertex->y - $offset_y));
+          $coords[] = round(( $vertex->x - $offset_x ) * $ratio ).','. round(($size_y - ($vertex->y - $offset_y)) * $ratio);
         }
         $owner_id = $territory->get_owner($game_id, $turn);
         if( $owner_id != null ) {

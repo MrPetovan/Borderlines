@@ -17,7 +17,6 @@
 <?php else :?>
 <h2><?php echo __('Showing "%s" on turn %s', $world->name, $turn)?></h2>
 <?php endif;?>
-
 <ul>
 <?php for( $i = 0; $i <= $current_game->current_turn; $i ++ ) :?>
   <li>
@@ -34,7 +33,7 @@
 
 <h3><?php echo __('Map')?></h3>
 <?php
-  if( $world->size_x > 968 ) {
+  if( 1 == 2 ) {
 ?>
 <svg id="map"/>
      <script type="text/javascript">
@@ -48,11 +47,12 @@
      </script>
 <?php
   }else {
-
+    $ratio = min( 968 / $world->size_x, 1);
     echo $world->drawImg(array(
       'with_map' => true,
       'game_id' => $current_game->id,
-      'turn' => $turn
+      'turn' => $turn,
+      'ratio' => $ratio
     ));
   }
 
@@ -141,9 +141,7 @@
 <table>
   <thead>
     <tr>
-      <th>
-        <a href="<?php echo $name_url?>#territories"><?php echo __('Name')?></a>
-      </th>
+      <th><a href="<?php echo $name_url?>#territories"><?php echo __('Name')?></a></th>
       <th><?php echo __('Area')?></th>
       <th><a href="<?php echo $owner_url?>#territories"><?php echo __('Owner')?></a></th>
     </tr>
