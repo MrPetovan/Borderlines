@@ -159,6 +159,8 @@ class Territory extends Territory_Model {
   /**
    * Calculates the area of any given non-crossing territory
    * @see http://www.mathopenref.com/coordterritoryarea2.html
+   *
+   * @return float
    */
   public function get_area() {
     $return = null;
@@ -180,6 +182,8 @@ class Territory extends Territory_Model {
   /**
    * Gets the coordinates of the centroid of the territory
    * @see http://stackoverflow.com/questions/2792443/finding-the-centroid-of-a-territory
+   *
+   * @return Vertex
    */
   public function get_centroid() {
     $return = null;
@@ -453,7 +457,7 @@ WHERE `world_id` = ".mysql_ureal_escape_string($world_id);
           // Previous owner wiped out
           if(!array_search($last_owner_id, array_keys( $troops)) !== false) {
             // The player with most troops gets the territory
-            asort( $troops );
+            arsort( $troops );
             reset( $troops );
             list( $player_id, $troops ) = each( $troops );
 
@@ -476,6 +480,40 @@ WHERE `world_id` = ".mysql_ureal_escape_string($world_id);
     return $return;
   }
 
+  public static function get_by_world(World $world, Game $game = null, $turn = null, $sort_field = null, $sort_direction = null) {
+    $return = null;
+
+    if( $game === null && $sort_field === null && $sort_direction === null ) {
+      $return = $world->territories;
+    }elseif( $game !== null ) {
+      if( $turn === null ) $turn = $game->current_turn;
+
+      $order_by = '';
+      switch( $sort_field ) {
+        case 'name': $order_by = 't.`name`'; break;
+        case 'owner': $order_by = 'ISNULL(t_o.`owner_id`), t_o.`owner_id`'; break;
+      }
+      if( $order_by != '' ) {
+        $order_by = '
+ORDER BY '.$order_by;
+        if( $sort_direction !== null && !$sort_direction ) {
+          $order_by .= ' DESC';
+        }
+      }
+
+      $sql = '
+SELECT `id`
+FROM `'.self::get_table_name().'` t
+JOIN `territory_owner` t_o ON
+  t_o.`territory_id` = t.`id`
+  AND t_o.`game_id` = '.$game->id.'
+  AND `turn` = '.$turn.'
+WHERE `world_id` = '.$world->id.$order_by;
+      $return = self::sql_to_list($sql);
+    }
+
+    return $return;
+  }
   // /CUSTOM
 
 }
