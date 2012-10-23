@@ -42,18 +42,16 @@ class Move_Troops extends Player_Order {
         $order_turn = $player->current_game->current_turn;
         $next_turn = $player->current_game->current_turn + 1;
 
-        //$from_troops_before = $player->get_territory_player_troops_list( $game_id, $next_turn, $from_territory->id );
+        $from_troops_before = $player->get_territory_player_troops_list( $game_id, $next_turn, $from_territory->id );
 
-        if( isset( $intermediate_troops_array[ $from_territory->id ][ $player->id ] ) && $intermediate_troops_array[ $from_territory->id ][ $player->id ] > 0 ) {
-          $from_troops_before = $intermediate_troops_array[ $from_territory->id ][ $player->id ];
+        if( count( $from_troops_before ) && isset( $intermediate_troops_array[ $from_territory->id ][ $player->id ] ) && $intermediate_troops_array[ $from_territory->id ][ $player->id ] > 0 ) {
+          $from_troops_before = $from_troops_before[0]['quantity'];
 
-          $from_troops_after = max( $from_troops_before - $parameters['count'], 0 );
+          // Capping with actual number of soldiers before any moves
+          $parameters['count'] = min( $intermediate_troops_array[ $from_territory->id ][ $player->id ], $parameters['count']);
+          $intermediate_troops_array[ $from_territory->id ][ $player->id ] -= $parameters['count'];
 
-          $intermediate_troops_array[ $from_territory->id ][ $player->id ] = $from_troops_after;
-
-          // Correction in case of order error
-          $parameters['count'] = $from_troops_before - $from_troops_after;
-
+          $from_troops_after = $from_troops_before - $parameters['count'];
           if( $from_troops_after > 0 ) {
             $player->set_territory_player_troops( $game_id, $next_turn, $from_territory->id, $from_troops_after );
           }else {
@@ -61,7 +59,6 @@ class Move_Troops extends Player_Order {
           }
 
           $to_troops_before = $player->get_territory_player_troops_list( $game_id, $next_turn, $to_territory->id );
-
           if( count( $to_troops_before ) ) {
             $to_troops_before = $to_troops_before[0]['quantity'];
           }else {
@@ -69,7 +66,6 @@ class Move_Troops extends Player_Order {
           }
 
           $to_troops_after = $to_troops_before + $parameters['count'];
-
           if( $to_troops_after > 0 ) {
             $player->set_territory_player_troops( $game_id, $next_turn, $to_territory->id, $to_troops_after );
           }else {
