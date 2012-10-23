@@ -4,9 +4,9 @@
   /* @var $territory Territory */
   /* @var $current_game Game */
   /* @var $current_player Player */
-  $territory_owner_row = array_pop( $territory->get_territory_owner_list( $current_game->id, $turn ) );
-  if( $territory_owner_row['owner_id'] !== null ) {
-    $owner = Player::instance($territory_owner_row['owner_id']);
+  $territory_owner_id = $territory->get_owner( $current_game->id, $turn );
+  if( $territory_owner_id !== null ) {
+    $owner = Player::instance($territory_owner_id);
   }
 
   $neighbour_list = array();
@@ -101,15 +101,11 @@
 <?php
     $current_turn = null;
     $player_troops = 0;
-    foreach( $territory->get_territory_player_troops_list( $current_game->id, $turn ) as $territory_player_troops ) {
+    foreach( $territory->get_territory_player_troops_list( $current_game->id ) as $territory_player_troops ) {
       $player = Player::instance( $territory_player_troops['player_id'] );
 
       if( $current_turn != $territory_player_troops['turn']) {
         $is_current = $territory_player_troops['turn'] == $turn;
-
-        if( $is_current && $player == $current_player ) {
-          $player_troops = $territory_player_troops['quantity'];
-        }
 
         if( $current_turn !== null ) {
           echo '
@@ -124,6 +120,9 @@
         $current_turn = $territory_player_troops['turn'];
       }
 
+      if( $is_current && $player == $current_player ) {
+        $player_troops = $territory_player_troops['quantity'];
+      }
 
       echo '
     <tr>
