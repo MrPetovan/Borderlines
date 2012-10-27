@@ -246,8 +246,6 @@ class Territory extends Territory_Model {
       if( in_array( $currentVertex, $currentTerritory->vertices ) ) {
         // Working backward to find the closure vertex, exclude non-area included vertices
         $territory = new Territory();
-        $territory->name = self::get_random_country_name();
-        $territory->capital_name = self::get_random_capital_name();
         $currentTerritoryVertices = $currentTerritory->vertices;
         do {
           $newVertex = array_pop( $currentTerritoryVertices );
@@ -483,9 +481,9 @@ WHERE `world_id` = ".mysql_ureal_escape_string($world_id);
   public static function get_by_world(World $world, Game $game = null, $turn = null, $sort_field = null, $sort_direction = null) {
     $return = null;
 
-    if( $game === null && $sort_field === null && $sort_direction === null ) {
+    if( $game === null || empty($game->id) ) {
       $return = $world->territories;
-    }elseif( $game !== null ) {
+    }else {
       if( $turn === null ) $turn = $game->current_turn;
 
       $order_by = '';
@@ -514,6 +512,7 @@ WHERE `world_id` = '.$world->id.$order_by;
 
     return $return;
   }
+
   // /CUSTOM
 
 }
