@@ -24,6 +24,7 @@
           <?php endif;?>
           <li><a href="<?php echo Page::get_page_url('game_list') ?>"><?php echo __('Games')?></a></li>
           <li><a href="<?php echo Page::get_page_url('player_list') ?>"><?php echo __('Players')?></a></li>
+          <li><a href="<?php echo Page::get_page_url('world_list') ?>"><?php echo __('Worlds')?></a></li>
           <li><a href="<?php echo Page::get_page_url('mon-compte') ?>"><?php echo __('Account')?></a></li>
           <li><a href="<?php echo Page::get_page_url('logout') ?>"><?php echo __('Logout')?></a></li>
         </ul>
