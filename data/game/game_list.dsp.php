@@ -27,7 +27,7 @@
     <td>'.$game->max_players.'</td>
     <td><a href="'.Page::get_page_url('show_player', false, array('id' => $player->id)).'">'.$player->name.'</a></td>
     <td>
-      '.(!$game->started && !$current_game ?'<a href="'.Page::get_url(PAGE_CODE, array('action' => 'join', 'game_id' => $game->id)).'">'.__('Join').'</a>':'').'
+      '.($game->can_join($current_player)?'<a href="'.Page::get_url(PAGE_CODE, array('action' => 'join', 'game_id' => $game->id)).'">'.__('Join').'</a>':'').'
       '.($current_game && $current_game->id == $game->id?'<a href="'.Page::get_url('game_over').'">'.__('Quit').'</a>':'').'
       '.(($current_player->id == $game->created_by || is_admin()) && $game->started === null?'<a href="'.Page::get_url(PAGE_CODE, array('action' => 'cancel', 'game_id' => $game->id)).'">'.__('Cancel').'</a>':'').'
       '.(($current_player->id == $game->created_by || is_admin()) && $game->started === null?'<a href="'.Page::get_url(PAGE_CODE, array('action' => 'start', 'game_id' => $game->id)).'">'.__('Start').'</a>':'').'

@@ -65,6 +65,15 @@
     </span>
   </p>
 </div>
+<h3><?php echo __('Game parameters')?></h3>
+<div class="informations formulaire">
+<?php foreach( $game->parameters as $option => $value ) :?>
+  <p class="field">
+    <span class="label"><?php echo __($option)?></span>
+    <span class="value"><?php echo $value?></span>
+  </p>
+<?php  endforeach;?>
+</div>
 <h3><?php echo __('Players')?></h3>
 <?php
 
@@ -100,7 +109,7 @@
         echo '
       <td class="num">'.$game_player_row['turn_ready'].'</td>
       <td class="num">'.l10n_number( $player_area[ 'player_' . $game_player_row['player_id'] ] ).' km²</td>
-      <td class="num">'.l10n_number( $player_troops[ $game_player_row['player_id'] ] ).' <img src="'.IMG.'img_html/helmet.png" alt="Troops" title="Troops"/></td>';
+      <td class="num">'.l10n_number( $player_troops[ $game_player_row['player_id'] ] ).' <img src="'.IMG.'img_html/helmet.png" alt="'.__('Troops').'" title="'.__('Troops').'"/></td>';
       }
       echo '
     </tr>';

@@ -1,9 +1,6 @@
 <?php
-  $member = Member::instance( Member::get_current_user_id() );
-
-  // TODO : Create player page
-  $player_list = Player::db_get_by_member_id( $member->id );
-  $current_player = array_shift( $player_list );
+  $member = Member::get_current_user();
+  $current_player = Player::get_current( $member );
 
   $game_mod = Game::instance();
 
@@ -39,6 +36,8 @@
           if( $game_to_join->id ) {
             if( $game_to_join->add_player( $current_player ) ) {
               Page::add_message( __('You successfully joined the game !') );
+            }else {
+              Page::add_message( __('You can\'t join this game'), Page::PAGE_MESSAGE_ERROR );
             }
           }else {
             Page::add_message( __('Unknown game'), Page::PAGE_MESSAGE_ERROR );
