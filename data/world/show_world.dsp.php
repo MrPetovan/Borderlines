@@ -12,25 +12,26 @@
 
 ?>
 
-<?php if( $is_current_turn ) :?>
+<?php if( $is_current_turn || !$game_id ) :?>
 <h2><?php echo __('Showing "%s"', $world->name)?></h2>
 <?php else :?>
 <h2><?php echo __('Showing "%s" on turn %s', $world->name, $turn)?></h2>
 <?php endif;?>
+<?php if( $game_id ) :?>
 <ul>
-<?php for( $i = 0; $i <= $current_game->current_turn; $i ++ ) :?>
+  <?php for( $i = 0; $i <= $current_game->current_turn; $i ++ ) :?>
   <li>
-      <?php if( $i == $turn ) : ?>
+    <?php if( $i == $turn ) : ?>
     <span><?php echo __('Turn %s', $i)?></span>
-      <?php else:?>
+    <?php else:?>
     <a href="<?php echo Page::get_url('show_world', array('game_id' => $current_game->id, 'turn' => $i))?>">
         <?php echo __('Turn %s', $i)?>
     </a>
-      <?php endif;?>
+    <?php endif;?>
   </li>
-<?php endfor;?>
+  <?php endfor;?>
 </ul>
-
+<?php endif;?>
 <h3><?php echo __('Map')?></h3>
 <?php
   if( 1 == 2 ) {
@@ -114,9 +115,6 @@
     </tr>
   </tbody>
 </table>
-<?php
-  }
-?>
 <h3 id="territories"><?php echo __('Territories')?></h3>
 <?php if(count($territory_list)) {
   $name_url_params = $params;
@@ -169,9 +167,75 @@
 ?>
   </tbody>
 </table>
-
-<?php }else { ?>
+<?php
+    }else {
+?>
 
 <p><?php echo __('No territories yet')?></p>
 
-<?php } //if(count($world->territories))?>
+<?php
+    } //if(count($world->territories))
+  }else {
+?>
+<h3><?php echo __('Generation Parameters')?></h3>
+<ul class="informations formulaire">
+  <li>
+    <span class="label"><?php echo __('Width')?></span>
+    <span class="value"><?php echo l10n_number($world->size_x)?> km²</span>
+  </li>
+  <li>
+    <span class="label"><?php echo __('Height')?></span>
+    <span class="value"><?php echo l10n_number($world->size_y)?> km²</span>
+  </li>
+  <li>
+    <span class="label"><?php echo __('Generation method')?></span>
+    <span class="value"><?php echo __($world->generation_method)?></span>
+  </li>
+<?php foreach( $world->generation_parameters as $param => $value ) {?>
+  <li>
+    <span class="label"><?php echo __($param)?></span>
+    <span class="value"><?php echo $value?></span>
+  </li>
+<?php }?>
+</ul>
+
+<h3 id="territories"><?php echo __('Territories')?></h3>
+<?php
+    if(count($territory_list)) {
+?>
+<table>
+  <thead>
+    <tr>
+      <th><?php echo __('Name')?></th>
+      <th><?php echo __('Area')?></th>
+    </tr>
+  </thead>
+  <tbody>
+<?php
+  $total = 0;
+  foreach( $territory_list as $territory ) {
+    /* @var $territory Territory */
+    $total += $territory->area;
+    echo '
+    <tr>
+      <td><a href="'.Page::get_url('show_territory', array_merge($territory_params, array('id' => $territory->id))).'">'.$territory->name.'</a></td>
+      <td class="num">'.l10n_number( $territory->get_area() ).' km²</td>
+    </tr>';
+  }
+?>
+  </tbody>
+  <tfoot>
+    <tr>
+      <td><?php echo __('%s territories', count( $territory_list ))?></td>
+      <td class="num"><?php echo __('Average: %s km²', l10n_number($total / count( $territory_list )))?></td>
+    </tr>
+  </tfoot>
+</table>
+<?php
+    }else {
+?>
+<p><?php echo __('No territories yet')?></p>
+<?php
+    } //if(count($world->territories))
+  }
+?>
