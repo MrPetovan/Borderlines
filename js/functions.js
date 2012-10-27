@@ -41,7 +41,7 @@ $(document).ready(function() {
         helper: "ui-resizable-helper"
       });
     $localdialog
-      .find('h4 span').text('Showing ' + $(this).attr('title'));
+      .find('h4 span').text($(this).attr('title'));
     $map.after($localdialog);
   })
 
