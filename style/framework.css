@@ -134,7 +134,7 @@ tr.current { font-weight: bold}
 .formulaire span.label,
 .formulaire span.value {
   display: inline-block;
-  line-height: 1em;
+  margin-bottom: 5px;
 }
 .formulaire p {
   overflow: hidden;
@@ -149,5 +149,12 @@ tr.current { font-weight: bold}
 .formulaire p.label_right label { width: auto}
 
 /* Formulaire d'informations */
+ul.informations.formulaire {
+  padding: 0;
+  list-style: none;
+}
 .informations.formulaire span.value { font-weight: normal;}
 .informations.formulaire span.label { font-weight: bold;}
+
+label:hover {text-decoration: underline}
+label.disabled {color: #808080}
