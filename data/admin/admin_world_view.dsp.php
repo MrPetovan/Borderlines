@@ -29,12 +29,24 @@
             <p class="field">
               <span class="libelle">Created</span>
               <span class="value"><?php echo guess_time($world->created, GUESS_DATETIME_LOCALE)?></span>
-            </p>    </div>
+            </p>
+<?php
+      $option_list = array(null => 'Pas de choix');
+      $player_list = Player::db_get_all();
+      foreach( $player_list as $player)
+        $option_list[ $player->id ] = $player->name;
+?>
+      <p class="field">
+        <span class="libelle">Created By</span>
+        <span class="value"><a href="<?php echo get_page_url('admin_player_view', true, array('id' => $world->created_by ) )?>"><?php echo $option_list[ $world->created_by ]?></a></span>
+      </p>
+    </div>
     <p><a href="<?php echo get_page_url('admin_world_mod', true, array('id' => $world->id))?>">Modifier cet objet World</a></p>
 <?php
   // CUSTOM
 ?>
      <h3>Map</h3>
+<?php if( 1 == 2 ) {?>
      <!--<iframe width="256" height="256" style="border:none" src="<?php echo Page::get_url('world_get_tile', array('w' => $world->id, 'x' => 0, 'y' => 0, 'z' => 1, 'force' => true))?>"></iframe><iframe width="256" height="256" style="border:none" src="<?php echo Page::get_url('world_get_tile', array('w' => $world->id, 'x' => 1, 'y' => 0, 'z' => 1, 'force' => true))?>"></iframe>
      <br/>
      <iframe width="256" height="256" style="border:none" src="<?php echo Page::get_url('world_get_tile', array('w' => $world->id, 'x' => 0, 'y' => 1, 'z' => 1, 'force' => true))?>"></iframe><iframe width="256" height="256" style="border:none" src="<?php echo Page::get_url('world_get_tile', array('w' => $world->id, 'x' => 1, 'y' => 1, 'z' => 1, 'force' => true))?>"></iframe>-->
@@ -48,6 +60,13 @@
     .center({lat: 36, lon:-169})
     .zoom(3);
      </script>
+<?php }else {
+  $ratio = min( 968 / $world->size_x, 1);
+  echo $world->drawImg(array(
+    'with_map' => true,
+    'ratio' => $ratio
+  ));
+}?>
 <p><a href="<?php echo get_page_url('admin_world_view', true, array('id' => $world->id, 'action' => 'generate'))?>">Regenerate territories</a></p>
 <h3>Territories</h3>
 <?php

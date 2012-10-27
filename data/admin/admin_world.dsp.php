@@ -22,6 +22,7 @@
           <th>Generation Method</th>
           <th>Generation Parameters</th>
           <th>Created</th>
+          <th>Created By</th>
         </tr>
       </thead>
       <tfoot>
@@ -41,7 +42,10 @@
           <td>'.$world->size_y.'</td>
           <td>'.$world->generation_method.'</td>
           <td>'.$world->generation_parameters.'</td>
-          <td>'.guess_time($world->created, GUESS_DATETIME_LOCALE).'</td>
+          <td>'.guess_time($world->created, GUESS_DATETIME_LOCALE).'</td>';
+      $player_temp = Player::instance( $world->created_by);
+      echo '
+          <td>'.$player_temp->name.'</td>
           <td><a href="'.htmlentities_utf8(Page::get_url('admin_world_mod', array('id' => $world->id))).'"><img src="'.IMG.'img_html/pencil.png" alt="Modifier" title="Modifier"/></a></td>
         </tr>';
     }

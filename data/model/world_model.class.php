@@ -12,6 +12,7 @@ class World_Model extends DBObject {
   protected $_generation_method = null;
   protected $_generation_parameters = null;
   protected $_created = null;
+  protected $_created_by = null;
 
   public function __construct($id = null) {
     parent::__construct($id);
@@ -33,10 +34,20 @@ class World_Model extends DBObject {
     if( is_numeric($size_y) && (int)$size_y == $size_y) $data = intval($size_y); else $data = null; $this->_size_y = $data;
   }
   public function set_created($date) { $this->_created = guess_time($date, GUESS_DATE_MYSQL);}
+  public function set_created_by($created_by) {
+    if( is_numeric($created_by) && (int)$created_by == $created_by) $data = intval($created_by); else $data = null; $this->_created_by = $data;
+  }
 
   /* FONCTIONS SQL */
 
 
+  public static function db_get_by_created_by($created_by) {
+    $sql = "
+SELECT `id` FROM `".self::get_table_name()."`
+WHERE `created_by` = ".mysql_ureal_escape_string($created_by);
+
+    return self::sql_to_list($sql);
+  }
 
   public static function db_get_select_list( $with_null = false ) {
     $return = array();
@@ -68,7 +79,14 @@ class World_Model extends DBObject {
         <p class="field">'.HTMLHelper::genererInputText('size_y', $this->get_size_y(), array(), "Size Y *").'</p>
         <p class="field">'.HTMLHelper::genererInputText('generation_method', $this->get_generation_method(), array(), "Generation Method").'</p>
         <p class="field">'.HTMLHelper::genererInputText('generation_parameters', $this->get_generation_parameters(), array(), "Generation Parameters").'</p>
-        <p class="field">'.HTMLHelper::genererInputText('created', $this->get_created(), array(), "Created *").'</p>
+        <p class="field">'.HTMLHelper::genererInputText('created', $this->get_created(), array(), "Created *").'</p>';
+      $option_list = array(null => 'Pas de choix');
+      $player_list = Player::db_get_all();
+      foreach( $player_list as $player)
+        $option_list[ $player->id ] = $player->name;
+
+      $return .= '
+      <p class="field">'.HTMLHelper::genererSelect('created_by', $option_list, $this->get_created_by(), array(), "Created By").'<a href="'.get_page_url('admin_player_mod').'">Créer un objet Player</a></p>
 
     </fieldset>';
 
