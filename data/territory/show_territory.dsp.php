@@ -23,9 +23,9 @@
 ?>
 
 <?php if( $is_current_turn ) :?>
-<h2><?php echo __('Showing "%s"', $territory->name)?></h2>
+<h2><?php echo __('"%s"', $territory->name)?></h2>
 <?php else :?>
-<h2><?php echo __('Showing "%s" on turn %s', $territory->name, $turn)?></h2>
+<h2><?php echo __('"%s" on turn %s', $territory->name, $turn)?></h2>
 <?php endif;?>
 <div class="informations formulaire">
   <p>
@@ -42,11 +42,11 @@
   </p>
   <p>
     <span class="label"><?php echo __('Current owner')?></span>
-    <span class="value"><?php echo $territory_owner_row['owner_id']?'<a href="'.Page::get_url('show_player', array('id' => $owner->id)).'">'.$owner->name.'</a>':__('Nobody')?></span>
+    <span class="value"><?php echo $territory_owner_id?'<a href="'.Page::get_url('show_player', array('id' => $owner->id)).'">'.$owner->name.'</a>':__('Nobody')?></span>
   </p>
   <p>
     <span class="label"><?php echo __('Status')?></span>
-    <span class="value"><?php echo $territory_owner_row['contested']?__('Contested'):__('Stable')?></span>
+    <span class="value"><?php echo $territory->is_contested( $current_game->id, $turn )?__('Contested'):__('Stable')?></span>
   </p>
 </div>
 <?php if( !$is_ajax ) :?>
