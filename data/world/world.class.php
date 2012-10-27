@@ -12,16 +12,50 @@ class World extends World_Model {
 
   const TILE_DIR = 'cache/world/';
 
-  public function get_generation_parameters()        { return unserialize($this->_generation_parameters);}
   public function set_generation_parameters($params) { $this->_generation_parameters = serialize($params);}
 
   protected $territories = null;
+  protected $_generation_method = 'simple';
 
   public function get_territories() {
     if( is_null( $this->territories )) {
       $this->territories = Territory::db_get_by_world_id($this->id);
     }
     return $this->territories;
+  }
+
+  public function get_generation_parameters( $all = false ) {
+    $simple_defaults = array(
+      'minVertexDist' => 100,
+      'maxVertexDist' => 110,
+      'relationNumber' => 2,
+      'maxEdgeDist' => 150,
+    );
+    $voronoi_defaults = array(
+      'distFromEdges' => 20,
+      'territoryNumber' => 100
+    );
+    if( $all ) {
+      $defaults = array_merge( $simple_defaults, $voronoi_defaults );
+    }else {
+      switch( $this->generation_method ) {
+        case 'simple' : {
+          $defaults = $simple_defaults;
+          break;
+        }
+        case 'voronoi' : {
+          $defaults = $voronoi_defaults;
+          break;
+        }
+      }
+    }
+
+    $options = unserialize($this->_generation_parameters);
+
+    foreach( $defaults as $key => $value ) {
+      if( !isset($options[$key] ) ) $options[ $key ] = $value;
+    }
+    return $options;
   }
 
   public function initialize_territories() {
@@ -32,18 +66,20 @@ class World extends World_Model {
     }
 
     if( $return ) {
-      Territory::db_remove_by_world_id( $this->id );
-
       foreach (glob(DIR_ROOT . self::TILE_DIR . '/tile_'.$this->id.'*') as $removeFile) {
         unlink($removeFile);
       }
 
-      $method = $this->generation_method;
+      $method = 'territory_generation_'.$this->generation_method;
       $territories = $this->$method();
 
       $this->territories = $territories;
 
+      Territory::db_remove_by_world_id( $this->id );
+
       foreach( $this->territories as $territory ) {
+        $territory->name = Territory::get_random_country_name();
+        $territory->capital_name = Territory::get_random_capital_name();
         $territory->world_id = $this->id;
         $territory->save();
       }
@@ -75,18 +111,7 @@ class World extends World_Model {
   public function territory_generation_simple() {
     $return = null;
 
-    $defaults = array(
-        'minVertexDist' => 100,
-        'maxVertexDist' => 110,
-        'relationNumber' => 2,
-        'maxEdgeDist' => 150
-    );
-
-    $options = $this->generation_params;
-
-    foreach( $defaults as $key => $value ) {
-      if( !isset($options[$key] ) ) $options[ $key ] = $value;
-    }
+    $options = $this->generation_parameters;
 
     $graph = new Graph();
     $graph->randomVertexGenerationDisk( $this->size_x, $minVertexDist, $maxVertexDist );
@@ -95,6 +120,101 @@ class World extends World_Model {
     $return = Territory::find_in_graph( $graph );
 
     unset( $graph );
+
+    return $return;
+  }
+
+  public function territory_generation_voronoi() {
+    $return = null;
+
+    $options = $this->generation_parameters;
+
+    require_once LIB.'php-voronoi/library/Nurbs/Voronoi.php';
+    require_once LIB.'php-voronoi/library/Nurbs/Point.php';
+
+    $bbox = new stdClass();
+    $bbox->xl = 0;
+    $bbox->xr = $this->size_x - 1;
+    $bbox->yt = 1;
+    $bbox->yb = $this->size_y;
+
+    $xo = $options['distFromEdges'];
+    $dx = $this->size_x - $options['distFromEdges'];
+    $yo = $options['distFromEdges'];
+    $dy = $this->size_y - $options['distFromEdges'];
+    $n = $options['territoryNumber'];
+    $sites = array();
+
+    //$im = imagecreatetruecolor($width, $height);
+    //$white = imagecolorallocate($im, 255, 255, 255);
+    //$red = imagecolorallocate($im, 255, 0, 0);
+    //$green = imagecolorallocate($im, 0, 100, 0);
+    //$black = imagecolorallocate($im, 0, 0, 0);
+    //imagefill($im, 0, 0, $white);
+    if( 1 == 2 ) {
+      $graph = new Graph();
+      $graph->randomVertexGenerationDisk( $this->size_x, $options['minVertexDist'], $options['maxVertexDist'] );
+      foreach( $graph->vertices as $vertex ) {
+        $sites[] = new Nurbs_Point($vertex->x, $vertex->y);
+      }
+    }
+
+    for ($i=0; $i < $n; $i++) {
+      $point = new Nurbs_Point(rand($xo, $dx), rand($yo, $dy));
+      $sites[] = $point;
+
+      //imagerectangle($im, $point->x - 2, $point->y - 2, $point->x + 2, $point->y + 2, $black);
+    }
+
+    $voronoi = new Voronoi();
+    $diagram = $voronoi->compute($sites, $bbox);
+    $territory_list = array();
+
+    foreach ($diagram['cells'] as $cell) {
+      // On va agreger les points du polygone.
+      $points = array();
+      $vertices = array();
+
+      if (count($cell->_halfedges) > 0) {
+        $v = $cell->_halfedges[0]->getStartPoint();
+        if ($v) {
+          $points[] = $v->x;
+          $points[] = $v->y;
+          $vertices[] = new Vertex(round($v->x), round($v->y));
+        } else {
+          var_dump($j.': no start point');
+        }
+
+        for ($i = 0; $i < count($cell->_halfedges); $i++) {
+          $halfedge = $cell->_halfedges[$i];
+          $edge = $halfedge->edge;
+
+          if ($edge->va && $edge->vb) {
+            //imageline($im, $edge->va->x, $edge->va->y, $edge->vb->x, $edge->vb->y, $red);
+          }
+
+          $v = $halfedge->getEndPoint();
+          if ($v) {
+            $points[] = $v->x;
+            $points[] = $v->y;
+            $vertices[] = new Vertex(round($v->x), round($v->y));
+          } else {
+            var_dump($j.': no end point #'.$i);
+          }
+        }
+      }
+
+      // On construit le polygone
+      //$color = imagecolorallocatealpha($im, rand(0, 255), rand(0, 255), rand(0, 255), 50);
+      //imagefilledpolygon($im, $points, count($points) / 2, $color);
+
+      if( count( $vertices ) > 3 ) {
+        $territory = new Territory();
+        $territory->vertices = $vertices;
+        $territory_list[] = $territory;
+      }
+    }
+    $return = $territory_list;
 
     return $return;
   }
@@ -332,20 +452,30 @@ class World extends World_Model {
         foreach( $territory->vertices as $vertex ) {
           $coords[] = round(( $vertex->x - $offset_x ) * $ratio ).','. round(($size_y - ($vertex->y - $offset_y)) * $ratio);
         }
-        $owner_id = $territory->get_owner($game_id, $turn);
-        if( $owner_id != null ) {
-          $owner = Player::instance($owner_id);
-        }
-        echo '
+        if( $game_id ) {
+          $owner_id = $territory->get_owner($game_id, $turn);
+          if( $owner_id != null ) {
+            $owner = Player::instance($owner_id);
+          }
+          echo '
         <area
           territory="'.$territory->id.'"
           shape="polygon"
           coords="'.implode(',', $coords).'"
           href="'.Page::get_url('show_territory', array('id' => $territory->id)).'"
-          title="'.$territory->name.' ('.($owner_id?$owner->name:'Nobody').')'.
-                  ($territory->is_capital($game_id, $turn)?' [Capital]':'').
-                  ($territory->is_contested($game_id, $turn)?' <Contested>':'').
+          title="'.$territory->name.' ('.($owner_id?$owner->name:__('Nobody')).')'.
+                  ($territory->is_capital($game_id, $turn)?' ['.__('Capital').']':'').
+                  ($territory->is_contested($game_id, $turn)?' <'.__('Contested').'>':'').
                 '" />';
+        }else {
+          echo '
+        <area
+          territory="'.$territory->id.'"
+          shape="polygon"
+          coords="'.implode(',', $coords).'"
+          href="'.Page::get_url('show_territory', array('id' => $territory->id)).'"
+          title="'.$territory->name.'" />';
+        }
       }
       echo '
       </map>
@@ -353,6 +483,51 @@ class World extends World_Model {
     }else {
       echo '<img src="data:image/png;base64,'.base64_encode( $imagevariable ).'"/>';
     }
+  }
+
+  public function html_creation_form() {
+    $generation_types = array(
+      'simple' => 'Simple',
+      'voronoi' => 'Voronoi'
+    );
+
+    $options = $this->get_generation_parameters(true);
+
+    $return = '
+    <script>
+    $(function(){
+      $options = $(".options");
+      $options.hide();
+      $("." + $("#select_generation_method").val()).show();
+      $("#select_generation_method").change(function(){
+        $options.hide();
+        $("." + $(this).val()).show();
+      });
+    });
+    </script>
+    <fieldset>
+      <legend>'.__('Create a world !').'</legend>
+      '.HTMLHelper::genererInputHidden('id', $this->get_id()).'
+      <p class="field">'.HTMLHelper::genererInputText('name', $this->get_name(), array(), __('Name').'*').'</p>
+      <p class="field">'.HTMLHelper::genererInputText('size_x', $this->get_size_x(), array(), __('Width').'*').'</p>
+      <p class="field">'.HTMLHelper::genererInputText('size_y', $this->get_size_y(), array(), __('Height').'*').'</p>
+      <p class="field">'.HTMLHelper::genererSelect('generation_method', $generation_types, $this->get_generation_method(), array('id' => 'select_generation_method'), __('Generation Method')).'</p>
+    </fieldset>
+    <fieldset class="options simple">
+      <legend>'.__('Simple Generator options').'</legend>
+      <p class="field">'.HTMLHelper::genererInputText('generation_parameters[minVertexDist]', $options['minVertexDist'], array(), __('Minimum point distance')).'</p>
+      <p class="field">'.HTMLHelper::genererInputText('generation_parameters[maxVertexDist]', $options['maxVertexDist'], array(), __('Maximum point distance')).'</p>
+      <p class="field">'.HTMLHelper::genererInputText('generation_parameters[relationNumber]', $options['relationNumber'], array(), __('Territory density')).'</p>
+      <p class="field">'.HTMLHelper::genererInputText('generation_parameters[maxEdgeDist]', $options['maxEdgeDist'], array(), __('Maximum border length')).'</p>
+    </fieldset>
+    <fieldset class="options voronoi">
+      <legend>'.__('Voronoi Generator options').'</legend>
+      <!--<p class="field">'.HTMLHelper::genererInputText('generation_parameters[minVertexDist]', $options['minVertexDist'], array(), __('Minimum territory distance')).'</p>
+      <p class="field">'.HTMLHelper::genererInputText('generation_parameters[maxVertexDist]', $options['maxVertexDist'], array(), __('Maximum territory distance')).'</p>-->
+      <p class="field">'.HTMLHelper::genererInputText('generation_parameters[distFromEdges]', $options['distFromEdges'], array(), __('Margin from map edges')).'</p>
+      <p class="field">'.HTMLHelper::genererInputText('generation_parameters[territoryNumber]', $options['territoryNumber'], array(), __('Territory count')).'</p>
+    </fieldset>';
+    return $return;
   }
 
   // /CUSTOM
