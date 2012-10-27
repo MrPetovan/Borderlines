@@ -46,6 +46,22 @@ AND `ended` IS NULL';
     return $return;
   }
 
+  public function can_create_world() {
+    $return = is_admin();
+    if( !$return ) {
+      $sql = '
+SELECT COUNT(*)
+FROM `world`
+WHERE `created_by` = '.$this->id.'
+AND `created` > DATE_SUB(NOW(), INTERVAL 1 HOUR)';
+      $res = mysql_uquery($sql);
+      $count = array_pop( mysql_fetch_row($res) );
+
+      $return = $count == 0;
+    }
+    return $return;
+  }
+
   public function get_game_player_list($game_id = null) {
     $where = '';
     if( ! is_null( $game_id )) $where .= '
@@ -176,7 +192,7 @@ SELECT `id`
 FROM `'.Game::get_table_name().'`
 JOIN `game_player` ON `game_id` = `id`
 WHERE `player_id` = '.mysql_ureal_escape_string($this->get_id()).'
-ORDER BY UNIX_TIMESTAMP( GREATEST( IFNULL(  `updated` , 0 ) , IFNULL(  `started` , 0 ) , IFNULL(  `created` , 0 ) ) ) DESC
+ORDER BY ISNULL(turn_leave) DESC, UNIX_TIMESTAMP( GREATEST( IFNULL(  `updated` , 0 ) , IFNULL(  `started` , 0 ) , IFNULL(  `created` , 0 ) ) ) DESC
 LIMIT 0,1';
 
     return Game::sql_to_object( $sql );
