@@ -62,6 +62,21 @@ AND `created` > DATE_SUB(NOW(), INTERVAL 1 HOUR)';
     return $return;
   }
 
+  public function can_create_player( Member $member ) {
+    $return = is_admin();
+    if( !$return ) {
+      $sql = '
+SELECT COUNT(*)
+FROM `player`
+WHERE `member_id` = '.$member->id;
+      $res = mysql_uquery($sql);
+      $count = array_pop( mysql_fetch_row($res) );
+
+      $return = $count == 0;
+    }
+    return $return;
+  }
+
   public function get_game_player_list($game_id = null) {
     $where = '';
     if( ! is_null( $game_id )) $where .= '
