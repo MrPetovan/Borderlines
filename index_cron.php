@@ -59,6 +59,8 @@
   require_once(INC.'db.inc.php');
   // Fonctions générales
   require_once(INC.'fonctions.inc.php');
+  // i18n functions
+  require_once(INC.'i18n.inc.php');
   // Fonctions liées aux pages
   require_once(INC.'page.inc.php');
   // Fonctions système de fichier
@@ -89,7 +91,12 @@
 
     foreach( $game_list as $game ) {
       if( $game->started ) {
-        $game->compute_auto();
+        echo date('[Y-m-d H:i:s]').' Game "'.$game->name .'" => ';
+        if( $game->compute_auto() ) {
+          echo "turn computed\n";
+        }else {
+          echo "turn failed\n";
+        }
       }else {
         if( $game->min_players && count( $game->get_game_player_list() ) >= $game->min_players ) {
           $game->start();
