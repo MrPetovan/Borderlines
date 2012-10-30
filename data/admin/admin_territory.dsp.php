@@ -20,6 +20,9 @@
           <th>Capital Name</th>
           <th>World Id</th>
           <th>Vertices</th>
+          <th>Passable</th>
+          <th>Capturable</th>
+          <th>Background</th>
         </tr>
       </thead>
       <tfoot>
@@ -40,6 +43,9 @@
       echo '
           <td>'.$world_temp->name.'</td>
           <td>'.$territory->vertices.'</td>
+          <td>'.$tab_visible[$territory->passable].'</td>
+          <td>'.$tab_visible[$territory->capturable].'</td>
+          <td>'.$territory->background.'</td>
           <td><a href="'.htmlentities_utf8(Page::get_url('admin_territory_mod', array('id' => $territory->id))).'"><img src="'.IMG.'img_html/pencil.png" alt="Modifier" title="Modifier"/></a></td>
         </tr>';
     }

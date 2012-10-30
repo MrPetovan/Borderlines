@@ -28,6 +28,18 @@
             <p class="field">
               <span class="libelle">Vertices</span>
               <span class="value"><?php echo $territory->vertices?></span>
+            </p>
+            <p class="field">
+              <span class="libelle">Passable</span>
+              <span class="value"><?php echo $tab_visible[$territory->passable]?></span>
+            </p>
+            <p class="field">
+              <span class="libelle">Capturable</span>
+              <span class="value"><?php echo $tab_visible[$territory->capturable]?></span>
+            </p>
+            <p class="field">
+              <span class="libelle">Background</span>
+              <span class="value"><?php echo $territory->background?></span>
             </p>    </div>
     <p><a href="<?php echo get_page_url('admin_territory_mod', true, array('id' => $territory->id))?>">Modifier cet objet Territory</a></p>
     <h4>Player History</h4>

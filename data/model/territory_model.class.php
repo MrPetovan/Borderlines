@@ -10,6 +10,9 @@ class Territory_Model extends DBObject {
   protected $_capital_name = null;
   protected $_world_id = null;
   protected $_vertices = null;
+  protected $_passable = null;
+  protected $_capturable = null;
+  protected $_background = null;
 
   public function __construct($id = null) {
     parent::__construct($id);
@@ -18,6 +21,10 @@ class Territory_Model extends DBObject {
   /* ACCESSEURS */
   public static function get_table_name() { return "territory"; }
 
+  public function get_passable() { return $this->is_passable(); }
+  public function is_passable() { return ($this->_passable == 1); }
+  public function get_capturable() { return $this->is_capturable(); }
+  public function is_capturable() { return ($this->_capturable == 1); }
 
   /* MUTATEURS */
   public function set_id($id) {
@@ -25,6 +32,12 @@ class Territory_Model extends DBObject {
   }
   public function set_world_id($world_id) {
     if( is_numeric($world_id) && (int)$world_id == $world_id) $data = intval($world_id); else $data = null; $this->_world_id = $data;
+  }
+  public function set_passable($passable) {
+    if($passable) $data = 1; else $data = 0; $this->_passable = $data;
+  }
+  public function set_capturable($capturable) {
+    if($capturable) $data = 1; else $data = 0; $this->_capturable = $data;
   }
 
   /* FONCTIONS SQL */
@@ -73,6 +86,9 @@ WHERE `world_id` = ".mysql_ureal_escape_string($world_id);
       $return .= '
       <p class="field">'.HTMLHelper::genererSelect('world_id', $option_list, $this->get_world_id(), array(), "World Id *").'<a href="'.get_page_url('admin_world_mod').'">Créer un objet World</a></p>
         <p class="field">'.HTMLHelper::genererInputText('vertices', $this->get_vertices(), array(), "Vertices").'</p>
+        <p class="field">'.HTMLHelper::genererInputCheckBox('passable', '1', $this->get_passable(), array('label_position' => 'right'), "Passable" ).'</p>
+        <p class="field">'.HTMLHelper::genererInputCheckBox('capturable', '1', $this->get_capturable(), array('label_position' => 'right'), "Capturable" ).'</p>
+        <p class="field">'.HTMLHelper::genererInputText('background', $this->get_background(), array(), "Background").'</p>
 
     </fieldset>';
 
