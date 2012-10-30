@@ -148,7 +148,7 @@ WHERE `game_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
 
   public function compute_auto() {
     $flag_turn_limit = $this->current_turn < $this->turn_limit;
-    $flag_turn_interval = $this->updated + $this->turn_interval < time();
+    $flag_turn_interval = $this->updated + $this->turn_interval <= time();
 
     // Checking if every player is ready
     $game_players = $this->get_game_player_list();
