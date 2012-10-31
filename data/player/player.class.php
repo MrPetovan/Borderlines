@@ -311,7 +311,7 @@ WHERE NOT EXISTS (
 AND t_o.`game_id` = '.mysql_ureal_escape_string($game_id).'
 AND t_o.`turn` = '.mysql_ureal_escape_string($turn).'
 AND t_o.`owner_id` = '.mysql_ureal_escape_string($this->get_id()).'
-ORDER BY `territory_id`';
+ORDER BY `quantity` DESC';
     $res = mysql_uquery($sql);
 
     return mysql_fetch_to_array($res);
