@@ -60,6 +60,7 @@
 
       <form action="<?php echo Page::get_url(PAGE_CODE, $_GET)?>" method="post">
         <p>2012<?php echo date('Y') != 2012?' - '.date('Y'):''?> &copy; Hypolite |
+          <a href="<?php echo Page::get_url('help_api')?>">API</a> |
           <?php echo __('Change language:')?>
           <select name="locale">
             <?php foreach( explode(',', LOCALES) as $locale ) :?>
