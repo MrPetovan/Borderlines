@@ -923,8 +923,7 @@ function which_os ()
   * @param mixed $defaultValue (optional)
   * @return mixed Value
   */
-  function getValue($key, $defaultValue = null)
-  {
+  function getValue($key, $defaultValue = null) {
     if (!isset($key) OR empty($key) OR !is_string($key))
       return false;
     $ret = (isset($_POST[$key]) ? $_POST[$key] : (isset($_GET[$key]) ? $_GET[$key] : $defaultValue));
@@ -932,6 +931,20 @@ function which_os ()
     if (is_string($ret) === true)
       $ret = urldecode(preg_replace('/((\%5C0+)|(\%00+))/i', '', urlencode($ret)));
     return !is_string($ret)? $ret : stripslashes($ret);
+  }
+
+  /**
+  * Get all values $_POST / $_GET
+  *
+  * @return array Values
+  */
+  function getValues() {
+    $return = array();
+    $keys = array_keys( $_REQUEST );
+    foreach( $keys as $key ) {
+      $return[] = getValue( $key );
+    }
+    return $return;
   }
 
   /**
