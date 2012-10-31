@@ -6,6 +6,9 @@
 ?>
 <h2><?php echo __('Dashboard')?></h2>
 <p><?php echo __('Welcome %s !', $current_player->get_name())?></p>
+<p>Player ID : <?php echo $current_player->id?></p>
+<p>API Key : <?php echo $current_player->api_key?></p>
+<p>API Signature : <?php echo sha1( $current_player->id . $current_player->api_key )?></p>
 <div class="informations formulaire">
   <p>
     <span class="label"><?php echo __('Current game')?></span>
