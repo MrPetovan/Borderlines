@@ -176,7 +176,24 @@
       $array = get_object_vars($this);
       foreach ( $array as $key => $value ) {
         if( strpos( $key, '_' ) === 0 ) {
-          $return[ substr( $key, 1 ) ] = $value;
+          $return[ substr( $key, 1 ) ] = $this->__get(substr( $key, 1 ));
+        }
+      }
+      return $return;
+    }
+
+    /**
+     * Retourne un tableau clé->valeur de toutes les propriétés innées (=SQL)
+     * de l'objet. Ces propriétés sont indiquées par un _ devant le nom SQL
+     *
+     * @return array
+     */
+    public function get_public_vars() {
+      $return = array();
+      $array = get_object_vars($this);
+      foreach ( $array as $key => $value ) {
+        if( strpos( $key, '_' ) === 0 ) {
+          $return[ substr( $key, 1 ) ] = $this->__get(substr( $key, 1 ));
         }
       }
       return $return;
