@@ -7,6 +7,7 @@
     if( Player::can_create_player( $member ) ) {
       $player = Player::instance();
       $player->member_id = Member::get_current_user_id();
+      $player->api_key = sha1( microtime() );
       $player->active = true;
       $player->created = time();
 
