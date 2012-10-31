@@ -9,7 +9,7 @@ header,section,footer,nav {
 
 a { text-decoration: none;}
 a img { border: none;}
-ul { padding-left: 20px;}
+ul, ol { padding-left: 20px;}
 
 p, ul, ol, h3, h4, h5, table {
   margin-bottom: 10px;
