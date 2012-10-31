@@ -9,6 +9,7 @@ class Player_Model extends DBObject {
   protected $_member_id = null;
   protected $_name = null;
   protected $_active = null;
+  protected $_api_key = null;
   protected $_created = null;
 
   public function __construct($id = null) {
@@ -41,6 +42,13 @@ class Player_Model extends DBObject {
     $sql = "
 SELECT `id` FROM `".self::get_table_name()."`
 WHERE `member_id` = ".mysql_ureal_escape_string($member_id);
+
+    return self::sql_to_list($sql);
+  }
+  public static function db_get_by_api_key($api_key) {
+    $sql = "
+SELECT `id` FROM `".self::get_table_name()."`
+WHERE `api_key` = ".mysql_ureal_escape_string($api_key);
 
     return self::sql_to_list($sql);
   }
@@ -79,6 +87,7 @@ WHERE `member_id` = ".mysql_ureal_escape_string($member_id);
       <p class="field">'.HTMLHelper::genererSelect('member_id', $option_list, $this->get_member_id(), array(), "Member Id *").'<a href="'.get_page_url('admin_member_mod').'">Créer un objet Member</a></p>
         <p class="field">'.HTMLHelper::genererInputText('name', $this->get_name(), array(), "Name *").'</p>
         <p class="field">'.HTMLHelper::genererInputCheckBox('active', '1', $this->get_active(), array('label_position' => 'right'), "Active" ).'</p>
+        <p class="field">'.HTMLHelper::genererInputText('api_key', $this->get_api_key(), array(), "Api Key *").'</p>
         <p class="field">'.HTMLHelper::genererInputText('created', $this->get_created(), array(), "Created *").'</p>
 
     </fieldset>';
@@ -97,7 +106,8 @@ WHERE `member_id` = ".mysql_ureal_escape_string($member_id);
     switch($num_error) { 
       case 1 : $return = "Le champ <strong>Member Id</strong> est obligatoire."; break;
       case 2 : $return = "Le champ <strong>Name</strong> est obligatoire."; break;
-      case 3 : $return = "Le champ <strong>Created</strong> est obligatoire."; break;
+      case 3 : $return = "Le champ <strong>Api Key</strong> est obligatoire."; break;
+      case 4 : $return = "Le champ <strong>Created</strong> est obligatoire."; break;
       default: $return = "Erreur de saisie, veuillez vérifier les champs.";
     }
     return $return;
@@ -115,7 +125,8 @@ WHERE `member_id` = ".mysql_ureal_escape_string($member_id);
 
     $return[] = Member::check_compulsory($this->get_member_id(), 1, true);
     $return[] = Member::check_compulsory($this->get_name(), 2);
-    $return[] = Member::check_compulsory($this->get_created(), 3);
+    $return[] = Member::check_compulsory($this->get_api_key(), 3);
+    $return[] = Member::check_compulsory($this->get_created(), 4);
 
     $return = array_unique($return);
     if(($true_key = array_search(true, $return, true)) !== false) {
