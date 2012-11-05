@@ -115,7 +115,9 @@ AND `territory_id` = '.mysql_ureal_escape_string($territory->id);
     }
 
     if( isset( $params['territory'] ) ) {
-      $title .= ' to '.$params['territory']->name;
+      $title = __($title. ' to %s', $params['territory']->name);
+    }else {
+      $title = __($title);
     }
 
     $page_params = array();
@@ -130,25 +132,23 @@ AND `territory_id` = '.mysql_ureal_escape_string($territory->id);
     $return = '
 <form action="'.Page::get_page_url( 'order' ).'" method="post">
   <fieldset>
-    <legend>'.$title.'</legend>';
-    if( !isset( $params['territory'] ) || isset( $territory_list[ $params['territory']->id ]) ) {
-      $return .= '
-    <p>Moving your capital takes two turns, and may be cancelled if you don\'t own the territory</p>
+    <legend>'.$title.'</legend>
+    <p>'.__('Moving your capital takes two turns, and may be cancelled if you don\'t own the territory on the execution turn').'</p>';
+    $return .= '
     '.HTMLHelper::genererInputHidden('url_return', Page::get_page_url( $params['page_code'], true, $page_params ) );
-      if( isset( $params['territory'] ) ) {
+    if( isset( $params['territory'] ) ) {
+      if( !isset( $territory_list[ $params['territory']->id ]) ) {
         $return .= '
-    '.HTMLHelper::genererInputHidden('parameters[territory_id]', $params['territory']->id);
-      }else {
-        $return .= '
-    <p>'.HTMLHelper::genererSelect( 'parameters[territory_id]', $territory_list, null, array(), 'Move capital to' ).'</p>';
+    <p>'.__('Warning : You don\'t own this territory right now').'</p>';
       }
       $return .= '
-    <p>'.HTMLHelper::genererButton( 'action', 'change_capital', array('type' => 'submit'), "Move, move, move !" ).'</p>';
+    '.HTMLHelper::genererInputHidden('parameters[territory_id]', $params['territory']->id);
     }else {
       $return .= '
-    <p>You don\'t own this territory</p>';
+    <p>'.HTMLHelper::genererSelect( 'parameters[territory_id]', $territory_list, null, array(), __('Move capital to') ).'</p>';
     }
     $return .= '
+    <p>'.HTMLHelper::genererButton( 'action', 'change_capital', array('type' => 'submit'), __('Move, move, move !') ).'</p>
   </fieldset>
 </form>';
 
