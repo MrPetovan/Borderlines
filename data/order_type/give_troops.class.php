@@ -1,26 +1,44 @@
 <?php
 class Give_Troops extends Player_Order {
   public function plan( Order_Type $order_type, Player $player, $params ) {
-    parent::plan( $order_type, $player, $params );
+    $valid = isset( $params['from_territory_id'] ) && isset( $params['to_player_id'] ) && isset( $params['count'] );
 
-    $soldiers_gifted = $params['count'];
-    $from_territory_id = $params['from_territory_id'];
-    $player = Player::instance( $this->player_id );
+    if( $valid ) {
+      $locale = localeconv();
+      $count = preg_replace('/[^\d\\'.$locale['decimal_point'].']/', '', $params['count']);
+      $params['count'] = $count;
+      $valid = strval( intval($params['count']) ) === $params['count'] && $params['count'] > 0;
+    }
+    if( $valid ) {
+      $territory = Territory::instance($params['from_territory_id']);
+      $valid = $territory->id !== null;
+    }
+    if( $valid ) {
+      $valid = count( $player->current_game->get_game_player_list($params['to_player_id']) ) != 0;
+    }
+    if( $valid ) {
+      parent::plan( $order_type, $player, $params );
 
-    $game = $player->current_game;
+      $soldiers_gifted = $params['count'];
+      $from_territory_id = $params['from_territory_id'];
+      $player = Player::instance( $this->player_id );
 
-    $player_territory = $player->get_territory_player_troops_list( $game->id, $game->current_turn, $from_territory_id );
+      $game = $player->current_game;
 
-    if( count( $player_territory ) ) {
-      $available_soldiers = $player_territory[0]['quantity'];
-      if( $available_soldiers < $soldiers_gifted ) {
-        $params['count'] = $available_soldiers;
+      $player_territory = $player->get_territory_player_troops_list( $game->id, $game->current_turn, $from_territory_id );
+
+      if( count( $player_territory ) ) {
+        $available_soldiers = $player_territory[0]['quantity'];
+        if( $available_soldiers < $soldiers_gifted ) {
+          $params['count'] = $available_soldiers;
+        }
+
+        $this->parameters = $params;
       }
-
-      $this->parameters = $params;
+      $valid = $this->save();
     }
 
-    return $this->save();
+    return $valid;
   }
 
   public function execute() {
