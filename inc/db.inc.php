@@ -134,6 +134,9 @@
     $return = array();
 
     while( $row = mysql_fetch_assoc($res ) ) {
+      foreach($row as $param => $value) {
+        $row[ $param ] = correctype( $value );
+      }
       $return[] = $row;
     }
     mysql_free_result($res);
