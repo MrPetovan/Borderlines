@@ -62,6 +62,7 @@
         $api_token->expires = time() + 3600;
         $error = $api_token->save();
 
+        $success = true;
         $allowed = true;
         $content = $api_token->get_public_vars();
       }
@@ -147,7 +148,7 @@
           break;
         }
         case 'get_last_player_diplomacy_list' : {
-          if( $current_game && !$current_game->has_ended() ) {
+          if( $current_game ) {
             $content = $current_player->get_last_player_diplomacy_list($current_game->id, $current_game->current_turn );
           }
           break;
@@ -164,7 +165,7 @@
           }
           if( $current_game->id ) {
             $success = true;
-            $content = $current_player->get_game_player_list( $current_game->id );
+            $content = $current_game->get_game_player_list();
           }
           break;
         }
