@@ -942,9 +942,18 @@ function which_os ()
     $return = array();
     $keys = array_keys( $_REQUEST );
     foreach( $keys as $key ) {
-      $return[] = getValue( $key );
+      $return[$key] = getValue( $key );
     }
     return $return;
+  }
+
+  function correctype($var) {
+    if( strval( intval( $var ) ) === $var ) {
+      $var = (int)$var;
+    }elseif( strval(floatval($var)) === $var ) {
+      $var = (float)$var;
+    }
+    return $var;
   }
 
   /**
