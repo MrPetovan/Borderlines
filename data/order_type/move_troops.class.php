@@ -1,26 +1,46 @@
 <?php
 class Move_Troops extends Player_Order {
   public function plan( Order_Type $order_type, Player $player, $params ) {
-    parent::plan( $order_type, $player, $params );
-
-    $soldiers_sent = $params['count'];
-    $from_territory_id = $params['from_territory_id'];
-    $player = Player::instance( $this->player_id );
-
-    $game = $player->current_game;
-
-    $player_territory = $player->get_territory_player_troops_list( $game->id, $game->current_turn, $from_territory_id );
-
-    if( count( $player_territory ) ) {
-      $available_soldiers = $player_territory[0]['quantity'];
-      if( $available_soldiers < $soldiers_sent ) {
-        $params['count'] = $available_soldiers;
-      }
-
-      $this->parameters = $params;
+    $valid = isset( $params['from_territory_id'] ) && isset( $params['to_territory_id'] ) && isset( $params['count'] );
+    if( $valid ) {
+      $locale = localeconv();
+      $count = preg_replace('/[^\d\\'.$locale['decimal_point'].']/', '', $params['count']);
+      $params['count'] = $count;
+      $valid = strval( intval($params['count']) ) === $params['count'] && $params['count'] > 0;
     }
+    if( $valid ) {
+      $territory = Territory::instance($params['from_territory_id']);
+      $valid = $territory->id !== null;
+    }
+    if( $valid ) {
+      $territory = Territory::instance($params['to_territory_id']);
+      $valid = $territory->id !== null;
+    }
+    if( $valid ) {
+      $valid = count( $territory->get_territory_neighbour_list( $params['from_territory_id'] ) ) > 0;
+    }
+    if( $valid ) {
+      parent::plan( $order_type, $player, $params );
 
-    return $this->save();
+      $soldiers_sent = $params['count'];
+      $from_territory_id = $params['from_territory_id'];
+      $player = Player::instance( $this->player_id );
+
+      $game = $player->current_game;
+
+      $player_territory = $player->get_territory_player_troops_list( $game->id, $game->current_turn, $from_territory_id );
+
+      if( count( $player_territory ) ) {
+        $available_soldiers = $player_territory[0]['quantity'];
+        if( $available_soldiers < $soldiers_sent ) {
+          $params['count'] = $available_soldiers;
+        }
+
+        $this->parameters = $params;
+      }
+      $valid = $this->save();
+    }
+    return $valid;
   }
 
   public function execute( array &$intermediate_troops_array ) {
@@ -76,6 +96,7 @@ class Move_Troops extends Player_Order {
               $player->del_territory_player_troops( $game_id, $next_turn, $to_territory->id );
             }
             $return = true;
+            $return_code = 0;
           }else {
             // Illegal move
             $return_code = 4;
