@@ -305,6 +305,10 @@ WHERE `game_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
         $order->execute();
       }
 
+      $order_list = $this->get_ready_orders( 'give_territory' );
+      foreach( $order_list as $order ) {
+        $order->execute();
+      }
       $player_list = Player::db_get_by_game($this->id, true);
 
       // Revenues and recruit
