@@ -272,7 +272,8 @@
 
         foreach($data as $var_name => $value) {
           $var_name = "_$var_name";
-          $this->$var_name = $value;
+
+          $this->$var_name = correctype( $value );
         }
 
         $return = true;
