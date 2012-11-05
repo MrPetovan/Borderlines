@@ -4,9 +4,13 @@
   /* @var $territory Territory */
   /* @var $current_game Game */
   /* @var $current_player Player */
-  $territory_owner_id = $territory->get_owner( $current_game->id, $turn );
-  if( $territory_owner_id !== null ) {
-    $owner = Player::instance($territory_owner_id);
+  $territory_params = array();
+  if( $current_game ) {
+    $territory_owner_id = $territory->get_owner( $current_game->id, $turn );
+    if( $territory_owner_id !== null ) {
+      $owner = Player::instance($territory_owner_id);
+    }
+    $territory_params = array('game_id' => $current_game->id );
   }
 
   $neighbour_list = array();
@@ -78,7 +82,7 @@
       }
       echo '
     <tr>
-      <td><a href="'.Page::get_url('show_territory', array('id' => $neighbour->id)).'">'.$neighbour->name.'</a></td>
+      <td><a href="'.Page::get_url('show_territory', array_merge( $territory_params, array('id' => $neighbour->id) )).'">'.$neighbour->name.'</a></td>
       <td>'.l10n_number( $neighbour->get_area() ).' km²</td>
       <td>'.($territory_owner_row['owner_id']?'<a href="'.Page::get_url('show_player', array('id' => $owner->id)).'">'.$owner->name.'</a>':__('Nobody')).'</td>
       <td>'.($territory_owner_row['contested']?__('Contested'):__('Stable')).'</td>
@@ -104,7 +108,7 @@
     foreach( $territory->get_territory_player_troops_list( $current_game->id ) as $territory_player_troops ) {
       $player = Player::instance( $territory_player_troops['player_id'] );
 
-      if( $current_turn != $territory_player_troops['turn']) {
+      if( $current_turn !== $territory_player_troops['turn']) {
         $is_current = $territory_player_troops['turn'] == $turn;
 
         if( $current_turn !== null ) {
@@ -134,7 +138,7 @@
   </tbody>
 </table>
 
-<?php if( $is_current_turn ) :?>
+<?php if( $is_current_turn && $current_game && !$current_game->has_ended() ) :?>
 
 <h3><?php echo __('Planned movements')?></h3>
 <?php
@@ -231,9 +235,15 @@
       array('current_player' => $current_player, 'territory' => $territory),
       array('id' => $territory->id )
     );
+
+    echo Player_Order::get_html_form_by_class(
+      'give_territory',
+      array('current_player' => $current_player, 'territory' => $territory),
+      array('id' => $territory->id )
+    );
 ?>
 
-<?php endif; //if( $turn == $current_game->current_turn )?>
+<?php endif; //if( $is_current_turn && !$game->has_ended() )?>
 
 <?php if( !$is_ajax ) :?>
 <p><a href="<?php echo Page::get_url('show_world', array('id' => $territory->world_id, 'game_id' => $current_game->id, 'turn' => $turn ) )?>"><?php echo __('Return to world map')?></a></p>
