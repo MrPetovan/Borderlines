@@ -26,6 +26,10 @@
               <span class="value"><?php echo $tab_visible[$player->active]?></span>
             </p>
             <p class="field">
+              <span class="libelle">Api Key</span>
+              <span class="value"><?php echo $player->api_key?></span>
+            </p>
+            <p class="field">
               <span class="libelle">Created</span>
               <span class="value"><?php echo guess_time($player->created, GUESS_DATETIME_LOCALE)?></span>
             </p>    </div>

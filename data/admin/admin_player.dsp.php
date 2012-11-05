@@ -19,6 +19,7 @@
           <th>Name</th>
           <th>Member Id</th>
           <th>Active</th>
+          <th>Api Key</th>
           <th>Created</th>
         </tr>
       </thead>
@@ -39,6 +40,7 @@
       echo '
           <td>'.$member_temp->name.'</td>
           <td>'.$tab_visible[$player->active].'</td>
+          <td>'.$player->api_key.'</td>
           <td>'.guess_time($player->created, GUESS_DATETIME_LOCALE).'</td>
           <td><a href="'.htmlentities_utf8(Page::get_url('admin_player_mod', array('id' => $player->id))).'"><img src="'.IMG.'img_html/pencil.png" alt="Modifier" title="Modifier"/></a></td>
         </tr>';
