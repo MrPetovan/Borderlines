@@ -33,6 +33,17 @@
 </ul>
 <?php endif;?>
 <h3><?php echo __('Map')?></h3>
+<script type="text/javascript">
+  $(function() {
+    //$('.map').maphilight();
+
+    /*$('a[rel]').mouseover(function(e) {
+        $('area[territory='+$(this).attr('rel')+']').mouseover();
+    }).mouseout(function(e) {
+        $('area[territory='+$(this).attr('rel')+']').mouseout();
+    })*/
+  })
+</script>
 <?php
   if( 1 == 2 ) {
 ?>
@@ -53,7 +64,8 @@
       'with_map' => true,
       'game_id' => $current_game->id,
       'turn' => $turn,
-      'ratio' => $ratio
+      'ratio' => $ratio,
+      'force' => is_admin() && getValue('force') !== null
     ));
   }
 
@@ -89,7 +101,7 @@
       }
       echo '
   <tr>
-    <td><a href="'.Page::get_url('show_territory', array_merge( $territory_params, array('id' => $territory->id) ) ).'">'.$territory->name.'</a></td>
+    <td><a href="'.Page::get_url('show_territory', array_merge( $territory_params, array('id' => $territory->id) ) ).'" rel="'.$territory->id.'">'.$territory->name.'</a></td>
     <td>';
       if( $owner == $current_player ) {
         echo 'Yourself';
