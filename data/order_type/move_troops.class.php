@@ -17,6 +17,9 @@ class Move_Troops extends Player_Order {
       $valid = $territory->id !== null;
     }
     if( $valid ) {
+      $valid = $territory->is_passable();
+    }
+    if( $valid ) {
       $valid = count( $territory->get_territory_neighbour_list( $params['from_territory_id'] ) ) > 0;
     }
     if( $valid ) {
@@ -62,48 +65,54 @@ class Move_Troops extends Player_Order {
       if( $from_territory && $to_territory ) {
         $game_id = $player->current_game->id;
 
-        if( self::check_move($from_territory, $to_territory, $player, $player->current_game) ) {
-          $order_turn = $player->current_game->current_turn;
-          $next_turn = $player->current_game->current_turn + 1;
+        if( $to_territory->is_passable() ) {
 
-          $from_troops_before = $player->get_territory_player_troops_list( $game_id, $next_turn, $from_territory->id );
+          if( self::check_move($from_territory, $to_territory, $player, $player->current_game) ) {
+            $order_turn = $player->current_game->current_turn;
+            $next_turn = $player->current_game->current_turn + 1;
 
-          if( count( $from_troops_before ) && isset( $intermediate_troops_array[ $from_territory->id ][ $player->id ] ) && $intermediate_troops_array[ $from_territory->id ][ $player->id ] > 0 ) {
-            $from_troops_before = $from_troops_before[0]['quantity'];
+            $from_troops_before = $player->get_territory_player_troops_list( $game_id, $next_turn, $from_territory->id );
 
-            // Capping with actual number of soldiers before any moves
-            $parameters['count'] = min( $intermediate_troops_array[ $from_territory->id ][ $player->id ], $parameters['count']);
-            $intermediate_troops_array[ $from_territory->id ][ $player->id ] -= $parameters['count'];
+            if( count( $from_troops_before ) && isset( $intermediate_troops_array[ $from_territory->id ][ $player->id ] ) && $intermediate_troops_array[ $from_territory->id ][ $player->id ] > 0 ) {
+              $from_troops_before = $from_troops_before[0]['quantity'];
 
-            $from_troops_after = $from_troops_before - $parameters['count'];
-            if( $from_troops_after > 0 ) {
-              $player->set_territory_player_troops( $game_id, $next_turn, $from_territory->id, $from_troops_after );
+              // Capping with actual number of soldiers before any moves
+              $parameters['count'] = min( $intermediate_troops_array[ $from_territory->id ][ $player->id ], $parameters['count']);
+              $intermediate_troops_array[ $from_territory->id ][ $player->id ] -= $parameters['count'];
+
+              $from_troops_after = $from_troops_before - $parameters['count'];
+              if( $from_troops_after > 0 ) {
+                $player->set_territory_player_troops( $game_id, $next_turn, $from_territory->id, $from_troops_after );
+              }else {
+                $player->del_territory_player_troops( $game_id, $next_turn, $from_territory->id );
+              }
+
+              $to_troops_before = $player->get_territory_player_troops_list( $game_id, $next_turn, $to_territory->id );
+              if( count( $to_troops_before ) ) {
+                $to_troops_before = $to_troops_before[0]['quantity'];
+              }else {
+                $to_troops_before = 0;
+              }
+
+              $to_troops_after = $to_troops_before + $parameters['count'];
+              if( $to_troops_after > 0 ) {
+                $player->set_territory_player_troops( $game_id, $next_turn, $to_territory->id, $to_troops_after );
+              }else {
+                $player->del_territory_player_troops( $game_id, $next_turn, $to_territory->id );
+              }
+              $return = true;
+              $return_code = 0;
             }else {
-              $player->del_territory_player_troops( $game_id, $next_turn, $from_territory->id );
+              // Illegal move
+              $return_code = 4;
             }
-
-            $to_troops_before = $player->get_territory_player_troops_list( $game_id, $next_turn, $to_territory->id );
-            if( count( $to_troops_before ) ) {
-              $to_troops_before = $to_troops_before[0]['quantity'];
-            }else {
-              $to_troops_before = 0;
-            }
-
-            $to_troops_after = $to_troops_before + $parameters['count'];
-            if( $to_troops_after > 0 ) {
-              $player->set_territory_player_troops( $game_id, $next_turn, $to_territory->id, $to_troops_after );
-            }else {
-              $player->del_territory_player_troops( $game_id, $next_turn, $to_territory->id );
-            }
-            $return = true;
-            $return_code = 0;
           }else {
-            // Illegal move
-            $return_code = 4;
+            // No troops available for move
+            $return_code = 3;
           }
         }else {
-          // No troops available for move
-          $return_code = 3;
+          // Territory not passable
+          $return_code = 5;
         }
       }else {
         // Unexisting territories
@@ -154,6 +163,13 @@ class Move_Troops extends Player_Order {
       $page_params = $params['page_params'];
     }
 
+    $status_array = array(
+        0 => '',
+        1 => '<span>('.__('No troops').')</span>',
+        2 => '<span>('.__('No retreat possible').')</span>',
+        3 => '<span>('.__('Impassable territory').')</span>'
+    );
+
     $neighbour_list = array();
 
     if( isset( $params['to_territory'] ) && !isset( $params['from_territory'] ) ) {
@@ -163,14 +179,18 @@ class Move_Troops extends Player_Order {
       foreach( $territory_neighbour_list as $neighbour_array ) {
         $neighbour = Territory::instance( $neighbour_array['neighbour_id'] );
         $neighbour_list[ $neighbour->id ] = $neighbour->name;
-        // No troops in neighbour territory
-        $neighbour_status[ $neighbour->id ] = 1;
+        // Impassable territory
+        $neighbour_status[ $neighbour->id ] = 3;
+        if( $neighbour->is_passable() ) {
+          // No troops in neighbour territory
+          $neighbour_status[ $neighbour->id ] = 1;
 
-        foreach( $territory_occupied_list as $territory_occupied_array ) {
-          if( $territory_occupied_array['territory_id'] == $neighbour_array['neighbour_id'] ) {
-            $neighbour_status[ $neighbour->id ] = 0;
-            $neighbour_list[ $neighbour->id ] = $neighbour->name. ' ('.l10n_number($territory_occupied_array['quantity']).' <img src="'.IMG.'img_html/helmet.png" alt="'.__('Troops').'" title="'.__('Troops').'"/>)';
-            break;
+          foreach( $territory_occupied_list as $territory_occupied_array ) {
+            if( $territory_occupied_array['territory_id'] == $neighbour_array['neighbour_id'] ) {
+              $neighbour_status[ $neighbour->id ] = 0;
+              $neighbour_list[ $neighbour->id ] = $neighbour->name. ' ('.l10n_number($territory_occupied_array['quantity']).' <img src="'.IMG.'img_html/helmet.png" alt="'.__('Troops').'" title="'.__('Troops').'"/>)';
+              break;
+            }
           }
         }
       }
@@ -183,10 +203,15 @@ class Move_Troops extends Player_Order {
         foreach( $territory_neighbour_list as $neighbour_array ) {
           $neighbour = Territory::instance( $neighbour_array['neighbour_id'] );
           $neighbour_list[ $neighbour->id ] = $neighbour->name;
-          $neighbour_status[ $neighbour->id ] = 0;
-          if( !self::check_move($params['from_territory'], $neighbour, $player, $game)) {
-            // Move not allowed
-            $neighbour_status[ $neighbour->id ] = 2;
+          // Impassable territory
+          $neighbour_status[ $neighbour->id ] = 3;
+          if( $neighbour->is_passable() ) {
+            // Move allowed
+            $neighbour_status[ $neighbour->id ] = 0;
+            if( !self::check_move($params['from_territory'], $neighbour, $player, $game)) {
+              // Move not allowed
+              $neighbour_status[ $neighbour->id ] = 2;
+            }
           }
         }
       }
@@ -208,12 +233,13 @@ class Move_Troops extends Player_Order {
     <ul>';
 
         foreach( $neighbour_list as $neighbour_id => $neighbour_name ) {
+
           $return .= '
       <li>
         <label'.($neighbour_status[ $neighbour_id ] != 0?' class="disabled"':'').'>
           <input type="radio" name="parameters[from_territory_id]" value="'.$neighbour_id.'"'.($neighbour_status[ $neighbour_id ] != 0?' disabled="disabled"':'').' />
           '.$neighbour_name.'
-          '.($neighbour_status[ $neighbour_id ] == 1?' <span>('.__('No troops').')</span>':'').'
+          '.$status_array[ $neighbour_status[ $neighbour_id ] ].'
         </label>
       </li>';
         }
@@ -234,7 +260,7 @@ class Move_Troops extends Player_Order {
         <label'.($neighbour_status[ $neighbour_id ] != 0?' class="disabled"':'').'>
           <input type="radio" name="parameters[to_territory_id]" value="'.$neighbour_id.'"'.($neighbour_status[ $neighbour_id ] != 0?' disabled="disabled"':'').' />
           '.$neighbour_name.'
-          '.($neighbour_status[ $neighbour_id ] == 2?' <span>('.__('No retreat possible').')</span>':'').'
+          '.$status_array[ $neighbour_status[ $neighbour_id ] ].'
         </label>
       </li>';
         }
