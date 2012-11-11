@@ -205,7 +205,7 @@ WHERE `game_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
         $previous_owner = $territory->get_owner($this->id, $current_turn );
         $new_owner = $territory->get_owner($this->id, $next_turn );
 
-        if( $territory->is_contested($this->id, $next_turn) ) {
+        if( $territory->is_capturable() && $territory->is_contested($this->id, $next_turn) ) {
           // Diplomacy checking and parties forming
           $diplomacy = array();
           $attacks = array();
@@ -298,11 +298,6 @@ WHERE `game_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
           // Recalculating ownership after battle
           $territory->compute_territory_owner($this->id, $next_turn );
         }
-      }
-
-      $order_list = $this->get_ready_orders( 'change_capital' );
-      foreach( $order_list as $order ) {
-        $order->execute();
       }
 
       $order_list = $this->get_ready_orders( 'give_territory' );
@@ -428,6 +423,11 @@ WHERE `game_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
             null
           );
         }
+      }
+
+      $order_list = $this->get_ready_orders( 'change_capital' );
+      foreach( $order_list as $order ) {
+        $order->execute();
       }
 
       $this->current_turn++;
