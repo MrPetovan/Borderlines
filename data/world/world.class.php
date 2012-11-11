@@ -70,6 +70,11 @@ class World extends World_Model {
         unlink($removeFile);
       }
 
+      foreach (glob(DIR_ROOT . self::TILE_DIR . '/'.$this->id.'/*') as $removeFile) {
+        if(is_file($removeFile))
+          unlink($removeFile);
+      }
+
       $method = 'territory_generation_'.$this->generation_method;
       $territories = $this->$method();
 
@@ -77,35 +82,80 @@ class World extends World_Model {
 
       Territory::db_remove_by_world_id( $this->id );
 
-      foreach( $this->territories as $territory ) {
-        $territory->name = Territory::get_random_country_name();
-        $territory->capital_name = Territory::get_random_capital_name();
+      $sea_territories = array();
+      foreach( $this->territories as $key => $territory ) {
+        $territory_areas[ 'territory_'.$key ] = $territory->area;
+        foreach( $territory->vertices as $vertex ) {
+          if( $vertex->x == 0 || $vertex->y == 1 || $vertex->x == $this->size_x - 1 || $vertex->y == $this->size_y ) {
+            $sea_territories[] = 'territory_'.$key;
+            unset( $territory_areas[ 'territory_'.$key ] );
+            break;
+          }
+        }
+      }
+      $total_territories = count( $territory_areas );
+      asort( $territory_areas );
+      $territory_areas = array_keys( $territory_areas );
+
+      $margin_percent_lakes = 0.05;
+      $margin_percent_moutains = 0.1;
+      $margin_count = floor( $total_territories * $margin_percent_moutains );
+      $moutain_territories = array_slice($territory_areas, 0, $margin_count);
+      $margin_count = floor( $total_territories * $margin_percent_lakes );
+      $sea_territories = array_merge( $sea_territories, array_slice( $territory_areas, - $margin_count ) );
+
+      $mountain_nb = 1;
+      $sea_nb = 1;
+
+      foreach( $this->get_territories() as $key => $territory ) {
+        if(array_search('territory_'.$key, $sea_territories) !== false) {
+          $territory->name = 'Sea '.$sea_nb++;
+          $territory->capital_name = 'Sea '.$sea_nb;
+          $territory->passable = 1;
+          $territory->capturable = 0;
+          $territory->background = 'sea';
+        }elseif( array_search('territory_'.$key, $moutain_territories) !== false ) {
+          $territory->name = 'Mountain '.$mountain_nb++;
+          $territory->capital_name = 'Mountain '.$mountain_nb;
+          $territory->passable = 0;
+          $territory->capturable = 0;
+          $territory->background = 'mountain';
+        }else {
+          $territory->name = Territory::get_random_country_name();
+          $territory->capital_name = Territory::get_random_capital_name();
+          $territory->passable = 1;
+          $territory->capturable = 1;
+        }
         $territory->world_id = $this->id;
         $territory->save();
       }
 
-      $neighbour_array = array();
-      foreach( $this->territories as $territory ) {
-        $vertices = $territory->vertices;
-        $currentVertex = array_shift( $vertices );
-        $vertices[] = $currentVertex;
-        foreach( $vertices as $vertex ) {
-          $neighbour_array[ $currentVertex->guid ][ $vertex->guid ][] = $territory;
-          $neighbour_array[ $vertex->guid ][ $currentVertex->guid ][] = $territory;
-          $currentVertex = $vertex;
-        }
-      }
+      $this->generate_neighbour_data();
+    }
+    return $return;
+  }
 
-      foreach( $neighbour_array as $startVertexGuid => $array ) {
-        foreach( $array as $endVertexGuid => $neighbours ) {
-          if( count( $neighbours ) == 2 ) {
-            $neighbours[0]->set_territory_neighbour( $neighbours[1]->id );
-            $neighbours[1]->set_territory_neighbour( $neighbours[0]->id );
-          }
+  public function generate_neighbour_data() {
+    $neighbour_array = array();
+    foreach( $this->get_territories() as $territory ) {
+      $vertices = $territory->vertices;
+      $currentVertex = array_shift( $vertices );
+      $vertices[] = $currentVertex;
+      foreach( $vertices as $vertex ) {
+        $neighbour_array[ $currentVertex->guid ][ $vertex->guid ][] = $territory;
+        $neighbour_array[ $vertex->guid ][ $currentVertex->guid ][] = $territory;
+        $currentVertex = $vertex;
+      }
+    }
+
+    foreach( $neighbour_array as $startVertexGuid => $array ) {
+      foreach( $array as $endVertexGuid => $neighbours ) {
+        if( count( $neighbours ) == 2 && $neighbours[1]->id != $neighbours[0]->id ) {
+          $neighbours[0]->set_territory_neighbour( $neighbours[1]->id, $startVertexGuid, $endVertexGuid );
+          $neighbours[1]->set_territory_neighbour( $neighbours[0]->id, $startVertexGuid, $endVertexGuid );
         }
       }
     }
-    return $return;
   }
 
   public function territory_generation_simple() {
@@ -231,53 +281,37 @@ class World extends World_Model {
     return $return;
   }
 
-  public function draw( $options = array() ) {
-    $defaults = array(
-        'territories' => null,
-        'game_id' => null,
-        'turn' => null,
-        'size_x' => $this->size_x,
-        'size_y' => $this->size_y,
-        'offset_x' => 0,
-        'offset_y' => 0,
-        'ratio' => 1
-    );
-
-    foreach( $defaults as $key => $value ) {
-      if( !isset($options[$key] ) ) $options[ $key ] = $value;
-    }
-
-    extract( $options );
-
-    if( $territories === null ) {
-      $territories = $this->get_territories();
+  private function cache_draw( $filepath, $options = array(), $direct_output = false, $force = false ) {
+    if( !is_file( DIR_ROOT . $filepath ) || $force ) {
+      $image = $this->draw( $options );
+      imagepng($image, DIR_ROOT . $filepath );
+      $last_modified = time();
     }else {
-      $size_x = 0;
-      $size_y = 0;
-      $offset_x = $this->size_x;
-      $offset_y = $this->size_y;
-      foreach( $territories as $key => $area ) {
-        foreach( $area->vertices as $pointAire ) {
-          $size_x = max( $size_x, $pointAire->x );
-          $size_y = max( $size_y, $pointAire->y );
-          $offset_x = min( $offset_x, $pointAire->x );
-          $offset_y = min( $offset_y, $pointAire->y );
-        }
-      }
-      $offset_x -= 10;
-      $offset_y -= 10;
-      $size_x = $size_x + 10;
-      $size_y = $size_y + 10;
+      $last_modified = filemtime(DIR_ROOT . $filepath);
     }
+
+    if( $direct_output ) {
+      header('Pragma: cache');
+      header('Cache-Control: public');
+      header('Last-Modified: '. gmdate('D, d M Y H:i:s', $last_modified) .' GMT');
+      //header('Expires: '. gmdate('D, d M Y H:i:s', time() + 60*60*24*30) .' GMT');
+      header('Content-type: image/png');
+      readfile( DIR_ROOT . $dir . $filename );
+    }
+  }
+
+  private function draw( $options = array() ) {
+    extract( $options );
 
     $font = DIR_ROOT.'/style/arial.ttf';
 
-    $img = imagecreatetruecolor(($size_x - $offset_x) * $ratio, ($size_y - $offset_y) * $ratio);
-    imagesavealpha($img, true);
+    $img = imagecreatetruecolor( ($size_x - $offset_x) * $ratio, ($size_y - $offset_y) * $ratio);
+    //imagealphablending($img, false);
+    //imagesavealpha($img, true);
 
     // Fill the image with transparent color
     $transparent = imagecolorallocatealpha($img,0x00,0x00,0x00,127);
-    $veil = imagecolorallocatealpha($img,0x00,0x00,0x00,64);
+    $veil = imagecolorallocatealpha($img,0x00,0x00,0x00,40);
 
     $white = imagecolorallocate($img, 255, 255, 255);
     $red = imagecolorallocate($img, 255, 0, 0);
@@ -285,38 +319,44 @@ class World extends World_Model {
     $blue = imagecolorallocate($img, 0, 0, 255);
     $black = imagecolorallocatealpha($img, 0, 0, 0, 0);
     $grey = imagecolorallocate($img, 211, 211, 211);
+    $darkgrey = imagecolorallocate($img, 17, 17, 17);
 
     $sand = imagecolorallocate($img, 255, 200, 0);
     //$earth = imagecolorallocate($img, 50, 21, 12);
     $earth = imagecolorallocate($img, 101, 159, 0);
 
-    $marine = imagecolorallocate($img, 0, 100, 255);
+    $marine = imagecolorallocatealpha($img, 0, 185, 255, 100);
     $sea = imagecolorallocate($img, 0, 161, 185);
 
-    $player_colors = array();
+    $player_colors = array(
+        imagecolorallocate($img,   0, 255, 255),
+        imagecolorallocate($img, 255,   0, 138),
+        imagecolorallocate($img, 126, 255,   0),
+        imagecolorallocate($img, 255, 108,   0),
+        imagecolorallocate($img, 120,   0, 255),
+        imagecolorallocate($img, 255, 240,   0),
+        imagecolorallocate($img, 255,  42,   0),
+        imagecolorallocate($img,   0, 102, 255),
+        imagecolorallocate($img, 255, 107, 187),
+        imagecolorallocate($img, 252, 156,  85),
+        imagecolorallocate($img, 184, 123, 254),
+        imagecolorallocate($img, 255,  92,  62),
+        imagecolorallocate($img, 104, 164, 255),
+    );
     $players = array();
     if( $game_id !== null ) {
       /* @var $game Game */
       $game = Game::instance($game_id);
-
-      foreach( $game->get_game_player_list() as $game_player_row ) {
+      foreach( $game->get_game_player_list() as $key => $game_player_row ) {
         $player = Player::instance($game_player_row['player_id']);
-        $color_array = toColorCode($player->name);
-        $player_colors[ $player->id ] = imagecolorallocate($img, $color_array['R'], $color_array['G'], $color_array['B']);
+        $player_color_index[ $player->id ] = $key;
         $players[] = $player;
       }
     }
 
-    imagefill($img, 0, 0, $grey);
+    imagefill($img, 0, 0, $darkgrey);
 
-    $divisor = 100;
-
-    $offset_grid_x = $offset_x % 100;
-    $offset_grid_y = $offset_y % 100;
-
-    for($iw=1; $iw < $size_x / $divisor; $iw++){imageline($img, ($iw * $divisor - $offset_grid_x) * $ratio, 0, ($iw * $divisor - $offset_grid_x) * $ratio, $size_x * $ratio, $white);}
-    for($ih=1; $ih < $size_y / $divisor; $ih++){imageline($img, 0, ($ih * $divisor - $offset_grid_y) * $ratio, $size_x * $ratio, ($ih * $divisor - $offset_grid_y) * $ratio, $white);}
-
+    $territory_owner = array();
     foreach( $territories as $key => $area ) {
       $polygon = array();
       foreach( $area->vertices as $pointAire ) {
@@ -324,34 +364,78 @@ class World extends World_Model {
         $polygon[] = self::y( $size_y, $offset_y, $pointAire->y ) * $ratio;
       }
 
-      $color = $white;
       if( $game_id !== null ) {
         $owner_id = $area->get_owner($game_id, $turn);
-        if( $owner_id ) {
-          $color = $player_colors[ $owner_id ];
-        }
+        $territory_owner[ $area->id ] = $owner_id;
       }
 
-      imagefilledpolygon( $img, $polygon, count( $area->vertices ), $color );
+      // Territory fill
+      if( $area->background === null ) {
+        $color = $black;
+        if( $game_id !== null) {
+          if( $owner_id ) {
+            $color = imagecolortoalpha( $img, $player_colors[ $player_color_index[ $owner_id ] ], 85);
+          }
+          $is_capital = $area->is_capital($game_id, $turn);
+          $is_contested = $area->is_contested($game_id, $turn);
 
-      if( $game_id !== null ) {
-        if( $area->is_capital($game_id, $turn) ) {
-          imagefilledpolygon( $img, $polygon, count( $area->vertices ), $veil );
+          if( $owner_id && $is_capital ) {
+            $color = imagecolortoalpha( $img, $player_colors[ $player_color_index[ $owner_id ] ], 42);
+            imagefilledpolygon( $img, $polygon, count( $area->vertices ), $color );
+          }
+          if( $area->is_contested($game_id, $turn) ) {
+            // Conflict overlay
+            if( $owner_id ) {
+              if( !$is_capital ) {
+                $color = imagecolortoalpha( $img, $player_colors[ $player_color_index[ $owner_id ] ], 85);
+                imagefilledpolygon( $img, $polygon, count( $area->vertices ), $color );
+              }
+              $tile_contested = imagecreatefrompng( DIR_ROOT.'img/img_css/conflict.png');
+            }else {
+              imagefilledpolygon( $img, $polygon, count( $area->vertices ), $color );
+              $tile_contested = imagecreatefrompng( DIR_ROOT.'img/img_css/conflict2.png');
+            }
+            imagesettile($img, $tile_contested);
+            imagefilledpolygon( $img, $polygon, count( $area->vertices ), IMG_COLOR_TILED );
+          }else {
+            imagefilledpolygon( $img, $polygon, count( $area->vertices ), $color );
+          }
+        }else {
+          imagefilledpolygon( $img, $polygon, count( $area->vertices ), $color );
         }
-        if( $area->is_contested($game_id, $turn) ) {
-          $tile_contested = imagecreatefrompng( DIR_ROOT.'img/img_css/conflict.png');
-          imagesettile($img, $tile_contested);
-          imagefilledpolygon( $img, $polygon, count( $area->vertices ), IMG_COLOR_TILED );
-        }
+      }else {
+        $tile_background = imagecreatefrompng( DIR_ROOT.'img/img_css/'.$area->background.'.png');
+        imagesettile($img, $tile_background);
+        imagefilledpolygon( $img, $polygon, count( $area->vertices ), IMG_COLOR_TILED );
+        imagepolygon( $img, $polygon, count( $area->vertices ), $marine );
       }
-
     }
-    foreach( $territories as $key => $area ) {
-      $lastPoint = $area->vertices[ count( $area ) - 1 ];
-      foreach( $area->vertices as $point ) {
-        imageline($img, ($lastPoint->x - $offset_x) * $ratio, self::y($size_y, $offset_y, $lastPoint->y) * $ratio, ($point->x - $offset_x) * $ratio, self::y($size_y, $offset_y, $point->y) * $ratio, $sand);
 
-        $lastPoint = $point;
+    // Territory borders
+    foreach( $territories as $key => $area ) {
+      if( $area->background !== 'sea' ) {
+        $color = $white;
+        if( $game_id !== null ) {
+          $owner_id = $territory_owner[ $area->id ];
+          if( $owner_id ) {
+            $color = $player_colors[ $player_color_index[ $owner_id ] ];
+          }
+        }
+
+        $lastPoint = $area->vertices[ count( $area->vertices ) - 1 ];
+        foreach( $area->vertices as $point ) {
+          $neighbour = $area->get_neighbour( $lastPoint->guid, $point->guid );
+          $glow = 5;
+          if( $game_id !== null && $neighbour && $neighbour->id && array_key_exists( $neighbour->id, $territory_owner ) && $territory_owner[ $area->id ] == $territory_owner[ $neighbour->id ] ) {
+            $glow = 0;
+            //imageline($img, ($lastPoint->x - $offset_x) * $ratio, self::y($size_y, $offset_y, $lastPoint->y) * $ratio, ($point->x - $offset_x) * $ratio, self::y($size_y, $offset_y, $point->y) * $ratio, $color);
+          }
+
+          imagelineglow($img, ($lastPoint->x - $offset_x) * $ratio, self::y($size_y, $offset_y, $lastPoint->y) * $ratio, ($point->x - $offset_x) * $ratio, self::y($size_y, $offset_y, $point->y) * $ratio, $color, $glow);
+          $lastPoint = $point;
+        }
+      }else {
+        //imagepolygon( $img, $polygon, count( $area->vertices ), $marine );
       }
     }
     foreach( $territories as $key => $area ) {
@@ -359,16 +443,21 @@ class World extends World_Model {
 
       $name = $area->name;
 
-      $font_size = min( max( 7, 10 * $ratio), 12 );
+      $font_size = round( min( max( 7, 10 * $ratio), 12 ) );
 
       $bbox = imagettfbbox( $font_size, 0, $font, $name );
       $textwidth = $bbox[2] - $bbox[0];
+      $textheight = $bbox[5] - $bbox[1];
+
+      $bot_left_x = ($centroid->x - $offset_x) * $ratio - $textwidth / 2;
+      $bot_left_y = self::y($size_y, $offset_y, $centroid->y) * $ratio;
 
       // Ajout d'ombres au texte
-      imagettftext($img, $font_size, 0, (($centroid->x - $offset_x) * $ratio - $textwidth / 2) + 1, self::y($size_y, $offset_y, $centroid->y ) * $ratio + 1, $grey, $font, $name);
+      //imagettftext($img, $font_size, 0, (($centroid->x - $offset_x) * $ratio - $textwidth / 2) + 1, self::y($size_y, $offset_y, $centroid->y ) * $ratio + 1, $grey, $font, $name);
+      imagefilledrectangle($img, $bot_left_x, $bot_left_y + 2, $bot_left_x + $textwidth, $bot_left_y + $textheight + 2, $veil);
 
       // Ajout du texte
-      imagettftext($img, $font_size, 0, (($centroid->x - $offset_x) * $ratio - $textwidth / 2), self::y($size_y, $offset_y, $centroid->y) * $ratio, $black, $font, $name);
+      imagettftext($img, $font_size, 0, $bot_left_x, $bot_left_y, $white, $font, $name);
     }
 
     if( $game_id != null ) {
@@ -381,16 +470,18 @@ class World extends World_Model {
               5, $key * 15 + 15
           ),
           4,
-          $player_colors[ $player->id ]
+          imagecolortoalpha($img, $player_colors[ $player_color_index[ $player->id ] ], 30)
         );
 
         // Ajout d'ombres au texte
-        imagettftext($img, 10, 0, 30 + 1, $key * 15 + 15 +1, $grey, $font, $player->name);
+        //imagettftext($img, 10, 0, 30 + 1, $key * 15 + 15 +1, $grey, $font, $player->name);
 
         // Ajout du texte
-        imagettftext($img, 10, 0, 30, $key * 15 + 15, $black, $font, $player->name);
+        imagettftext($img, 10, 0, 30, $key * 15 + 15, $white, $font, $player->name);
       }
     }
+
+    imagefilter($img, IMG_FILTER_SMOOTH, 10);
 
     return $img;
   }
@@ -409,40 +500,58 @@ class World extends World_Model {
         'size_y' => $this->size_y,
         'offset_x' => 0,
         'offset_y' => 0,
-        'ratio' => 1
+        'ratio' => 1,
+        'force' => false
     );
 
     foreach( $defaults as $key => $value ) {
       if( !isset($options[$key] ) ) $options[ $key ] = $value;
     }
 
-    extract( $options );
+    if( $options['territories'] === null ) {
+      $options['territories'] = $this->get_territories();
 
-    $image = $this->draw( $options );
-    ob_start();
-    imagepng($image);
-    $imagevariable = ob_get_clean();
+      if( $options['game_id'] !== null ) {
+        $game = Game::instance($options['game_id']);
+        if( $options['turn'] === null ) $options['turn'] = $game->current_turn;
+        $dir = 'cache/world/'.$this->id.'/game/'.$options['game_id'].'/';
+        $filename = 'map_turn_'.$options['turn'].'_'.$options['size_x'].'x'.$options['size_y'].'_ratio_'.$options['ratio'].'.png';
+      }else {
+        $dir = 'cache/world/'.$this->id.'/';
+        $filename = 'map_'.$options['size_x'].'_'.$options['size_y'].'.png';
+      }
+      if( !is_dir( DIR_ROOT . $dir ) ) mkdir($dir, 0700, true);
 
-    if( $territories === null ) {
-      $territories = $this->get_territories();
+      $this->cache_draw($dir . $filename, $options, false, $options['force']);
+      $image_src = URL_ROOT . $dir . $filename;
     }else {
-      $size_x = 0;
-      $size_y = 0;
-      $offset_x = $this->size_x;
-      $offset_y = $this->size_y;
-      foreach( $territories as $key => $area ) {
+      $options['size_x'] = 0;
+      $options['size_y'] = 0;
+      $options['offset_x'] = $this->size_x;
+      $options['offset_y'] = $this->size_y;
+      foreach( $options['territories'] as $key => $area ) {
         foreach( $area->vertices as $pointAire ) {
-          $size_x = max( $size_x, $pointAire->x );
-          $size_y = max( $size_y, $pointAire->y );
-          $offset_x = min( $offset_x, $pointAire->x );
-          $offset_y = min( $offset_y, $pointAire->y );
+          $options['size_x'] = max( $options['size_x'], $pointAire->x );
+          $options['size_y'] = max( $options['size_y'], $pointAire->y );
+          $options['offset_x'] = min( $options['offset_x'], $pointAire->x );
+          $options['offset_y'] = min( $options['offset_y'], $pointAire->y );
         }
       }
-      $size_x = $size_x - $offset_x + 20;
-      $size_y = $size_y - $offset_y + 20;
-      $offset_x -= 10;
-      $offset_y -= 10;
+      $options['size_x'] = $options['size_x'] + 10;
+      $options['size_y'] = $options['size_y'] + 10;
+      $options['offset_x'] -= 10;
+      $options['offset_y'] -= 10;
+
+      $image = $this->draw( $options );
+      ob_start();
+      imagepng($image);
+      $image_src = 'data:image/png;base64,'.base64_encode( ob_get_clean() );
+
+      $options['size_x'] = $options['size_x'] - $options['offset_x'] + 10;
+      $options['size_y'] = $options['size_y'] - $options['offset_y'] + 10;
     }
+
+    extract( $options );
 
     if( $with_map ) {
       echo '
@@ -479,9 +588,9 @@ class World extends World_Model {
       }
       echo '
       </map>
-      <img usemap="#world" src="data:image/png;base64,'.base64_encode( $imagevariable ).'">';
+      <img usemap="#world" src="'.$image_src.'" class="map">';
     }else {
-      echo '<img src="data:image/png;base64,'.base64_encode( $imagevariable ).'"/>';
+      echo '<img src="'.$image_src.'"/>';
     }
   }
 
