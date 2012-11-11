@@ -75,6 +75,8 @@
   require_once(INC.'fonctions.inc.php');
   // i18n functions
   require_once(INC.'i18n.inc.php');
+  // Extending GD functions
+  require_once(INC.'gd.inc.php');
   // Fonctions liées aux pages
   require_once(INC.'page.inc.php');
   // Fonctions système de fichier
