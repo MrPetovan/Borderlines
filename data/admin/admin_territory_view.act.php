@@ -46,7 +46,9 @@
       case 'set_territory_neighbour':
         if( $territory->id ) {
           $flag_set_territory_neighbour = $territory->set_territory_neighbour(
-            ($value = getValue('neighbour_id')) == ''?null:$value
+            ($value = getValue('neighbour_id')) == ''?null:$value,
+            getValue('guid1'),
+            getValue('guid2')
           );
           if( ! $flag_set_territory_neighbour ) {
             Page::add_message( '$territory->set_territory_neighbour : ' . mysql_error(), Page::PAGE_MESSAGE_ERROR );
@@ -56,7 +58,7 @@
       case 'del_territory_neighbour':
         if( $territory->id ) {
           $flag_del_territory_neighbour = $territory->del_territory_neighbour(
-            ($value = getValue('neighbour_id')) == ''?null:$value
+            getValue('neighbour_id')
           );
         }
         break;

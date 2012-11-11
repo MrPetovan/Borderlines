@@ -208,7 +208,7 @@ AND `criterion_id` = '.mysql_ureal_escape_string($criterion_id);
 AND `neighbour_id` = '.mysql_ureal_escape_string($neighbour_id);
 
     $sql = '
-SELECT `territory_id`, `neighbour_id`
+SELECT `territory_id`, `neighbour_id`, `guid1`, `guid2`
 FROM `territory_neighbour`
 WHERE `territory_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
     $res = mysql_uquery($sql);
@@ -216,8 +216,8 @@ WHERE `territory_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
     return mysql_fetch_to_array($res);
   }
 
-  public function set_territory_neighbour( $neighbour_id ) {
-    $sql = "REPLACE INTO `territory_neighbour` ( `territory_id`, `neighbour_id` ) VALUES (".mysql_ureal_escape_string( $this->get_id(), $neighbour_id ).")";
+  public function set_territory_neighbour( $neighbour_id, $guid1, $guid2 ) {
+    $sql = "REPLACE INTO `territory_neighbour` ( `territory_id`, `neighbour_id`, `guid1`, `guid2` ) VALUES (".mysql_ureal_escape_string( $this->get_id(), $neighbour_id, $guid1, $guid2 ).")";
 
     return mysql_uquery($sql);
   }

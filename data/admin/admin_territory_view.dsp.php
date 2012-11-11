@@ -190,12 +190,14 @@
     <table>
       <thead>
         <tr>
-          <th>Neighbour Id</th>          <th>Action</th>
+          <th>Neighbour Id</th>
+          <th>Guid1</th>
+          <th>Guid2</th>          <th>Action</th>
         </tr>
       </thead>
       <tfoot>
         <tr>
-          <td colspan="2"><?php echo count( $territory_neighbour_list )?> lignes</td>
+          <td colspan="4"><?php echo count( $territory_neighbour_list )?> lignes</td>
         </tr>
       </tfoot>
       <tbody>
@@ -204,7 +206,9 @@
 
          echo '
         <tr>
-        <td>'.$territory_neighbour['neighbour_id'].'</td>          <td>
+        <td>'.$territory_neighbour['neighbour_id'].'</td>
+        <td>'.$territory_neighbour['guid1'].'</td>
+        <td>'.$territory_neighbour['guid2'].'</td>          <td>
             <form action="'.get_page_url(PAGE_CODE, true, array('id' => $territory->id)).'" method="post">
               '.HTMLHelper::genererInputHidden('id', $territory->id).'
 
@@ -227,6 +231,14 @@
         <legend>Ajouter un élément</legend>
         <p class="field">
           <?php echo HTMLHelper::genererInputText('neighbour_id', null, array(), 'Neighbour Id*' )?>
+          
+        </p>
+        <p class="field">
+          <?php echo HTMLHelper::genererInputText('guid1', null, array(), 'Guid1*' )?>
+          
+        </p>
+        <p class="field">
+          <?php echo HTMLHelper::genererInputText('guid2', null, array(), 'Guid2*' )?>
           
         </p>
         <p><?php echo HTMLHelper::genererButton('action',  'set_territory_neighbour', array('type' => 'submit'), 'Ajouter un élément')?></p>
