@@ -13,13 +13,6 @@
   if( ! $world_id ) {
     if( $game_id ) {
       $world_id = $current_game->world_id;
-
-
-      if( $turn === null ) {
-        $turn = $current_game->current_turn;
-      }
-
-      $params = array('game_id' => $current_game->id, 'turn' => $turn);
     }else {
       Page::redirect('game_list');
     }
@@ -36,6 +29,14 @@
   if( !$world->id ) {
     Page::add_message(__('Unknown world'), Page::PAGE_MESSAGE_ERROR);
     Page::redirect('world_list');
+  }
+
+  if( $current_game->id ) {
+    if( $turn === null ) {
+      $turn = $current_game->current_turn;
+    }
+
+    $params = array('game_id' => $current_game->id, 'turn' => $turn);
   }
 
   $sort_field = getValue('sort_field', 'name');
