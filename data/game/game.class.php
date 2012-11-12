@@ -117,8 +117,10 @@ WHERE `game_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
     $territories = Territory::db_get_by_world_id( $this->world_id );
 
     foreach( $player_list as $player ) {
-      shuffle( $territories );
-      $starting_territory = array_pop( $territories );
+      do {
+        shuffle( $territories );
+        $starting_territory = array_pop( $territories );
+      }while( !$starting_territory->is_capturable() );
 
       $this->bootstrap_player( $player, $starting_territory->id );
     }
@@ -546,10 +548,13 @@ WHERE `ended` IS NULL";
       if( $this->started ) {
         $empty_territories = $this->get_territory_owner_list(null, $this->current_turn, false);
 
-        shuffle( $empty_territories );
-        $empty_territory = array_pop( $empty_territories );
+        do {
+          shuffle( $empty_territories );
+          $empty_territory_owner_row = array_pop( $empty_territories );
+          $starting_territory = Territory::instance($empty_territory_owner_row['territory_id']);
+        }while( !$starting_territory->is_capturable() );
 
-        $this->bootstrap_player( $player, $empty_territory['territory_id'] );
+        $this->bootstrap_player( $player, $starting_territory->id );
         $message = new Shout();
         $message->game_id = $this->id;
         $message->shouter_id = $player->id;
