@@ -1,27 +1,36 @@
 <?php
 class Change_Capital extends Player_Order {
   public function plan( Order_Type $order_type, Player $player, $params ) {
-    $return = null;
-    $has_already_been_ordered = false;
+    $valid = isset( $params['to_territory_id'] );
+    if( $valid ) {
+      $has_already_been_ordered = false;
 
-    $orders = Player_Order::db_get_planned_by_player_id( $player->id, $player->current_game->id );
-    foreach( $orders as $player_order ) {
-      if( $order_type->id == $player_order->order_type_id ) {
-        $has_already_been_ordered = true;
+      $orders = Player_Order::db_get_planned_by_player_id( $player->id, $player->current_game->id );
+      foreach( $orders as $player_order ) {
+        if( $order_type->id == $player_order->order_type_id ) {
+          $has_already_been_ordered = true;
+        }
       }
+
+      $valid = !$has_already_been_ordered;
     }
-    if(! $has_already_been_ordered ) {
+    if( $valid ) {
+      $territory = Territory::instance($params['to_territory_id']);
+      $valid = $territory->id !== null;
+    }
+    if( $valid ) {
+      $valid = $territory->is_capturable();
+    }
+    if( $valid ) {
       parent::plan( $order_type, $player, $params );
 
       // Executes the turn after ordered
       $this->turn_scheduled = $player->current_game->current_turn + 1;
 
-      $return = $this->save();
-    }else {
-      $return = false;
+      $valid = $this->save();
     }
 
-    return $return;
+    return $valid;
   }
 
   public function execute() {
@@ -37,46 +46,53 @@ class Change_Capital extends Player_Order {
       /* @var $territory Territory */
       $territory = Territory::instance( $parameters['territory_id'] );
 
-      if( $territory ) {
-        if( $territory->get_owner($player->current_game->id, $player->current_game->current_turn + 1) == $this->player_id ) {
-          $sql = '
+      if( $territory->id !== null ) {
+        if( $territory->is_capturable() ) {
+          if( $territory->get_owner($player->current_game->id, $player->current_game->current_turn + 1) == $this->player_id ) {
+            $sql = '
 UPDATE `territory_owner`
 SET `capital` = 0
 WHERE `game_id` = '.mysql_ureal_escape_string($player->current_game->id).'
 AND `turn` = '.mysql_ureal_escape_string($player->current_game->current_turn + 1).'
 AND `owner_id` = '.mysql_ureal_escape_string($this->player_id);
-          mysql_uquery($sql);
+            mysql_uquery($sql);
 
-          $sql = '
+            $sql = '
 UPDATE `territory_owner`
 SET `capital` = 1
 WHERE `game_id` = '.mysql_ureal_escape_string($player->current_game->id).'
 AND `turn` = '.mysql_ureal_escape_string($player->current_game->current_turn + 1).'
 AND `territory_id` = '.mysql_ureal_escape_string($territory->id);
-          mysql_uquery($sql);
+            mysql_uquery($sql);
 
-          $player->current_game->set_player_history(
-            $player->id,
-            $player->current_game->current_turn + 1,
-            time(),
-            "Your capital has been successfully moved",
-            $territory->id
-          );
-          $return_code = 0;
+            $player->current_game->set_player_history(
+              $player->id,
+              $player->current_game->current_turn + 1,
+              time(),
+              "Your capital has been successfully moved",
+              $territory->id
+            );
+            $return_code = 0;
+          }else {
+            $player->current_game->set_player_history(
+              $player->id,
+              $player->current_game->current_turn + 1,
+              time(),
+              "You don't own the territory, capital moving cancelled !",
+              $territory->id
+            );
+            $return_code = 1;
+          }
         }else {
-          $player->current_game->set_player_history(
-            $player->id,
-            $player->current_game->current_turn + 1,
-            time(),
-            "You don't own the territory, capital moving cancelled !",
-            $territory->id
-          );
-          $return_code = 1;
+          // Territory not capturable
+          $return_code = 4;
         }
       }else {
+        // Inexistent territory
         $return_code = 2;
       }
     }else {
+      // Missing parameter
       $return_code = 3;
     }
 
