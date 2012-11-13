@@ -393,7 +393,7 @@ class World extends World_Model {
               $tile_contested = imagecreatefrompng( DIR_ROOT.'img/img_css/conflict.png');
             }else {
               imagefilledpolygon( $img, $polygon, count( $area->vertices ), $color );
-              $tile_contested = imagecreatefrompng( DIR_ROOT.'img/img_css/conflict2.png');
+              $tile_contested = imagecreatefrompng( DIR_ROOT.'img/img_css/conflict_inverse.png');
             }
             imagesettile($img, $tile_contested);
             imagefilledpolygon( $img, $polygon, count( $area->vertices ), IMG_COLOR_TILED );
