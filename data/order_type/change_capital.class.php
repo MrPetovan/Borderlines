@@ -1,7 +1,7 @@
 <?php
 class Change_Capital extends Player_Order {
   public function plan( Order_Type $order_type, Player $player, $params ) {
-    $valid = isset( $params['to_territory_id'] );
+    $valid = isset( $params['territory_id'] );
     if( $valid ) {
       $has_already_been_ordered = false;
 
@@ -15,7 +15,7 @@ class Change_Capital extends Player_Order {
       $valid = !$has_already_been_ordered;
     }
     if( $valid ) {
-      $territory = Territory::instance($params['to_territory_id']);
+      $territory = Territory::instance($params['territory_id']);
       $valid = $territory->id !== null;
     }
     if( $valid ) {
