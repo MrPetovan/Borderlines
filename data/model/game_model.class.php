@@ -106,8 +106,14 @@ WHERE `created_by` = ".mysql_ureal_escape_string($created_by);
     <fieldset>
       <legend>Text fields</legend>
         '.HTMLHelper::genererInputHidden('id', $this->get_id()).'
-        <p class="field">'.HTMLHelper::genererInputText('name', $this->get_name(), array(), "Name *").'</p>
-        <p class="field">'.HTMLHelper::genererInputText('version', $this->get_version(), array(), "Version").'</p>';
+        <p class="field">'.(is_array($this->get_name())?
+          HTMLHelper::genererTextArea( "name", parameters_to_string( $this->get_name() ), array(), "Name *" ):
+          HTMLHelper::genererInputText( "name", $this->get_name(), array(), "Name *")).'
+        </p>
+        <p class="field">'.(is_array($this->get_version())?
+          HTMLHelper::genererTextArea( "version", parameters_to_string( $this->get_version() ), array(), "Version" ):
+          HTMLHelper::genererInputText( "version", $this->get_version(), array(), "Version")).'
+        </p>';
       $option_list = array();
       $world_list = World::db_get_all();
       foreach( $world_list as $world)
@@ -115,16 +121,46 @@ WHERE `created_by` = ".mysql_ureal_escape_string($created_by);
 
       $return .= '
       <p class="field">'.HTMLHelper::genererSelect('world_id', $option_list, $this->get_world_id(), array(), "World Id *").'<a href="'.get_page_url('admin_world_mod').'">Créer un objet World</a></p>
-        <p class="field">'.HTMLHelper::genererInputText('current_turn', $this->get_current_turn(), array(), "Current Turn").'</p>
-        <p class="field">'.HTMLHelper::genererInputText('turn_interval', $this->get_turn_interval(), array(), "Turn Interval *").'</p>
-        <p class="field">'.HTMLHelper::genererInputText('turn_limit', $this->get_turn_limit(), array(), "Turn Limit *").'</p>
-        <p class="field">'.HTMLHelper::genererInputText('min_players', $this->get_min_players(), array(), "Min Players").'</p>
-        <p class="field">'.HTMLHelper::genererInputText('max_players', $this->get_max_players(), array(), "Max Players").'</p>
-        <p class="field">'.HTMLHelper::genererInputText('parameters', $this->get_parameters(), array(), "Parameters").'</p>
-        <p class="field">'.HTMLHelper::genererInputText('created', $this->get_created(), array(), "Created *").'</p>
-        <p class="field">'.HTMLHelper::genererInputText('started', $this->get_started(), array(), "Started").'</p>
-        <p class="field">'.HTMLHelper::genererInputText('updated', $this->get_updated(), array(), "Updated").'</p>
-        <p class="field">'.HTMLHelper::genererInputText('ended', $this->get_ended(), array(), "Ended").'</p>';
+        <p class="field">'.(is_array($this->get_current_turn())?
+          HTMLHelper::genererTextArea( "current_turn", parameters_to_string( $this->get_current_turn() ), array(), "Current Turn" ):
+          HTMLHelper::genererInputText( "current_turn", $this->get_current_turn(), array(), "Current Turn")).'
+        </p>
+        <p class="field">'.(is_array($this->get_turn_interval())?
+          HTMLHelper::genererTextArea( "turn_interval", parameters_to_string( $this->get_turn_interval() ), array(), "Turn Interval *" ):
+          HTMLHelper::genererInputText( "turn_interval", $this->get_turn_interval(), array(), "Turn Interval *")).'
+        </p>
+        <p class="field">'.(is_array($this->get_turn_limit())?
+          HTMLHelper::genererTextArea( "turn_limit", parameters_to_string( $this->get_turn_limit() ), array(), "Turn Limit *" ):
+          HTMLHelper::genererInputText( "turn_limit", $this->get_turn_limit(), array(), "Turn Limit *")).'
+        </p>
+        <p class="field">'.(is_array($this->get_min_players())?
+          HTMLHelper::genererTextArea( "min_players", parameters_to_string( $this->get_min_players() ), array(), "Min Players" ):
+          HTMLHelper::genererInputText( "min_players", $this->get_min_players(), array(), "Min Players")).'
+        </p>
+        <p class="field">'.(is_array($this->get_max_players())?
+          HTMLHelper::genererTextArea( "max_players", parameters_to_string( $this->get_max_players() ), array(), "Max Players" ):
+          HTMLHelper::genererInputText( "max_players", $this->get_max_players(), array(), "Max Players")).'
+        </p>
+        <p class="field">'.(is_array($this->get_parameters())?
+          HTMLHelper::genererTextArea( "parameters", parameters_to_string( $this->get_parameters() ), array(), "Parameters" ):
+          HTMLHelper::genererInputText( "parameters", $this->get_parameters(), array(), "Parameters")).'
+        </p>
+        <p class="field">'.(is_array($this->get_created())?
+          HTMLHelper::genererTextArea( "created", parameters_to_string( $this->get_created() ), array(), "Created *" ):
+          HTMLHelper::genererInputText( "created", $this->get_created(), array(), "Created *")).'
+        </p>
+        <p class="field">'.(is_array($this->get_started())?
+          HTMLHelper::genererTextArea( "started", parameters_to_string( $this->get_started() ), array(), "Started" ):
+          HTMLHelper::genererInputText( "started", $this->get_started(), array(), "Started")).'
+        </p>
+        <p class="field">'.(is_array($this->get_updated())?
+          HTMLHelper::genererTextArea( "updated", parameters_to_string( $this->get_updated() ), array(), "Updated" ):
+          HTMLHelper::genererInputText( "updated", $this->get_updated(), array(), "Updated")).'
+        </p>
+        <p class="field">'.(is_array($this->get_ended())?
+          HTMLHelper::genererTextArea( "ended", parameters_to_string( $this->get_ended() ), array(), "Ended" ):
+          HTMLHelper::genererInputText( "ended", $this->get_ended(), array(), "Ended")).'
+        </p>';
       $option_list = array();
       $player_list = Player::db_get_all();
       foreach( $player_list as $player)

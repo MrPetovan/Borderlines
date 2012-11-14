@@ -129,14 +129,38 @@ WHERE `player_id` = ".mysql_ureal_escape_string($player_id);
 
       $return .= '
       <p class="field">'.HTMLHelper::genererSelect('player_id', $option_list, $this->get_player_id(), array(), "Player Id *").'<a href="'.get_page_url('admin_player_mod').'">Créer un objet Player</a></p>
-        <p class="field">'.HTMLHelper::genererInputText('datetime_order', $this->get_datetime_order(), array(), "Datetime Order *").'</p>
-        <p class="field">'.HTMLHelper::genererInputText('datetime_scheduled', $this->get_datetime_scheduled(), array(), "Datetime Scheduled *").'</p>
-        <p class="field">'.HTMLHelper::genererInputText('datetime_execution', $this->get_datetime_execution(), array(), "Datetime Execution").'</p>
-        <p class="field">'.HTMLHelper::genererInputText('turn_ordered', $this->get_turn_ordered(), array(), "Turn Ordered *").'</p>
-        <p class="field">'.HTMLHelper::genererInputText('turn_scheduled', $this->get_turn_scheduled(), array(), "Turn Scheduled *").'</p>
-        <p class="field">'.HTMLHelper::genererInputText('turn_executed', $this->get_turn_executed(), array(), "Turn Executed").'</p>
-        <p class="field">'.HTMLHelper::genererInputText('parameters', $this->get_parameters(), array(), "Parameters").'</p>
-        <p class="field">'.HTMLHelper::genererInputText('return', $this->get_return(), array(), "Return").'</p>
+        <p class="field">'.(is_array($this->get_datetime_order())?
+          HTMLHelper::genererTextArea( "datetime_order", parameters_to_string( $this->get_datetime_order() ), array(), "Datetime Order *" ):
+          HTMLHelper::genererInputText( "datetime_order", $this->get_datetime_order(), array(), "Datetime Order *")).'
+        </p>
+        <p class="field">'.(is_array($this->get_datetime_scheduled())?
+          HTMLHelper::genererTextArea( "datetime_scheduled", parameters_to_string( $this->get_datetime_scheduled() ), array(), "Datetime Scheduled *" ):
+          HTMLHelper::genererInputText( "datetime_scheduled", $this->get_datetime_scheduled(), array(), "Datetime Scheduled *")).'
+        </p>
+        <p class="field">'.(is_array($this->get_datetime_execution())?
+          HTMLHelper::genererTextArea( "datetime_execution", parameters_to_string( $this->get_datetime_execution() ), array(), "Datetime Execution" ):
+          HTMLHelper::genererInputText( "datetime_execution", $this->get_datetime_execution(), array(), "Datetime Execution")).'
+        </p>
+        <p class="field">'.(is_array($this->get_turn_ordered())?
+          HTMLHelper::genererTextArea( "turn_ordered", parameters_to_string( $this->get_turn_ordered() ), array(), "Turn Ordered *" ):
+          HTMLHelper::genererInputText( "turn_ordered", $this->get_turn_ordered(), array(), "Turn Ordered *")).'
+        </p>
+        <p class="field">'.(is_array($this->get_turn_scheduled())?
+          HTMLHelper::genererTextArea( "turn_scheduled", parameters_to_string( $this->get_turn_scheduled() ), array(), "Turn Scheduled *" ):
+          HTMLHelper::genererInputText( "turn_scheduled", $this->get_turn_scheduled(), array(), "Turn Scheduled *")).'
+        </p>
+        <p class="field">'.(is_array($this->get_turn_executed())?
+          HTMLHelper::genererTextArea( "turn_executed", parameters_to_string( $this->get_turn_executed() ), array(), "Turn Executed" ):
+          HTMLHelper::genererInputText( "turn_executed", $this->get_turn_executed(), array(), "Turn Executed")).'
+        </p>
+        <p class="field">'.(is_array($this->get_parameters())?
+          HTMLHelper::genererTextArea( "parameters", parameters_to_string( $this->get_parameters() ), array(), "Parameters" ):
+          HTMLHelper::genererInputText( "parameters", $this->get_parameters(), array(), "Parameters")).'
+        </p>
+        <p class="field">'.(is_array($this->get_return())?
+          HTMLHelper::genererTextArea( "return", parameters_to_string( $this->get_return() ), array(), "Return" ):
+          HTMLHelper::genererInputText( "return", $this->get_return(), array(), "Return")).'
+        </p>
 
     </fieldset>';
 

@@ -85,10 +85,19 @@ WHERE `api_key` = ".mysql_ureal_escape_string($api_key);
 
       $return .= '
       <p class="field">'.HTMLHelper::genererSelect('member_id', $option_list, $this->get_member_id(), array(), "Member Id *").'<a href="'.get_page_url('admin_member_mod').'">Créer un objet Member</a></p>
-        <p class="field">'.HTMLHelper::genererInputText('name', $this->get_name(), array(), "Name *").'</p>
+        <p class="field">'.(is_array($this->get_name())?
+          HTMLHelper::genererTextArea( "name", parameters_to_string( $this->get_name() ), array(), "Name *" ):
+          HTMLHelper::genererInputText( "name", $this->get_name(), array(), "Name *")).'
+        </p>
         <p class="field">'.HTMLHelper::genererInputCheckBox('active', '1', $this->get_active(), array('label_position' => 'right'), "Active" ).'</p>
-        <p class="field">'.HTMLHelper::genererInputText('api_key', $this->get_api_key(), array(), "Api Key *").'</p>
-        <p class="field">'.HTMLHelper::genererInputText('created', $this->get_created(), array(), "Created *").'</p>
+        <p class="field">'.(is_array($this->get_api_key())?
+          HTMLHelper::genererTextArea( "api_key", parameters_to_string( $this->get_api_key() ), array(), "Api Key *" ):
+          HTMLHelper::genererInputText( "api_key", $this->get_api_key(), array(), "Api Key *")).'
+        </p>
+        <p class="field">'.(is_array($this->get_created())?
+          HTMLHelper::genererTextArea( "created", parameters_to_string( $this->get_created() ), array(), "Created *" ):
+          HTMLHelper::genererInputText( "created", $this->get_created(), array(), "Created *")).'
+        </p>
 
     </fieldset>';
 

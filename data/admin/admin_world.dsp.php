@@ -38,10 +38,10 @@
           <td><input type="checkbox" name="world_id[]" value="'.$world->id.'"/></td>
           <td><a href="'.htmlentities_utf8(Page::get_url('admin_world_view', array('id' => $world->id))).'">'.$world->get_name().'</a></td>
 
-          <td>'.$world->size_x.'</td>
-          <td>'.$world->size_y.'</td>
-          <td>'.$world->generation_method.'</td>
-          <td>'.$world->generation_parameters.'</td>
+          <td>'.(is_array($world->size_x)?nl2br(parameters_to_string($world->size_x)):$world->size_x).'</td>
+          <td>'.(is_array($world->size_y)?nl2br(parameters_to_string($world->size_y)):$world->size_y).'</td>
+          <td>'.(is_array($world->generation_method)?nl2br(parameters_to_string($world->generation_method)):$world->generation_method).'</td>
+          <td>'.(is_array($world->generation_parameters)?nl2br(parameters_to_string($world->generation_parameters)):$world->generation_parameters).'</td>
           <td>'.guess_time($world->created, GUESS_DATETIME_LOCALE).'</td>';
       $player_temp = Player::instance( $world->created_by);
       echo '

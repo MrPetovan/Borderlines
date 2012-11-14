@@ -12,19 +12,19 @@
 
             <p class="field">
               <span class="libelle">Size X</span>
-              <span class="value"><?php echo $world->size_x?></span>
+              <span class="value"><?php echo is_array($world->size_x)?nl2br(parameters_to_string( $world->size_x )):$world->size_x?></span>
             </p>
             <p class="field">
               <span class="libelle">Size Y</span>
-              <span class="value"><?php echo $world->size_y?></span>
+              <span class="value"><?php echo is_array($world->size_y)?nl2br(parameters_to_string( $world->size_y )):$world->size_y?></span>
             </p>
             <p class="field">
               <span class="libelle">Generation Method</span>
-              <span class="value"><?php echo $world->generation_method?></span>
+              <span class="value"><?php echo is_array($world->generation_method)?nl2br(parameters_to_string( $world->generation_method )):$world->generation_method?></span>
             </p>
             <p class="field">
               <span class="libelle">Generation Parameters</span>
-              <span class="value"><?php echo $world->generation_parameters?></span>
+              <span class="value"><?php echo is_array($world->generation_parameters)?nl2br(parameters_to_string( $world->generation_parameters )):$world->generation_parameters?></span>
             </p>
             <p class="field">
               <span class="libelle">Created</span>
@@ -109,6 +109,69 @@
   }
 ?>
 
+<?php
+  $lake_nb = 0;
+  $lake_area = 0;
+  $mountain_nb = 0;
+  $mountain_area = 0;
+  $sea_nb = 0;
+  $sea_area = 0;
+  $capturable_nb = 0;
+  $capturable_area = 0;
+  foreach( $world->territories as $territory ) {
+    if( strpos($territory->name, 'Lake') === 0 ) {
+      $lake_nb ++;
+      $lake_area += $territory->area;
+    }elseif( strpos($territory->name, 'Mountain') === 0) {
+      $mountain_nb ++;
+      $mountain_area += $territory->area;
+    }elseif( strpos($territory->name, 'Sea') === 0) {
+      $sea_nb ++;
+      $sea_area += $territory->area;
+    }else {
+      $capturable_nb ++;
+      $capturable_area += $territory->area;
+    }
+  }
+?>
+<table class="table table-condensed table-striped">
+  <caption>Territory stats</caption>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th class="num">Nb</th>
+      <th class="num">Area total</th>
+      <th class="num">Area avg</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Sea</td>
+      <td class="num"><?php echo l10n_number($sea_nb)?></td>
+      <td class="num"><?php echo l10n_number($sea_area)?> km²</td>
+      <td class="num"><?php echo $sea_nb != 0?l10n_number($sea_area / $sea_nb):0?> km²</td>
+    </tr>
+    <tr>
+      <td>Lake</td>
+      <td class="num"><?php echo l10n_number($lake_nb)?></td>
+      <td class="num"><?php echo l10n_number($lake_area)?> km²</td>
+      <td class="num"><?php echo $lake_nb != 0?l10n_number($lake_area / $lake_nb):0?> km²</td>
+    </tr>
+    <tr>
+      <td>Mountain</td>
+      <td class="num"><?php echo l10n_number($mountain_nb)?></td>
+      <td class="num"><?php echo l10n_number($mountain_area)?> km²</td>
+      <td class="num"><?php echo $mountain_nb != 0?l10n_number($mountain_area / $mountain_nb):0?> km²</td>
+    </tr>
+    <tr>
+      <td>Capturable</td>
+      <td class="num"><?php echo l10n_number($capturable_nb)?></td>
+      <td class="num"><?php echo l10n_number($capturable_area)?> km²</td>
+      <td class="num"><?php echo $capturable_nb != 0?l10n_number($capturable_area / $capturable_nb):0?> km²</td>
+    </tr>
+  </tbody>
+
+</table>
 <?php
 
   // /CUSTOM

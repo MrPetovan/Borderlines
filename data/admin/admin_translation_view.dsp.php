@@ -12,19 +12,19 @@
 
             <p class="field">
               <span class="libelle">Code</span>
-              <span class="value"><?php echo $translation->code?></span>
+              <span class="value"><?php echo is_array($translation->code)?nl2br(parameters_to_string( $translation->code )):$translation->code?></span>
             </p>
             <p class="field">
               <span class="libelle">Locale</span>
-              <span class="value"><?php echo $translation->locale?></span>
+              <span class="value"><?php echo is_array($translation->locale)?nl2br(parameters_to_string( $translation->locale )):$translation->locale?></span>
             </p>
             <p class="field">
               <span class="libelle">Translation</span>
-              <span class="value"><?php echo $translation->translation?></span>
+              <span class="value"><?php echo is_array($translation->translation)?nl2br(parameters_to_string( $translation->translation )):$translation->translation?></span>
             </p>
             <p class="field">
               <span class="libelle">Context</span>
-              <span class="value"><?php echo $translation->context?></span>
+              <span class="value"><?php echo is_array($translation->context)?nl2br(parameters_to_string( $translation->context )):$translation->context?></span>
             </p>    </div>
     <p><a href="<?php echo get_page_url('admin_translation_mod', true, array('id' => $translation->id))?>">Modifier cet objet Translation</a></p>
 <?php

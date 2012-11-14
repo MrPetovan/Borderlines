@@ -50,7 +50,7 @@ foreach( $table_columns as $column_name => $column_props ) {
       case 'char':
       default:
         echo "
-          <td>'.$".$class_db_identifier."->".$column_name.".'</td>";
+          <td>'.(is_array($".$class_db_identifier."->".$column_name.")?nl2br(parameters_to_string($".$class_db_identifier."->".$column_name.")):$".$class_db_identifier."->".$column_name.").'</td>";
         break;
       case 'datetime':
       case 'time':

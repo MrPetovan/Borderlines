@@ -12,7 +12,7 @@
 
             <p class="field">
               <span class="libelle">Capital Name</span>
-              <span class="value"><?php echo $territory->capital_name?></span>
+              <span class="value"><?php echo is_array($territory->capital_name)?nl2br(parameters_to_string( $territory->capital_name )):$territory->capital_name?></span>
             </p>
 <?php
       $option_list = array();
@@ -27,7 +27,7 @@
 
             <p class="field">
               <span class="libelle">Vertices</span>
-              <span class="value"><?php echo $territory->vertices?></span>
+              <span class="value"><?php echo is_array($territory->vertices)?nl2br(parameters_to_string( $territory->vertices )):$territory->vertices?></span>
             </p>
             <p class="field">
               <span class="libelle">Passable</span>
@@ -39,7 +39,7 @@
             </p>
             <p class="field">
               <span class="libelle">Background</span>
-              <span class="value"><?php echo $territory->background?></span>
+              <span class="value"><?php echo is_array($territory->background)?nl2br(parameters_to_string( $territory->background )):$territory->background?></span>
             </p>    </div>
     <p><a href="<?php echo get_page_url('admin_territory_mod', true, array('id' => $territory->id))?>">Modifier cet objet Territory</a></p>
     <h4>Player History</h4>

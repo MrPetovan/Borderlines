@@ -75,7 +75,10 @@ WHERE `game_id` = ".mysql_ureal_escape_string($game_id);
     <fieldset>
       <legend>Text fields</legend>
         '.HTMLHelper::genererInputHidden('id', $this->get_id()).'
-        <p class="field">'.HTMLHelper::genererInputText('date_sent', $this->get_date_sent(), array(), "Date Sent *").'</p>';
+        <p class="field">'.(is_array($this->get_date_sent())?
+          HTMLHelper::genererTextArea( "date_sent", parameters_to_string( $this->get_date_sent() ), array(), "Date Sent *" ):
+          HTMLHelper::genererInputText( "date_sent", $this->get_date_sent(), array(), "Date Sent *")).'
+        </p>';
       $option_list = array();
       $player_list = Player::db_get_all();
       foreach( $player_list as $player)
@@ -83,7 +86,10 @@ WHERE `game_id` = ".mysql_ureal_escape_string($game_id);
 
       $return .= '
       <p class="field">'.HTMLHelper::genererSelect('shouter_id', $option_list, $this->get_shouter_id(), array(), "Shouter Id *").'<a href="'.get_page_url('admin_player_mod').'">Créer un objet Player</a></p>
-        <p class="field">'.HTMLHelper::genererInputText('text', $this->get_text(), array(), "Text *").'</p>';
+        <p class="field">'.(is_array($this->get_text())?
+          HTMLHelper::genererTextArea( "text", parameters_to_string( $this->get_text() ), array(), "Text *" ):
+          HTMLHelper::genererInputText( "text", $this->get_text(), array(), "Text *")).'
+        </p>';
       $option_list = array(null => 'Pas de choix');
       $game_list = Game::db_get_all();
       foreach( $game_list as $game)

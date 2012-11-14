@@ -42,7 +42,7 @@
       $game_temp = Game::instance( $conversation->game_id);
       echo '
           <td>'.$game_temp->name.'</td>
-          <td>'.$conversation->subject.'</td>
+          <td>'.(is_array($conversation->subject)?nl2br(parameters_to_string($conversation->subject)):$conversation->subject).'</td>
           <td>'.guess_time($conversation->created, GUESS_DATETIME_LOCALE).'</td>
           <td><a href="'.htmlentities_utf8(Page::get_url('admin_conversation_mod', array('id' => $conversation->id))).'"><img src="'.IMG.'img_html/pencil.png" alt="Modifier" title="Modifier"/></a></td>
         </tr>';

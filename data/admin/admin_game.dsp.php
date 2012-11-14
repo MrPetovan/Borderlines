@@ -45,16 +45,16 @@
           <td><input type="checkbox" name="game_id[]" value="'.$game->id.'"/></td>
           <td><a href="'.htmlentities_utf8(Page::get_url('admin_game_view', array('id' => $game->id))).'">'.$game->get_name().'</a></td>
 
-          <td>'.$game->version.'</td>';
+          <td>'.(is_array($game->version)?nl2br(parameters_to_string($game->version)):$game->version).'</td>';
       $world_temp = World::instance( $game->world_id);
       echo '
           <td>'.$world_temp->name.'</td>
-          <td>'.$game->current_turn.'</td>
-          <td>'.$game->turn_interval.'</td>
-          <td>'.$game->turn_limit.'</td>
-          <td>'.$game->min_players.'</td>
-          <td>'.$game->max_players.'</td>
-          <td>'.$game->parameters.'</td>
+          <td>'.(is_array($game->current_turn)?nl2br(parameters_to_string($game->current_turn)):$game->current_turn).'</td>
+          <td>'.(is_array($game->turn_interval)?nl2br(parameters_to_string($game->turn_interval)):$game->turn_interval).'</td>
+          <td>'.(is_array($game->turn_limit)?nl2br(parameters_to_string($game->turn_limit)):$game->turn_limit).'</td>
+          <td>'.(is_array($game->min_players)?nl2br(parameters_to_string($game->min_players)):$game->min_players).'</td>
+          <td>'.(is_array($game->max_players)?nl2br(parameters_to_string($game->max_players)):$game->max_players).'</td>
+          <td>'.(is_array($game->parameters)?nl2br(parameters_to_string($game->parameters)):$game->parameters).'</td>
           <td>'.guess_time($game->created, GUESS_DATETIME_LOCALE).'</td>
           <td>'.guess_time($game->started, GUESS_DATETIME_LOCALE).'</td>
           <td>'.guess_time($game->updated, GUESS_DATETIME_LOCALE).'</td>

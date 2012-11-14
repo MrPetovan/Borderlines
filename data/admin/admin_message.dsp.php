@@ -42,7 +42,7 @@
       $player_temp = Player::instance( $message->player_id);
       echo '
           <td>'.$player_temp->name.'</td>
-          <td>'.$message->text.'</td>
+          <td>'.(is_array($message->text)?nl2br(parameters_to_string($message->text)):$message->text).'</td>
           <td>'.guess_time($message->created, GUESS_DATETIME_LOCALE).'</td>
           <td><a href="'.htmlentities_utf8(Page::get_url('admin_message_mod', array('id' => $message->id))).'"><img src="'.IMG.'img_html/pencil.png" alt="Modifier" title="Modifier"/></a></td>
         </tr>';

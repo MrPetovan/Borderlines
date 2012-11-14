@@ -12,7 +12,7 @@
 
             <p class="field">
               <span class="libelle">Class Name</span>
-              <span class="value"><?php echo $order_type->class_name?></span>
+              <span class="value"><?php echo is_array($order_type->class_name)?nl2br(parameters_to_string( $order_type->class_name )):$order_type->class_name?></span>
             </p>
             <p class="field">
               <span class="libelle">Active</span>

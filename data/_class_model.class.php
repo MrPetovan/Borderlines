@@ -139,7 +139,10 @@ foreach( $table_columns as $column_name => $column_props ) {
       case 'date':
       default:
         echo '
-        <p class="field">\'.HTMLHelper::genererInputText(\''.$column_name.'\', $this->get_'.$column_name.'(), array(), "'.$column_props['Comment'].($column_props['Null'] == 'NO' && is_null( $column_props['Default'] )?' *':'').'").\'</p>';
+        <p class="field">\'.(is_array($this->get_'.$column_name.'())?
+          HTMLHelper::genererTextArea( "'.$column_name.'", parameters_to_string( $this->get_'.$column_name.'() ), array(), "'.$column_props['Comment'].($column_props['Null'] == 'NO' && is_null( $column_props['Default'] )?' *':'').'" ):
+          HTMLHelper::genererInputText( "'.$column_name.'", $this->get_'.$column_name.'(), array(), "'.$column_props['Comment'].($column_props['Null'] == 'NO' && is_null( $column_props['Default'] )?' *':'').'")).\'
+        </p>';
         break;
       case 'tinyint' :
         echo '

@@ -76,8 +76,14 @@ WHERE `world_id` = ".mysql_ureal_escape_string($world_id);
     <fieldset>
       <legend>Text fields</legend>
         '.HTMLHelper::genererInputHidden('id', $this->get_id()).'
-        <p class="field">'.HTMLHelper::genererInputText('name', $this->get_name(), array(), "Name *").'</p>
-        <p class="field">'.HTMLHelper::genererInputText('capital_name', $this->get_capital_name(), array(), "Capital Name *").'</p>';
+        <p class="field">'.(is_array($this->get_name())?
+          HTMLHelper::genererTextArea( "name", parameters_to_string( $this->get_name() ), array(), "Name *" ):
+          HTMLHelper::genererInputText( "name", $this->get_name(), array(), "Name *")).'
+        </p>
+        <p class="field">'.(is_array($this->get_capital_name())?
+          HTMLHelper::genererTextArea( "capital_name", parameters_to_string( $this->get_capital_name() ), array(), "Capital Name *" ):
+          HTMLHelper::genererInputText( "capital_name", $this->get_capital_name(), array(), "Capital Name *")).'
+        </p>';
       $option_list = array();
       $world_list = World::db_get_all();
       foreach( $world_list as $world)
@@ -85,10 +91,16 @@ WHERE `world_id` = ".mysql_ureal_escape_string($world_id);
 
       $return .= '
       <p class="field">'.HTMLHelper::genererSelect('world_id', $option_list, $this->get_world_id(), array(), "World Id *").'<a href="'.get_page_url('admin_world_mod').'">Créer un objet World</a></p>
-        <p class="field">'.HTMLHelper::genererInputText('vertices', $this->get_vertices(), array(), "Vertices").'</p>
+        <p class="field">'.(is_array($this->get_vertices())?
+          HTMLHelper::genererTextArea( "vertices", parameters_to_string( $this->get_vertices() ), array(), "Vertices" ):
+          HTMLHelper::genererInputText( "vertices", $this->get_vertices(), array(), "Vertices")).'
+        </p>
         <p class="field">'.HTMLHelper::genererInputCheckBox('passable', '1', $this->get_passable(), array('label_position' => 'right'), "Passable" ).'</p>
         <p class="field">'.HTMLHelper::genererInputCheckBox('capturable', '1', $this->get_capturable(), array('label_position' => 'right'), "Capturable" ).'</p>
-        <p class="field">'.HTMLHelper::genererInputText('background', $this->get_background(), array(), "Background").'</p>
+        <p class="field">'.(is_array($this->get_background())?
+          HTMLHelper::genererTextArea( "background", parameters_to_string( $this->get_background() ), array(), "Background" ):
+          HTMLHelper::genererInputText( "background", $this->get_background(), array(), "Background")).'
+        </p>
 
     </fieldset>';
 

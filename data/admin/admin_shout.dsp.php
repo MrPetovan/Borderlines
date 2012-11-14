@@ -40,7 +40,7 @@
       $player_temp = Player::instance( $shout->shouter_id);
       echo '
           <td>'.$player_temp->name.'</td>
-          <td>'.$shout->text.'</td>';
+          <td>'.(is_array($shout->text)?nl2br(parameters_to_string($shout->text)):$shout->text).'</td>';
       $game_temp = Game::instance( $shout->game_id);
       echo '
           <td>'.$game_temp->name.'</td>

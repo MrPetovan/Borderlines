@@ -27,7 +27,7 @@
 
             <p class="field">
               <span class="libelle">Text</span>
-              <span class="value"><?php echo $shout->text?></span>
+              <span class="value"><?php echo is_array($shout->text)?nl2br(parameters_to_string( $shout->text )):$shout->text?></span>
             </p>
 <?php
       $option_list = array(null => 'Pas de choix');

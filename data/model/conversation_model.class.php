@@ -89,8 +89,14 @@ WHERE `game_id` = ".mysql_ureal_escape_string($game_id);
 
       $return .= '
       <p class="field">'.HTMLHelper::genererSelect('game_id', $option_list, $this->get_game_id(), array(), "Game Id").'<a href="'.get_page_url('admin_game_mod').'">Créer un objet Game</a></p>
-        <p class="field">'.HTMLHelper::genererInputText('subject', $this->get_subject(), array(), "Subject *").'</p>
-        <p class="field">'.HTMLHelper::genererInputText('created', $this->get_created(), array(), "Created *").'</p>
+        <p class="field">'.(is_array($this->get_subject())?
+          HTMLHelper::genererTextArea( "subject", parameters_to_string( $this->get_subject() ), array(), "Subject *" ):
+          HTMLHelper::genererInputText( "subject", $this->get_subject(), array(), "Subject *")).'
+        </p>
+        <p class="field">'.(is_array($this->get_created())?
+          HTMLHelper::genererTextArea( "created", parameters_to_string( $this->get_created() ), array(), "Created *" ):
+          HTMLHelper::genererInputText( "created", $this->get_created(), array(), "Created *")).'
+        </p>
 
     </fieldset>';
 

@@ -36,7 +36,7 @@
           <td><input type="checkbox" name="api_token_id[]" value="'.$api_token->id.'"/></td>
           <td><a href="'.htmlentities_utf8(Page::get_url('admin_api_token_view', array('id' => $api_token->id))).'">'.$api_token->get_id().'</a></td>
 
-          <td>'.$api_token->hash.'</td>';
+          <td>'.(is_array($api_token->hash)?nl2br(parameters_to_string($api_token->hash)):$api_token->hash).'</td>';
       $player_temp = Player::instance( $api_token->player_id);
       echo '
           <td>'.$player_temp->name.'</td>

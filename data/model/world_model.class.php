@@ -74,12 +74,30 @@ WHERE `created_by` = ".mysql_ureal_escape_string($created_by);
     <fieldset>
       <legend>Text fields</legend>
         '.HTMLHelper::genererInputHidden('id', $this->get_id()).'
-        <p class="field">'.HTMLHelper::genererInputText('name', $this->get_name(), array(), "Name *").'</p>
-        <p class="field">'.HTMLHelper::genererInputText('size_x', $this->get_size_x(), array(), "Size X *").'</p>
-        <p class="field">'.HTMLHelper::genererInputText('size_y', $this->get_size_y(), array(), "Size Y *").'</p>
-        <p class="field">'.HTMLHelper::genererInputText('generation_method', $this->get_generation_method(), array(), "Generation Method").'</p>
-        <p class="field">'.HTMLHelper::genererInputText('generation_parameters', $this->get_generation_parameters(), array(), "Generation Parameters").'</p>
-        <p class="field">'.HTMLHelper::genererInputText('created', $this->get_created(), array(), "Created *").'</p>';
+        <p class="field">'.(is_array($this->get_name())?
+          HTMLHelper::genererTextArea( "name", parameters_to_string( $this->get_name() ), array(), "Name *" ):
+          HTMLHelper::genererInputText( "name", $this->get_name(), array(), "Name *")).'
+        </p>
+        <p class="field">'.(is_array($this->get_size_x())?
+          HTMLHelper::genererTextArea( "size_x", parameters_to_string( $this->get_size_x() ), array(), "Size X *" ):
+          HTMLHelper::genererInputText( "size_x", $this->get_size_x(), array(), "Size X *")).'
+        </p>
+        <p class="field">'.(is_array($this->get_size_y())?
+          HTMLHelper::genererTextArea( "size_y", parameters_to_string( $this->get_size_y() ), array(), "Size Y *" ):
+          HTMLHelper::genererInputText( "size_y", $this->get_size_y(), array(), "Size Y *")).'
+        </p>
+        <p class="field">'.(is_array($this->get_generation_method())?
+          HTMLHelper::genererTextArea( "generation_method", parameters_to_string( $this->get_generation_method() ), array(), "Generation Method" ):
+          HTMLHelper::genererInputText( "generation_method", $this->get_generation_method(), array(), "Generation Method")).'
+        </p>
+        <p class="field">'.(is_array($this->get_generation_parameters())?
+          HTMLHelper::genererTextArea( "generation_parameters", parameters_to_string( $this->get_generation_parameters() ), array(), "Generation Parameters" ):
+          HTMLHelper::genererInputText( "generation_parameters", $this->get_generation_parameters(), array(), "Generation Parameters")).'
+        </p>
+        <p class="field">'.(is_array($this->get_created())?
+          HTMLHelper::genererTextArea( "created", parameters_to_string( $this->get_created() ), array(), "Created *" ):
+          HTMLHelper::genererInputText( "created", $this->get_created(), array(), "Created *")).'
+        </p>';
       $option_list = array(null => 'Pas de choix');
       $player_list = Player::db_get_all();
       foreach( $player_list as $player)

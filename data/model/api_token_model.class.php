@@ -75,7 +75,10 @@ WHERE `player_id` = ".mysql_ureal_escape_string($player_id);
     <fieldset>
       <legend>Text fields</legend>
         '.HTMLHelper::genererInputHidden('id', $this->get_id()).'
-        <p class="field">'.HTMLHelper::genererInputText('hash', $this->get_hash(), array(), "Hash *").'</p>';
+        <p class="field">'.(is_array($this->get_hash())?
+          HTMLHelper::genererTextArea( "hash", parameters_to_string( $this->get_hash() ), array(), "Hash *" ):
+          HTMLHelper::genererInputText( "hash", $this->get_hash(), array(), "Hash *")).'
+        </p>';
       $option_list = array();
       $player_list = Player::db_get_all();
       foreach( $player_list as $player)
@@ -83,8 +86,14 @@ WHERE `player_id` = ".mysql_ureal_escape_string($player_id);
 
       $return .= '
       <p class="field">'.HTMLHelper::genererSelect('player_id', $option_list, $this->get_player_id(), array(), "Player Id *").'<a href="'.get_page_url('admin_player_mod').'">Créer un objet Player</a></p>
-        <p class="field">'.HTMLHelper::genererInputText('created', $this->get_created(), array(), "Created *").'</p>
-        <p class="field">'.HTMLHelper::genererInputText('expires', $this->get_expires(), array(), "Expires *").'</p>
+        <p class="field">'.(is_array($this->get_created())?
+          HTMLHelper::genererTextArea( "created", parameters_to_string( $this->get_created() ), array(), "Created *" ):
+          HTMLHelper::genererInputText( "created", $this->get_created(), array(), "Created *")).'
+        </p>
+        <p class="field">'.(is_array($this->get_expires())?
+          HTMLHelper::genererTextArea( "expires", parameters_to_string( $this->get_expires() ), array(), "Expires *" ):
+          HTMLHelper::genererInputText( "expires", $this->get_expires(), array(), "Expires *")).'
+        </p>
 
     </fieldset>';
 

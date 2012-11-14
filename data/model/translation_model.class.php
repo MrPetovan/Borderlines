@@ -60,10 +60,22 @@ WHERE `code` = ".mysql_ureal_escape_string($code);
     <fieldset>
       <legend>Text fields</legend>
         '.HTMLHelper::genererInputHidden('id', $this->get_id()).'
-        <p class="field">'.HTMLHelper::genererInputText('code', $this->get_code(), array(), "Code *").'</p>
-        <p class="field">'.HTMLHelper::genererInputText('locale', $this->get_locale(), array(), "Locale *").'</p>
-        <p class="field">'.HTMLHelper::genererInputText('translation', $this->get_translation(), array(), "Translation").'</p>
-        <p class="field">'.HTMLHelper::genererInputText('context', $this->get_context(), array(), "Context").'</p>
+        <p class="field">'.(is_array($this->get_code())?
+          HTMLHelper::genererTextArea( "code", parameters_to_string( $this->get_code() ), array(), "Code *" ):
+          HTMLHelper::genererInputText( "code", $this->get_code(), array(), "Code *")).'
+        </p>
+        <p class="field">'.(is_array($this->get_locale())?
+          HTMLHelper::genererTextArea( "locale", parameters_to_string( $this->get_locale() ), array(), "Locale *" ):
+          HTMLHelper::genererInputText( "locale", $this->get_locale(), array(), "Locale *")).'
+        </p>
+        <p class="field">'.(is_array($this->get_translation())?
+          HTMLHelper::genererTextArea( "translation", parameters_to_string( $this->get_translation() ), array(), "Translation" ):
+          HTMLHelper::genererInputText( "translation", $this->get_translation(), array(), "Translation")).'
+        </p>
+        <p class="field">'.(is_array($this->get_context())?
+          HTMLHelper::genererTextArea( "context", parameters_to_string( $this->get_context() ), array(), "Context" ):
+          HTMLHelper::genererInputText( "context", $this->get_context(), array(), "Context")).'
+        </p>
 
     </fieldset>';
 

@@ -34,7 +34,7 @@
 
             <p class="field">
               <span class="libelle">Subject</span>
-              <span class="value"><?php echo $conversation->subject?></span>
+              <span class="value"><?php echo is_array($conversation->subject)?nl2br(parameters_to_string( $conversation->subject )):$conversation->subject?></span>
             </p>
             <p class="field">
               <span class="libelle">Created</span>

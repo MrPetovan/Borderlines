@@ -27,7 +27,7 @@
             </p>
             <p class="field">
               <span class="libelle">Api Key</span>
-              <span class="value"><?php echo $player->api_key?></span>
+              <span class="value"><?php echo is_array($player->api_key)?nl2br(parameters_to_string( $player->api_key )):$player->api_key?></span>
             </p>
             <p class="field">
               <span class="libelle">Created</span>

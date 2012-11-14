@@ -36,10 +36,10 @@
           <td><input type="checkbox" name="translation_id[]" value="'.$translation->id.'"/></td>
           <td><a href="'.htmlentities_utf8(Page::get_url('admin_translation_view', array('id' => $translation->id))).'">'.$translation->get_id().'</a></td>
 
-          <td>'.$translation->code.'</td>
-          <td>'.$translation->locale.'</td>
-          <td>'.$translation->translation.'</td>
-          <td>'.$translation->context.'</td>
+          <td>'.(is_array($translation->code)?nl2br(parameters_to_string($translation->code)):$translation->code).'</td>
+          <td>'.(is_array($translation->locale)?nl2br(parameters_to_string($translation->locale)):$translation->locale).'</td>
+          <td>'.(is_array($translation->translation)?nl2br(parameters_to_string($translation->translation)):$translation->translation).'</td>
+          <td>'.(is_array($translation->context)?nl2br(parameters_to_string($translation->context)):$translation->context).'</td>
           <td><a href="'.htmlentities_utf8(Page::get_url('admin_translation_mod', array('id' => $translation->id))).'"><img src="'.IMG.'img_html/pencil.png" alt="Modifier" title="Modifier"/></a></td>
         </tr>';
     }

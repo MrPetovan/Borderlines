@@ -55,11 +55,11 @@
           <td>'.guess_time($player_order->datetime_order, GUESS_DATETIME_LOCALE).'</td>
           <td>'.guess_time($player_order->datetime_scheduled, GUESS_DATETIME_LOCALE).'</td>
           <td>'.guess_time($player_order->datetime_execution, GUESS_DATETIME_LOCALE).'</td>
-          <td>'.$player_order->turn_ordered.'</td>
-          <td>'.$player_order->turn_scheduled.'</td>
-          <td>'.$player_order->turn_executed.'</td>
-          <td>'.$player_order->parameters.'</td>
-          <td>'.$player_order->return.'</td>
+          <td>'.(is_array($player_order->turn_ordered)?nl2br(parameters_to_string($player_order->turn_ordered)):$player_order->turn_ordered).'</td>
+          <td>'.(is_array($player_order->turn_scheduled)?nl2br(parameters_to_string($player_order->turn_scheduled)):$player_order->turn_scheduled).'</td>
+          <td>'.(is_array($player_order->turn_executed)?nl2br(parameters_to_string($player_order->turn_executed)):$player_order->turn_executed).'</td>
+          <td>'.(is_array($player_order->parameters)?nl2br(parameters_to_string($player_order->parameters)):$player_order->parameters).'</td>
+          <td>'.(is_array($player_order->return)?nl2br(parameters_to_string($player_order->return)):$player_order->return).'</td>
           <td><a href="'.htmlentities_utf8(Page::get_url('admin_player_order_mod', array('id' => $player_order->id))).'"><img src="'.IMG.'img_html/pencil.png" alt="Modifier" title="Modifier"/></a></td>
         </tr>';
     }

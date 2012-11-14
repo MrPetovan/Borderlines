@@ -35,7 +35,7 @@ foreach( $table_columns as $column_name => $column_props ) {
           echo '
             <p class="field">
               <span class="libelle">'.$column_props['Comment'].'</span>
-              <span class="value"><?php echo $'.$class_db_identifier.'->'.$column_name.'?></span>
+              <span class="value"><?php echo is_array($'.$class_db_identifier.'->'.$column_name.')?nl2br(parameters_to_string( $'.$class_db_identifier.'->'.$column_name.' )):$'.$class_db_identifier.'->'.$column_name.'?></span>
             </p>';
           break;
         case 'datetime':

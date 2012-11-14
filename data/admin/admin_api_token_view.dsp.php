@@ -12,7 +12,7 @@
 
             <p class="field">
               <span class="libelle">Hash</span>
-              <span class="value"><?php echo $api_token->hash?></span>
+              <span class="value"><?php echo is_array($api_token->hash)?nl2br(parameters_to_string( $api_token->hash )):$api_token->hash?></span>
             </p>
 <?php
       $option_list = array();

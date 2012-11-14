@@ -12,7 +12,7 @@
 
             <p class="field">
               <span class="libelle">Version</span>
-              <span class="value"><?php echo $game->version?></span>
+              <span class="value"><?php echo is_array($game->version)?nl2br(parameters_to_string( $game->version )):$game->version?></span>
             </p>
 <?php
       $option_list = array();
@@ -27,27 +27,27 @@
 
             <p class="field">
               <span class="libelle">Current Turn</span>
-              <span class="value"><?php echo $game->current_turn?></span>
+              <span class="value"><?php echo is_array($game->current_turn)?nl2br(parameters_to_string( $game->current_turn )):$game->current_turn?></span>
             </p>
             <p class="field">
               <span class="libelle">Turn Interval</span>
-              <span class="value"><?php echo $game->turn_interval?></span>
+              <span class="value"><?php echo is_array($game->turn_interval)?nl2br(parameters_to_string( $game->turn_interval )):$game->turn_interval?></span>
             </p>
             <p class="field">
               <span class="libelle">Turn Limit</span>
-              <span class="value"><?php echo $game->turn_limit?></span>
+              <span class="value"><?php echo is_array($game->turn_limit)?nl2br(parameters_to_string( $game->turn_limit )):$game->turn_limit?></span>
             </p>
             <p class="field">
               <span class="libelle">Min Players</span>
-              <span class="value"><?php echo $game->min_players?></span>
+              <span class="value"><?php echo is_array($game->min_players)?nl2br(parameters_to_string( $game->min_players )):$game->min_players?></span>
             </p>
             <p class="field">
               <span class="libelle">Max Players</span>
-              <span class="value"><?php echo $game->max_players?></span>
+              <span class="value"><?php echo is_array($game->max_players)?nl2br(parameters_to_string( $game->max_players )):$game->max_players?></span>
             </p>
             <p class="field">
               <span class="libelle">Parameters</span>
-              <span class="value"><?php echo $game->parameters?></span>
+              <span class="value"><?php echo is_array($game->parameters)?nl2br(parameters_to_string( $game->parameters )):$game->parameters?></span>
             </p>
             <p class="field">
               <span class="libelle">Created</span>

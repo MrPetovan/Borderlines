@@ -57,23 +57,23 @@
             </p>
             <p class="field">
               <span class="libelle">Turn Ordered</span>
-              <span class="value"><?php echo $player_order->turn_ordered?></span>
+              <span class="value"><?php echo is_array($player_order->turn_ordered)?nl2br(parameters_to_string( $player_order->turn_ordered )):$player_order->turn_ordered?></span>
             </p>
             <p class="field">
               <span class="libelle">Turn Scheduled</span>
-              <span class="value"><?php echo $player_order->turn_scheduled?></span>
+              <span class="value"><?php echo is_array($player_order->turn_scheduled)?nl2br(parameters_to_string( $player_order->turn_scheduled )):$player_order->turn_scheduled?></span>
             </p>
             <p class="field">
               <span class="libelle">Turn Executed</span>
-              <span class="value"><?php echo $player_order->turn_executed?></span>
+              <span class="value"><?php echo is_array($player_order->turn_executed)?nl2br(parameters_to_string( $player_order->turn_executed )):$player_order->turn_executed?></span>
             </p>
             <p class="field">
               <span class="libelle">Parameters</span>
-              <span class="value"><?php echo $player_order->parameters?></span>
+              <span class="value"><?php echo is_array($player_order->parameters)?nl2br(parameters_to_string( $player_order->parameters )):$player_order->parameters?></span>
             </p>
             <p class="field">
               <span class="libelle">Return</span>
-              <span class="value"><?php echo $player_order->return?></span>
+              <span class="value"><?php echo is_array($player_order->return)?nl2br(parameters_to_string( $player_order->return )):$player_order->return?></span>
             </p>    </div>
     <p><a href="<?php echo get_page_url('admin_player_order_mod', true, array('id' => $player_order->id))?>">Modifier cet objet Player Order</a></p>
     <h4>Player Resource History</h4>
