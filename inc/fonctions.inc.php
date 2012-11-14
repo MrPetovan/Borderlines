@@ -989,4 +989,22 @@ function which_os ()
       "B" => hexdec(substr($checksum, 4, 2))
     );
   }
+
+  function parameters_to_string( array $hash ) {
+    $string = '';
+    foreach( $hash as $key => $value ) {
+      $string .= $key . '=' . $value ."\n";
+    }
+    return $string;
+  }
+
+  function string_to_parameters( $string ) {
+    $hash = array();
+    $temp = explode("\n", str_replace("\r\n", "\n", trim( $string )));
+    foreach( $temp as $substring ) {
+      list($key, $value) = explode('=', $substring, 2);
+      $hash[$key] = $value;
+    }
+    return $hash;
+  }
 ?>
