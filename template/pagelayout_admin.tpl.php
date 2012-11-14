@@ -10,6 +10,7 @@
     <link rel="icon" type="image/x-icon" href="img/favicon.ico" />
 
     <link rel="stylesheet" type="text/css" href="<?php echo URL_ROOT ?>style/bootstrap.min.css" media="all" />
+    <link rel="stylesheet" type="text/css" href="<?php echo URL_ROOT ?>style/admin.css" media="all" />
 </head>
 <body>
   <div class="navbar navbar-inverse">
