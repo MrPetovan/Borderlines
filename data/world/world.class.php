@@ -10,18 +10,14 @@ class World extends World_Model {
 
   // CUSTOM
 
+  protected $territories = array();
+  protected $_generation_method = 'voronoi';
+
   const TILE_DIR = 'cache/world/';
 
-  public function set_generation_parameters($params) { $this->_generation_parameters = serialize($params);}
-
-  protected $territories = null;
-  protected $_generation_method = 'simple';
-
-  public function get_territories() {
-    if( is_null( $this->territories )) {
-      $this->territories = Territory::db_get_by_world_id($this->id);
-    }
-    return $this->territories;
+  public function __construct($id = null) {
+    $this->_generation_parameters = serialize(array());
+    parent::__construct($id);
   }
 
   public function get_generation_parameters( $all = false ) {
@@ -30,10 +26,14 @@ class World extends World_Model {
       'maxVertexDist' => 110,
       'relationNumber' => 2,
       'maxEdgeDist' => 150,
+      'mountainDensity' => 10,
+      'lakeDensity' => 5
     );
     $voronoi_defaults = array(
-      'distFromEdges' => 20,
-      'territoryNumber' => 100
+      'distFromEdges' => 50,
+      'territoryDensityDelta' => 0,
+      'mountainDensity' => 10,
+      'lakeDensity' => 5
     );
     if( $all ) {
       $defaults = array_merge( $simple_defaults, $voronoi_defaults );
@@ -57,6 +57,14 @@ class World extends World_Model {
     }
     return $options;
   }
+  public function set_generation_parameters($params) { $this->_generation_parameters = serialize($params);}
+
+  public function get_territories() {
+    if( is_null( $this->territories )) {
+      $this->territories = Territory::db_get_by_world_id($this->id);
+    }
+    return $this->territories;
+  }
 
   public function initialize_territories() {
     $return = true;
@@ -69,26 +77,30 @@ class World extends World_Model {
       foreach (glob(DIR_ROOT . self::TILE_DIR . '/tile_'.$this->id.'*') as $removeFile) {
         unlink($removeFile);
       }
-
       foreach (glob(DIR_ROOT . self::TILE_DIR . '/'.$this->id.'/*') as $removeFile) {
         if(is_file($removeFile))
           unlink($removeFile);
       }
 
+      $options = $this->generation_parameters;
+
       $method = 'territory_generation_'.$this->generation_method;
-      $territories = $this->$method();
+      $territories = $this->$method( $options );
 
       $this->territories = $territories;
 
       Territory::db_remove_by_world_id( $this->id );
 
-      $sea_territories = array();
-      foreach( $this->territories as $key => $territory ) {
+      $sea_nb = 1;
+      foreach( $this->get_territories() as $key => $territory ) {
         $territory_areas[ 'territory_'.$key ] = $territory->area;
         foreach( $territory->vertices as $vertex ) {
           if( $vertex->x == 0 || $vertex->y == 1 || $vertex->x == $this->size_x - 1 || $vertex->y == $this->size_y ) {
             $sea_territories[] = 'territory_'.$key;
             unset( $territory_areas[ 'territory_'.$key ] );
+
+
+
             break;
           }
         }
@@ -97,20 +109,26 @@ class World extends World_Model {
       asort( $territory_areas );
       $territory_areas = array_keys( $territory_areas );
 
-      $margin_percent_lakes = 0.05;
-      $margin_percent_moutains = 0.1;
+      $margin_percent_lakes = max( 0, min( $options['lakeDensity'], 50)) / 100;
+      $margin_percent_moutains = max( 0, min( $options['mountainDensity'], 50)) / 100;
       $margin_count = floor( $total_territories * $margin_percent_moutains );
       $moutain_territories = array_slice($territory_areas, 0, $margin_count);
       $margin_count = floor( $total_territories * $margin_percent_lakes );
-      $sea_territories = array_merge( $sea_territories, array_slice( $territory_areas, - $margin_count ) );
+      $lake_territories = array_slice( $territory_areas, - $margin_count );
 
       $mountain_nb = 1;
-      $sea_nb = 1;
+      $lake_nb = 1;
 
       foreach( $this->get_territories() as $key => $territory ) {
         if(array_search('territory_'.$key, $sea_territories) !== false) {
           $territory->name = 'Sea '.$sea_nb++;
           $territory->capital_name = 'Sea '.$sea_nb;
+          $territory->passable = 1;
+          $territory->capturable = 0;
+          $territory->background = 'sea';
+        }elseif (array_search('territory_'.$key, $lake_territories) !== false) {
+          $territory->name = 'Lake '.$lake_nb++;
+          $territory->capital_name = 'Lake '.$lake_nb;
           $territory->passable = 1;
           $territory->capturable = 0;
           $territory->background = 'sea';
@@ -120,7 +138,7 @@ class World extends World_Model {
           $territory->passable = 0;
           $territory->capturable = 0;
           $territory->background = 'mountain';
-        }else {
+        }elseif( $territory->name === null ) {
           $territory->name = Territory::get_random_country_name();
           $territory->capital_name = Territory::get_random_capital_name();
           $territory->passable = 1;
@@ -158,10 +176,12 @@ class World extends World_Model {
     }
   }
 
-  public function territory_generation_simple() {
+  public function territory_generation_simple( array $options = null) {
     $return = null;
 
-    $options = $this->generation_parameters;
+    if( $options === null ) {
+      $options = $this->generation_parameters;
+    }
 
     $graph = new Graph();
     $graph->randomVertexGenerationDisk( $this->size_x, $minVertexDist, $maxVertexDist );
@@ -174,10 +194,12 @@ class World extends World_Model {
     return $return;
   }
 
-  public function territory_generation_voronoi() {
+  public function territory_generation_voronoi( array $options = null ) {
     $return = null;
 
-    $options = $this->generation_parameters;
+    if( $options === null ) {
+      $options = $this->generation_parameters;
+    }
 
     require_once LIB.'php-voronoi/library/Nurbs/Voronoi.php';
     require_once LIB.'php-voronoi/library/Nurbs/Point.php';
@@ -192,7 +214,9 @@ class World extends World_Model {
     $dx = $this->size_x - $options['distFromEdges'];
     $yo = $options['distFromEdges'];
     $dy = $this->size_y - $options['distFromEdges'];
-    $n = $options['territoryNumber'];
+
+    $territoryDensityDelta = (max( -20, min( 20, $options['territoryDensityDelta'])) + 70) / 100;
+    $n = floor( $territoryDensityDelta * $this->size_x * $this->size_y / 10000 );
     $sites = array();
 
     //$im = imagecreatetruecolor($width, $height);
@@ -212,8 +236,6 @@ class World extends World_Model {
     for ($i=0; $i < $n; $i++) {
       $point = new Nurbs_Point(rand($xo, $dx), rand($yo, $dy));
       $sites[] = $point;
-
-      //imagerectangle($im, $point->x - 2, $point->y - 2, $point->x + 2, $point->y + 2, $black);
     }
 
     $voronoi = new Voronoi();
@@ -600,6 +622,14 @@ class World extends World_Model {
       'voronoi' => 'Voronoi'
     );
 
+    $territory_density_delta = array(
+      '-20' => 'Sparse',
+      '-10' => 'Slightly Sparse',
+      '0' => 'Normal',
+      '+10' => 'Slightly Dense',
+      '+20' => 'Dense'
+    );
+
     $options = $this->get_generation_parameters(true);
 
     $return = '
@@ -631,10 +661,10 @@ class World extends World_Model {
     </fieldset>
     <fieldset class="options voronoi">
       <legend>'.__('Voronoi Generator options').'</legend>
-      <!--<p class="field">'.HTMLHelper::genererInputText('generation_parameters[minVertexDist]', $options['minVertexDist'], array(), __('Minimum territory distance')).'</p>
-      <p class="field">'.HTMLHelper::genererInputText('generation_parameters[maxVertexDist]', $options['maxVertexDist'], array(), __('Maximum territory distance')).'</p>-->
       <p class="field">'.HTMLHelper::genererInputText('generation_parameters[distFromEdges]', $options['distFromEdges'], array(), __('Margin from map edges')).'</p>
-      <p class="field">'.HTMLHelper::genererInputText('generation_parameters[territoryNumber]', $options['territoryNumber'], array(), __('Territory count')).'</p>
+      <p class="field">'.HTMLHelper::genererSelect('generation_parameters[territoryDensityDelta]', $territory_density_delta, $options['territoryDensityDelta'], array(), __('Territory Density')).'</p>
+      <p class="field">'.HTMLHelper::genererInputText('generation_parameters[lakeDensity]', $options['lakeDensity'], array(), __('Lake Density (0-50%%)')).'</p>
+      <p class="field">'.HTMLHelper::genererInputText('generation_parameters[mountainDensity]', $options['mountainDensity'], array(), __('Moutain density (0-50%%)')).'</p>
     </fieldset>';
     return $return;
   }
