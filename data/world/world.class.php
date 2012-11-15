@@ -10,7 +10,7 @@ class World extends World_Model {
 
   // CUSTOM
 
-  protected $territories = array();
+  protected $territories = null;
   protected $_generation_method = 'voronoi';
 
   const TILE_DIR = 'cache/world/';
