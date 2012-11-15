@@ -39,7 +39,7 @@ class Game extends Game_Model {
     if( $return && $this->max_players ) {
       $return = count( $this->get_game_player_list() ) < $this->max_players;
     }
-    if( $return && $options['ALLOW_JOIN_MIDGAME'] ) {
+    if( $return && $this->started && $options['ALLOW_JOIN_MIDGAME'] ) {
       $return = count( $this->get_territory_owner_list(null, $this->current_turn, false) ) >= 5;
     }
 
