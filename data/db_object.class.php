@@ -586,7 +586,7 @@ WHERE `id` = ".mysql_ureal_escape_string($this->get_id());
         $sql_name = '_'.$name;
 
         if($name != "id" && property_exists( $this, $sql_name ) ) {
-          if( is_array( $this->$name ) ) {
+          if( is_array( $this->$name ) && is_string( $value ) ) {
             $value = string_to_parameters( $value );
           }
           $this->$name = $value;
