@@ -340,5 +340,9 @@
     /* @var $api_token Api_Token */
     $api_token = Api_Token::instance();
   }
-  $api_token->set_api_log($method, $_SERVER['QUERY_STRING'], $allowed?1:0, $success?1:0, time());
+  $params = $_REQUEST;
+  unset( $params['token'] );
+  unset( $params['m'] );
+  unset( $params['page'] );
+  $api_token->set_api_log($method, str_replace("\n", '&', trim(parameters_to_string($params))), $allowed?1:0, $success?1:0, time());
 ?>
