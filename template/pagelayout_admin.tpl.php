@@ -35,6 +35,9 @@
         $menu_array['admin_'.$dir] = to_readable($dir);
       }
     }
+
+    ksort($menu_array);
+
     foreach ($menu_array as $code_page => $libelle) {
       if( Page::get_url($code_page, array(), false) != '' ) {
         echo '
