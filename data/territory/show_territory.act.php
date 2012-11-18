@@ -1,9 +1,6 @@
 <?php
   $member = Member::instance( Member::get_current_user_id() );
-
-  // TODO : Create player page
-  $player_list = Player::db_get_by_member_id( $member->id );
-  $current_player = array_shift( $player_list );
+  $current_player = Player::get_current( $member );
 
   $current_game = null;
   if( is_admin() && ( $game_id = getValue('game_id') ) ) {
