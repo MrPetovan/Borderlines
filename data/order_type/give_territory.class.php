@@ -99,6 +99,8 @@ class Give_Territory extends Player_Order {
         $territory = Territory::instance( $territory_owner_row['territory_id'] );
         $territory_select[ $territory->id ] = $territory->name;
       }
+    }else {
+      $territory_select = $game->get_territory_owner_list($params['territory']->id, $game->current_turn, $params['current_player']->id);
     }
 
     $player_select = array(
@@ -117,7 +119,7 @@ class Give_Territory extends Player_Order {
 <form action="'.Page::get_page_url( 'order' ).'" method="post">
   <fieldset>
     <legend>'.$title.'</legend>';
-    if( !isset( $params['territory'] ) || count( $territory_select ) == 0 ) {
+    if( !isset( $params['territory'] ) || count( $territory_select ) != 0 ) {
       $return .= HTMLHelper::genererInputHidden('url_return', Page::get_page_url( $params['page_code'], true, $page_params ) );
       if( isset( $params['territory'] ) ) {
         $return .= '
