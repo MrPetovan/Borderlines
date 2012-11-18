@@ -140,6 +140,8 @@ class Give_Troops extends Player_Order {
         $territory = Territory::instance( $territory_player_troops_row['territory_id'] );
         $territory_select[ $territory->id ] = $territory->name. ' (' . l10n_number($territory_player_troops_row['quantity']) . ')';
       }
+    }else {
+      $territory_select = $game->get_territory_player_troops_list($game->current_turn, $params['from_territory']->id, $params['current_player']->id);
     }
 
     $player_select = array();
@@ -156,7 +158,7 @@ class Give_Troops extends Player_Order {
 <form action="'.Page::get_page_url( 'order' ).'" method="post">
   <fieldset>
     <legend>'.$title.'</legend>';
-    if( !isset( $params['from_territory'] ) || count( $territory_select ) == 0 ) {
+    if( !isset( $params['from_territory'] ) || count( $territory_select ) != 0 ) {
       $return .= HTMLHelper::genererInputHidden('url_return', Page::get_page_url( $params['page_code'], true, $page_params ) ).'
     <p>'.HTMLHelper::genererInputText( 'parameters[count]', 0, array(), 'Troop size', null ).'</p>';
       if( isset( $params['from_territory'] ) ) {
