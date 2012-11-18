@@ -148,9 +148,11 @@ AND `territory_id` = '.mysql_ureal_escape_string($territory->id);
     $return = '
 <form action="'.Page::get_page_url( 'order' ).'" method="post">
   <fieldset>
-    <legend>'.$title.'</legend>
+    <legend>'.$title.'</legend>';
+    if( !isset($params['territory']) || $params['territory']->is_capturable() ) {
+      $return .= '
     <p>'.__('Moving your capital takes two turns, and may be cancelled if you don\'t own the territory on the execution turn').'</p>';
-    $return .= '
+      $return .= '
     '.HTMLHelper::genererInputHidden('url_return', Page::get_page_url( $params['page_code'], true, $page_params ) );
     if( isset( $params['territory'] ) ) {
       if( !isset( $territory_list[ $params['territory']->id ]) ) {
@@ -162,9 +164,14 @@ AND `territory_id` = '.mysql_ureal_escape_string($territory->id);
     }else {
       $return .= '
     <p>'.HTMLHelper::genererSelect( 'parameters[territory_id]', $territory_list, null, array(), __('Move capital to') ).'</p>';
+      }
+      $return .= '
+    <p>'.HTMLHelper::genererButton( 'action', 'change_capital', array('type' => 'submit'), __('Move, move, move !') ).'</p>';
+    }else {
+      $return .= '
+    <p>'.__('This territory is not suitable for capital move.').'</p>';
     }
     $return .= '
-    <p>'.HTMLHelper::genererButton( 'action', 'change_capital', array('type' => 'submit'), __('Move, move, move !') ).'</p>
   </fieldset>
 </form>';
 
