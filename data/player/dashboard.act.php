@@ -27,6 +27,7 @@
                 break;
               }
             }
+            Page::redirect(PAGE_CODE);
           }
         }
       }else {
