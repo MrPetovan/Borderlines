@@ -39,8 +39,8 @@ class Game extends Game_Model {
     if( $return && $this->max_players ) {
       $return = count( $this->get_game_player_list() ) < $this->max_players;
     }
-    if( $return && $this->started && $options['ALLOW_JOIN_MIDGAME'] ) {
-      $return = count( $this->get_territory_owner_list(null, $this->current_turn, false) ) >= 5;
+    if( $return && $this->started ) {
+      $return = $options['ALLOW_JOIN_MIDGAME'] && count( $this->get_territory_owner_list(null, $this->current_turn, false) ) >= 5;
     }
 
     return $return;
@@ -129,6 +129,10 @@ WHERE `game_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
   public function revert($turn) {
     $turn = max( 0, (int)$turn );
 
+    $sql = 'UPDATE `game_player` SET `turn_leave` = NULL WHERE `game_id` = '.mysql_ureal_escape_string($this->id).' AND `turn_leave` >= '.mysql_ureal_escape_string($turn);
+    mysql_uquery($sql);
+    $sql = 'UPDATE `game_player` SET `turn_ready` = '.mysql_ureal_escape_string($turn).' WHERE `game_id` = '.mysql_ureal_escape_string($this->id).' AND `turn_ready` > '.mysql_ureal_escape_string($turn);
+    mysql_uquery($sql);
     $sql = 'DELETE FROM `player_diplomacy` WHERE `game_id` = '.mysql_ureal_escape_string($this->id).' AND `turn` > '.mysql_ureal_escape_string($turn);
     mysql_uquery($sql);
     $sql = 'DELETE FROM `player_history` WHERE `game_id` = '.mysql_ureal_escape_string($this->id).' AND `turn` > '.mysql_ureal_escape_string($turn);
@@ -149,19 +153,27 @@ WHERE `game_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
   }
 
   public function compute_auto() {
+    $return = false;
+
+    // Turn limit
     $flag_turn_limit = $this->current_turn < $this->turn_limit;
-    $flag_turn_interval = $this->updated + $this->turn_interval <= time();
+
+    // Turn interval
+    $time_supposed = floor( ($this->updated + $this->turn_interval) / 60 );
+    $time_actual = floor( time() / 60);
+    $flag_turn_interval = $time_supposed <= $time_actual;
 
     // Checking if every player is ready
     $game_players = $this->get_game_player_list();
     $flag_players_ready = true;
     while( (list( $key, $game_player) = each( $game_players )) && $flag_players_ready  ) {
-      $flag_players_ready = $game_player['turn_ready'] > $this->current_turn;
+      $flag_players_ready = $game_player['turn_leave'] || $game_player['turn_ready'] > $this->current_turn;
     }
 
     if( $flag_turn_limit && ( $flag_turn_interval || $flag_players_ready ) ) {
-      $this->compute();
+      $return = $this->compute();
     }
+    return $return;
   }
 
   public function compute() {
@@ -207,7 +219,7 @@ WHERE `game_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
         $previous_owner = $territory->get_owner($this->id, $current_turn );
         $new_owner = $territory->get_owner($this->id, $next_turn );
 
-        if( $territory->is_capturable() && $territory->is_contested($this->id, $next_turn) ) {
+        if( $territory->is_contested($this->id, $next_turn) ) {
           // Diplomacy checking and parties forming
           $diplomacy = array();
           $attacks = array();
@@ -451,7 +463,7 @@ WHERE `game_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
             }
           }
 
-          $this->save();
+          $return = $this->save();
         }else {
           foreach( $player_list as $player ) {
             $member = Member::instance( $player->member_id );
