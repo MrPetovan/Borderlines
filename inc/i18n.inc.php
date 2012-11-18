@@ -8,11 +8,11 @@
   function load_translations( $locale ) {
     $i18n_replacements = array();
 
-    $sql = 'SELECT `code`, `translation` FROM `translation` WHERE `locale` = '. mysql_ureal_escape_string( $locale );
+    $sql = 'SELECT `code`, `translation`, `context` FROM `translation` WHERE `locale` = '. mysql_ureal_escape_string( $locale );
     $res = mysql_uquery($sql);
 
     while( $row = mysql_fetch_assoc($res) ) {
-      $i18n_replacements[ $row['code'] ] = $row['translation'];
+      $i18n_replacements[ $row['context'].'-'.$row['code'] ] = $row['translation'];
     }
 
     return $i18n_replacements;
@@ -26,11 +26,10 @@
       }
     }
 
-
     if( $format !== '' ) {
-      if(array_key_exists( $format, $i18n_replacements ) ) {
-        if( $i18n_replacements[ $format ] !== null ) {
-          $format = $i18n_replacements[ $format ];
+      if(array_key_exists( PAGE_CODE.'-'.$format, $i18n_replacements ) ) {
+        if( $i18n_replacements[ PAGE_CODE.'-'.$format ] !== null ) {
+          $format = $i18n_replacements[ PAGE_CODE.'-'.$format ];
         }
       }else {
         $translation = Translation::instance();
@@ -40,7 +39,7 @@
 
         $success = $translation->save();
 
-        $i18n_replacements[ $format ] = $format;
+        $i18n_replacements[ PAGE_CODE.'-'.$format ] = $format;
       }
     }
 
