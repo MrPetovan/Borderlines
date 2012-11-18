@@ -221,20 +221,22 @@ class Move_Troops extends Player_Order {
 <form action="'.Page::get_page_url( 'order' ).'" method="post">
   <fieldset>
     <legend><img src="'.IMG.'img_html/'.$image.'" alt="" /> '.__($title, $territory_name).'</legend>';
-    if( count( $neighbour_list ) ) {
-      $return .= HTMLHelper::genererInputHidden('url_return', Page::get_page_url( $params['page_code'], true, $page_params ) ).'
+    if( ( !isset( $params['to_territory'] ) || $params['to_territory']->is_passable() )
+      && ( !isset( $params['from_territory'] ) || $params['from_territory']->is_passable() ) ) {
+      if( count( $neighbour_list ) && array_search( 0, $neighbour_status) !== false ) {
+        $return .= HTMLHelper::genererInputHidden('url_return', Page::get_page_url( $params['page_code'], true, $page_params ) ).'
     <p>'.HTMLHelper::genererInputText( 'parameters[count]', 0, array(), __('Troop size'), null ).'</p>';
-      if( isset( $params['from_territory'] ) ) {
-        $return .= '
+        if( isset( $params['from_territory'] ) ) {
+          $return .= '
     '.HTMLHelper::genererInputHidden('parameters[from_territory_id]', $params['from_territory']->id);
-      }else {
-        $return .= '
+        }else {
+          $return .= '
     <p>'.__('Move from:').'</p>
     <ul>';
 
-        foreach( $neighbour_list as $neighbour_id => $neighbour_name ) {
+          foreach( $neighbour_list as $neighbour_id => $neighbour_name ) {
 
-          $return .= '
+            $return .= '
       <li>
         <label'.($neighbour_status[ $neighbour_id ] != 0?' class="disabled"':'').'>
           <input type="radio" name="parameters[from_territory_id]" value="'.$neighbour_id.'"'.($neighbour_status[ $neighbour_id ] != 0?' disabled="disabled"':'').' />
@@ -268,16 +270,20 @@ class Move_Troops extends Player_Order {
     </ul>';
       }
 
-    $return .= '
+      $return .= '
     <p>'.HTMLHelper::genererButton( 'action', 'move_troops', array('type' => 'submit'), __('March!') ).'</p>';
-    }else {
-      if( isset( $troops ) ) {
-        $return .= '
-    <p>'.__('You don\'t have any troops in this territory').'</p>';
       }else {
-        $return .= '
+        if( isset( $troops ) ) {
+          $return .= '
+    <p>'.__('You don\'t have any troops in this territory').'</p>';
+        }else {
+          $return .= '
     <p>'.__('You don\'t have any troops in neighbouring territories').'</p>';
+        }
       }
+    }else {
+      $return .= '
+    <p>'.__('This territory is not passable').'</p>';
     }
     $return .= '
   </fieldset>
