@@ -22,12 +22,25 @@ WHERE `member_id` = ".mysql_ureal_escape_string( $member_id );
 
   public static function get_current( Member $member ) {
     $return = null;
-    $player_list = Player::db_get_by_member_id( $member->id );
-    if( count( $player_list ) ) {
-      $return = array_shift( $player_list );
+    if( !isset( $_SESSION['current_player_id'] ) ) {
+      $player_list = Player::db_get_by_member_id( $member->id );
+      $_SESSION['current_player_id'] = null;
+      if( count( $player_list ) ) {
+         $player = array_shift( $player_list );
+         $_SESSION['current_player_id'] = $player->id;
+         $return = $player;
+      }
+    }else {
+      $return = Player::instance( $_SESSION['current_player_id'] );
     }
 
     return $return;
+  }
+
+  public static function set_current( Player $player ) {
+    $_SESSION['current_player_id'] = $player->id;
+
+    return true;
   }
 
   public function can_create_game() {
@@ -72,7 +85,7 @@ WHERE `member_id` = '.$member->id;
       $res = mysql_uquery($sql);
       $count = array_pop( mysql_fetch_row($res) );
 
-      $return = $count == 0;
+      $return = $count < 2;
     }
     return $return;
   }
