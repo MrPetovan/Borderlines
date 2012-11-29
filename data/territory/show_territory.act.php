@@ -3,7 +3,7 @@
   $current_player = Player::get_current( $member );
 
   $current_game = null;
-  if( is_admin() && ( $game_id = getValue('game_id') ) ) {
+  if( /*is_admin() &&*/ ( $game_id = getValue('game_id') ) ) {
     $current_game = Game::instance( $game_id );
   }else {
     $current_game = $current_player->current_game;
