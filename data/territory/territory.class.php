@@ -411,78 +411,80 @@ OR `guid1` = "'.$guid2.'" AND `guid2` = "'.$guid1.'")';
     // Default : ownership continues
     $owner_id = $last_owner_id;
 
-    if( $this->is_capturable() ) {
-      if( count( $player_territories ) == 1 ) {
-        if( $last_owner_id === null ) {
-          // Empty territory
-          $owner_id = $player_territories[0]['player_id'];
-        }else {
-          $invader = Player::instance( $player_territories[0]['player_id'] );
-          $player_diplomacy_list = $invader->get_last_player_diplomacy_list($game_id);
+    if( count( $player_territories ) == 1 ) {
+      if( $last_owner_id === null ) {
+        // Empty territory
+        $owner_id = $player_territories[0]['player_id'];
+      }else {
+        $invader = Player::instance( $player_territories[0]['player_id'] );
+        $player_diplomacy_list = $invader->get_last_player_diplomacy_list($game_id);
 
-          // If invader marked the previous owner as enemy, he captures the territory
-          foreach( $player_diplomacy_list as $player_diplomacy ) {
-            if( $player_diplomacy['to_player_id'] == $last_owner_id && $player_diplomacy['status'] == 'Enemy' ) {
-              $owner_id = $invader->id;
+        // If invader marked the previous owner as enemy, he captures the territory
+        foreach( $player_diplomacy_list as $player_diplomacy ) {
+          if( $player_diplomacy['to_player_id'] == $last_owner_id && $player_diplomacy['status'] == 'Enemy' ) {
+            $owner_id = $invader->id;
+          }
+        }
+      }
+    }else {
+      $all_allies = true;
+      $all_allies_with_owner = true;
+
+      foreach( $player_territories as $player_territory_from ) {
+        /* @var $player_from Player */
+        $player_from = Player::instance( $player_territory_from['player_id'] );
+
+        $player_diplomacy_list = $player_from->get_last_player_diplomacy_list($game_id);
+
+        foreach( $player_territories as $player_territory_to ) {
+          foreach( $player_diplomacy_list as $key => $player_diplomacy ) {
+            if( $player_diplomacy['to_player_id'] == $player_territory_to['player_id'] ) {
+              if( $player_diplomacy['status'] == 'Enemy' ) {
+                $all_allies = false;
+              }
             }
+          }
+        }
+        foreach( $player_diplomacy_list as $key => $player_diplomacy ) {
+          if( $player_diplomacy['to_player_id'] == $last_owner_id ) {
+            if( $player_diplomacy['status'] == 'Enemy' ) {
+              $all_allies_with_owner = false;
+            }
+          }
+        }
+      }
+
+      if( $all_allies ) {
+        if($last_owner_id === null || !$all_allies_with_owner ) {
+          $troops = array();
+
+          foreach( $player_territories as $player_territory ) {
+            $troops[ $player_territory['player_id'] ] = $player_territory['quantity'];
+          }
+
+          // Previous owner wiped out or empty territory
+          if(array_search($last_owner_id, array_keys( $troops)) === false) {
+            // The player with most troops gets the territory
+            arsort( $troops );
+            reset( $troops );
+            list( $player_id, $troops ) = each( $troops );
+
+            $owner_id = $player_id;
           }
         }
       }else {
-        $all_allies = true;
-        $all_allies_with_owner = true;
-
-        foreach( $player_territories as $player_territory_from ) {
-          /* @var $player_from Player */
-          $player_from = Player::instance( $player_territory_from['player_id'] );
-
-          $player_diplomacy_list = $player_from->get_last_player_diplomacy_list($game_id);
-
-          foreach( $player_territories as $player_territory_to ) {
-            foreach( $player_diplomacy_list as $key => $player_diplomacy ) {
-              if( $player_diplomacy['to_player_id'] == $player_territory_to['player_id'] ) {
-                if( $player_diplomacy['status'] == 'Enemy' ) {
-                  $all_allies = false;
-                }
-              }
-            }
-          }
-          foreach( $player_diplomacy_list as $key => $player_diplomacy ) {
-            if( $player_diplomacy['to_player_id'] == $last_owner_id ) {
-              if( $player_diplomacy['status'] == 'Enemy' ) {
-                $all_allies_with_owner = false;
-              }
-            }
-          }
-        }
-
-        if( $all_allies ) {
-          if( !$all_allies_with_owner ) {
-            $troops = array();
-
-            foreach( $player_territories as $player_territory ) {
-              $troops[ $player_territory['player_id'] ] = $player_territory['quantity'];
-            }
-
-            // Previous owner wiped out
-            if(!array_search($last_owner_id, array_keys( $troops)) !== false) {
-              // The player with most troops gets the territory
-              arsort( $troops );
-              reset( $troops );
-              list( $player_id, $troops ) = each( $troops );
-
-              $owner_id = $player_id;
-            }
-          }
-        }else {
-          // Contested territory
-          $is_contested = true;
-        }
+        // Contested territory
+        $is_contested = true;
       }
     }
 
-    // In case of changed owner, reset the capital state
-    $is_capital = $is_capital && ($last_owner_id == $owner_id);
-
+    if( !$this->is_capturable() ) {
+      $owner_id = null;
+      $is_capital = false;
+    }else {
+      // In case of changed owner, reset the capital state
+      $is_capital = $is_capital && ($last_owner_id == $owner_id);
+    }
     $this->set_territory_owner($game_id, $turn, $owner_id, $is_contested?1:0, $is_capital?1:0);
 
     $return = array('owner_id' => $owner_id, 'contested' => $is_contested, 'capital' => $is_capital);
