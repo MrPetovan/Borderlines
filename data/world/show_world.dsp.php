@@ -9,9 +9,7 @@
   }else {
     $territory_params = array();
   }
-
 ?>
-
 <?php if( $is_current_turn || !$game_id ) :?>
 <h2><?php echo __('Showing "%s"', $world->name)?></h2>
 <?php else :?>
@@ -193,15 +191,15 @@
 <ul class="informations formulaire">
   <li>
     <span class="label"><?php echo __('Width')?></span>
-    <span class="value"><?php echo l10n_number($world->size_x)?> km²</span>
+    <span class="value"><?php echo l10n_number($world->size_x)?> km</span>
   </li>
   <li>
     <span class="label"><?php echo __('Height')?></span>
-    <span class="value"><?php echo l10n_number($world->size_y)?> km²</span>
+    <span class="value"><?php echo l10n_number($world->size_y)?> km</span>
   </li>
   <li>
     <span class="label"><?php echo __('Generation method')?></span>
-    <span class="value"><?php echo __($world->generation_method)?></span>
+    <span class="value"><?php echo __( ucfirst( $world->generation_method ) )?></span>
   </li>
 <?php foreach( $world->generation_parameters as $param => $value ) {?>
   <li>
