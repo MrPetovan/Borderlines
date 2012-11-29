@@ -29,18 +29,16 @@ class Quit_Game extends Player_Order {
 
     $current_game = $player->current_game;
 
+    $current_turn = $current_game->current_turn;
     $next_turn = $current_game->current_turn + 1;
 
     $parameters = $this->parameters;
 
     // Removing quitting players
     $current_game->del_territory_player_troops($next_turn, null, $player->id);
-    foreach( Player_Order::db_get_planned_by_player_id($player->id, $current_game->id) as $order ) {
-      /* @var $order Player_Order */
-      $order->cancel();
-    }
 
-    foreach( $current_game->get_territory_owner_list(null, $next_turn, $player->id) as $territory_owner) {
+    $territory_owner_list = $current_game->get_territory_owner_list(null, $current_turn, $player->id);
+    foreach( $territory_owner_list as $territory_owner) {
       $territory = Territory::instance($territory_owner['territory_id']);
       $ownership_array = $territory->compute_territory_owner($current_game->id, $next_turn );
       if( $ownership_array['owner_id'] == $player->id ) {
@@ -51,10 +49,17 @@ class Quit_Game extends Player_Order {
     $game_player = array_pop( $current_game->get_game_player_list( $player->id ) );
     $current_game->set_game_player($player->id, $game_player['turn_ready'], $current_game->current_turn);
 
+    $return_code = 0;
+
     $this->datetime_execution = time();
     $this->turn_executed = $current_game->current_turn + 1;
     $this->return = $return_code;
     $this->save();
+
+    foreach( Player_Order::db_get_planned_by_player_id($player->id, $current_game->id) as $order ) {
+      /* @var $order Player_Order */
+      $order->cancel();
+    }
 
     return $return;
   }
