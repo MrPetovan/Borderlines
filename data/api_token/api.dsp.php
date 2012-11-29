@@ -2,7 +2,13 @@
   if( $allowed ) {
     if( $success ) {
       if( $content ) {
-        echo json_encode($content);
+        $content = json_encode($content);
+        if( $callback = getValue('callback') ) {
+          echo $callback.'('.$content.');';
+        }else {
+          echo $content;
+        }
+         ;
       }else {
         echo 1;
       }
