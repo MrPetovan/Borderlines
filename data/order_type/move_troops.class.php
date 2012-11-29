@@ -9,18 +9,21 @@ class Move_Troops extends Player_Order {
       $valid = strval( intval($params['count']) ) === $params['count'] && $params['count'] > 0;
     }
     if( $valid ) {
-      $territory = Territory::instance($params['from_territory_id']);
-      $valid = $territory->id !== null;
+      $from_territory = Territory::instance($params['from_territory_id']);
+      $valid = $from_territory->id !== null;
     }
     if( $valid ) {
-      $territory = Territory::instance($params['to_territory_id']);
-      $valid = $territory->id !== null;
+      $to_territory = Territory::instance($params['to_territory_id']);
+      $valid = $to_territory->id !== null;
     }
     if( $valid ) {
-      $valid = $territory->is_passable();
+      $valid = $to_territory->is_passable();
     }
     if( $valid ) {
-      $valid = count( $territory->get_territory_neighbour_list( $params['from_territory_id'] ) ) > 0;
+      $valid = count( $to_territory->get_territory_neighbour_list( $params['from_territory_id'] ) ) > 0;
+    }
+    if( $valid ) {
+      $valid = self::check_move($from_territory, $to_territory, $player, $player->current_game);
     }
     if( $valid ) {
       parent::plan( $order_type, $player, $params );
@@ -55,8 +58,10 @@ class Move_Troops extends Player_Order {
     $player = Player::instance( $this->player_id );
 
     $parameters = $this->parameters;
-    if( isset( $parameters['count'] ) && isset( $parameters['from_territory_id'] ) && isset( $parameters['to_territory_id'] ) ) {
+    $order_turn = $player->current_game->current_turn;
+    $next_turn = $player->current_game->current_turn + 1;
 
+    if( isset( $parameters['count'] ) && isset( $parameters['from_territory_id'] ) && isset( $parameters['to_territory_id'] ) ) {
       /* @var $from_territory Territory */
       /* @var $to_territory Territory */
       $from_territory = Territory::instance( $parameters['from_territory_id'] );
@@ -68,9 +73,6 @@ class Move_Troops extends Player_Order {
         if( $to_territory->is_passable() ) {
 
           if( self::check_move($from_territory, $to_territory, $player, $player->current_game) ) {
-            $order_turn = $player->current_game->current_turn;
-            $next_turn = $player->current_game->current_turn + 1;
-
             $from_troops_before = $player->get_territory_player_troops_list( $game_id, $next_turn, $from_territory->id );
 
             if( count( $from_troops_before ) && isset( $intermediate_troops_array[ $from_territory->id ][ $player->id ] ) && $intermediate_troops_array[ $from_territory->id ][ $player->id ] > 0 ) {
@@ -187,8 +189,13 @@ class Move_Troops extends Player_Order {
 
           foreach( $territory_occupied_list as $territory_occupied_array ) {
             if( $territory_occupied_array['territory_id'] == $neighbour_array['neighbour_id'] ) {
-              $neighbour_status[ $neighbour->id ] = 0;
-              $neighbour_list[ $neighbour->id ] = $neighbour->name. ' ('.l10n_number($territory_occupied_array['quantity']).' <img src="'.IMG.'img_html/helmet.png" alt="'.__('Troops').'" title="'.__('Troops').'"/>)';
+              if( self::check_move($neighbour, $params['to_territory'], $player, $game)) {
+                $neighbour_status[ $neighbour->id ] = 0;
+                $neighbour_list[ $neighbour->id ] = $neighbour->name. ' ('.l10n_number($territory_occupied_array['quantity']).' <img src="'.IMG.'img_html/helmet.png" alt="'.__('Troops').'" title="'.__('Troops').'"/>)';
+              }else {
+                // Move not allowed
+                $neighbour_status[ $neighbour->id ] = 2;
+              }
               break;
             }
           }
