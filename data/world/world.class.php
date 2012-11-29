@@ -98,9 +98,6 @@ class World extends World_Model {
           if( $vertex->x == 0 || $vertex->y == 1 || $vertex->x == $this->size_x - 1 || $vertex->y == $this->size_y ) {
             $sea_territories[] = 'territory_'.$key;
             unset( $territory_areas[ 'territory_'.$key ] );
-
-
-
             break;
           }
         }
@@ -114,7 +111,7 @@ class World extends World_Model {
       $margin_count = floor( $total_territories * $margin_percent_moutains );
       $moutain_territories = array_slice($territory_areas, 0, $margin_count);
       $margin_count = floor( $total_territories * $margin_percent_lakes );
-      $lake_territories = array_slice( $territory_areas, - $margin_count );
+      $lake_territories = $margin_count == 0?array():array_slice( $territory_areas, - $margin_count );
 
       $mountain_nb = 1;
       $lake_nb = 1;
@@ -636,12 +633,20 @@ class World extends World_Model {
     <script>
     $(function(){
       $options = $(".options");
-      $options.hide();
-      $("." + $("#select_generation_method").val()).show();
+
       $("#select_generation_method").change(function(){
-        $options.hide();
-        $("." + $(this).val()).show();
+        show_options( $(this).val() )
       });
+
+      show_options( $("#select_generation_method").val() );
+
+      function show_options( type ) {
+        $fieldset = $(".options." + type);
+        $options.hide();
+        $options.find("input,select,textarea").attr("disabled", "disabled");
+        $fieldset.find("input,select,textarea").removeAttr("disabled");
+        $fieldset.show();
+      }
     });
     </script>
     <fieldset>
