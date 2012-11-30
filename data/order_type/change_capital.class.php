@@ -48,7 +48,7 @@ class Change_Capital extends Player_Order {
 
       if( $territory->id !== null ) {
         if( $territory->is_capturable() ) {
-          if( $territory->get_owner($player->current_game->id, $player->current_game->current_turn + 1) == $this->player_id ) {
+          if( $territory->get_owner( $player->current_game, $player->current_game->current_turn + 1 ) == $this->player_id ) {
             $sql = '
 UPDATE `territory_owner`
 SET `capital` = 0
