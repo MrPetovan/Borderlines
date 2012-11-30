@@ -384,7 +384,7 @@ class World extends World_Model {
       }
 
       if( $game_id !== null ) {
-        $owner_id = $area->get_owner($game_id, $turn);
+        $owner_id = $area->get_owner( $game, $turn );
         $territory_owner[ $area->id ] = $owner_id;
       }
 
@@ -395,14 +395,14 @@ class World extends World_Model {
           if( $owner_id ) {
             $color = imagecolortoalpha( $img, $player_colors[ $player_color_index[ $owner_id ] ], 85);
           }
-          $is_capital = $area->is_capital($game_id, $turn);
-          $is_contested = $area->is_contested($game_id, $turn);
+          $is_capital = $area->is_capital($game, $turn);
+          $is_contested = $area->is_contested($game, $turn);
 
           if( $owner_id && $is_capital ) {
             $color = imagecolortoalpha( $img, $player_colors[ $player_color_index[ $owner_id ] ], 42);
             imagefilledpolygon( $img, $polygon, count( $area->vertices ), $color );
           }
-          if( $area->is_contested($game_id, $turn) ) {
+          if( $area->is_contested($game, $turn) ) {
             // Conflict overlay
             if( $owner_id ) {
               if( !$is_capital ) {
@@ -581,7 +581,7 @@ class World extends World_Model {
           $coords[] = round(( $vertex->x - $offset_x ) * $ratio ).','. round(($size_y - ($vertex->y - $offset_y)) * $ratio);
         }
         if( $game_id ) {
-          $owner_id = $territory->get_owner($game_id, $turn);
+          $owner_id = $territory->get_owner( $game, $turn );
           if( $owner_id != null ) {
             $owner = Player::instance($owner_id);
           }
@@ -592,8 +592,8 @@ class World extends World_Model {
           coords="'.implode(',', $coords).'"
           href="'.Page::get_url('show_territory', array('id' => $territory->id)).'"
           title="'.$territory->name.' ('.($owner_id?$owner->name:__('Nobody')).')'.
-                  ($territory->is_capital($game_id, $turn)?' ['.__('Capital').']':'').
-                  ($territory->is_contested($game_id, $turn)?' <'.__('Contested').'>':'').
+                  ($territory->is_capital( $game, $turn )?' ['.__('Capital').']':'').
+                  ($territory->is_contested( $game, $turn )?' <'.__('Contested').'>':'').
                 '" />';
         }else {
           echo '
