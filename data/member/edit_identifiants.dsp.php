@@ -16,7 +16,6 @@
       foreach ($tab_error as $error) {
         $tab_msg[] = Member::get_message_erreur($error);
       }
-      var_debug($tab_msg);
       $tab_msg = array_unique($tab_msg);
       $html_msg = '<div class="error">';
       foreach ($tab_msg as $msg_error) {
