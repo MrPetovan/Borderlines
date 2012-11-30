@@ -195,7 +195,7 @@
           }
           if( $current_game->id ) {
             $success = true;
-            $content = $current_player->get_territory_player_troops_list($current_game->id, $turn);
+            $content = $current_game->get_territory_player_troops_list( $turn, null, $current_player->id );
           }
           break;
         }
@@ -234,7 +234,7 @@
           $territory = Territory::instance(getValue('territory_id'));
           if( $territory->id && $current_game && $current_game->id ) {
             $success = true;
-            $content = $territory->get_owner( $current_game->id, $turn );
+            $content = $territory->get_owner( $current_game, $turn );
           }
           break;
         }
@@ -245,7 +245,7 @@
           $territory = Territory::instance(getValue('territory_id'));
           if( $territory->id && $current_game && $current_game->id ) {
             $success = true;
-            $content = $territory->is_contested( $current_game->id, $turn );
+            $content = $territory->is_contested( $current_game, $turn );
           }
           break;
         }
@@ -256,7 +256,7 @@
           $territory = Territory::instance(getValue('territory_id'));
           if( $territory->id && $current_game && $current_game->id ) {
             $success = true;
-            $content = $territory->is_capital( $current_game->id, $turn );
+            $content = $territory->is_capital( $current_game, $turn );
           }
           break;
         }
