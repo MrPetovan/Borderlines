@@ -103,31 +103,6 @@
           );
         }
         break;
-      case 'set_player_resource_history':
-        if( $player->id ) {
-          $flag_set_player_resource_history = $player->set_player_resource_history(
-            ($value = getValue('game_id')) == ''?null:$value,
-            ($value = getValue('resource_id')) == ''?null:$value,
-            ($value = getValue('turn')) == ''?null:$value,
-            ($value = getValue('datetime')) == ''?null:$value,
-            ($value = getValue('delta')) == ''?null:$value,
-            getValue('reason'),
-            ($value = getValue('player_order_id')) == ''?null:$value
-          );
-          if( ! $flag_set_player_resource_history ) {
-            Page::add_message( '$player->set_player_resource_history : ' . mysql_error(), Page::PAGE_MESSAGE_ERROR );
-          }
-        }
-        break;
-      case 'del_player_resource_history':
-        if( $player->id ) {
-          $flag_del_player_resource_history = $player->del_player_resource_history(
-            ($value = getValue('game_id')) == ''?null:$value,
-            ($value = getValue('resource_id')) == ''?null:$value,
-            ($value = getValue('player_order_id')) == ''?null:$value
-          );
-        }
-        break;
       case 'set_player_spygame_value':
         if( $player->id ) {
           $flag_set_player_spygame_value = $player->set_player_spygame_value(
@@ -175,25 +150,50 @@
           );
         }
         break;
-      case 'set_territory_player_troops':
+      case 'set_territory_player_status':
         if( $player->id ) {
-          $flag_set_territory_player_troops = $player->set_territory_player_troops(
+          $flag_set_territory_player_status = $player->set_territory_player_status(
             ($value = getValue('game_id')) == ''?null:$value,
             ($value = getValue('turn')) == ''?null:$value,
             ($value = getValue('territory_id')) == ''?null:$value,
-            ($value = getValue('quantity')) == ''?null:$value
+            ($value = getValue('supremacy')) == ''?null:$value
           );
-          if( ! $flag_set_territory_player_troops ) {
-            Page::add_message( '$player->set_territory_player_troops : ' . mysql_error(), Page::PAGE_MESSAGE_ERROR );
+          if( ! $flag_set_territory_player_status ) {
+            Page::add_message( '$player->set_territory_player_status : ' . mysql_error(), Page::PAGE_MESSAGE_ERROR );
           }
         }
         break;
-      case 'del_territory_player_troops':
+      case 'del_territory_player_status':
         if( $player->id ) {
-          $flag_del_territory_player_troops = $player->del_territory_player_troops(
+          $flag_del_territory_player_status = $player->del_territory_player_status(
             ($value = getValue('game_id')) == ''?null:$value,
             ($value = getValue('turn')) == ''?null:$value,
             ($value = getValue('territory_id')) == ''?null:$value
+          );
+        }
+        break;
+      case 'set_territory_player_troops_history':
+        if( $player->id ) {
+          $flag_set_territory_player_troops_history = $player->set_territory_player_troops_history(
+            ($value = getValue('game_id')) == ''?null:$value,
+            ($value = getValue('turn')) == ''?null:$value,
+            ($value = getValue('territory_id')) == ''?null:$value,
+            ($value = getValue('delta')) == ''?null:$value,
+            getValue('reason'),
+            ($value = getValue('reason_player_id')) == ''?null:$value
+          );
+          if( ! $flag_set_territory_player_troops_history ) {
+            Page::add_message( '$player->set_territory_player_troops_history : ' . mysql_error(), Page::PAGE_MESSAGE_ERROR );
+          }
+        }
+        break;
+      case 'del_territory_player_troops_history':
+        if( $player->id ) {
+          $flag_del_territory_player_troops_history = $player->del_territory_player_troops_history(
+            ($value = getValue('game_id')) == ''?null:$value,
+            ($value = getValue('turn')) == ''?null:$value,
+            ($value = getValue('territory_id')) == ''?null:$value,
+            ($value = getValue('reason_player_id')) == ''?null:$value
           );
         }
         break;

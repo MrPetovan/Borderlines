@@ -66,31 +66,6 @@
           );
         }
         break;
-      case 'set_player_resource_history':
-        if( $game->id ) {
-          $flag_set_player_resource_history = $game->set_player_resource_history(
-            ($value = getValue('player_id')) == ''?null:$value,
-            ($value = getValue('resource_id')) == ''?null:$value,
-            ($value = getValue('turn')) == ''?null:$value,
-            ($value = getValue('datetime')) == ''?null:$value,
-            ($value = getValue('delta')) == ''?null:$value,
-            getValue('reason'),
-            ($value = getValue('player_order_id')) == ''?null:$value
-          );
-          if( ! $flag_set_player_resource_history ) {
-            Page::add_message( '$game->set_player_resource_history : ' . mysql_error(), Page::PAGE_MESSAGE_ERROR );
-          }
-        }
-        break;
-      case 'del_player_resource_history':
-        if( $game->id ) {
-          $flag_del_player_resource_history = $game->del_player_resource_history(
-            ($value = getValue('player_id')) == ''?null:$value,
-            ($value = getValue('resource_id')) == ''?null:$value,
-            ($value = getValue('player_order_id')) == ''?null:$value
-          );
-        }
-        break;
       case 'set_territory_owner':
         if( $game->id ) {
           $flag_set_territory_owner = $game->set_territory_owner(
@@ -114,25 +89,50 @@
           );
         }
         break;
-      case 'set_territory_player_troops':
+      case 'set_territory_player_status':
         if( $game->id ) {
-          $flag_set_territory_player_troops = $game->set_territory_player_troops(
+          $flag_set_territory_player_status = $game->set_territory_player_status(
             ($value = getValue('turn')) == ''?null:$value,
             ($value = getValue('territory_id')) == ''?null:$value,
             ($value = getValue('player_id')) == ''?null:$value,
-            ($value = getValue('quantity')) == ''?null:$value
+            ($value = getValue('supremacy')) == ''?null:$value
           );
-          if( ! $flag_set_territory_player_troops ) {
-            Page::add_message( '$game->set_territory_player_troops : ' . mysql_error(), Page::PAGE_MESSAGE_ERROR );
+          if( ! $flag_set_territory_player_status ) {
+            Page::add_message( '$game->set_territory_player_status : ' . mysql_error(), Page::PAGE_MESSAGE_ERROR );
           }
         }
         break;
-      case 'del_territory_player_troops':
+      case 'del_territory_player_status':
         if( $game->id ) {
-          $flag_del_territory_player_troops = $game->del_territory_player_troops(
+          $flag_del_territory_player_status = $game->del_territory_player_status(
             ($value = getValue('turn')) == ''?null:$value,
             ($value = getValue('territory_id')) == ''?null:$value,
             ($value = getValue('player_id')) == ''?null:$value
+          );
+        }
+        break;
+      case 'set_territory_player_troops_history':
+        if( $game->id ) {
+          $flag_set_territory_player_troops_history = $game->set_territory_player_troops_history(
+            ($value = getValue('turn')) == ''?null:$value,
+            ($value = getValue('territory_id')) == ''?null:$value,
+            ($value = getValue('player_id')) == ''?null:$value,
+            ($value = getValue('delta')) == ''?null:$value,
+            getValue('reason'),
+            ($value = getValue('reason_player_id')) == ''?null:$value
+          );
+          if( ! $flag_set_territory_player_troops_history ) {
+            Page::add_message( '$game->set_territory_player_troops_history : ' . mysql_error(), Page::PAGE_MESSAGE_ERROR );
+          }
+        }
+        break;
+      case 'del_territory_player_troops_history':
+        if( $game->id ) {
+          $flag_del_territory_player_troops_history = $game->del_territory_player_troops_history(
+            ($value = getValue('turn')) == ''?null:$value,
+            ($value = getValue('territory_id')) == ''?null:$value,
+            ($value = getValue('player_id')) == ''?null:$value,
+            ($value = getValue('reason_player_id')) == ''?null:$value
           );
         }
         break;
@@ -144,8 +144,6 @@
   // CUSTOM
 
   $list = $game->get_ready_orders();
-
-  $player_order_log = Player_Order::db_get_order_log( $game->id );
 
   if( $action = getValue('action') ) {
     switch( $action ) {
@@ -176,6 +174,7 @@
         }
         break;
       }
+      die();
     }
     Page::page_redirect( PAGE_CODE, array('id' => $game->id ) );
   }

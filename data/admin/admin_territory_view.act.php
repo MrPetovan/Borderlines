@@ -85,25 +85,50 @@
           );
         }
         break;
-      case 'set_territory_player_troops':
+      case 'set_territory_player_status':
         if( $territory->id ) {
-          $flag_set_territory_player_troops = $territory->set_territory_player_troops(
+          $flag_set_territory_player_status = $territory->set_territory_player_status(
             ($value = getValue('game_id')) == ''?null:$value,
             ($value = getValue('turn')) == ''?null:$value,
             ($value = getValue('player_id')) == ''?null:$value,
-            ($value = getValue('quantity')) == ''?null:$value
+            ($value = getValue('supremacy')) == ''?null:$value
           );
-          if( ! $flag_set_territory_player_troops ) {
-            Page::add_message( '$territory->set_territory_player_troops : ' . mysql_error(), Page::PAGE_MESSAGE_ERROR );
+          if( ! $flag_set_territory_player_status ) {
+            Page::add_message( '$territory->set_territory_player_status : ' . mysql_error(), Page::PAGE_MESSAGE_ERROR );
           }
         }
         break;
-      case 'del_territory_player_troops':
+      case 'del_territory_player_status':
         if( $territory->id ) {
-          $flag_del_territory_player_troops = $territory->del_territory_player_troops(
+          $flag_del_territory_player_status = $territory->del_territory_player_status(
             ($value = getValue('game_id')) == ''?null:$value,
             ($value = getValue('turn')) == ''?null:$value,
             ($value = getValue('player_id')) == ''?null:$value
+          );
+        }
+        break;
+      case 'set_territory_player_troops_history':
+        if( $territory->id ) {
+          $flag_set_territory_player_troops_history = $territory->set_territory_player_troops_history(
+            ($value = getValue('game_id')) == ''?null:$value,
+            ($value = getValue('turn')) == ''?null:$value,
+            ($value = getValue('player_id')) == ''?null:$value,
+            ($value = getValue('delta')) == ''?null:$value,
+            getValue('reason'),
+            ($value = getValue('reason_player_id')) == ''?null:$value
+          );
+          if( ! $flag_set_territory_player_troops_history ) {
+            Page::add_message( '$territory->set_territory_player_troops_history : ' . mysql_error(), Page::PAGE_MESSAGE_ERROR );
+          }
+        }
+        break;
+      case 'del_territory_player_troops_history':
+        if( $territory->id ) {
+          $flag_del_territory_player_troops_history = $territory->del_territory_player_troops_history(
+            ($value = getValue('game_id')) == ''?null:$value,
+            ($value = getValue('turn')) == ''?null:$value,
+            ($value = getValue('player_id')) == ''?null:$value,
+            ($value = getValue('reason_player_id')) == ''?null:$value
           );
         }
         break;

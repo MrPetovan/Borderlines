@@ -45,13 +45,6 @@ WHERE `member_id` = ".mysql_ureal_escape_string($member_id);
 
     return self::sql_to_list($sql);
   }
-  public static function db_get_by_api_key($api_key) {
-    $sql = "
-SELECT `id` FROM `".self::get_table_name()."`
-WHERE `api_key` = ".mysql_ureal_escape_string($api_key);
-
-    return self::sql_to_list($sql);
-  }
 
   public static function db_get_select_list( $with_null = false ) {
     $return = array();
@@ -317,46 +310,6 @@ AND `territory_id` = '.mysql_ureal_escape_string($territory_id);
 
 
 
-  public function get_player_resource_history_list($game_id = null, $resource_id = null, $player_order_id = null) {
-    $where = '';
-    if( ! is_null( $game_id )) $where .= '
-AND `game_id` = '.mysql_ureal_escape_string($game_id);
-    if( ! is_null( $resource_id )) $where .= '
-AND `resource_id` = '.mysql_ureal_escape_string($resource_id);
-    if( ! is_null( $player_order_id )) $where .= '
-AND `player_order_id` = '.mysql_ureal_escape_string($player_order_id);
-
-    $sql = '
-SELECT `game_id`, `player_id`, `resource_id`, `turn`, `datetime`, `delta`, `reason`, `player_order_id`
-FROM `player_resource_history`
-WHERE `player_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
-    $res = mysql_uquery($sql);
-
-    return mysql_fetch_to_array($res);
-  }
-
-  public function set_player_resource_history( $game_id, $resource_id, $turn, $datetime, $delta, $reason, $player_order_id = null ) {
-    $sql = "REPLACE INTO `player_resource_history` ( `game_id`, `player_id`, `resource_id`, `turn`, `datetime`, `delta`, `reason`, `player_order_id` ) VALUES (".mysql_ureal_escape_string( $game_id, $this->get_id(), $resource_id, $turn, guess_time( $datetime, GUESS_TIME_MYSQL ), $delta, $reason, $player_order_id ).")";
-
-    return mysql_uquery($sql);
-  }
-
-  public function del_player_resource_history( $game_id = null, $resource_id = null, $player_order_id = null ) {
-    $where = '';
-    if( ! is_null( $game_id )) $where .= '
-AND `game_id` = '.mysql_ureal_escape_string($game_id);
-    if( ! is_null( $resource_id )) $where .= '
-AND `resource_id` = '.mysql_ureal_escape_string($resource_id);
-    if( ! is_null( $player_order_id )) $where .= '
-AND `player_order_id` = '.mysql_ureal_escape_string($player_order_id);
-    $sql = 'DELETE FROM `player_resource_history`
-    WHERE `player_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
-
-    return mysql_uquery($sql);
-  }
-
-
-
   public function get_player_spygame_value_list($game_id = null, $value_guid = null, $turn = null) {
     $where = '';
     if( ! is_null( $game_id )) $where .= '
@@ -437,7 +390,7 @@ AND `turn` = '.mysql_ureal_escape_string($turn);
 
 
 
-  public function get_territory_player_troops_list($game_id = null, $turn = null, $territory_id = null) {
+  public function get_territory_player_status_list($game_id = null, $turn = null, $territory_id = null) {
     $where = '';
     if( ! is_null( $game_id )) $where .= '
 AND `game_id` = '.mysql_ureal_escape_string($game_id);
@@ -447,21 +400,21 @@ AND `turn` = '.mysql_ureal_escape_string($turn);
 AND `territory_id` = '.mysql_ureal_escape_string($territory_id);
 
     $sql = '
-SELECT `game_id`, `turn`, `territory_id`, `player_id`, `quantity`
-FROM `territory_player_troops`
+SELECT `game_id`, `turn`, `territory_id`, `player_id`, `supremacy`
+FROM `territory_player_status`
 WHERE `player_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
     $res = mysql_uquery($sql);
 
     return mysql_fetch_to_array($res);
   }
 
-  public function set_territory_player_troops( $game_id, $turn, $territory_id, $quantity ) {
-    $sql = "REPLACE INTO `territory_player_troops` ( `game_id`, `turn`, `territory_id`, `player_id`, `quantity` ) VALUES (".mysql_ureal_escape_string( $game_id, $turn, $territory_id, $this->get_id(), $quantity ).")";
+  public function set_territory_player_status( $game_id, $turn, $territory_id, $supremacy ) {
+    $sql = "REPLACE INTO `territory_player_status` ( `game_id`, `turn`, `territory_id`, `player_id`, `supremacy` ) VALUES (".mysql_ureal_escape_string( $game_id, $turn, $territory_id, $this->get_id(), $supremacy ).")";
 
     return mysql_uquery($sql);
   }
 
-  public function del_territory_player_troops( $game_id = null, $turn = null, $territory_id = null ) {
+  public function del_territory_player_status( $game_id = null, $turn = null, $territory_id = null ) {
     $where = '';
     if( ! is_null( $game_id )) $where .= '
 AND `game_id` = '.mysql_ureal_escape_string($game_id);
@@ -469,7 +422,51 @@ AND `game_id` = '.mysql_ureal_escape_string($game_id);
 AND `turn` = '.mysql_ureal_escape_string($turn);
     if( ! is_null( $territory_id )) $where .= '
 AND `territory_id` = '.mysql_ureal_escape_string($territory_id);
-    $sql = 'DELETE FROM `territory_player_troops`
+    $sql = 'DELETE FROM `territory_player_status`
+    WHERE `player_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
+
+    return mysql_uquery($sql);
+  }
+
+
+
+  public function get_territory_player_troops_history_list($game_id = null, $turn = null, $territory_id = null, $reason_player_id = null) {
+    $where = '';
+    if( ! is_null( $game_id )) $where .= '
+AND `game_id` = '.mysql_ureal_escape_string($game_id);
+    if( ! is_null( $turn )) $where .= '
+AND `turn` = '.mysql_ureal_escape_string($turn);
+    if( ! is_null( $territory_id )) $where .= '
+AND `territory_id` = '.mysql_ureal_escape_string($territory_id);
+    if( ! is_null( $reason_player_id )) $where .= '
+AND `reason_player_id` = '.mysql_ureal_escape_string($reason_player_id);
+
+    $sql = '
+SELECT `game_id`, `turn`, `territory_id`, `player_id`, `delta`, `reason`, `reason_player_id`
+FROM `territory_player_troops_history`
+WHERE `player_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
+    $res = mysql_uquery($sql);
+
+    return mysql_fetch_to_array($res);
+  }
+
+  public function set_territory_player_troops_history( $game_id, $turn, $territory_id, $delta, $reason, $reason_player_id = null ) {
+    $sql = "REPLACE INTO `territory_player_troops_history` ( `game_id`, `turn`, `territory_id`, `player_id`, `delta`, `reason`, `reason_player_id` ) VALUES (".mysql_ureal_escape_string( $game_id, $turn, $territory_id, $this->get_id(), $delta, $reason, $reason_player_id ).")";
+
+    return mysql_uquery($sql);
+  }
+
+  public function del_territory_player_troops_history( $game_id = null, $turn = null, $territory_id = null, $reason_player_id = null ) {
+    $where = '';
+    if( ! is_null( $game_id )) $where .= '
+AND `game_id` = '.mysql_ureal_escape_string($game_id);
+    if( ! is_null( $turn )) $where .= '
+AND `turn` = '.mysql_ureal_escape_string($turn);
+    if( ! is_null( $territory_id )) $where .= '
+AND `territory_id` = '.mysql_ureal_escape_string($territory_id);
+    if( ! is_null( $reason_player_id )) $where .= '
+AND `reason_player_id` = '.mysql_ureal_escape_string($reason_player_id);
+    $sql = 'DELETE FROM `territory_player_troops_history`
     WHERE `player_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
 
     return mysql_uquery($sql);
