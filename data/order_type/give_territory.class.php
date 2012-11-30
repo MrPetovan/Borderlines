@@ -16,7 +16,7 @@ class Give_Territory extends Player_Order {
       $to_player = Player::instance( $parameters['to_player_id'] );
 
       if( $territory->id == $parameters['territory_id'] && $to_player->id == $parameters['to_player_id'] ) {
-        if( $territory->get_owner($player->current_game->id, $player->current_game->current_turn + 1) == $this->player_id ) {
+        if( $territory->get_owner( $player->current_game, $player->current_game->current_turn + 1 ) == $this->player_id ) {
           $territory_owner_list = array_pop( $territory->get_territory_owner_list($player->current_game->id, $player->current_game->current_turn + 1) );
           $territory->set_territory_owner($player->current_game->id, $player->current_game->current_turn + 1, $parameters['to_player_id'], $territory_owner_list['contested'], 0);
 
