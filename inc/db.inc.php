@@ -67,6 +67,15 @@ function mysql_uquery($query, $link_identifier = null) {
   if (DEBUG_SQL) {
     mysql_log($query);
   }
+
+  $queries = preg_split("/;+(?=([^'|^\\\']*['|\\\'][^'|^\\\']*['|\\\'])*[^'|^\\\']*[^'|^\\\']$)/", $query);
+  $query = array_pop( $queries );
+  if( count( $queries ) > 0 ) {
+    foreach( $queries as $subquery ) {
+      mysql_uquery($subquery, $link_identifier);
+    }
+  }
+
   if (is_null($link_identifier)) {
     $res = mysql_query($query);
   } else {
