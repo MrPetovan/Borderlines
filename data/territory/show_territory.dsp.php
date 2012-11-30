@@ -6,7 +6,7 @@
   /* @var $current_player Player */
   $territory_params = array();
   if( $current_game ) {
-    $territory_owner_id = $territory->get_owner( $current_game->id, $turn );
+    $territory_owner_id = $territory->get_owner( $current_game, $turn );
     if( $territory_owner_id !== null ) {
       $owner = Player::instance($territory_owner_id);
     }
@@ -50,7 +50,7 @@
   </p>
   <p>
     <span class="label"><?php echo __('Status')?></span>
-    <span class="value"><?php echo $territory->is_contested( $current_game->id, $turn )?__('Contested'):__('Stable')?></span>
+    <span class="value"><?php echo $territory->is_contested( $current_game, $turn )?__('Contested'):__('Stable')?></span>
   </p>
 </div>
 <?php if( !$is_ajax ) :?>
@@ -99,13 +99,15 @@
   <thead>
     <tr>
       <th><?php echo __('Player')?></th>
-      <th><?php echo __('Quantity')?></th>
+      <th colspan="2"><?php echo __('Quantity')?></th>
     </tr>
   </thead>
 <?php
     $current_turn = null;
     $player_troops = 0;
-    foreach( $territory->get_territory_player_troops_list( $current_game->id ) as $territory_player_troops ) {
+
+    foreach( $current_game->get_territory_player_troops_list( null, $territory->id ) as $territory_player_troops ) {
+      /* @var $player Player */
       $player = Player::instance( $territory_player_troops['player_id'] );
 
       if( $current_turn !== $territory_player_troops['turn']) {
@@ -118,7 +120,7 @@
         echo '
   <tbody class="archive'.($is_current?' current':'').'">
     <tr class="title">
-      <th colspan="2">'.__('Turn %s', $territory_player_troops['turn']).'</th>
+      <th colspan="3">'.__('Turn %s', $territory_player_troops['turn']).'</th>
     </tr>';
 
         $current_turn = $territory_player_troops['turn'];
@@ -128,10 +130,20 @@
         $player_troops = $territory_player_troops['quantity'];
       }
 
+      $troops_history = $player->get_territory_player_troops_history_list($current_game->id, $current_turn, $territory->id);
+      foreach( $troops_history as $troops_history_row ) {
+        echo '
+    <tr>
+      <td></td>
+      <td>'.__( $troops_history_row['reason'] ).'</td>
+      <td class="num">'.($troops_history_row['delta']>=0?'+':'').l10n_number( $troops_history_row['delta'] ).' <img src="'.IMG.'img_html/helmet.png" alt="'.__('Troops').'" title="'.__('Troops').'"/></td>
+    </tr>';
+      }
+
       echo '
     <tr>
       <td><a href="'.Page::get_url('show_player', array('id' => $player->id)).'">'.$player->name.'</a></td>
-      <td>'.l10n_number( $territory_player_troops['quantity'] ).' <img src="'.IMG.'img_html/helmet.png" alt="'.__('Troops').'" title="'.__('Troops').'"/></td>
+      <td colspan="2" class="num">'.l10n_number( $territory_player_troops['quantity'] ).' <img src="'.IMG.'img_html/helmet.png" alt="'.__('Troops').'" title="'.__('Troops').'"/></td>
     </tr>';
     }
 ?>
