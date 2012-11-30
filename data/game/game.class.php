@@ -11,6 +11,44 @@ class Game extends Game_Model {
   // CUSTOM
   protected $_version = 'world';
 
+  public function get_territory_player_troops_list($turn = null, $territory_id = null, $player_id = null) {
+    $return = array();
+    if( is_null( $turn ) ) {
+      for($turn = 0; $turn <= $this->current_turn; $turn ++ ) {
+        $return = array_merge( $return, $this->get_territory_player_troops_list($turn, $territory_id, $player_id));
+      }
+    }else {
+      $where = '';
+      if( ! is_null( $territory_id )) $where .= '
+AND `territory_id` = '.mysql_ureal_escape_string($territory_id);
+      if( ! is_null( $player_id )) $where .= '
+AND `player_id` = '.mysql_ureal_escape_string($player_id);
+
+      $sql = '
+SELECT
+   `game_id`,
+   '.$turn.' AS `turn`,
+   `territory_id`,
+   `player_id`,
+   IFNULL( SUM( `delta` ), 0 ) AS `quantity`
+FROM `territory_player_troops_history`
+WHERE `game_id` = '.mysql_ureal_escape_string($this->get_id()).'
+AND `turn` <= '.mysql_ureal_escape_string($turn).$where.'
+GROUP BY
+  `game_id`,
+  `territory_id`,
+  `player_id`';
+      $res = mysql_uquery( $sql );
+
+      foreach( mysql_fetch_to_array($res) as $row ) {
+        if( $row['quantity'] != 0 ) {
+          $return[] = $row;
+        }
+      }
+    }
+    return $return;
+  }
+
   public function get_parameters() {
     $defaults = array(
         'HOME_TROOPS_MAINTENANCE' => 1,
@@ -93,8 +131,6 @@ WHERE `game_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
     $this->updated = null;
 
     Player_Order::db_truncate_by_game( $this->id );
-    $this->del_player_resource_history();
-    //$this->del_game_player();
 
     $world = new World();
     $world->name = $this->name;
@@ -113,6 +149,11 @@ WHERE `game_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
     $this->save();
 
     $player_list = Player::db_get_by_game( $this->id );
+
+    $sql = 'DELETE FROM `territory_owner` WHERE `game_id` = '.mysql_ureal_escape_string($this->id);
+    mysql_uquery($sql);
+    $sql = 'DELETE FROM `territory_player_troops_history` WHERE `game_id` = '.mysql_ureal_escape_string($this->id);
+    mysql_uquery($sql);
 
     $territories = Territory::db_get_by_world_id( $this->world_id );
 
@@ -145,10 +186,11 @@ WHERE `game_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
     mysql_uquery($sql);
     $sql = 'DELETE FROM `territory_owner` WHERE `game_id` = '.mysql_ureal_escape_string($this->id).' AND `turn` > '.mysql_ureal_escape_string($turn);
     mysql_uquery($sql);
-    $sql = 'DELETE FROM `territory_player_troops` WHERE `game_id` = '.mysql_ureal_escape_string($this->id).' AND `turn` > '.mysql_ureal_escape_string($turn);
+    $sql = 'DELETE FROM `territory_player_troops_history` WHERE `game_id` = '.mysql_ureal_escape_string($this->id).' AND `turn` > '.mysql_ureal_escape_string($turn);
     mysql_uquery($sql);
 
     $this->current_turn = $turn;
+    $this->ended = null;
     $this->save();
   }
 
@@ -184,16 +226,9 @@ WHERE `game_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
 
       $options = $this->get_parameters();
 
-      // Duplicating troops record before moves
       $player_troops_list = $this->get_territory_player_troops_list($current_turn);
       foreach( $player_troops_list as $player_troops_row ) {
         $intermediate_troops_array[ $player_troops_row['territory_id'] ][ $player_troops_row['player_id'] ] = $player_troops_row['quantity'];
-        $this->set_territory_player_troops(
-          $next_turn,
-          $player_troops_row['territory_id'],
-          $player_troops_row['player_id'],
-          $player_troops_row['quantity']
-        );
       }
 
       // Removing quitting players
@@ -216,16 +251,16 @@ WHERE `game_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
       // Updating territories ownership and battle on contested territories
       foreach( $territories as $territory ) {
         /* @var $territory Territory */
-        $previous_owner = $territory->get_owner($this->id, $current_turn );
-        $new_owner = $territory->get_owner($this->id, $next_turn );
+        $previous_owner = $territory->get_owner( $this, $current_turn );
+        $new_owner = $territory->get_owner( $this, $next_turn );
 
-        if( $territory->is_contested($this->id, $next_turn) ) {
+        if( $territory->is_contested( $this, $next_turn ) ) {
           // Diplomacy checking and parties forming
           $diplomacy = array();
           $attacks = array();
           $losses = array();
 
-          $player_troops = $territory->get_territory_player_troops_list($this->id, $next_turn);
+          $player_troops = $this->get_territory_player_troops_list($next_turn, $territory->id);
           foreach( $player_troops as $key => $attacker_row ) {
             $this->set_player_history(
               $attacker_row['player_id'],
@@ -265,7 +300,12 @@ WHERE `game_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
           // Cleaning up
           foreach( $player_troops as $key => $player_row ) {
 
-            $new_quantity = max( 0, $player_row['quantity'] - array_sum( $losses[ $player_row['player_id'] ] ) );
+            $total_damages = array_sum( $losses[ $player_row['player_id'] ] );
+            $total_losses = min( $player_row['quantity'], $total_damages );
+            $ratio = 1;
+            if( $total_damages > $total_losses ) {
+              $ratio = $total_losses / $total_damages;
+            }
 
             foreach( $losses[ $player_row['player_id'] ] as $attacker_player_id => $damages ) {
               $player = Player::instance($attacker_player_id);
@@ -284,13 +324,13 @@ WHERE `game_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
                 $player_row['player_id'],
                 $next_turn,
                 time(),
-                $player->name . "'s troops inflicted ".$damages." damages to yours",
+                $player->name . "'s troops inflicted ".$damages.' damages to yours, inflicting '.round( $damages * $ratio ).' losses',
                 $territory->id
               );
+              $this->set_territory_player_troops_history($next_turn, $player_row['territory_id'], $player_row['player_id'], round( - $damages * $ratio ), 'Combat', $player->id);
             }
 
-            if( $new_quantity == 0 ) {
-              $this->del_territory_player_troops($next_turn, $player_row['territory_id'], $player_row['player_id']);
+            if( $total_losses == $player_row['quantity'] ) {
               $this->set_player_history(
                 $player_row['player_id'],
                 $next_turn,
@@ -299,18 +339,17 @@ WHERE `game_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
                 $territory->id
               );
             }else {
-              $this->set_territory_player_troops($next_turn, $player_row['territory_id'], $player_row['player_id'], $new_quantity);
               $this->set_player_history(
                 $player_row['player_id'],
                 $next_turn,
                 time(),
-                "You lost ".array_sum( $losses[ $player_row['player_id'] ] )." on ".$player_row['quantity']." troops in battle",
+                "You lost ".$total_losses." on ".$player_row['quantity']." troops in battle",
                 $territory->id);
             }
           }
 
           // Recalculating ownership after battle
-          $territory->compute_territory_owner($this->id, $next_turn );
+          $territory->compute_territory_owner( $this, $next_turn );
         }
       }
 
@@ -344,7 +383,7 @@ WHERE `game_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
           "You got a revenue of ".$revenue,
           null);
         $troops_maintenance = 0;
-        $troops_list = $player->get_territory_player_troops_list($this->id, $current_turn);
+        $troops_list = $this->get_territory_player_troops_list($current_turn, null, $player->id);
         foreach( $troops_list as $territory_player_troops_row ) {
           $is_home = false;
 
@@ -380,11 +419,11 @@ WHERE `game_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
             null
           );
           $ratio_desertion = 1 - $revenue / $troops_maintenance;
-          $troops_list = $player->get_territory_player_troops_list($this->id, $next_turn);
+          $troops_list = $this->get_territory_player_troops_list($next_turn, null, $player->id);
           foreach( $troops_list as $troops_row ) {
             $territory = Territory::instance($troops_row['territory_id']);
             $deserters = floor( $troops_row['quantity'] * $ratio_desertion );
-            $player->set_territory_player_troops($this->id, $next_turn, $troops_row['territory_id'], $troops_row['quantity'] - $deserters);
+            $player->set_territory_player_troops_history($this->id, $next_turn, $troops_row['territory_id'], - $deserters, 'Desertion');
             $this->set_player_history(
               $player->id,
               $next_turn,
@@ -392,6 +431,8 @@ WHERE `game_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
               $deserters." troops deserted",
               $troops_row['territory_id']
             );
+            // Recalculating ownership after desertion
+            $territory->compute_territory_owner( $this, $next_turn );
           }
 
           $troops_maintenance = $revenue;
@@ -418,9 +459,7 @@ WHERE `game_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
 
         if( $capital_id !== null ) {
           $troops_recruited = floor( $recruit_budget / $options['RECRUIT_TROOPS_PRICE'] );
-          $territory_player_troops_list = $player->get_territory_player_troops_list($this->id, $next_turn, $capital_id);
-          $capital_territory_troops = array_pop( $territory_player_troops_list );
-          $player->set_territory_player_troops($this->id, $next_turn, $capital_id, $capital_territory_troops['quantity'] + $troops_recruited);
+          $player->set_territory_player_troops_history($this->id, $next_turn, $capital_id, $troops_recruited, 'Recruitement');
           $this->set_player_history(
             $player->id,
             $next_turn,
@@ -590,7 +629,7 @@ WHERE `ended` IS NULL";
       }
     }
 
-    $this->set_territory_player_troops($this->current_turn, $territory_id, $player->id, 1000);
+    $this->set_territory_player_troops_history($this->current_turn, $territory_id, $player->id, 1000, 'Init');
     $this->set_territory_owner($territory_id, $this->current_turn, $player->id, 0, 1);
 
     $member = Member::instance( $player->member_id );

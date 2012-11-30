@@ -325,22 +325,19 @@ OR `guid1` = "'.$guid2.'" AND `guid2` = "'.$guid1.'")';
     return self::sql_to_object($sql);
   }
 
-  public function get_owner( $game_id, $turn = null ) {
+  public function get_owner( Game $game, $turn = null ) {
     $return = null;
 
     if( is_null( $turn ) ) {
-      /* @var $game Game */
-      $game = Game::instance( $game_id );
-
       $turn = $game->current_turn;
     }
 
-    $territory_owner_list = $this->get_territory_owner_list( $game_id, $turn );
+    $territory_owner_list = $this->get_territory_owner_list( $game->id, $turn );
 
     if( count( $territory_owner_list ) ) {
       $territory_owner_row = array_shift( $territory_owner_list );
     }else {
-      $territory_owner_row = $this->compute_territory_owner( $game_id, $turn );
+      $territory_owner_row = $this->compute_territory_owner( $game, $turn );
     }
 
     $return = $territory_owner_row['owner_id'];
@@ -348,22 +345,19 @@ OR `guid1` = "'.$guid2.'" AND `guid2` = "'.$guid1.'")';
     return $return;
   }
 
-  public function is_contested( $game_id, $turn = null ) {
+  public function is_contested( Game $game, $turn = null ) {
     $return = null;
 
     if( is_null( $turn ) ) {
-      /* @var $game Game */
-      $game = Game::instance( $game_id );
-
       $turn = $game->current_turn;
     }
 
-    $territory_owner_list = $this->get_territory_owner_list( $game_id, $turn );
+    $territory_owner_list = $this->get_territory_owner_list( $game->id, $turn );
 
     if( count( $territory_owner_list ) ) {
       $territory_owner_row = array_shift( $territory_owner_list );
     }else {
-      $territory_owner_row = $this->compute_territory_owner( $game_id, $turn );
+      $territory_owner_row = $this->compute_territory_owner( $game, $turn );
     }
 
     $return = $territory_owner_row['contested'] == 1;
@@ -371,22 +365,19 @@ OR `guid1` = "'.$guid2.'" AND `guid2` = "'.$guid1.'")';
     return $return;
   }
 
-  public function is_capital( $game_id, $turn = null ) {
+  public function is_capital( Game $game, $turn = null ) {
     $return = null;
 
     if( is_null( $turn ) ) {
-      /* @var $game Game */
-      $game = Game::instance( $game_id );
-
       $turn = $game->current_turn;
     }
 
-    $territory_owner_list = $this->get_territory_owner_list( $game_id, $turn );
+    $territory_owner_list = $this->get_territory_owner_list( $game->id, $turn );
 
     if( count( $territory_owner_list ) ) {
       $territory_owner_row = array_shift( $territory_owner_list );
     }else {
-      $territory_owner_row = $this->compute_territory_owner( $game_id, $turn );
+      $territory_owner_row = $this->compute_territory_owner( $game, $turn );
     }
 
     $return = $territory_owner_row['capital'] == 1;
@@ -394,17 +385,17 @@ OR `guid1` = "'.$guid2.'" AND `guid2` = "'.$guid1.'")';
     return $return;
   }
 
-  public function compute_territory_owner( $game_id, $turn ) {
-    $player_territories = $this->get_territory_player_troops_list($game_id, $turn);
+  public function compute_territory_owner( Game $game, $turn ) {
+    $player_territories = $game->get_territory_player_troops_list($turn, $this->id);
 
     $last_owner_id = null;
     $is_capital = false;
     $is_contested = false;
 
     if( $turn > 0 ) {
-      $last_owner_id = $this->get_owner($game_id, $turn - 1);
+      $last_owner_id = $this->get_owner( $game, $turn - 1 );
 
-      $territory_owner_list = $this->get_territory_owner_list( $game_id, $turn - 1 );
+      $territory_owner_list = $this->get_territory_owner_list( $game->id, $turn - 1 );
       $is_capital = $territory_owner_list[0]['capital'] == 1;
     }
 
@@ -417,7 +408,7 @@ OR `guid1` = "'.$guid2.'" AND `guid2` = "'.$guid1.'")';
         $owner_id = $player_territories[0]['player_id'];
       }else {
         $invader = Player::instance( $player_territories[0]['player_id'] );
-        $player_diplomacy_list = $invader->get_last_player_diplomacy_list($game_id);
+        $player_diplomacy_list = $invader->get_last_player_diplomacy_list($game->id);
 
         // If invader marked the previous owner as enemy, he captures the territory
         foreach( $player_diplomacy_list as $player_diplomacy ) {
@@ -434,7 +425,7 @@ OR `guid1` = "'.$guid2.'" AND `guid2` = "'.$guid1.'")';
         /* @var $player_from Player */
         $player_from = Player::instance( $player_territory_from['player_id'] );
 
-        $player_diplomacy_list = $player_from->get_last_player_diplomacy_list($game_id);
+        $player_diplomacy_list = $player_from->get_last_player_diplomacy_list($game->id);
 
         foreach( $player_territories as $player_territory_to ) {
           foreach( $player_diplomacy_list as $key => $player_diplomacy ) {
@@ -485,7 +476,7 @@ OR `guid1` = "'.$guid2.'" AND `guid2` = "'.$guid1.'")';
       // In case of changed owner, reset the capital state
       $is_capital = $is_capital && ($last_owner_id == $owner_id);
     }
-    $this->set_territory_owner($game_id, $turn, $owner_id, $is_contested?1:0, $is_capital?1:0);
+    $this->set_territory_owner($game->id, $turn, $owner_id, $is_contested?1:0, $is_capital?1:0);
 
     $return = array('owner_id' => $owner_id, 'contested' => $is_contested, 'capital' => $is_capital);
 
