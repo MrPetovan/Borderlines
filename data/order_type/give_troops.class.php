@@ -25,19 +25,20 @@ class Give_Troops extends Player_Order {
 
       $game = $player->current_game;
 
-      $player_territory = $player->get_territory_player_troops_list( $game->id, $game->current_turn, $from_territory_id );
+      $player_territory = $game->get_territory_player_troops_list( $game->current_turn, $from_territory_id, $player->id );
 
-      if( count( $player_territory ) ) {
-        $available_soldiers = $player_territory[0]['quantity'];
-        if( $available_soldiers < $soldiers_gifted ) {
-          $params['count'] = $available_soldiers;
-        }
-
-        $this->parameters = $params;
+      $valid = count( $player_territory ) > 0;
+    }
+    if( $valid ) {
+      $available_soldiers = $player_territory[0]['quantity'];
+      if( $available_soldiers < $soldiers_gifted ) {
+        $params['count'] = $available_soldiers;
       }
+
+      $this->parameters = $params;
+
       $valid = $this->save();
     }
-
     return $valid;
   }
 
@@ -56,44 +57,26 @@ class Give_Troops extends Player_Order {
       $to_player = Player::instance( $parameters['to_player_id'] );
 
       if( $from_territory && $to_player ) {
-        $game_id = $player->current_game->id;
-        $order_turn = $player->current_game->current_turn;
-        $next_turn = $player->current_game->current_turn + 1;
+        $current_game = $player->current_game;
+        $game_id = $current_game->id;
+        $order_turn = $current_game->current_turn;
+        $next_turn = $current_game->current_turn + 1;
 
-        $from_troops_before = $player->get_territory_player_troops_list( $game_id, $next_turn, $from_territory->id );
+        $from_troops_before = $current_game->get_territory_player_troops_list( $next_turn, $from_territory->id, $player->id );
 
         if( count( $from_troops_before ) ) {
           $from_troops_before = $from_troops_before[0]['quantity'];
 
-          $from_troops_after = max( $from_troops_before - $parameters['count'], 0 );
-
           // Correction in case of order error
-          $parameters['count'] = $from_troops_before - $from_troops_after;
+          $parameters['count'] = min( $parameters['count'], $from_troops_before );
 
-          if( $from_troops_after > 0 ) {
-            $player->set_territory_player_troops( $game_id, $next_turn, $from_territory->id, $from_troops_after );
-          }else {
-            $player->del_territory_player_troops( $game_id, $next_turn, $from_territory->id );
-          }
-
-          $to_troops_before = $to_player->get_territory_player_troops_list( $game_id, $next_turn, $from_territory->id );
-
-          if( count( $to_troops_before ) ) {
-            $to_troops_before = $to_troops_before[0]['quantity'];
-          }else {
-            $to_troops_before = 0;
-          }
-
-          $to_troops_after = $to_troops_before + $parameters['count'];
-
-          if( $to_troops_after > 0 ) {
-            $to_player->set_territory_player_troops( $game_id, $next_turn, $from_territory->id, $to_troops_after );
-          }elseif( count( $to_troops_before ) ) {
-            $to_player->del_territory_player_troops( $game_id, $next_turn, $from_territory->id );
-          }
+          $player->set_territory_player_troops_history( $game_id, $next_turn, $from_territory->id, - $parameters['count'], 'Troops gift', $to_player->id );
+          $to_player->set_territory_player_troops_history( $game_id, $next_turn, $from_territory->id, $parameters['count'], 'Troops gift', $player->id );
+          $return_code = 0;
+          $return = true;
+        }else {
+          $return_code = 2;
         }
-
-        $return = true;
       }
     }
 
