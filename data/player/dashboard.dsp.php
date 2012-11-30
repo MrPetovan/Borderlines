@@ -1,6 +1,7 @@
 <?php
   $resource_list = Resource::db_get_all();
 
+  $players = Player::db_get_by_member_id( $member->id );
   /* @var $current_player Player */
   /* @var $current_game Game */
 ?>
@@ -9,6 +10,14 @@
 <p>Player ID : <?php echo $current_player->id?></p>
 <p>API Key : <?php echo $current_player->api_key?></p>
 <p>API Signature : <?php echo sha1( $current_player->id . $current_player->api_key )?></p>
+<?php if ( 1 == 2 ) {?>
+<ul>
+  <?php foreach( $players as $player ) {?>
+  <li><a href="<?php echo Page::get_url(PAGE_CODE, array('player_id' => $player->id ))?>"><?php echo $player->name?></a></li>
+  <?php } ?>
+</ul>
+<p><a href="<?php echo Page::get_url('create_player')?>">Create player</a></p>
+<?php }?>
 <div class="informations formulaire">
   <p>
     <span class="label"><?php echo __('Current game')?></span>
@@ -100,8 +109,8 @@
 <h3>Territory Summary</h3>
 <?php
     $territory_summaries = array();
-    $territory_summaries[ $current_game->current_turn - 1 ] = $current_player->get_territory_summary($current_game->id, $current_game->current_turn - 1);
-    $territory_summaries[ $current_game->current_turn ] = $current_player->get_territory_summary($current_game->id, $current_game->current_turn);
+    $territory_summaries[ $current_game->current_turn - 1 ] = $current_player->get_territory_summary($current_game, $current_game->current_turn - 1);
+    $territory_summaries[ $current_game->current_turn ] = $current_player->get_territory_summary($current_game, $current_game->current_turn);
 ?>
 <table class="accordion">
 <?php
@@ -220,7 +229,7 @@
 
   $troops_home = 0;
   $troops_away = 0;
-  $troops_list = $current_player->get_territory_player_troops_list($current_game->id, $previous_turn);
+  $troops_list = $current_game->get_territory_player_troops_list($previous_turn, null, $current_player->id);
   foreach( $troops_list as $territory_player_troops_row ) {
     $is_home = false;
 
