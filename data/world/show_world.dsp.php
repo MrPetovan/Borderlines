@@ -71,7 +71,7 @@
 ?>
 <h3>Territory Summary</h3>
 <?php
-    $territory_summary = $current_player->get_territory_summary($current_game->id, $turn);
+    $territory_summary = $current_player->get_territory_summary( $current_game, $turn );
 ?>
 <table>
   <tr>
@@ -163,7 +163,7 @@
 <?php
   foreach( $territory_list as $territory ) {
     /* @var $territory Territory */
-    $owner_id = $territory->get_owner($current_game->id, $turn);
+    $owner_id = $territory->get_owner( $current_game, $turn);
     if( $owner_id != null ) {
       $owner = Player::instance($owner_id);
     }
