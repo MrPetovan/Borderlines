@@ -22,11 +22,10 @@ class Quit_Game extends Player_Order {
   public function execute() {
     $return = false;
 
-    $return_code = -1;
-
     /* @var $player Player */
     $player = Player::instance( $this->player_id );
 
+    /* @var $current_game Game */
     $current_game = $player->current_game;
 
     $current_turn = $current_game->current_turn;
@@ -35,12 +34,15 @@ class Quit_Game extends Player_Order {
     $parameters = $this->parameters;
 
     // Removing quitting players
-    $current_game->del_territory_player_troops($next_turn, null, $player->id);
+    foreach( $current_game->get_territory_player_troops_list($current_turn, null, $player->id) as $territory_player_troops_row ) {
+      extract( $territory_player_troops_row );
+      $current_game->set_territory_player_troops_history($next_turn, $territory_id, $player_id, - $quantity, 'Leave game', $player_id);
+    }
 
     $territory_owner_list = $current_game->get_territory_owner_list(null, $current_turn, $player->id);
     foreach( $territory_owner_list as $territory_owner) {
       $territory = Territory::instance($territory_owner['territory_id']);
-      $ownership_array = $territory->compute_territory_owner($current_game->id, $next_turn );
+      $ownership_array = $territory->compute_territory_owner( $current_game, $next_turn );
       if( $ownership_array['owner_id'] == $player->id ) {
         $current_game->set_territory_owner($territory_owner['territory_id'], $next_turn, null, 0, 0);
       }
