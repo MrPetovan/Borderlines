@@ -29,32 +29,6 @@ AND `datetime_execution` IS NULL";
     return self::sql_to_list($sql);
   }
 
-  public static function db_get_order_log( $game_id ) {
-    $sql = "
-SELECT
-  `id`,
-  `order_type_id`,
-  `".self::get_table_name()."`.`player_id` AS `order_player_id`,
-  `datetime_order`,
-  `datetime_scheduled`,
-  `datetime_execution`,
-  `parameters`,
-  `return`,
-  `player_resource_history`.`player_id`,
-  `resource_id`,
-  `datetime`,
-  `delta`,
-  `reason`
-FROM `".self::get_table_name()."`
-LEFT JOIN `player_resource_history` ON `player_order_id` = `id`
-WHERE `".self::get_table_name()."`.`game_id` = ".mysql_ureal_escape_string($game_id)."
-ORDER BY `datetime_execution` DESC, `".self::get_table_name()."`.`player_id`";
-
-    $res = mysql_uquery( $sql );
-
-    return mysql_fetch_to_array( $res );
-  }
-
   public function plan( Order_Type $order_type, Player $player, $params = array(), $turn = null ) {
     if( is_null( $turn ) ) {
       $turn = $player->current_game->current_turn;
