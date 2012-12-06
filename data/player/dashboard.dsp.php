@@ -159,7 +159,7 @@
       <td>'.($territory_row['capital']?'Capital':'Province').'</td>
       <td class="num">'.l10n_number( $territory->area ).' km²</td>
       <td>'.($territory_row['contested']?'<img src="'.IMG.'img_html/bomb.png" alt=""/> '.__('Contested'):'<img src="'.IMG.'img_html/accept.png" alt=""/> '.__('Stable')).'</td>
-      <td class="num">'.l10n_number( $territory_row['quantity'] ).' <img src="'.IMG.'img_html/helmet.png" alt="'.__('Troops').'" title="'.__('Troops').'"/></td>
+      <td class="num">'.l10n_number( $territory_row['quantity'] ).' <img src="'.IMG.'img_html/troops.png" alt="'.__('Troops').'" title="'.__('Troops').'"/></td>
     </tr>';
       }
       echo '
@@ -172,7 +172,7 @@
       <th><?php echo __('Total')?></th>
       <td class="num"><?php echo l10n_number( $total_territory )?> km²</td>
       <th><?php echo __('Total')?></th>
-      <td class="num"><?php echo l10n_number( $total_troops ).' <img src="'.IMG.'img_html/helmet.png" alt="'.__('Troops').'" title="'.__('Troops').'"/>' ?></td>
+      <td class="num"><?php echo l10n_number( $total_troops ).' <img src="'.IMG.'img_html/troops.png" alt="'.__('Troops').'" title="'.__('Troops').'"/>' ?></td>
     </tr>
   </tbody>
 </table>
@@ -283,7 +283,7 @@
   <p>
     <span class="label"><?php echo __('Troops home')?></span>
     <span class="value num">
-      <?php echo l10n_number( $troops_home, 0 )?> <img src="<?php echo IMG.'img_html/helmet.png'?>" alt="Troops" title="Troops" />
+      <?php echo l10n_number( $troops_home, 0 )?> <img src="<?php echo IMG.'img_html/troops.png'?>" alt="Troops" title="Troops" />
       @ <?php echo l10n_number( $options['HOME_TROOPS_MAINTENANCE'], 0 )?> <img src="<?php echo IMG.'img_html/coins.png'?>" alt="" title="" />
       = <?php echo l10n_number( $troops_home * $options['HOME_TROOPS_MAINTENANCE'], 0 )?> <img src="<?php echo IMG.'img_html/coins.png'?>" alt="" title="" />
     </span>
@@ -291,7 +291,7 @@
   <p>
     <span class="label"><?php echo __('Troops away')?></span>
     <span class="value num">
-      <?php echo l10n_number( $troops_away, 0 )?> <img src="<?php echo IMG.'img_html/helmet.png'?>" alt="Troops" title="Troops" />
+      <?php echo l10n_number( $troops_away, 0 )?> <img src="<?php echo IMG.'img_html/troops.png'?>" alt="Troops" title="Troops" />
       @ <?php echo l10n_number( $options['AWAY_TROOPS_MAINTENANCE'], 0)?> <img src="<?php echo IMG.'img_html/coins.png'?>" alt="" title="" />
       = <?php echo l10n_number( $troops_away * $options['AWAY_TROOPS_MAINTENANCE'], 0)?> <img src="<?php echo IMG.'img_html/coins.png'?>" alt="" title="" />
     </span>
@@ -311,7 +311,7 @@
   <p>
     <span class="label"><?php echo __('Total troops recruited')?></span>
     <span class="value num">
-      <?php echo l10n_number( $troops_recruited, 0 )?> <img src="<?php echo IMG.'img_html/helmet.png'?>" alt="Troops" title="Troops" />
+      <?php echo l10n_number( $troops_recruited, 0 )?> <img src="<?php echo IMG.'img_html/troops.png'?>" alt="Troops" title="Troops" />
       @ <?php echo l10n_number( $options['RECRUIT_TROOPS_PRICE'], 0)?> <img src="<?php echo IMG.'img_html/coins.png'?>" alt="" title="" />
     </span>
   </p>

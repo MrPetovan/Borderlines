@@ -136,14 +136,14 @@
     <tr>
       <td></td>
       <td>'.__( $troops_history_row['reason'] ).'</td>
-      <td class="num">'.($troops_history_row['delta']>=0?'+':'').l10n_number( $troops_history_row['delta'] ).' <img src="'.IMG.'img_html/helmet.png" alt="'.__('Troops').'" title="'.__('Troops').'"/></td>
+      <td class="num">'.($troops_history_row['delta']>=0?'+':'').l10n_number( $troops_history_row['delta'] ).' <img src="'.IMG.'img_html/troops.png" alt="'.__('Troops').'" title="'.__('Troops').'"/></td>
     </tr>';
       }
 
       echo '
     <tr>
       <td><a href="'.Page::get_url('show_player', array('id' => $player->id)).'">'.$player->name.'</a></td>
-      <td colspan="2" class="num">'.l10n_number( $territory_player_troops['quantity'] ).' <img src="'.IMG.'img_html/helmet.png" alt="'.__('Troops').'" title="'.__('Troops').'"/></td>
+      <td colspan="2" class="num">'.l10n_number( $territory_player_troops['quantity'] ).' <img src="'.IMG.'img_html/troops.png" alt="'.__('Troops').'" title="'.__('Troops').'"/></td>
     </tr>';
     }
 ?>
@@ -195,7 +195,7 @@
   <tfoot>
     <tr>
       <th><?php echo __('On turn %s', $current_game->current_turn + 1 )?></th>
-      <td class="num"><?php echo l10n_number( $player_troops ).' <img src="'.IMG.'img_html/helmet.png" alt="'.__('Troops').'" title="'.__('Troops').'"/>'?></td>
+      <td class="num"><?php echo l10n_number( $player_troops ).' <img src="'.IMG.'img_html/troops.png" alt="'.__('Troops').'" title="'.__('Troops').'"/>'?></td>
       <td></td>
       <td></td>
     </tr>
@@ -206,7 +206,7 @@
     echo '
     <tr>
       <td>'.($planned_order['origin']?'<a href="'.Page::get_url('show_territory', array('id' => $planned_order['origin']->id)).'">'.$planned_order['origin']->name.'</a>':'').'</td>
-      <td class="num">'.l10n_number( $planned_order['count'] ).' <img src="'.IMG.'img_html/helmet.png" alt="'.__('Troops').'" title="'.__('Troops').'"/></td>
+      <td class="num">'.l10n_number( $planned_order['count'] ).' <img src="'.IMG.'img_html/troops.png" alt="'.__('Troops').'" title="'.__('Troops').'"/></td>
       <td>'.($planned_order['destination']?'<a href="'.Page::get_url('show_territory', array('id' => $planned_order['destination']->id)).'">'.$planned_order['destination']->name.'</a>':'').'</td>
       <td>
         <form action="'.Page::get_url('order').'" method="post">
@@ -223,10 +223,29 @@
 <?php }else{?>
 <p><?php echo __("You don't have planned any order in this territory")?>
 <?php } ?>
+<h3>Issue an order</h3>
+<script>
+  $( function () {
+    $( ".orders" ).accordion({
+      collapsible: true,
+      header: "legend",
+      fillSpace: 0,
+      autoHeight: 0,
+      active: false
+    });
+  })
+</script>
+<div class="orders">
 <?php
     echo Player_Order::get_html_form_by_class(
       'move_troops',
       array('current_player' => $current_player, 'from_territory' => $territory),
+      array('id' => $territory->id )
+    );
+
+    echo Player_Order::get_html_form_by_class(
+      'move_troops',
+      array('current_player' => $current_player, 'from_territory' => $territory, 'future' => 1),
       array('id' => $territory->id )
     );
 
@@ -254,7 +273,7 @@
       array('id' => $territory->id )
     );
 ?>
-
+</div>
 <?php endif; //if( $is_current_turn && !$game->has_ended() )?>
 
 <?php if( !$is_ajax ) :?>
