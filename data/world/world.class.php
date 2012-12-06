@@ -288,16 +288,50 @@ class World extends World_Model {
     return $return;
   }
 
-  public function save( $flags = 0 ) {
-    $return = parent::save( $flags );
+  function get_territories_distances_from( Territory $source_territory ) {
+    $dijkstra = $this->get_shortest_paths_from($source_territory);
 
-    /*if( $return === true ) {
-        foreach( $this->territories as $territory ) {
-            $territory->world_id = $this->id;
-            $territory->save();
-        }
-    }*/
+    $territories = array();
+    foreach( $this->get_territories() as $territory ) {
+      if( $territory->is_passable() && $territory != $source_territory ) {
+        $territories[ $territory->id ] = $territory;
+      }
+    }
+
+    $return = array();
+    foreach( array_keys( $territories ) as $territory_id ) {
+      $current_territory_id = $territory_id;
+      $distance = 0;
+      do {
+        $previous_territory_id = $dijkstra[ $current_territory_id ];
+        $current_territory_id = $previous_territory_id;
+        $distance++;
+      }while( $current_territory_id != $source_territory->id );
+      $return[ $territory_id ] = $distance;
+    }
+
     return $return;
+  }
+
+  function get_shortest_paths_from( Territory $sourceTerritory ) {
+    $territories = array();
+    $links = array();
+
+    foreach( $this->get_territories() as $territory ) {
+      if( $territory->is_passable() ) {
+        $territories[ $territory->id ] = $territory;
+        foreach( $territory->get_territory_neighbour_list() as $territory_neighbour_row ) {
+          $neighbour = Territory::instance( $territory_neighbour_row['neighbour_id'] );
+          if( $neighbour->is_passable() ) {
+            $distance = Vertex::distance( $territory->get_centroid(), $neighbour->get_centroid() );
+            $links[ $territory->id ][ $neighbour->id ] = $distance + 10000;
+            $links[ $neighbour->id ][ $territory->id ] = $distance + 10000;
+          }
+        }
+      }
+    }
+
+    return $sourceTerritory->get_shortest_paths_to($territories, $links);
   }
 
   private function cache_draw( $filepath, $options = array(), $direct_output = false, $force = false ) {
@@ -527,12 +561,15 @@ class World extends World_Model {
       if( !isset($options[$key] ) ) $options[ $key ] = $value;
     }
 
+    if( $options['game_id'] !== null ) {
+        $game = Game::instance($options['game_id']);
+        if( $options['turn'] === null ) $options['turn'] = $game->current_turn;
+    }
+
     if( $options['territories'] === null ) {
       $options['territories'] = $this->get_territories();
 
       if( $options['game_id'] !== null ) {
-        $game = Game::instance($options['game_id']);
-        if( $options['turn'] === null ) $options['turn'] = $game->current_turn;
         $dir = 'cache/world/'.$this->id.'/game/'.$options['game_id'].'/';
         $filename = 'map_turn_'.$options['turn'].'_'.$options['size_x'].'x'.$options['size_y'].'_ratio_'.$options['ratio'].'.png';
       }else {
