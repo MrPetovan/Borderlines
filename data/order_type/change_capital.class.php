@@ -148,30 +148,32 @@ AND `territory_id` = '.mysql_ureal_escape_string($territory->id);
     $return = '
 <form action="'.Page::get_page_url( 'order' ).'" method="post">
   <fieldset>
-    <legend>'.$title.'</legend>';
+    <legend><img src="'.IMG.'img_html/capital_move.png" alt="" /> '.$title.'</legend>
+    <div class="content">';
     if( !isset($params['territory']) || $params['territory']->is_capturable() ) {
       $return .= '
-    <p>'.__('Moving your capital takes two turns, and may be cancelled if you don\'t own the territory on the execution turn').'</p>';
+      <p>'.__('Moving your capital takes two turns, and may be cancelled if you don\'t own the territory on the execution turn').'</p>';
       $return .= '
-    '.HTMLHelper::genererInputHidden('url_return', Page::get_page_url( $params['page_code'], true, $page_params ) );
+      '.HTMLHelper::genererInputHidden('url_return', Page::get_page_url( $params['page_code'], true, $page_params ) );
     if( isset( $params['territory'] ) ) {
       if( !isset( $territory_list[ $params['territory']->id ]) ) {
         $return .= '
-    <p>'.__('Warning : You don\'t own this territory right now').'</p>';
+      <p>'.__('Warning : You don\'t own this territory right now').'</p>';
       }
       $return .= '
-    '.HTMLHelper::genererInputHidden('parameters[territory_id]', $params['territory']->id);
+      '.HTMLHelper::genererInputHidden('parameters[territory_id]', $params['territory']->id);
     }else {
       $return .= '
-    <p>'.HTMLHelper::genererSelect( 'parameters[territory_id]', $territory_list, null, array(), __('Move capital to') ).'</p>';
+      <p>'.HTMLHelper::genererSelect( 'parameters[territory_id]', $territory_list, null, array(), __('Move capital to') ).'</p>';
       }
       $return .= '
-    <p>'.HTMLHelper::genererButton( 'action', 'change_capital', array('type' => 'submit'), __('Move, move, move !') ).'</p>';
+      <p>'.HTMLHelper::genererButton( 'action', 'change_capital', array('type' => 'submit'), __('Move, move, move !') ).'</p>';
     }else {
       $return .= '
-    <p>'.__('This territory is not suitable for capital move.').'</p>';
+      <p>'.__('This territory is not suitable for capital move.').'</p>';
     }
     $return .= '
+    </div>
   </fieldset>
 </form>';
 
