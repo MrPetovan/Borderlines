@@ -5,6 +5,7 @@
     <link rel="shortcut icon" type="image/x-icon" href="img/favicon.ico" />
     <link rel="icon" type="image/x-icon" href="img/favicon.ico" />
 
+    <link rel="stylesheet" type="text/css" href="<?php echo URL_ROOT ?>style/jquery-ui-latest.custom.min.css" media="all" />
     <link rel="stylesheet" type="text/css" href="<?php echo URL_ROOT ?>style/commun.css" media="all" />
     <link rel="stylesheet" type="text/css" href="<?php echo URL_ROOT ?>style/framework.css" media="all" />
     <link rel="stylesheet" type="text/css" href="<?php echo URL_ROOT ?>style/scramblednations.css" media="all" />
