@@ -7,6 +7,7 @@
   $nb_total = World::db_count_all(true);
 ?>
 <h2>Liste des Worlds</h2>
+<?php echo nav_page(PAGE_CODE, $nb_total, $page_no, $nb_per_page)?>
 <table class="table table-condensed table-striped table-hover">
   <thead>
     <tr>
@@ -42,6 +43,7 @@
 ?>
   </tbody>
 </table>
+<?php echo nav_page(PAGE_CODE, $nb_total, $page_no, $nb_per_page)?>
 <?php
   if( $current_player->can_create_world() ) {
     echo '
