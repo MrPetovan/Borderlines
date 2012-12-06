@@ -89,3 +89,9 @@ body.clean {
   overflow-y: scroll;
   margin-bottom: 10px;
 }
+
+.orders fieldset {
+  border: none;
+  padding: 0;
+  margin: 0;
+}
