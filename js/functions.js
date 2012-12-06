@@ -21,10 +21,20 @@ $(document).ready(function() {
     inst._clear();
   });
   $dialog.find('.close').click(function(){
-    $(this).parent().parent().hide();
+    $(this).parent().parent().remove();
   })
 
-  $('map area').each(function(){
+  if( game_id = getURLParameter('game_id') ) {
+    game_url = '&game_id=' + game_id;
+  }else {
+    game_url = '';
+  }
+  if( turn = getURLParameter('turn') ) {
+    turn_url = '&turn=' + turn;
+  }else {
+    turn_url = '';
+  }
+  $map.on('click','area',function(e) {
     $localdialog = $dialog
       .clone(true)
       .attr('id', 'dialog-' + $(this).attr('territory'))
@@ -43,24 +53,12 @@ $(document).ready(function() {
     $localdialog
       .find('h4 span').text($(this).attr('title'));
     $map.after($localdialog);
-  })
 
-  if( game_id = getURLParameter('game_id') ) {
-    game_url = '&game_id=' + game_id;
-  }else {
-    game_url = '';
-  }
-  if( turn = getURLParameter('turn') ) {
-    turn_url = '&turn=' + turn;
-  }else {
-    turn_url = '';
-  }
-  $map.on('click','area',function(e) {
-      $('#dialog-' + $(this).attr('territory'))
-        .css({'left': e.pageX, 'top': e.pageY - $map.position().top})
-        .show()
-        .find('iframe')
-        .attr('src', 'index.php?page=show_territory_ajax' + game_url + turn_url + '&id=' + $(this).attr('territory'));
+    $localdialog
+      .css({'left': e.pageX, 'top': e.pageY - $map.position().top})
+      .show()
+      .find('iframe')
+      .attr('src', '?page=show_territory_ajax' + game_url + turn_url + '&id=' + $(this).attr('territory'));
 
     return false;
   });
