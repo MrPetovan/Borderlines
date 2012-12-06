@@ -317,16 +317,7 @@ WHERE `game_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
                   $player->name . "'s troops backstabbed yours !",
                   $territory->id
                 );
-              }else {
-                $verb = 'killed';
               }
-              $this->set_player_history(
-                $player_row['player_id'],
-                $next_turn,
-                time(),
-                $player->name . "'s troops inflicted ".$damages.' damages to yours, inflicting '.round( $damages * $ratio ).' losses',
-                $territory->id
-              );
               $this->set_territory_player_troops_history($next_turn, $player_row['territory_id'], $player_row['player_id'], round( - $damages * $ratio ), 'Combat', $player->id);
             }
 
@@ -338,13 +329,6 @@ WHERE `game_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
                 "All of your ".$player_row['quantity']." troops have been killed",
                 $territory->id
               );
-            }else {
-              $this->set_player_history(
-                $player_row['player_id'],
-                $next_turn,
-                time(),
-                "You lost ".$total_losses." on ".$player_row['quantity']." troops in battle",
-                $territory->id);
             }
           }
 
@@ -423,16 +407,18 @@ WHERE `game_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
           foreach( $troops_list as $troops_row ) {
             $territory = Territory::instance($troops_row['territory_id']);
             $deserters = floor( $troops_row['quantity'] * $ratio_desertion );
-            $player->set_territory_player_troops_history($this->id, $next_turn, $troops_row['territory_id'], - $deserters, 'Desertion');
-            $this->set_player_history(
-              $player->id,
-              $next_turn,
-              time(),
-              $deserters." troops deserted",
-              $troops_row['territory_id']
-            );
-            // Recalculating ownership after desertion
-            $territory->compute_territory_owner( $this, $next_turn );
+            if( $deserters > 0 ) {
+              $player->set_territory_player_troops_history($this->id, $next_turn, $troops_row['territory_id'], - $deserters, 'Desertion');
+              $this->set_player_history(
+                $player->id,
+                $next_turn,
+                time(),
+                $deserters." troops deserted",
+                $troops_row['territory_id']
+              );
+              // Recalculating ownership after desertion
+              $territory->compute_territory_owner( $this, $next_turn );
+            }
           }
 
           $troops_maintenance = $revenue;
@@ -558,39 +544,6 @@ WHERE `ended` IS NULL";
     return self::sql_to_list( $sql );
   }
 
-  public function html_get_game_list_form() {
-    $turn_interval_list = array(
-      600 => "Crazy short - 10 min",
-      3600 => "Short - Hourly",
-      86400 => "Medium - Daily",
-      604800 => "Long - Weekly",
-    );
-
-    $options = $this->parameters;
-
-    $return = '
-    <fieldset>
-      <legend>'.__('Create a game !').'</legend>
-      '.HTMLHelper::genererInputHidden('id', $this->get_id()).'
-      <p class="field">'.HTMLHelper::genererInputText('name', $this->get_name(), array(), __('Name').'*').'</p>
-      <p class="field">'.HTMLHelper::genererSelect('turn_interval', $turn_interval_list, $this->get_turn_interval(), array(), __('Turn Interval').'*').'</p>
-      <p class="field">'.HTMLHelper::genererSelect('world_id', World::db_get_select_list(), $this->world_id, array(), __('World').'*').'</p>
-      <p class="field">'.HTMLHelper::genererInputText('turn_limit', $this->get_turn_limit(), array('title' => __('Game will stop after a fixed amount of turns')), __('Turn Limit').'*').'</p>
-      <p class="field">'.HTMLHelper::genererInputText('min_players', $this->get_min_players(), array('title' => __('Number of players required to automatically launch the game')), __('Minimum nb of players')).'</p>
-      <p class="field">'.HTMLHelper::genererInputText('max_players', $this->get_max_players(), array(), __('Maximum nb of players')).'</p>
-    </fieldset>
-    <fieldset>
-      <legend>'.__('Game options').'</legend>
-      <p class="field">'.HTMLHelper::genererInputText('parameters[HOME_TROOPS_MAINTENANCE]', $options['HOME_TROOPS_MAINTENANCE'], array(), __('Home troops cost')).'</p>
-      <p class="field">'.HTMLHelper::genererInputText('parameters[AWAY_TROOPS_MAINTENANCE]', $options['AWAY_TROOPS_MAINTENANCE'], array(), __('Away troops cost')).'</p>
-      <p class="field">'.HTMLHelper::genererInputText('parameters[RECRUIT_TROOPS_PRICE]', $options['RECRUIT_TROOPS_PRICE'], array(), __('Recruit troop price')).'</p>
-      <p class="field">'.HTMLHelper::genererInputText('parameters[TROOPS_EFFICACITY]', $options['TROOPS_EFFICACITY'], array(), __('Troops efficacity (1 damage/x troops)')).'</p>
-      <p class="field">'.HTMLHelper::genererInputCheckBox('parameters[ALLOW_JOIN_MIDGAME]', '0', $options['ALLOW_JOIN_MIDGAME'], array(), __('Allow players to join mid-game')).'</p>
-    </fieldset>';
-
-    return $return;
-  }
-
   public function add_player( Player $player ) {
     $return = false;
 
@@ -639,6 +592,93 @@ WHERE `ended` IS NULL";
       Page::add_message("Message failed to ".$player->name, Page::PAGE_MESSAGE_WARNING);
       Page::add_message(var_export( error_get_last(), 1 ), Page::PAGE_MESSAGE_WARNING);
     }
+  }
+
+  public function get_shortest_path( Territory $origin_territory, Territory $destination_territory, Player $player, $avoid_enemies = true ) {
+    $territories = array();
+    $links = array();
+
+    // TODO : Avoid enemies
+    if( $avoid_enemies ) {
+      $diplomacy = array( $player->id => true );
+      $diplomacy_list = $player->get_last_player_diplomacy_list( $this->id );
+      foreach( $diplomacy_list as $diplomacy_row ) {
+        $diplomacy[ $diplomacy_row['to_player_id'] ] = $diplomacy_row['status'] != 'Enemy';
+      }
+
+      $traversable = array();
+      $ownership_list = $this->get_territory_owner_list(null, $this->current_turn);
+      foreach( $ownership_list as $ownership_row ) {
+        $traversable[ $ownership_row['territory_id'] ] = $ownership_row['owner_id'] === null || $diplomacy[ $ownership_row['owner_id'] ];
+      }
+    }
+
+    $world = World::instance( $this->world_id );
+
+    foreach( $world->territories as $territory ) {
+      if( $territory->is_passable() && (!$avoid_enemies || $traversable[ $territory->id ]) ) {
+        $territories[ $territory->id ] = $territory;
+        foreach( $territory->get_territory_neighbour_list() as $territory_neighbour_row ) {
+          $neighbour = Territory::instance( $territory_neighbour_row['neighbour_id'] );
+          if( $neighbour->is_passable() && (!$avoid_enemies || $traversable[ $neighbour->id ]) ) {
+            $distance = Vertex::distance( $territory->get_centroid(), $neighbour->get_centroid() );
+            $links[ $territory->id ][ $neighbour->id ] = $distance + 10000;
+            $links[ $neighbour->id ][ $territory->id ] = $distance + 10000;
+          }
+        }
+      }
+    }
+
+
+    $shortest_path = $origin_territory->get_shortest_paths_to($territories, $links);
+
+    $current_territory_id = $destination_territory->id;
+
+    $path = array();
+    $i = 0;
+    do {
+      array_push( $path, $current_territory_id );
+
+      $current_territory_id = $shortest_path[ $current_territory_id ];
+    }while( $current_territory_id != $origin_territory->id && $i++ < 1000 );
+    $path = array_reverse($path);
+
+    unset( $shortest_path );
+
+    return $path;
+  }
+
+  public function html_get_game_list_form() {
+    $turn_interval_list = array(
+      600 => "Crazy short - 10 min",
+      3600 => "Short - Hourly",
+      86400 => "Medium - Daily",
+      604800 => "Long - Weekly",
+    );
+
+    $options = $this->parameters;
+
+    $return = '
+    <fieldset>
+      <legend>'.__('Create a game !').'</legend>
+      '.HTMLHelper::genererInputHidden('id', $this->get_id()).'
+      <p class="field">'.HTMLHelper::genererInputText('name', $this->get_name(), array(), __('Name').'*').'</p>
+      <p class="field">'.HTMLHelper::genererSelect('turn_interval', $turn_interval_list, $this->get_turn_interval(), array(), __('Turn Interval').'*').'</p>
+      <p class="field">'.HTMLHelper::genererSelect('world_id', World::db_get_select_list(), $this->world_id, array(), __('World').'*').'</p>
+      <p class="field">'.HTMLHelper::genererInputText('turn_limit', $this->get_turn_limit(), array('title' => __('Game will stop after a fixed amount of turns')), __('Turn Limit').'*').'</p>
+      <p class="field">'.HTMLHelper::genererInputText('min_players', $this->get_min_players(), array('title' => __('Number of players required to automatically launch the game')), __('Minimum nb of players')).'</p>
+      <p class="field">'.HTMLHelper::genererInputText('max_players', $this->get_max_players(), array(), __('Maximum nb of players')).'</p>
+    </fieldset>
+    <fieldset>
+      <legend>'.__('Game options').'</legend>
+      <p class="field">'.HTMLHelper::genererInputText('parameters[HOME_TROOPS_MAINTENANCE]', $options['HOME_TROOPS_MAINTENANCE'], array(), __('Home troops cost')).'</p>
+      <p class="field">'.HTMLHelper::genererInputText('parameters[AWAY_TROOPS_MAINTENANCE]', $options['AWAY_TROOPS_MAINTENANCE'], array(), __('Away troops cost')).'</p>
+      <p class="field">'.HTMLHelper::genererInputText('parameters[RECRUIT_TROOPS_PRICE]', $options['RECRUIT_TROOPS_PRICE'], array(), __('Recruit troop price')).'</p>
+      <p class="field">'.HTMLHelper::genererInputText('parameters[TROOPS_EFFICACITY]', $options['TROOPS_EFFICACITY'], array(), __('Troops efficacity (1 damage/x troops)')).'</p>
+      <p class="field">'.HTMLHelper::genererInputCheckBox('parameters[ALLOW_JOIN_MIDGAME]', '0', $options['ALLOW_JOIN_MIDGAME'], array(), __('Allow players to join mid-game')).'</p>
+    </fieldset>';
+
+    return $return;
   }
 
   // /CUSTOM
