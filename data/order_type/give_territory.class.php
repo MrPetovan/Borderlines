@@ -118,31 +118,33 @@ class Give_Territory extends Player_Order {
     $return = '
 <form action="'.Page::get_page_url( 'order' ).'" method="post">
   <fieldset>
-    <legend>'.$title.'</legend>';
+    <legend><img src="'.IMG.'img_html/territory_gift.png" alt="" /> '.$title.'</legend>
+    <div class="content">';
     if( !isset( $params['territory'] ) || count( $territory_select ) != 0 ) {
       $return .= HTMLHelper::genererInputHidden('url_return', Page::get_page_url( $params['page_code'], true, $page_params ) );
       if( isset( $params['territory'] ) ) {
         $return .= '
-    '.HTMLHelper::genererInputHidden('parameters[territory_id]', $params['territory']->id);
+      '.HTMLHelper::genererInputHidden('parameters[territory_id]', $params['territory']->id);
       }else {
         $return .= '
-    <p>'.HTMLHelper::genererSelect( 'parameters[territory_id]', $territory_select, null, array(), __('Give') ).'</p>';
+      <p>'.HTMLHelper::genererSelect( 'parameters[territory_id]', $territory_select, null, array(), __('Give') ).'</p>';
       }
       if( isset( $params['to_player'] ) ) {
         $return .= '
-    '.HTMLHelper::genererInputHidden('parameters[to_player_id]', $params['to_player']->id);
+      '.HTMLHelper::genererInputHidden('parameters[to_player_id]', $params['to_player']->id);
       }else {
         $return .= '
-    <p>'.HTMLHelper::genererSelect( 'parameters[to_player_id]', $player_select, null, array(), __('Give to') ).'</p>';
+      <p>'.HTMLHelper::genererSelect( 'parameters[to_player_id]', $player_select, null, array(), __('Give to') ).'</p>';
       }
 
     $return .= '
-    <p>'.HTMLHelper::genererButton( 'action', strtolower(__CLASS__), array('type' => 'submit'), __('Give territory') ).'</p>';
+      <p>'.HTMLHelper::genererButton( 'action', strtolower(__CLASS__), array('type' => 'submit'), __('Give territory') ).'</p>';
     }else {
       $return .= '
-    <p>'.__('You don\'t have any territory to give').'</p>';
+      <p>'.__('You don\'t have any territory to give').'</p>';
     }
     $return .= '
+    </div>
   </fieldset>
 </form>';
 
