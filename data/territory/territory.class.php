@@ -307,6 +307,34 @@ class Territory extends Territory_Model {
     return $return;
   }
 
+  public function get_shortest_paths_to( array $territories, array $neighbours ) {
+    $seenTerritories = array();
+    $distances[ $this->id ] = 0;
+    $previousTerritory = array();
+
+    // Dijkstra <3
+    $i = 0;
+    while( count( $seenTerritories ) != count( $territories ) && $i++ < count( $territories ) ) {
+      $currentTerritory = $territories[ get_key_for_minimum_value( $distances, $seenTerritories ) ];
+      $seenTerritories[ $currentTerritory->id ] = $currentTerritory;
+
+      if( isset( $neighbours[ $currentTerritory->id ] ) ) {
+        foreach( $neighbours[ $currentTerritory->id ] as $destinationTerritoryId => $weight ) {
+          if(
+            !isset( $distances[ $destinationTerritoryId ] )
+            || $distances[ $currentTerritory->id ] + $weight < $distances[ $destinationTerritoryId ]
+          ) {
+            $distances[ $destinationTerritoryId ] = $distances[ $currentTerritory->id ] + $weight;
+            $previousTerritory[ $destinationTerritoryId ] = $currentTerritory->id;
+          }
+        }
+      }
+    }
+    //var_debug( $this, $territories, $neighbours );die();
+
+    return $previousTerritory;
+  }
+
   public static function db_remove_by_world_id($world_id) {
     $sql = "
 DELETE FROM `".self::get_table_name()."`
