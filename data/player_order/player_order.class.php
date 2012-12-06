@@ -25,24 +25,26 @@ WHERE `game_id` = ".mysql_ureal_escape_string($game_id);
 SELECT `id` FROM `".self::get_table_name()."`
 WHERE `player_id` = ".mysql_ureal_escape_string($player_id)."
 AND `game_id` = ".mysql_ureal_escape_string($game_id)."
-AND `datetime_execution` IS NULL";
+AND `turn_executed` IS NULL";
     return self::sql_to_list($sql);
   }
 
-  public function plan( Order_Type $order_type, Player $player, $params = array(), $turn = null ) {
+  public function plan( Order_Type $order_type, Player $player, $params = array(), $turn = null, $player_order_id = null ) {
     if( is_null( $turn ) ) {
       $turn = $player->current_game->current_turn;
     }
     $this->order_type_id = $order_type->id;
     $this->player_id = $player->id;
     $this->game_id = $player->current_game->id;
-    $this->turn_ordered = $turn;
-    $this->turn_scheduled = $turn;
     $this->datetime_order = time();
-    $this->datetime_scheduled = time();
+    $this->turn_ordered = $player->current_game->current_turn;
+    $this->turn_scheduled = $turn;
     $this->parameters = $params;
+    $this->parent_player_order_id = $player_order_id;
 
-    return $this->save();
+    $return = $this->save();
+
+    return $return;
   }
 
   public function pre_execute() {}
@@ -51,7 +53,7 @@ AND `datetime_execution` IS NULL";
   public function cancel( ) {
     $return = false;
 
-    if( is_null( $this->datetime_execution ) || is_null( $this->turn_executed ) ) {
+    if( is_null( $this->turn_executed ) ) {
       $return = $this->db_delete();
     }
 
