@@ -106,25 +106,27 @@ class Quit_Game extends Player_Order {
     $return = '
 <form action="'.Page::get_page_url( 'order' ).'" method="post">
   <fieldset>
-    <legend>'.$title.'</legend>';
+    <legend><img src="'.IMG.'img_html/door_open.png" alt="" /> '.$title.'</legend>
+    <div class="content">';
     if( !isset( $params['territory'] ) || isset( $territory_list[ $params['territory']->id ]) ) {
       $return .= '
-    <p>Moving your capital takes two turns, and may be cancelled if you don\'t own the territory</p>
-    '.HTMLHelper::genererInputHidden('url_return', Page::get_page_url( $params['page_code'], true, $page_params ) );
+      <p>Moving your capital takes two turns, and may be cancelled if you don\'t own the territory</p>
+      '.HTMLHelper::genererInputHidden('url_return', Page::get_page_url( $params['page_code'], true, $page_params ) );
       if( isset( $params['territory'] ) ) {
         $return .= '
-    '.HTMLHelper::genererInputHidden('parameters[territory_id]', $params['territory']->id);
+      '.HTMLHelper::genererInputHidden('parameters[territory_id]', $params['territory']->id);
       }else {
         $return .= '
-    <p>'.HTMLHelper::genererSelect( 'parameters[territory_id]', $territory_list, null, array(), 'Move capital to' ).'</p>';
+      <p>'.HTMLHelper::genererSelect( 'parameters[territory_id]', $territory_list, null, array(), 'Move capital to' ).'</p>';
       }
       $return .= '
-    <p>'.HTMLHelper::genererButton( 'action', 'change_capital', array('type' => 'submit'), "Move, move, move !" ).'</p>';
+      <p>'.HTMLHelper::genererButton( 'action', 'change_capital', array('type' => 'submit'), "Move, move, move !" ).'</p>';
     }else {
       $return .= '
-    <p>You don\'t own this territory</p>';
+      <p>You don\'t own this territory</p>';
     }
     $return .= '
+    </div>
   </fieldset>
 </form>';
 
