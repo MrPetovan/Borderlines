@@ -10,13 +10,13 @@ class Player_Order_Model extends DBObject {
   protected $_order_type_id = null;
   protected $_player_id = null;
   protected $_datetime_order = null;
-  protected $_datetime_scheduled = null;
   protected $_datetime_execution = null;
   protected $_turn_ordered = null;
   protected $_turn_scheduled = null;
   protected $_turn_executed = null;
   protected $_parameters = null;
   protected $_return = null;
+  protected $_parent_player_order_id = null;
 
   public function __construct($id = null) {
     parent::__construct($id);
@@ -26,7 +26,6 @@ class Player_Order_Model extends DBObject {
   public static function get_table_name() { return "player_order"; }
 
   public function get_datetime_order()    { return guess_time($this->_datetime_order);}
-  public function get_datetime_scheduled()    { return guess_time($this->_datetime_scheduled);}
   public function get_datetime_execution()    { return guess_time($this->_datetime_execution);}
 
   /* MUTATEURS */
@@ -43,7 +42,6 @@ class Player_Order_Model extends DBObject {
     if( is_numeric($player_id) && (int)$player_id == $player_id) $data = intval($player_id); else $data = null; $this->_player_id = $data;
   }
   public function set_datetime_order($date) { $this->_datetime_order = guess_time($date, GUESS_DATE_MYSQL);}
-  public function set_datetime_scheduled($date) { $this->_datetime_scheduled = guess_time($date, GUESS_DATE_MYSQL);}
   public function set_datetime_execution($date) { $this->_datetime_execution = guess_time($date, GUESS_DATE_MYSQL);}
   public function set_turn_ordered($turn_ordered) {
     if( is_numeric($turn_ordered) && (int)$turn_ordered == $turn_ordered) $data = intval($turn_ordered); else $data = null; $this->_turn_ordered = $data;
@@ -56,6 +54,9 @@ class Player_Order_Model extends DBObject {
   }
   public function set_return($return) {
     if( is_numeric($return) && (int)$return == $return) $data = intval($return); else $data = null; $this->_return = $data;
+  }
+  public function set_parent_player_order_id($parent_player_order_id) {
+    if( is_numeric($parent_player_order_id) && (int)$parent_player_order_id == $parent_player_order_id) $data = intval($parent_player_order_id); else $data = null; $this->_parent_player_order_id = $data;
   }
 
   /* FONCTIONS SQL */
@@ -79,6 +80,13 @@ WHERE `order_type_id` = ".mysql_ureal_escape_string($order_type_id);
     $sql = "
 SELECT `id` FROM `".self::get_table_name()."`
 WHERE `player_id` = ".mysql_ureal_escape_string($player_id);
+
+    return self::sql_to_list($sql);
+  }
+  public static function db_get_by_parent_player_order_id($parent_player_order_id) {
+    $sql = "
+SELECT `id` FROM `".self::get_table_name()."`
+WHERE `parent_player_order_id` = ".mysql_ureal_escape_string($parent_player_order_id);
 
     return self::sql_to_list($sql);
   }
@@ -133,10 +141,6 @@ WHERE `player_id` = ".mysql_ureal_escape_string($player_id);
           HTMLHelper::genererTextArea( "datetime_order", parameters_to_string( $this->get_datetime_order() ), array(), "Datetime Order *" ):
           HTMLHelper::genererInputText( "datetime_order", $this->get_datetime_order(), array(), "Datetime Order *")).'
         </p>
-        <p class="field">'.(is_array($this->get_datetime_scheduled())?
-          HTMLHelper::genererTextArea( "datetime_scheduled", parameters_to_string( $this->get_datetime_scheduled() ), array(), "Datetime Scheduled *" ):
-          HTMLHelper::genererInputText( "datetime_scheduled", $this->get_datetime_scheduled(), array(), "Datetime Scheduled *")).'
-        </p>
         <p class="field">'.(is_array($this->get_datetime_execution())?
           HTMLHelper::genererTextArea( "datetime_execution", parameters_to_string( $this->get_datetime_execution() ), array(), "Datetime Execution" ):
           HTMLHelper::genererInputText( "datetime_execution", $this->get_datetime_execution(), array(), "Datetime Execution")).'
@@ -160,7 +164,14 @@ WHERE `player_id` = ".mysql_ureal_escape_string($player_id);
         <p class="field">'.(is_array($this->get_return())?
           HTMLHelper::genererTextArea( "return", parameters_to_string( $this->get_return() ), array(), "Return" ):
           HTMLHelper::genererInputText( "return", $this->get_return(), array(), "Return")).'
-        </p>
+        </p>';
+      $option_list = array(null => 'Pas de choix');
+      $player_order_list = Player_Order::db_get_all();
+      foreach( $player_order_list as $player_order)
+        $option_list[ $player_order->id ] = $player_order->name;
+
+      $return .= '
+      <p class="field">'.HTMLHelper::genererSelect('parent_player_order_id', $option_list, $this->get_parent_player_order_id(), array(), "Parent Player Order Id").'<a href="'.get_page_url('admin_player_order_mod').'">Créer un objet Player Order</a></p>
 
     </fieldset>';
 
@@ -180,9 +191,8 @@ WHERE `player_id` = ".mysql_ureal_escape_string($player_id);
       case 2 : $return = "Le champ <strong>Order Type Id</strong> est obligatoire."; break;
       case 3 : $return = "Le champ <strong>Player Id</strong> est obligatoire."; break;
       case 4 : $return = "Le champ <strong>Datetime Order</strong> est obligatoire."; break;
-      case 5 : $return = "Le champ <strong>Datetime Scheduled</strong> est obligatoire."; break;
-      case 6 : $return = "Le champ <strong>Turn Ordered</strong> est obligatoire."; break;
-      case 7 : $return = "Le champ <strong>Turn Scheduled</strong> est obligatoire."; break;
+      case 5 : $return = "Le champ <strong>Turn Ordered</strong> est obligatoire."; break;
+      case 6 : $return = "Le champ <strong>Turn Scheduled</strong> est obligatoire."; break;
       default: $return = "Erreur de saisie, veuillez vérifier les champs.";
     }
     return $return;
@@ -202,9 +212,8 @@ WHERE `player_id` = ".mysql_ureal_escape_string($player_id);
     $return[] = Member::check_compulsory($this->get_order_type_id(), 2, true);
     $return[] = Member::check_compulsory($this->get_player_id(), 3, true);
     $return[] = Member::check_compulsory($this->get_datetime_order(), 4);
-    $return[] = Member::check_compulsory($this->get_datetime_scheduled(), 5);
-    $return[] = Member::check_compulsory($this->get_turn_ordered(), 6, true);
-    $return[] = Member::check_compulsory($this->get_turn_scheduled(), 7, true);
+    $return[] = Member::check_compulsory($this->get_turn_ordered(), 5, true);
+    $return[] = Member::check_compulsory($this->get_turn_scheduled(), 6, true);
 
     $return = array_unique($return);
     if(($true_key = array_search(true, $return, true)) !== false) {

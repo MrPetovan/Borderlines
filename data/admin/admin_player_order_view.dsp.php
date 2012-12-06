@@ -48,10 +48,6 @@
               <span class="value"><?php echo guess_time($player_order->datetime_order, GUESS_DATETIME_LOCALE)?></span>
             </p>
             <p class="field">
-              <span class="libelle">Datetime Scheduled</span>
-              <span class="value"><?php echo guess_time($player_order->datetime_scheduled, GUESS_DATETIME_LOCALE)?></span>
-            </p>
-            <p class="field">
               <span class="libelle">Datetime Execution</span>
               <span class="value"><?php echo guess_time($player_order->datetime_execution, GUESS_DATETIME_LOCALE)?></span>
             </p>
@@ -74,7 +70,18 @@
             <p class="field">
               <span class="libelle">Return</span>
               <span class="value"><?php echo is_array($player_order->return)?nl2br(parameters_to_string( $player_order->return )):$player_order->return?></span>
-            </p>    </div>
+            </p>
+<?php
+      $option_list = array(null => 'Pas de choix');
+      $player_order_list = Player_Order::db_get_all();
+      foreach( $player_order_list as $player_order)
+        $option_list[ $player_order->id ] = $player_order->name;
+?>
+      <p class="field">
+        <span class="libelle">Parent Player Order Id</span>
+        <span class="value"><a href="<?php echo get_page_url('admin_player_order_view', true, array('id' => $player_order->parent_player_order_id ) )?>"><?php echo $option_list[ $player_order->parent_player_order_id ]?></a></span>
+      </p>
+    </div>
     <p><a href="<?php echo get_page_url('admin_player_order_mod', true, array('id' => $player_order->id))?>">Modifier cet objet Player Order</a></p>
 <?php
   // CUSTOM
