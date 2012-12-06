@@ -1007,4 +1007,12 @@ function which_os ()
     }
     return $hash;
   }
+
+  function get_key_for_minimum_value( $array, $exclusions = null ) {
+    if( !is_null( $exclusions ) ) {
+      $array = array_diff_key( $array, $exclusions );
+    }
+
+    return reset( array_keys( $array , min($array) ) );
+  }
 ?>
