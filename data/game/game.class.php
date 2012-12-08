@@ -292,8 +292,15 @@ WHERE `game_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
               if( !isset( $losses[ $defender_player_id ][ $attacker_row['player_id'] ] ) ) {
                 $losses[ $defender_player_id ][ $attacker_row['player_id'] ] = 0;
               }
+              // Backstabbing (defender consider attacker as an ally)
+              if( $diplomacy[ $defender_player_id ][ $attacker_row['player_id'] ] ) {
+                $attack_mul = 2;
+              }else {
+                $attack_mul = 1;
+              }
+
               $losses[ $defender_player_id ][ $attacker_row['player_id'] ] =
-                round($attacker_damages / count( $attacks[ $attacker_row['player_id'] ] ) );
+                round($attacker_damages * $attack_mul / count( $attacks[ $attacker_row['player_id'] ] ) );
             }
           }
 
