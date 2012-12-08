@@ -414,11 +414,14 @@ OR `guid1` = "'.$guid2.'" AND `guid2` = "'.$guid1.'")';
   }
 
   public function compute_territory_owner( Game $game, $turn ) {
-    $player_territories = $game->get_territory_player_troops_list($turn, $this->id);
+    $territory_player_troops_list = $game->get_territory_player_troops_list($turn, $this->id);
 
     $last_owner_id = null;
     $is_capital = false;
     $is_contested = false;
+
+    $player_supremacy = array();
+    $player_supremacy_troops = array();
 
     if( $turn > 0 ) {
       $last_owner_id = $this->get_owner( $game, $turn - 1 );
@@ -430,12 +433,12 @@ OR `guid1` = "'.$guid2.'" AND `guid2` = "'.$guid1.'")';
     // Default : ownership continues
     $owner_id = $last_owner_id;
 
-    if( count( $player_territories ) == 1 ) {
+    if( count( $territory_player_troops_list ) == 1 ) {
       if( $last_owner_id === null ) {
         // Empty territory
-        $owner_id = $player_territories[0]['player_id'];
+        $owner_id = $territory_player_troops_list[0]['player_id'];
       }else {
-        $invader = Player::instance( $player_territories[0]['player_id'] );
+        $invader = Player::instance( $territory_player_troops_list[0]['player_id'] );
         $player_diplomacy_list = $invader->get_last_player_diplomacy_list($game->id);
 
         // If invader marked the previous owner as enemy, he captures the territory
@@ -445,21 +448,34 @@ OR `guid1` = "'.$guid2.'" AND `guid2` = "'.$guid1.'")';
           }
         }
       }
+      $this->set_territory_player_status(
+        $game->id,
+        $turn,
+        $territory_player_troops_list[0]['player_id'],
+        1
+      );
     }else {
       $all_allies = true;
       $all_allies_with_owner = true;
 
-      foreach( $player_territories as $player_territory_from ) {
+      foreach( $territory_player_troops_list as $player_territory_from ) {
         /* @var $player_from Player */
         $player_from = Player::instance( $player_territory_from['player_id'] );
 
+        $troops[ $player_territory_from['player_id'] ] = $player_territory_from['quantity'];
+        $player_supremacy_troops[ $player_territory_from['player_id'] ] = $player_territory_from['quantity'];
+
         $player_diplomacy_list = $player_from->get_last_player_diplomacy_list($game->id);
 
-        foreach( $player_territories as $player_territory_to ) {
+        foreach( $territory_player_troops_list as $player_territory_to ) {
           foreach( $player_diplomacy_list as $key => $player_diplomacy ) {
             if( $player_diplomacy['to_player_id'] == $player_territory_to['player_id'] ) {
               if( $player_diplomacy['status'] == 'Enemy' ) {
+                $player_supremacy_troops[ $player_territory_from['player_id'] ] -= $player_territory_to['quantity'];
                 $all_allies = false;
+              }
+              if( $player_diplomacy['status'] == 'Ally' ) {
+                $player_supremacy_troops[ $player_territory_from['player_id'] ] += $player_territory_to['quantity'];
               }
             }
           }
@@ -477,8 +493,15 @@ OR `guid1` = "'.$guid2.'" AND `guid2` = "'.$guid1.'")';
         if($last_owner_id === null || !$all_allies_with_owner ) {
           $troops = array();
 
-          foreach( $player_territories as $player_territory ) {
+          foreach( $territory_player_troops_list as $player_territory ) {
             $troops[ $player_territory['player_id'] ] = $player_territory['quantity'];
+
+            $this->set_territory_player_status(
+              $game->id,
+              $turn,
+              $player_territory['player_id'],
+              1
+            );
           }
 
           // Previous owner wiped out or empty territory
@@ -491,9 +514,26 @@ OR `guid1` = "'.$guid2.'" AND `guid2` = "'.$guid1.'")';
             $owner_id = $player_id;
           }
         }
+
+        foreach( $player_supremacy_troops as $player_id => $supremacy_score ) {
+          $this->set_territory_player_status(
+            $game->id,
+            $turn,
+            $player_id,
+            $supremacy_score >= 0?1:0
+          );
+        }
       }else {
         // Contested territory
         $is_contested = true;
+        foreach( $player_supremacy_troops as $player_id => $supremacy_score ) {
+          $this->set_territory_player_status(
+            $game->id,
+            $turn,
+            $player_id,
+            $supremacy_score >= 0?1:0
+          );
+        }
       }
     }
 

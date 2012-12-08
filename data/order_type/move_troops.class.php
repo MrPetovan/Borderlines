@@ -457,18 +457,45 @@ class Move_Troops extends Player_Order {
   }
 
   public static function check_move(Territory $from_territory, Territory $to_territory, Player $player, Game $game) {
-    // Retreat only computing : troops in enemy territory can't move to another enemy territory
-    $allow_move = !$from_territory->is_contested( $game );
-    // Owning target territory or territory empty = pass
+    // Retreat only computing : troops with no supremacy can't move to another enemy territory
+    $supremacy_from_list = $from_territory->get_territory_player_status_list($game->id, $game->current_turn, $player->id);
+
+    $allow_move = count( $supremacy_from_list ) == 0 || $supremacy_from_list[0]['supremacy'] == 1;
+    // Owning target territory = pass
     if( !$allow_move ) {
       $to_owner_id = $to_territory->get_owner( $game );
-      $allow_move = $to_owner_id === null || $to_owner_id == $player->id;
+      $allow_move = $to_owner_id == $player->id;
+    }
+    // Having the supremacy in target territory = pass
+    if( !$allow_move ) {
+      $supremacy_to_list = $to_territory->get_territory_player_status_list($game->id, $game->current_turn);
+      $supremacy_to = array();
+      foreach( $supremacy_to_list as $supremacy_to_row ) {
+        $supremacy_to[ $supremacy_to_row['player_id'] ] = $supremacy_to_row['supremacy'];
+      }
+
+      $allow_move = isset($supremacy_to[ $player->id ]) && $supremacy_to[ $player->id ] == 1;
+    }
+    // Empty territory (sea, neutral) = supremacy check
+    if( !$allow_move && $to_owner_id === null ) {
+      $supremacists = array_keys( $supremacy_to, 1 );
+      if( count( $supremacists ) ) {
+        $diplomacy_list = $player->get_last_player_diplomacy_list($game->id);
+        foreach( $diplomacy_list as $diplomacy_row ) {
+          if( $diplomacy_row['status'] == 'Ally' && in_array( $diplomacy_row['to_player_id'], $supremacists ) ) {
+            $allow_move = true;
+          }
+        }
+      }else {
+        $allow_move = true;
+      }
     }
     // Marking target territory player as ally = pass
     if( !$allow_move  ) {
       $player_diplomacy = array_pop( $player->get_player_diplomacy_list($game->id, null, $to_owner_id) );
       $allow_move = $player_diplomacy['status'] == 'Ally';
     }
+
     return $allow_move;
   }
 }

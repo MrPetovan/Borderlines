@@ -106,6 +106,13 @@
     $current_turn = null;
     $player_troops = 0;
 
+    $territory_player_status_list = $current_game->get_territory_player_status_list(null, $territory->id);
+
+    $supremacy = array();
+    foreach( $territory_player_status_list as $territory_player_status_row ) {
+      $supremacy[ $territory_player_status_row['turn'] ][ $territory_player_status_row['player_id'] ] = $territory_player_status_row['supremacy'];
+    }
+
     foreach( $current_game->get_territory_player_troops_list( null, $territory->id ) as $territory_player_troops ) {
       /* @var $player Player */
       $player = Player::instance( $territory_player_troops['player_id'] );
@@ -143,7 +150,8 @@
       echo '
     <tr>
       <td><a href="'.Page::get_url('show_player', array('id' => $player->id)).'">'.$player->name.'</a></td>
-      <td colspan="2" class="num">'.l10n_number( $territory_player_troops['quantity'] ).' <img src="'.IMG.'img_html/troops.png" alt="'.__('Troops').'" title="'.__('Troops').'"/></td>
+      <td class="num">'.(!isset( $supremacy[$current_turn][$player->id] ) || $supremacy[$current_turn][$player->id]?__('Supremacy').' <img src="'.IMG.'img_html/lightning.png" alt=""/>':__('Retreat').' <img src="'.IMG.'img_html/link_break.png" alt=""/>'). '</td>
+      <td class="num">' . l10n_number( $territory_player_troops['quantity'] ).' <img src="'.IMG.'img_html/troops.png" alt="'.__('Troops').'" title="'.__('Troops').'"/></td>
     </tr>';
     }
 ?>
