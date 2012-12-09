@@ -32,16 +32,16 @@
     foreach( $territory_player_troops_list as $territory_player_troops_row ) {
       $player_troops[ $territory_player_troops_row['player_id'] ] += $territory_player_troops_row['quantity'];
     }
-    $territory_owner_list = $game->get_territory_owner_list(null, $game->current_turn);
+    $territory_status_list = $game->get_territory_status_list(null, $game->current_turn);
 
-    foreach( $territory_owner_list as $territory_owner_row ) {
-      if( $territory_owner_row['owner_id'] ) {
-        $territory = Territory::instance( $territory_owner_row['territory_id'] );
+    foreach( $territory_status_list as $territory_status_row ) {
+      if( $territory_status_row['owner_id'] ) {
+        $territory = Territory::instance( $territory_status_row['territory_id'] );
 
-        if( isset( $player_area[ 'player_' . $territory_owner_row['owner_id'] ] )) {
-          $player_area[ 'player_' . $territory_owner_row['owner_id'] ] += $territory->area;
+        if( isset( $player_area[ 'player_' . $territory_status_row['owner_id'] ] )) {
+          $player_area[ 'player_' . $territory_status_row['owner_id'] ] += $territory->area;
         }else {
-          $player_area[ 'player_' . $territory_owner_row['owner_id'] ] = $territory->area;
+          $player_area[ 'player_' . $territory_status_row['owner_id'] ] = $territory->area;
         }
       }
     }

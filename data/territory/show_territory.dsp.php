@@ -93,16 +93,16 @@
   <tbody>
 <?php
     foreach( $neighbour_list as $neighbour ) {
-      $territory_owner_row = array_pop( $neighbour->get_territory_owner_list( $current_game->id, $turn ) );
-      if( $territory_owner_row['owner_id'] !== null ) {
-        $territory_owner = Player::instance($territory_owner_row['owner_id']);
+      $territory_status_row = array_pop( $neighbour->get_territory_status_list( $current_game->id, $turn ) );
+      if( $territory_status_row['owner_id'] !== null ) {
+        $territory_owner = Player::instance($territory_status_row['owner_id']);
       }
       echo '
     <tr>
       <td><a href="'.Page::get_url('show_territory', array_merge( $territory_params, array('id' => $neighbour->id) )).'">'.$neighbour->name.'</a></td>
       <td>'.l10n_number( $neighbour->get_area() ).' km²</td>
-      <td>'.($territory_owner_row['owner_id']?'<a href="'.Page::get_url('show_player', array('id' => $territory_owner->id)).'">'.$territory_owner->name.'</a>':__('Nobody')).'</td>
-      <td>'.($territory_owner_row['contested']?__('Contested'):__('Stable')).'</td>
+      <td>'.($territory_status_row['owner_id']?'<a href="'.Page::get_url('show_player', array('id' => $territory_owner->id)).'">'.$territory_owner->name.'</a>':__('Nobody')).'</td>
+      <td>'.($territory_status_row['contested']?__('Contested'):__('Stable')).'</td>
     </tr>';
     }
 ?>

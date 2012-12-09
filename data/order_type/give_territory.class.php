@@ -18,8 +18,8 @@ class Give_Territory extends Player_Order {
       if( $territory->id == $parameters['territory_id'] && $to_player->id == $parameters['to_player_id'] ) {
         $owner = $territory->get_owner( $player->current_game, $player->current_game->current_turn + 1 );
         if( $owner == $player ) {
-          $territory_owner_list = array_pop( $territory->get_territory_owner_list($player->current_game->id, $player->current_game->current_turn + 1) );
-          $territory->set_territory_owner($player->current_game->id, $player->current_game->current_turn + 1, $parameters['to_player_id'], $territory_owner_list['contested'], 0);
+          $territory_status_row = array_pop( $territory->get_territory_status_list($player->current_game->id, $player->current_game->current_turn + 1) );
+          $territory->set_territory_status($player->current_game->id, $player->current_game->current_turn + 1, $parameters['to_player_id'], $territory_status_row['contested'], 0, $territory_status_row['economic_ratio']);
 
           if( $parameters['to_player_id'] === null ) {
             $message = 'You successfully left the territory';
@@ -95,13 +95,13 @@ class Give_Territory extends Player_Order {
 
     $territory_select = array();
     if( !isset( $params['territory'] )  ) {
-      $territory_owner_list = $game->get_territory_owner_list(null, $game->current_turn, $params['current_player']->id);
-      foreach( $territory_owner_list as $territory_owner_row ) {
-        $territory = Territory::instance( $territory_owner_row['territory_id'] );
+      $territory_status_list = $game->get_territory_status_list(null, $game->current_turn, $params['current_player']->id);
+      foreach( $territory_status_list as $territory_status_row ) {
+        $territory = Territory::instance( $territory_status_row['territory_id'] );
         $territory_select[ $territory->id ] = $territory->name;
       }
     }else {
-      $territory_select = $game->get_territory_owner_list($params['territory']->id, $game->current_turn, $params['current_player']->id);
+      $territory_select = $game->get_territory_status_list($params['territory']->id, $game->current_turn, $params['current_player']->id);
     }
 
     $player_select = array(

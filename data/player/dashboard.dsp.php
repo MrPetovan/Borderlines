@@ -212,11 +212,11 @@
   $troops_home = 0;
   $troops_away = 0;
   $troops_list = $current_game->get_territory_player_troops_list($current_game->current_turn, null, $current_player->id);
-  $territory_owner_list = $current_game->get_territory_owner_list(null, $current_game->current_turn, $current_player->id);
+  $territory_status_list = $current_game->get_territory_status_list(null, $current_game->current_turn, $current_player->id);
   foreach( $troops_list as $territory_player_troops_row ) {
     $is_home = false;
 
-    foreach( $territory_owner_list as $territory_previous_owner_row ) {
+    foreach( $territory_status_list as $territory_previous_owner_row ) {
       if( $territory_previous_owner_row['territory_id'] == $territory_player_troops_row['territory_id'] ) {
         $is_home = true;
         break;

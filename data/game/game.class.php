@@ -80,7 +80,7 @@ GROUP BY
       $return = count( $this->get_game_player_list() ) < $this->max_players;
     }
     if( $return && $this->started ) {
-      $return = $options['ALLOW_JOIN_MIDGAME'] && count( $this->get_territory_owner_list(null, $this->current_turn, false) ) >= 5;
+      $return = $options['ALLOW_JOIN_MIDGAME'] && count( $this->get_territory_status_list(null, $this->current_turn, false) ) >= 5;
     }
 
     return $return;
@@ -101,7 +101,7 @@ GROUP BY
     return ($this->current_turn >= $this->turn_limit);
   }
 
-  public function get_territory_owner_list($territory_id = null, $turn = null, $owner_id = null) {
+  public function get_territory_status_list($territory_id = null, $turn = null, $owner_id = null) {
     $where = '';
     if( ! is_null( $territory_id )) $where .= '
 AND `territory_id` = '.mysql_ureal_escape_string($territory_id);
@@ -118,7 +118,7 @@ AND `owner_id` = '.mysql_ureal_escape_string($owner_id);
     }
 
     $sql = '
-SELECT `territory_id`, `game_id`, `turn`, `owner_id`, `contested`, `capital`
+SELECT `territory_id`, `game_id`, `turn`, `owner_id`, `contested`, `capital`, `economy_ratio`
 FROM `territory_status`
 WHERE `game_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
     $res = mysql_uquery($sql);
@@ -253,8 +253,8 @@ WHERE `game_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
       // Updating territories ownership and battle on contested territories
       foreach( $territories as $territory ) {
         /* @var $territory Territory */
-        $territory->compute_territory_owner( $this, $current_turn );
-        $territory->compute_territory_owner( $this, $next_turn );
+        $territory->compute_territory_status( $this, $current_turn );
+        $territory->compute_territory_status( $this, $next_turn );
 
         if( $territory->is_contested( $this, $next_turn ) ) {
           // Diplomacy checking and parties forming
@@ -342,7 +342,7 @@ WHERE `game_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
           }
 
           // Recalculating ownership after battle
-          $territory->compute_territory_owner( $this, $next_turn );
+          $territory->compute_territory_status( $this, $next_turn );
         }
       }
 
@@ -355,11 +355,11 @@ WHERE `game_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
       // Revenues and recruit
       foreach( $player_list as $player ) {
         $area = 0;
-        $territory_previous_owner_list = $player->get_territory_owner_list(null, $this->id, $current_turn);
-        foreach( $territory_previous_owner_list as $territory_owner_row ) {
+        $territory_previous_owner_list = $player->get_territory_status_list(null, $this->id, $current_turn);
+        foreach( $territory_previous_owner_list as $territory_status_row ) {
 
-          if( !$territory_owner_row['contested'] ) {
-            $territory = Territory::instance($territory_owner_row['territory_id']);
+          if( !$territory_status_row['contested'] ) {
+            $territory = Territory::instance($territory_status_row['territory_id']);
             $area += $territory->get_area();
           }
         }
@@ -426,7 +426,7 @@ WHERE `game_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
                 $troops_row['territory_id']
               );
               // Recalculating ownership after desertion
-              $territory->compute_territory_owner( $this, $next_turn );
+              $territory->compute_territory_status( $this, $next_turn );
             }
           }
 
@@ -552,12 +552,12 @@ WHERE `ended` IS NULL";
     if( $this->can_join( $player ) ) {
       $this->set_game_player( $player->id, -1 );
       if( $this->started ) {
-        $empty_territories = $this->get_territory_owner_list(null, $this->current_turn, false);
+        $empty_territories = $this->get_territory_status_list(null, $this->current_turn, false);
 
         do {
           shuffle( $empty_territories );
-          $empty_territory_owner_row = array_pop( $empty_territories );
-          $starting_territory = Territory::instance($empty_territory_owner_row['territory_id']);
+          $empty_territory_status_row = array_pop( $empty_territories );
+          $starting_territory = Territory::instance($empty_territory_status_row['territory_id']);
         }while( !$starting_territory->is_capturable() );
 
         $this->bootstrap_player( $player, $starting_territory->id );
@@ -585,7 +585,7 @@ WHERE `ended` IS NULL";
     }
 
     $this->set_territory_player_troops_history($this->current_turn, $territory_id, $player->id, 1000, 'Init');
-    $this->set_territory_owner($territory_id, $this->current_turn, $player->id, 0, 1);
+    $this->set_territory_status($territory_id, $this->current_turn, $player->id, 0, 1, 1);
 
     $member = Member::instance( $player->member_id );
     if( php_mail($member->email, SITE_NAME." | Game started", $player->get_email_game_new_turn( $this ), true)) {
@@ -609,7 +609,7 @@ WHERE `ended` IS NULL";
       }
 
       $traversable = array();
-      $ownership_list = $this->get_territory_owner_list(null, $this->current_turn);
+      $ownership_list = $this->get_territory_status_list(null, $this->current_turn);
       foreach( $ownership_list as $ownership_row ) {
         $traversable[ $ownership_row['territory_id'] ] = $ownership_row['owner_id'] === null || $diplomacy[ $ownership_row['owner_id'] ];
       }

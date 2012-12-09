@@ -360,15 +360,15 @@ OR `guid1` = "'.$guid2.'" AND `guid2` = "'.$guid1.'")';
       $turn = $game->current_turn;
     }
 
-    $territory_owner_list = $this->get_territory_owner_list( $game->id, $turn );
+    $territory_status_list = $this->get_territory_status_list( $game->id, $turn );
 
-    if( count( $territory_owner_list ) ) {
-      $territory_owner_row = array_shift( $territory_owner_list );
+    if( count( $territory_status_list ) ) {
+      $territory_status_row = array_shift( $territory_status_list );
     }else {
-      $territory_owner_row = $this->compute_territory_owner( $game, $turn );
+      $territory_status_row = $this->compute_territory_status( $game, $turn );
     }
 
-    $return = $territory_owner_row['owner_id'];
+    $return = $territory_status_row['owner_id'];
 
     return Player::instance( $return );
   }
@@ -380,15 +380,15 @@ OR `guid1` = "'.$guid2.'" AND `guid2` = "'.$guid1.'")';
       $turn = $game->current_turn;
     }
 
-    $territory_owner_list = $this->get_territory_owner_list( $game->id, $turn );
+    $territory_status_list = $this->get_territory_status_list( $game->id, $turn );
 
-    if( count( $territory_owner_list ) ) {
-      $territory_owner_row = array_shift( $territory_owner_list );
+    if( count( $territory_status_list ) ) {
+      $territory_status_row = array_shift( $territory_status_list );
     }else {
-      $territory_owner_row = $this->compute_territory_owner( $game, $turn );
+      $territory_status_row = $this->compute_territory_status( $game, $turn );
     }
 
-    $return = $territory_owner_row['contested'] == 1;
+    $return = $territory_status_row['contested'] == 1;
 
     return $return;
   }
@@ -400,20 +400,20 @@ OR `guid1` = "'.$guid2.'" AND `guid2` = "'.$guid1.'")';
       $turn = $game->current_turn;
     }
 
-    $territory_owner_list = $this->get_territory_owner_list( $game->id, $turn );
+    $territory_status_list = $this->get_territory_status_list( $game->id, $turn );
 
-    if( count( $territory_owner_list ) ) {
-      $territory_owner_row = array_shift( $territory_owner_list );
+    if( count( $territory_status_list ) ) {
+      $territory_status_row = array_shift( $territory_status_list );
     }else {
-      $territory_owner_row = $this->compute_territory_owner( $game, $turn );
+      $territory_status_row = $this->compute_territory_status( $game, $turn );
     }
 
-    $return = $territory_owner_row['capital'] == 1;
+    $return = $territory_status_row['capital'] == 1;
 
     return $return;
   }
 
-  public function compute_territory_owner( Game $game, $turn = null ) {
+  public function compute_territory_status( Game $game, $turn = null ) {
     if( is_null( $turn ) ) {
       $turn = $game->current_turn;
     }
@@ -429,8 +429,8 @@ OR `guid1` = "'.$guid2.'" AND `guid2` = "'.$guid1.'")';
     if( $turn > 0 ) {
       $last_owner = $this->get_owner( $game, $turn - 1 );
 
-      $territory_owner_list = $this->get_territory_owner_list( $game->id, $turn - 1 );
-      $is_capital = $territory_owner_list[0]['capital'] == 1;
+      $territory_status_list = $this->get_territory_status_list( $game->id, $turn - 1 );
+      $is_capital = $territory_status_list[0]['capital'] == 1;
     }
 
     // Default : ownership continues
@@ -539,7 +539,7 @@ OR `guid1` = "'.$guid2.'" AND `guid2` = "'.$guid1.'")';
       // In case of changed owner, reset the capital state
       $is_capital = $is_capital && ($last_owner->id == $new_owner->id);
     }
-    $this->set_territory_owner($game->id, $turn, $new_owner->id, $is_contested?1:0, $is_capital?1:0);
+    $this->set_territory_status($game->id, $turn, $new_owner->id, $is_contested?1:0, $is_capital?1:0);
 
     $return = array('owner_id' => $new_owner->id, 'contested' => $is_contested, 'capital' => $is_capital);
 
@@ -551,9 +551,9 @@ OR `guid1` = "'.$guid2.'" AND `guid2` = "'.$guid1.'")';
       $turn = $game->current_turn;
     }
     $return = null;
-    $territory_owner = $this->get_owner( $game, $turn );
-    if( $territory_owner->id !== null ) {
-      $capital = $territory_owner->get_capital( $game, $turn );
+    $territory_status = $this->get_owner( $game, $turn );
+    if( $territory_status->id !== null ) {
+      $capital = $territory_status->get_capital( $game, $turn );
       $distance = null;
       if( $capital->id !== null ) {
         $return = Vertex::distance( $capital->get_centroid(), $this->get_centroid() );

@@ -24,7 +24,7 @@
         'notready'                          => array(),
         'get_game_player_list'              => array('[game_id]' => 'Game Id (optional)'),
         'get_territory_summary'             => array('[turn]' => 'Turn (optional)'),
-        'get_territory_owner_list'          => array('[turn]' => 'Turn (optional)'),
+        'get_territory_status_list'          => array('[turn]' => 'Turn (optional)'),
         'get_territory_player_troops_list'  => array('[turn]' => 'Turn (optional)'),
         'get_player_history_list'           => array(),
         'get_shout_list'                    => array('[game_related]' => 'Game related (optional)'),
@@ -179,13 +179,13 @@
           }
           break;
         }
-        case 'get_territory_owner_list' : {
+        case 'get_territory_status_list' : {
           if( !$turn = getValue('turn') ) {
             $turn = $current_game->current_turn;
           }
           if( $current_game->id ) {
             $success = true;
-            $content = $current_player->get_territory_owner_list(null, $current_game->id, $turn);
+            $content = $current_player->get_territory_status_list(null, $current_game->id, $turn);
           }
           break;
         }

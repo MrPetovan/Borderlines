@@ -123,11 +123,11 @@ AND `territory_id` = '.mysql_ureal_escape_string($territory->id);
 
     $game = $params['current_player']->current_game;
 
-    $territory_owner_list = $current_player->get_territory_owner_list(null, $game->id, $game->current_turn);
+    $territory_status_list = $current_player->get_territory_status_list(null, $game->id, $game->current_turn);
 
     $territory_list = array();
-    foreach( $territory_owner_list as $territory_owner_row ) {
-      $territory = Territory::instance( $territory_owner_row['territory_id'] );
+    foreach( $territory_status_list as $territory_status_row ) {
+      $territory = Territory::instance( $territory_status_row['territory_id'] );
       $territory_list[ $territory->id ] = $territory->name;
     }
 
