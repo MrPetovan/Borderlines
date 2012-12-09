@@ -239,14 +239,14 @@ ORDER BY `CONSTRAINT_NAME`";
   echo '<p>'.count( $unchanged_file_list ).' files unchanged</p>';
 
   // Sauvegarde de la structure de la base
-  $command = MYSQLDUMP_PATH.'mysqldump --no-data --host="'.DB_HOST.'" --user="'.DB_USER.'" --password="'.DB_PASS.'" "'.DB_BASE.'" 2>&1 > "'.DATA.'database_structure_'.date('Ymd').'.sql"';
+  $command = MYSQLDUMP_PATH.'mysqldump --no-data --host="'.DB_HOST.'" --user="'.DB_USER.'" --password="'.DB_PASS.'" "'.DB_BASE.'" 2>&1 > "'.DIR_ROOT.'archive/database_structure_'.date('Ymd').'.sql"';
   $return_var = null;
   $output = array();
   exec( $command, $output, $return_var );
 
   if( $return_var === 0 ) {
     echo '
-    <p>Database structure saved in '.DATA.'database_structure_'.date('Ymd').'.sql</p>';
+    <p>Database structure saved in '.DIR_ROOT.'archive/database_structure_'.date('Ymd').'.sql</p>';
   }else {
     echo '<p>Error while saving database structure</p>
     <p>'.implode('<br/>', $output).'</p>';
