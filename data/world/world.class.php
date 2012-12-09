@@ -418,29 +418,29 @@ class World extends World_Model {
       }
 
       if( $game_id !== null ) {
-        $owner_id = $area->get_owner( $game, $turn );
-        $territory_owner[ $area->id ] = $owner_id;
+        $owner = $area->get_owner( $game, $turn );
+        $territory_owner[ $area->id ] = $owner->id;
       }
 
       // Territory fill
       if( $area->background === null ) {
         $color = $black;
         if( $game_id !== null) {
-          if( $owner_id ) {
-            $color = imagecolortoalpha( $img, $player_colors[ $player_color_index[ $owner_id ] ], 85);
+          if( $owner->id ) {
+            $color = imagecolortoalpha( $img, $player_colors[ $player_color_index[ $owner->id ] ], 85);
           }
           $is_capital = $area->is_capital($game, $turn);
           $is_contested = $area->is_contested($game, $turn);
 
-          if( $owner_id && $is_capital ) {
-            $color = imagecolortoalpha( $img, $player_colors[ $player_color_index[ $owner_id ] ], 42);
+          if( $owner->id && $is_capital ) {
+            $color = imagecolortoalpha( $img, $player_colors[ $player_color_index[ $owner->id ] ], 42);
             imagefilledpolygon( $img, $polygon, count( $area->vertices ), $color );
           }
           if( $area->is_contested($game, $turn) ) {
             // Conflict overlay
-            if( $owner_id ) {
+            if( $owner->id ) {
               if( !$is_capital ) {
-                $color = imagecolortoalpha( $img, $player_colors[ $player_color_index[ $owner_id ] ], 85);
+                $color = imagecolortoalpha( $img, $player_colors[ $player_color_index[ $owner->id ] ], 85);
                 imagefilledpolygon( $img, $polygon, count( $area->vertices ), $color );
               }
               $tile_contested = imagecreatefrompng( DIR_ROOT.'img/img_css/conflict.png');
@@ -469,9 +469,9 @@ class World extends World_Model {
       if( $area->background !== 'sea' ) {
         $color = $white;
         if( $game_id !== null ) {
-          $owner_id = $territory_owner[ $area->id ];
-          if( $owner_id ) {
-            $color = $player_colors[ $player_color_index[ $owner_id ] ];
+          $owner->id = $territory_owner[ $area->id ];
+          if( $owner->id ) {
+            $color = $player_colors[ $player_color_index[ $owner->id ] ];
           }
         }
 
@@ -618,17 +618,14 @@ class World extends World_Model {
           $coords[] = round(( $vertex->x - $offset_x ) * $ratio ).','. round(($size_y - ($vertex->y - $offset_y)) * $ratio);
         }
         if( $game_id ) {
-          $owner_id = $territory->get_owner( $game, $turn );
-          if( $owner_id != null ) {
-            $owner = Player::instance($owner_id);
-          }
+          $owner = $territory->get_owner( $game, $turn );
           echo '
         <area
           territory="'.$territory->id.'"
           shape="polygon"
           coords="'.implode(',', $coords).'"
           href="'.Page::get_url('show_territory', array('id' => $territory->id)).'"
-          title="'.$territory->name.' ('.($owner_id?$owner->name:__('Nobody')).')'.
+          title="'.$territory->name.' ('.($owner->id?$owner->name:__('Nobody')).')'.
                   ($territory->is_capital( $game, $turn )?' ['.__('Capital').']':'').
                   ($territory->is_contested( $game, $turn )?' <'.__('Contested').'>':'').
                 '" />';

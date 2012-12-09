@@ -207,33 +207,16 @@
 </table>
 <h3><?php echo __('Economy')?></h3>
 <?php
-  $capital_id = null;
-  $area = 0;
-  $previous_turn = $current_game->current_turn;
-  $territory_previous_owner_list = $current_player->get_territory_owner_list(null, $current_game->id, $previous_turn);
-  foreach( $territory_previous_owner_list as $territory_owner_row ) {
-
-    if( !$territory_owner_row['contested'] ) {
-      $territory = Territory::instance($territory_owner_row['territory_id']);
-      $area += $territory->get_area();
-    }
-    if( $territory_owner_row['capital'] ) {
-      $capital_id = $territory_owner_row['territory_id'];
-    }
-  }
-
-  $ratio = -$area * 0.00002 + 3;
-  if( $ratio < 1 ) $ratio = 1;
-
-  $revenue = round( $area * $ratio );
+  $revenue = $current_player->get_revenue( $current_game, $current_game->current_turn + 1 );
 
   $troops_home = 0;
   $troops_away = 0;
-  $troops_list = $current_game->get_territory_player_troops_list($previous_turn, null, $current_player->id);
+  $troops_list = $current_game->get_territory_player_troops_list($current_game->current_turn, null, $current_player->id);
+  $territory_owner_list = $current_game->get_territory_owner_list(null, $current_game->current_turn, $current_player->id);
   foreach( $troops_list as $territory_player_troops_row ) {
     $is_home = false;
 
-    foreach( $territory_previous_owner_list as $territory_previous_owner_row ) {
+    foreach( $territory_owner_list as $territory_previous_owner_row ) {
       if( $territory_previous_owner_row['territory_id'] == $territory_player_troops_row['territory_id'] ) {
         $is_home = true;
         break;
@@ -253,31 +236,16 @@
 
   $recruit_budget = $revenue - $troops_maintenance;
 
-  // Is there a capital (after move) ?
-  $capital_id = null;
-  $territory_current_owner_list = $current_player->get_territory_owner_list(null, $current_game->id, $previous_turn);
-  foreach( $territory_current_owner_list as $territory_owner_row ) {
-    if( $territory_owner_row['capital'] ) {
-      $capital_id = $territory_owner_row['territory_id'];
-      break;
-    }
-  }
-  $troops_recruited = 0;
-  if( $capital_id !== null ) {
+  // Is there a capital ?
+  $capital = $current_player->get_capital($current_game);
+
+  if( $capital->id !== null ) {
     $troops_recruited = floor( $recruit_budget / $options['RECRUIT_TROOPS_PRICE'] );
   }
 ?>
 <div class="informations formulaire">
   <p>
-    <span class="label"><?php echo __('Total area of stable territory on turn %s', $previous_turn)?></span>
-    <span class="value num"><?php echo l10n_number( round($area), 0 )?> km²</span>
-  </p>
-  <p>
-    <span class="label"><?php echo __('Economy ratio')?></span>
-    <span class="value num"><?php echo l10n_number( $ratio, 2 )?></span>
-  </p>
-  <p>
-    <span class="label"><?php echo __('Total revenue for turn %s', $previous_turn)?></span>
+    <span class="label"><?php echo __('Total revenue for turn %s', $current_game->current_turn)?></span>
     <span class="value num"><?php echo l10n_number( $revenue, 0 )?>  <img src="<?php echo IMG.'img_html/coins.png'?>" alt="" title="" /></span>
   </p>
   <p>

@@ -61,7 +61,7 @@
           <td>'.(is_array($player_order->return)?nl2br(parameters_to_string($player_order->return)):$player_order->return).'</td>';
       $player_order_temp = Player_Order::instance( $player_order->parent_player_order_id);
       echo '
-          <td>'.$player_order_temp->id.'</td>
+          <td>'.$player_order_temp->name.'</td>
           <td><a href="'.htmlentities_utf8(Page::get_url('admin_player_order_mod', array('id' => $player_order->id))).'"><img src="'.IMG.'img_html/pencil.png" alt="Modifier" title="Modifier"/></a></td>
         </tr>';
     }

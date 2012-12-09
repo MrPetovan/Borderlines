@@ -463,8 +463,8 @@ class Move_Troops extends Player_Order {
     $allow_move = count( $supremacy_from_list ) == 0 || $supremacy_from_list[0]['supremacy'] == 1;
     // Owning target territory = pass
     if( !$allow_move ) {
-      $to_owner_id = $to_territory->get_owner( $game );
-      $allow_move = $to_owner_id == $player->id;
+      $to_owner = $to_territory->get_owner( $game );
+      $allow_move = $to_owner == $player;
     }
     // Having the supremacy in target territory = pass
     if( !$allow_move ) {
@@ -477,7 +477,7 @@ class Move_Troops extends Player_Order {
       $allow_move = isset($supremacy_to[ $player->id ]) && $supremacy_to[ $player->id ] == 1;
     }
     // Empty territory (sea, neutral) = supremacy check
-    if( !$allow_move && $to_owner_id === null ) {
+    if( !$allow_move && $to_owner->id === null ) {
       $supremacists = array_keys( $supremacy_to, 1 );
       if( count( $supremacists ) ) {
         $diplomacy_list = $player->get_last_player_diplomacy_list($game->id);
@@ -492,7 +492,7 @@ class Move_Troops extends Player_Order {
     }
     // Marking target territory player as ally = pass
     if( !$allow_move  ) {
-      $player_diplomacy = array_pop( $player->get_player_diplomacy_list($game->id, null, $to_owner_id) );
+      $player_diplomacy = array_pop( $player->get_player_diplomacy_list($game->id, null, $to_owner->id) );
       $allow_move = $player_diplomacy['status'] == 'Ally';
     }
 

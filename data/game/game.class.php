@@ -51,11 +51,13 @@ GROUP BY
 
   public function get_parameters() {
     $defaults = array(
-        'HOME_TROOPS_MAINTENANCE' => 1,
-        'AWAY_TROOPS_MAINTENANCE' => 2,
-        'RECRUIT_TROOPS_PRICE' => 10,
-        'TROOPS_EFFICACITY' => 10,
+        'HOME_TROOPS_MAINTENANCE' => 2,
+        'AWAY_TROOPS_MAINTENANCE' => 3,
+        'RECRUIT_TROOPS_PRICE' => 20,
+        'TROOPS_EFFICACITY' => 5,
+        'TROOPS_CAPTURE_POWER' => 10,
         'ALLOW_JOIN_MIDGAME' => 1,
+        'BASE_TERRITORY_REVENUE' => 10000
     );
 
     $options = unserialize($this->_parameters);
@@ -117,7 +119,7 @@ AND `owner_id` = '.mysql_ureal_escape_string($owner_id);
 
     $sql = '
 SELECT `territory_id`, `game_id`, `turn`, `owner_id`, `contested`, `capital`
-FROM `territory_owner`
+FROM `territory_status`
 WHERE `game_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
     $res = mysql_uquery($sql);
 
@@ -150,7 +152,7 @@ WHERE `game_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
 
     $player_list = Player::db_get_by_game( $this->id );
 
-    $sql = 'DELETE FROM `territory_owner` WHERE `game_id` = '.mysql_ureal_escape_string($this->id);
+    $sql = 'DELETE FROM `territory_status` WHERE `game_id` = '.mysql_ureal_escape_string($this->id);
     mysql_uquery($sql);
     $sql = 'DELETE FROM `territory_player_troops_history` WHERE `game_id` = '.mysql_ureal_escape_string($this->id);
     mysql_uquery($sql);
@@ -184,7 +186,7 @@ WHERE `game_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
     mysql_uquery($sql);
     $sql = 'DELETE FROM `player_spygame_value` WHERE `game_id` = '.mysql_ureal_escape_string($this->id).' AND `turn` > '.mysql_ureal_escape_string($turn);
     mysql_uquery($sql);
-    $sql = 'DELETE FROM `territory_owner` WHERE `game_id` = '.mysql_ureal_escape_string($this->id).' AND `turn` > '.mysql_ureal_escape_string($turn);
+    $sql = 'DELETE FROM `territory_status` WHERE `game_id` = '.mysql_ureal_escape_string($this->id).' AND `turn` > '.mysql_ureal_escape_string($turn);
     mysql_uquery($sql);
     $sql = 'DELETE FROM `territory_player_troops_history` WHERE `game_id` = '.mysql_ureal_escape_string($this->id).' AND `turn` > '.mysql_ureal_escape_string($turn);
     mysql_uquery($sql);
@@ -251,8 +253,8 @@ WHERE `game_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
       // Updating territories ownership and battle on contested territories
       foreach( $territories as $territory ) {
         /* @var $territory Territory */
-        $previous_owner = $territory->get_owner( $this, $current_turn );
-        $new_owner = $territory->get_owner( $this, $next_turn );
+        $territory->compute_territory_owner( $this, $current_turn );
+        $territory->compute_territory_owner( $this, $next_turn );
 
         if( $territory->is_contested( $this, $next_turn ) ) {
           // Diplomacy checking and parties forming
@@ -441,24 +443,17 @@ WHERE `game_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
         $recruit_budget = $revenue - $troops_maintenance;
 
         // Is there a capital (after move) ?
-        $capital_id = null;
-        $territory_current_owner_list = $player->get_territory_owner_list(null, $this->id, $current_turn + 1);
-        foreach( $territory_current_owner_list as $territory_owner_row ) {
-          if( $territory_owner_row['capital'] ) {
-            $capital_id = $territory_owner_row['territory_id'];
-            break;
-          }
-        }
+        $capital = $player->get_capital( $this, $current_turn + 1 );
 
-        if( $capital_id !== null ) {
+        if( $capital->id !== null ) {
           $troops_recruited = floor( $recruit_budget / $options['RECRUIT_TROOPS_PRICE'] );
-          $player->set_territory_player_troops_history($this->id, $next_turn, $capital_id, $troops_recruited, 'Recruitement');
+          $player->set_territory_player_troops_history($this->id, $next_turn, $capital->id, $troops_recruited, 'Recruitement');
           $this->set_player_history(
             $player->id,
             $next_turn,
             time(),
             "You recruited ".$troops_recruited." new troops at your capital",
-            $capital_id
+            $capital->id
           );
         }else {
           $this->set_player_history(

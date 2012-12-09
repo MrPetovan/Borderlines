@@ -370,7 +370,7 @@ OR `guid1` = "'.$guid2.'" AND `guid2` = "'.$guid1.'")';
 
     $return = $territory_owner_row['owner_id'];
 
-    return $return;
+    return Player::instance( $return );
   }
 
   public function is_contested( Game $game, $turn = null ) {
@@ -413,10 +413,13 @@ OR `guid1` = "'.$guid2.'" AND `guid2` = "'.$guid1.'")';
     return $return;
   }
 
-  public function compute_territory_owner( Game $game, $turn ) {
+  public function compute_territory_owner( Game $game, $turn = null ) {
+    if( is_null( $turn ) ) {
+      $turn = $game->current_turn;
+    }
     $territory_player_troops_list = $game->get_territory_player_troops_list($turn, $this->id);
 
-    $last_owner_id = null;
+    $last_owner = null;
     $is_capital = false;
     $is_contested = false;
 
@@ -424,27 +427,27 @@ OR `guid1` = "'.$guid2.'" AND `guid2` = "'.$guid1.'")';
     $player_supremacy_troops = array();
 
     if( $turn > 0 ) {
-      $last_owner_id = $this->get_owner( $game, $turn - 1 );
+      $last_owner = $this->get_owner( $game, $turn - 1 );
 
       $territory_owner_list = $this->get_territory_owner_list( $game->id, $turn - 1 );
       $is_capital = $territory_owner_list[0]['capital'] == 1;
     }
 
     // Default : ownership continues
-    $owner_id = $last_owner_id;
+    $new_owner = $last_owner;
 
     if( count( $territory_player_troops_list ) == 1 ) {
-      if( $last_owner_id === null ) {
+      if( $last_owner->id === null ) {
         // Empty territory
-        $owner_id = $territory_player_troops_list[0]['player_id'];
+        $new_owner->id = $territory_player_troops_list[0]['player_id'];
       }else {
         $invader = Player::instance( $territory_player_troops_list[0]['player_id'] );
         $player_diplomacy_list = $invader->get_last_player_diplomacy_list($game->id);
 
         // If invader marked the previous owner as enemy, he captures the territory
         foreach( $player_diplomacy_list as $player_diplomacy ) {
-          if( $player_diplomacy['to_player_id'] == $last_owner_id && $player_diplomacy['status'] == 'Enemy' ) {
-            $owner_id = $invader->id;
+          if( $player_diplomacy['to_player_id'] == $last_owner->id && $player_diplomacy['status'] == 'Enemy' ) {
+            $new_owner = $invader;
           }
         }
       }
@@ -481,7 +484,7 @@ OR `guid1` = "'.$guid2.'" AND `guid2` = "'.$guid1.'")';
           }
         }
         foreach( $player_diplomacy_list as $key => $player_diplomacy ) {
-          if( $player_diplomacy['to_player_id'] == $last_owner_id ) {
+          if( $player_diplomacy['to_player_id'] == $last_owner->id ) {
             if( $player_diplomacy['status'] == 'Enemy' ) {
               $all_allies_with_owner = false;
             }
@@ -490,7 +493,7 @@ OR `guid1` = "'.$guid2.'" AND `guid2` = "'.$guid1.'")';
       }
 
       if( $all_allies ) {
-        if($last_owner_id === null || !$all_allies_with_owner ) {
+        if($last_owner->id === null || !$all_allies_with_owner ) {
           $troops = array();
 
           foreach( $territory_player_troops_list as $player_territory ) {
@@ -505,49 +508,78 @@ OR `guid1` = "'.$guid2.'" AND `guid2` = "'.$guid1.'")';
           }
 
           // Previous owner wiped out or empty territory
-          if(array_search($last_owner_id, array_keys( $troops)) === false) {
+          if(array_search($last_owner->id, array_keys( $troops)) === false) {
             // The player with most troops gets the territory
             arsort( $troops );
             reset( $troops );
             list( $player_id, $troops ) = each( $troops );
 
-            $owner_id = $player_id;
+            $new_owner->id = $player_id;
           }
-        }
-
-        foreach( $player_supremacy_troops as $player_id => $supremacy_score ) {
-          $this->set_territory_player_status(
-            $game->id,
-            $turn,
-            $player_id,
-            $supremacy_score >= 0?1:0
-          );
         }
       }else {
         // Contested territory
         $is_contested = true;
-        foreach( $player_supremacy_troops as $player_id => $supremacy_score ) {
-          $this->set_territory_player_status(
-            $game->id,
-            $turn,
-            $player_id,
-            $supremacy_score >= 0?1:0
-          );
-        }
+      }
+      // Supremacy
+      foreach( $player_supremacy_troops as $player_id => $supremacy_score ) {
+        $this->set_territory_player_status(
+          $game->id,
+          $turn,
+          $player_id,
+          $supremacy_score >= 0?1:0
+        );
       }
     }
 
     if( !$this->is_capturable() ) {
-      $owner_id = null;
+      $new_owner->id = null;
       $is_capital = false;
     }else {
       // In case of changed owner, reset the capital state
-      $is_capital = $is_capital && ($last_owner_id == $owner_id);
+      $is_capital = $is_capital && ($last_owner->id == $new_owner->id);
     }
-    $this->set_territory_owner($game->id, $turn, $owner_id, $is_contested?1:0, $is_capital?1:0);
+    $this->set_territory_owner($game->id, $turn, $new_owner->id, $is_contested?1:0, $is_capital?1:0);
 
-    $return = array('owner_id' => $owner_id, 'contested' => $is_contested, 'capital' => $is_capital);
+    $return = array('owner_id' => $new_owner->id, 'contested' => $is_contested, 'capital' => $is_capital);
 
+    return $return;
+  }
+
+  public function get_distance_to_capital( Game $game, $turn = null ) {
+    if( is_null( $turn ) ) {
+      $turn = $game->current_turn;
+    }
+    $return = null;
+    $territory_owner = $this->get_owner( $game, $turn );
+    if( $territory_owner->id !== null ) {
+      $capital = $territory_owner->get_capital( $game, $turn );
+      $distance = null;
+      if( $capital->id !== null ) {
+        $return = Vertex::distance( $capital->get_centroid(), $this->get_centroid() );
+      }
+    }
+    return $return;
+  }
+
+  public function get_corruption_ratio( Game $game, $turn = null ) {
+    if( is_null( $turn ) ) {
+      $turn = $game->current_turn;
+    }
+    $distance_to_capital = $this->get_distance_to_capital( $game, $turn );
+
+    $return = $this->get_corruption_ratio_from_distance($distance_to_capital);
+
+    return $return;
+  }
+
+  public function get_corruption_ratio_from_distance( $distance_to_capital ) {
+    $return = null;
+    if( $distance_to_capital !== null ) {
+      $return = $distance_to_capital / 10000;
+    }else {
+      $return = .5;
+    }
     return $return;
   }
 
@@ -575,7 +607,7 @@ ORDER BY '.$order_by;
       $sql = '
 SELECT `id`
 FROM `'.self::get_table_name().'` t
-JOIN `territory_owner` t_o ON
+JOIN `territory_status` t_o ON
   t_o.`territory_id` = t.`id`
   AND t_o.`game_id` = '.$game->id.'
   AND `turn` = '.$turn.'

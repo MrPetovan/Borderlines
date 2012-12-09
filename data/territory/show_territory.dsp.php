@@ -4,12 +4,11 @@
   /* @var $territory Territory */
   /* @var $current_game Game */
   /* @var $current_player Player */
+  /* @var $territory_owner Player */
   $territory_params = array();
   if( $current_game ) {
-    $territory_owner_id = $territory->get_owner( $current_game, $turn );
-    if( $territory_owner_id !== null ) {
-      $owner = Player::instance($territory_owner_id);
-    }
+    $territory_owner = $territory->get_owner( $current_game, $turn );
+
     $territory_params = array('game_id' => $current_game->id );
   }
 
@@ -46,8 +45,26 @@
   </p>
   <p>
     <span class="label"><?php echo __('Current owner')?></span>
-    <span class="value"><?php echo $territory_owner_id?'<a href="'.Page::get_url('show_player', array('id' => $owner->id)).'">'.$owner->name.'</a>':__('Nobody')?></span>
+    <span class="value"><?php echo $territory_owner->id?'<a href="'.Page::get_url('show_player', array('id' => $territory_owner->id)).'">'.$territory_owner->name.'</a>':__('Nobody')?></span>
   </p>
+<?php
+  $distance = $territory->get_distance_to_capital($current_game, $turn);
+
+  if( $distance ) {
+?>
+  <p>
+    <span class="label"><?php echo __('Distance to the owner\'s capital')?></span>
+    <span class="value"><?php echo $distance?l10n_number( $distance ).' km':__('No capital')?></span>
+  </p>
+<?php
+  }
+  $corruption_ratio = $territory->get_corruption_ratio_from_distance( $distance );
+?>
+  <p>
+    <span class="label"><?php echo __('Corruption')?></span>
+    <span class="value"><?php echo l10n_number( round( $corruption_ratio * 100 ) ).' %'?></span>
+  </p>
+
   <p>
     <span class="label"><?php echo __('Status')?></span>
     <span class="value"><?php echo $territory->is_contested( $current_game, $turn )?__('Contested'):__('Stable')?></span>
@@ -78,13 +95,13 @@
     foreach( $neighbour_list as $neighbour ) {
       $territory_owner_row = array_pop( $neighbour->get_territory_owner_list( $current_game->id, $turn ) );
       if( $territory_owner_row['owner_id'] !== null ) {
-        $owner = Player::instance($territory_owner_row['owner_id']);
+        $territory_owner = Player::instance($territory_owner_row['owner_id']);
       }
       echo '
     <tr>
       <td><a href="'.Page::get_url('show_territory', array_merge( $territory_params, array('id' => $neighbour->id) )).'">'.$neighbour->name.'</a></td>
       <td>'.l10n_number( $neighbour->get_area() ).' km²</td>
-      <td>'.($territory_owner_row['owner_id']?'<a href="'.Page::get_url('show_player', array('id' => $owner->id)).'">'.$owner->name.'</a>':__('Nobody')).'</td>
+      <td>'.($territory_owner_row['owner_id']?'<a href="'.Page::get_url('show_player', array('id' => $territory_owner->id)).'">'.$territory_owner->name.'</a>':__('Nobody')).'</td>
       <td>'.($territory_owner_row['contested']?__('Contested'):__('Stable')).'</td>
     </tr>';
     }

@@ -127,29 +127,6 @@
           );
         }
         break;
-      case 'set_territory_owner':
-        if( $player->id ) {
-          $flag_set_territory_owner = $player->set_territory_owner(
-            ($value = getValue('territory_id')) == ''?null:$value,
-            ($value = getValue('game_id')) == ''?null:$value,
-            ($value = getValue('turn')) == ''?null:$value,
-            ($value = getValue('contested')) == ''?null:$value,
-            ($value = getValue('capital')) == ''?null:$value
-          );
-          if( ! $flag_set_territory_owner ) {
-            Page::add_message( '$player->set_territory_owner : ' . mysql_error(), Page::PAGE_MESSAGE_ERROR );
-          }
-        }
-        break;
-      case 'del_territory_owner':
-        if( $player->id ) {
-          $flag_del_territory_owner = $player->del_territory_owner(
-            ($value = getValue('territory_id')) == ''?null:$value,
-            ($value = getValue('game_id')) == ''?null:$value,
-            ($value = getValue('turn')) == ''?null:$value
-          );
-        }
-        break;
       case 'set_territory_player_status':
         if( $player->id ) {
           $flag_set_territory_player_status = $player->set_territory_player_status(
@@ -194,6 +171,30 @@
             ($value = getValue('turn')) == ''?null:$value,
             ($value = getValue('territory_id')) == ''?null:$value,
             ($value = getValue('reason_player_id')) == ''?null:$value
+          );
+        }
+        break;
+      case 'set_territory_status':
+        if( $player->id ) {
+          $flag_set_territory_status = $player->set_territory_status(
+            ($value = getValue('territory_id')) == ''?null:$value,
+            ($value = getValue('game_id')) == ''?null:$value,
+            ($value = getValue('turn')) == ''?null:$value,
+            ($value = getValue('contested')) == ''?null:$value,
+            ($value = getValue('capital')) == ''?null:$value,
+            ($value = getValue('economy_ratio')) == ''?null:$value
+          );
+          if( ! $flag_set_territory_status ) {
+            Page::add_message( '$player->set_territory_status : ' . mysql_error(), Page::PAGE_MESSAGE_ERROR );
+          }
+        }
+        break;
+      case 'del_territory_status':
+        if( $player->id ) {
+          $flag_del_territory_status = $player->del_territory_status(
+            ($value = getValue('territory_id')) == ''?null:$value,
+            ($value = getValue('game_id')) == ''?null:$value,
+            ($value = getValue('turn')) == ''?null:$value
           );
         }
         break;

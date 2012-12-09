@@ -299,7 +299,11 @@ AND `turn` = `pd_max`.`max_turn`';
     return mysql_fetch_to_array($res);
   }
 
-  public function get_territory_summary(Game $game, $turn) {
+  public function get_territory_summary( Game $game, $turn = null ) {
+    if( is_null( $turn ) ) {
+      $turn = $game->current_turn;
+    }
+
     $territory_player_troops_list = $game->get_territory_player_troops_list($turn, null, $this->id);
     $territory_owner_list = $game->get_territory_owner_list(null, $turn, $this->id);
     $troops = array();
@@ -323,6 +327,47 @@ AND `turn` = `pd_max`.`max_turn`';
     array_multisort($troops, SORT_DESC, $return);
 
     return $return;
+  }
+
+  public function get_capital( Game $game, $turn = null ) {
+    if( is_null( $turn ) ) {
+      $turn = $game->current_turn;
+    }
+
+    $capital_id = null;
+    $territory_current_owner_list = $this->get_territory_owner_list(null, $game->id, $turn);
+    foreach( $territory_current_owner_list as $territory_owner_row ) {
+      if( $territory_owner_row['capital'] ) {
+        $capital_id = $territory_owner_row['territory_id'];
+        break;
+      }
+    }
+    return Territory::instance( $capital_id );
+  }
+
+  public function get_revenue( Game $game, $turn = null ) {
+    if( is_null( $turn ) ) {
+      $turn = $game->current_turn;
+    }
+    $game_options = $game->get_parameters();
+
+    $capital = $this->get_capital( $game, $turn );
+
+    $revenue = 0;
+    $territory_previous_owner_list = $this->get_territory_owner_list(null, $game->id, $turn - 1);
+    foreach( $territory_previous_owner_list as $territory_owner_row ) {
+      if( !$territory_owner_row['contested'] ) {
+        $territory = Territory::instance($territory_owner_row['territory_id']);
+        $corruption_ratio = $territory->get_corruption_ratio( $game, $turn );
+
+        $base_revenue = $game_options['BASE_TERRITORY_REVENUE'] * (1 - $corruption_ratio);
+      }else {
+        $base_revenue = 0;
+      }
+      $revenue += $base_revenue;
+    }
+
+    return $revenue;
   }
 
   /**

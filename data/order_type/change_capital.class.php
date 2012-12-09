@@ -48,9 +48,10 @@ class Change_Capital extends Player_Order {
 
       if( $territory->id !== null ) {
         if( $territory->is_capturable() ) {
-          if( $territory->get_owner( $player->current_game, $player->current_game->current_turn + 1 ) == $this->player_id ) {
+          $owner = $territory->get_owner( $player->current_game, $player->current_game->current_turn + 1 );
+          if( $owner == $player ) {
             $sql = '
-UPDATE `territory_owner`
+UPDATE `territory_status`
 SET `capital` = 0
 WHERE `game_id` = '.mysql_ureal_escape_string($player->current_game->id).'
 AND `turn` = '.mysql_ureal_escape_string($player->current_game->current_turn + 1).'
@@ -58,7 +59,7 @@ AND `owner_id` = '.mysql_ureal_escape_string($this->player_id);
             mysql_uquery($sql);
 
             $sql = '
-UPDATE `territory_owner`
+UPDATE `territory_status`
 SET `capital` = 1
 WHERE `game_id` = '.mysql_ureal_escape_string($player->current_game->id).'
 AND `turn` = '.mysql_ureal_escape_string($player->current_game->current_turn + 1).'

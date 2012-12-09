@@ -163,15 +163,12 @@
 <?php
   foreach( $territory_list as $territory ) {
     /* @var $territory Territory */
-    $owner_id = $territory->get_owner( $current_game, $turn);
-    if( $owner_id != null ) {
-      $owner = Player::instance($owner_id);
-    }
+    $owner = $territory->get_owner( $current_game, $turn);
     echo '
     <tr>
       <td><a href="'.Page::get_url('show_territory', array_merge($territory_params, array('id' => $territory->id))).'">'.$territory->name.'</a></td>
       <td>'.l10n_number( $territory->get_area() ).' km²</td>
-      <td>'.($owner_id?'<a href="'.Page::get_url('show_player', array('id' => $owner->id)).'">'.$owner->name.'</a>':__('Nobody')).'</td>
+      <td>'.($owner->id?'<a href="'.Page::get_url('show_player', array('id' => $owner->id)).'">'.$owner->name.'</a>':__('Nobody')).'</td>
     </tr>';
   }
 ?>
