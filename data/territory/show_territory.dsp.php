@@ -7,7 +7,8 @@
   /* @var $territory_owner Player */
   $territory_params = array();
   if( $current_game ) {
-    $territory_owner = $territory->get_owner( $current_game, $turn );
+    $territory_status = $territory->get_territory_status($current_game, $turn);
+    $territory_owner = Player::instance($territory_status['owner_id']);
 
     $territory_params = array('game_id' => $current_game->id );
   }
@@ -23,6 +24,8 @@
   $orders = Player_Order::db_get_planned_by_player_id($current_player->id, $current_game->id);
 
   $is_current_turn = $turn == $current_game->current_turn;
+
+  $is_contested = $territory_status['contested'];
 ?>
 
 <?php if( $is_current_turn ) :?>
@@ -43,6 +46,7 @@
     <span class="label"><?php echo __('Capital city')?></span>
     <span class="value"><?php echo $territory->capital_name?></span>
   </p>
+<?php if( $current_game ) :?>
   <p>
     <span class="label"><?php echo __('Current owner')?></span>
     <span class="value"><?php echo $territory_owner->id?'<a href="'.Page::get_url('show_player', array('id' => $territory_owner->id)).'">'.$territory_owner->name.'</a>':__('Nobody')?></span>
@@ -59,7 +63,12 @@
 <?php
   }
   $corruption_ratio = $territory->get_corruption_ratio_from_distance( $distance );
+  $economy_ratio = $territory->get_economy_ratio( $current_game, $turn );
 ?>
+  <p>
+    <span class="label"><?php echo __('Economy ratio')?></span>
+    <span class="value"><?php echo l10n_number( round( $economy_ratio * 100 ) ).' %'?></span>
+  </p>
   <p>
     <span class="label"><?php echo __('Corruption')?></span>
     <span class="value"><?php echo l10n_number( round( $corruption_ratio * 100 ) ).' %'?></span>
@@ -67,8 +76,15 @@
 
   <p>
     <span class="label"><?php echo __('Status')?></span>
-    <span class="value"><?php echo $territory->is_contested( $current_game, $turn )?__('Contested'):__('Stable')?></span>
+    <span class="value"><?php echo $is_contested?__('Contested'):__('Stable')?></span>
   </p>
+<?php if( $is_contested ) :?>
+  <p>
+    <span class="label"><?php echo __('Revenue Suppression')?></span>
+    <span class="value"><?php echo l10n_number( $territory_status['revenue_suppression'] * 100 )?> %</span>
+  </p>
+<?php endif;?>
+<?php endif; //if( $current_game ) :?>
 </div>
 <?php if( !$is_ajax ) :?>
 <p>

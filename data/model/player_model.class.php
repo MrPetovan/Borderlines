@@ -444,7 +444,7 @@ AND `game_id` = '.mysql_ureal_escape_string($game_id);
 AND `turn` = '.mysql_ureal_escape_string($turn);
 
     $sql = '
-SELECT `territory_id`, `game_id`, `turn`, `owner_id`, `contested`, `capital`, `economy_ratio`
+SELECT `territory_id`, `game_id`, `turn`, `owner_id`, `contested`, `capital`, `revenue_suppression`
 FROM `territory_status`
 WHERE `owner_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
     $res = mysql_uquery($sql);
@@ -452,8 +452,8 @@ WHERE `owner_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
     return mysql_fetch_to_array($res);
   }
 
-  public function set_territory_status( $territory_id, $game_id, $turn, $contested, $capital, $economy_ratio ) {
-    $sql = "REPLACE INTO `territory_status` ( `territory_id`, `game_id`, `turn`, `owner_id`, `contested`, `capital`, `economy_ratio` ) VALUES (".mysql_ureal_escape_string( $territory_id, $game_id, $turn, $this->get_id(), $contested, $capital, $economy_ratio ).")";
+  public function set_territory_status( $territory_id, $game_id, $turn, $contested, $capital, $revenue_suppression ) {
+    $sql = "REPLACE INTO `territory_status` ( `territory_id`, `game_id`, `turn`, `owner_id`, `contested`, `capital`, `revenue_suppression` ) VALUES (".mysql_ureal_escape_string( $territory_id, $game_id, $turn, $this->get_id(), $contested, $capital, $revenue_suppression ).")";
 
     return mysql_uquery($sql);
   }

@@ -356,15 +356,18 @@ AND `turn` = `pd_max`.`max_turn`';
     $revenue = 0;
     $territory_previous_owner_list = $this->get_territory_status_list(null, $game->id, $turn - 1);
     foreach( $territory_previous_owner_list as $territory_status_row ) {
-      if( !$territory_status_row['contested'] ) {
-        $territory = Territory::instance($territory_status_row['territory_id']);
-        $corruption_ratio = $territory->get_corruption_ratio( $game, $turn );
+      $territory = Territory::instance($territory_status_row['territory_id']);
+      $corruption_ratio = $territory->get_corruption_ratio( $game, $turn );
 
-        $base_revenue = $game_options['BASE_TERRITORY_REVENUE'] * (1 - $corruption_ratio);
-      }else {
-        $base_revenue = 0;
-      }
-      $revenue += $base_revenue;
+      $territory_revenue =
+        $game_options['TERRITORY_BASE_REVENUE']
+        * ( 1 - $corruption_ratio )
+        * ( $territory->get_economy_ratio( $game, $turn ) )
+        * ( 1 - $territory_status_row['revenue_suppression'] );
+
+      //var_debug( $territory->name, $game_options['TERRITORY_BASE_REVENUE'], $corruption_ratio, $territory->get_economy_ratio( $game, $turn ), $territory_status_row['revenue_suppression'], $territory_revenue );
+
+      $revenue += $territory_revenue;
     }
 
     return $revenue;

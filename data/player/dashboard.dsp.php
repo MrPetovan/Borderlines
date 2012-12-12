@@ -1,6 +1,4 @@
 <?php
-  $resource_list = Resource::db_get_all();
-
   $players = Player::db_get_by_member_id( $member->id );
   /* @var $current_player Player */
   /* @var $current_game Game */

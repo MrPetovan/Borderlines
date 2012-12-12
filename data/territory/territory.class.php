@@ -353,6 +353,28 @@ OR `guid1` = "'.$guid2.'" AND `guid2` = "'.$guid1.'")';
     return self::sql_to_object($sql);
   }
 
+  public function get_economy_ratio( Game $game, $turn = null ) {
+    $return = null;
+
+    $where = '';
+    if( !is_null( $turn ) ) {
+      $where = '
+AND `turn` <= '.mysql_ureal_escape_string( $turn );
+    }
+    $sql = '
+SELECT IFNULL( SUM( `delta` ), 0 )
+FROM `territory_economy_history`
+WHERE `territory_id` = '.mysql_ureal_escape_string($this->id).'
+AND `game_id` = '.mysql_ureal_escape_string($game->id).$where;
+    $res = mysql_uquery( $sql );
+    $row = mysql_fetch_row( $res );
+    if( $row ) {
+      $return = array_shift( $row );
+    }
+
+    return $return;
+  }
+
   public function get_owner( Game $game, $turn = null ) {
     $return = null;
 
@@ -413,18 +435,40 @@ OR `guid1` = "'.$guid2.'" AND `guid2` = "'.$guid1.'")';
     return $return;
   }
 
+  public function get_territory_status( Game $game, $turn = null ) {
+    $return = null;
+
+    if( is_null( $turn ) ) {
+      $turn = $game->current_turn;
+    }
+
+    $territory_status_list = $this->get_territory_status_list( $game->id, $turn );
+    if( count( $territory_status_list ) ) {
+      $return = array_pop( $territory_status_list );
+    }else {
+      $return = $this->compute_territory_status( $game, $turn );
+    }
+
+    return $return;
+  }
+
   public function compute_territory_status( Game $game, $turn = null ) {
     if( is_null( $turn ) ) {
       $turn = $game->current_turn;
     }
-    $territory_player_troops_list = $game->get_territory_player_troops_list($turn, $this->id);
 
-    $last_owner = null;
+    $game_parameters = $game->get_parameters();
+    $last_owner = Player::instance();
     $is_capital = false;
     $is_contested = false;
+    $economy_ratio = 0;
+
+    $troops_disturbing = 0;
 
     $player_supremacy = array();
     $player_supremacy_troops = array();
+
+    $territory_player_troops_list = $game->get_territory_player_troops_list($turn, $this->id);
 
     if( $turn > 0 ) {
       $last_owner = $this->get_owner( $game, $turn - 1 );
@@ -487,6 +531,9 @@ OR `guid1` = "'.$guid2.'" AND `guid2` = "'.$guid1.'")';
           if( $player_diplomacy['to_player_id'] == $last_owner->id ) {
             if( $player_diplomacy['status'] == 'Enemy' ) {
               $all_allies_with_owner = false;
+              if( isset( $troops[ $player_diplomacy['from_player_id'] ] ) ) {
+                $troops_disturbing += $troops[ $player_diplomacy['from_player_id'] ];
+              }
             }
           }
         }
@@ -521,6 +568,7 @@ OR `guid1` = "'.$guid2.'" AND `guid2` = "'.$guid1.'")';
         // Contested territory
         $is_contested = true;
       }
+
       // Supremacy
       foreach( $player_supremacy_troops as $player_id => $supremacy_score ) {
         $this->set_territory_player_status(
@@ -532,6 +580,7 @@ OR `guid1` = "'.$guid2.'" AND `guid2` = "'.$guid1.'")';
       }
     }
 
+    // Capital status
     if( !$this->is_capturable() ) {
       $new_owner->id = null;
       $is_capital = false;
@@ -539,9 +588,15 @@ OR `guid1` = "'.$guid2.'" AND `guid2` = "'.$guid1.'")';
       // In case of changed owner, reset the capital state
       $is_capital = $is_capital && ($last_owner->id == $new_owner->id);
     }
-    $this->set_territory_status($game->id, $turn, $new_owner->id, $is_contested?1:0, $is_capital?1:0);
 
-    $return = array('owner_id' => $new_owner->id, 'contested' => $is_contested, 'capital' => $is_capital);
+    // Revenue suppression
+    $area = $this->get_area();
+    $revenue_suppression = min( 1, round( ($troops_disturbing * $game_parameters['TROOPS_CAPTURE_POWER']) / $area, 2) );
+
+    // Status update
+    $this->set_territory_status($game->id, $turn, $new_owner->id, $is_contested?1:0, $is_capital?1:0, $revenue_suppression);
+
+    $return = array('owner_id' => $new_owner->id, 'contested' => $is_contested, 'capital' => $is_capital, 'revenue_suppression' => $revenue_suppression);
 
     return $return;
   }

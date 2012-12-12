@@ -294,6 +294,77 @@
         <p><?php echo HTMLHelper::genererButton('action',  'set_player_history', array('type' => 'submit'), 'Ajouter un élément')?></p>
       </fieldset>
     </form>
+    <h4>Territory Economy History</h4>
+<?php
+
+  $territory_economy_history_list = $game->get_territory_economy_history_list();
+
+  if(count($territory_economy_history_list)) {
+?>
+    <table>
+      <thead>
+        <tr>
+          <th>Territory Id</th>
+          <th>Turn</th>
+          <th>Delta</th>
+          <th>Reason</th>          <th>Action</th>
+        </tr>
+      </thead>
+      <tfoot>
+        <tr>
+          <td colspan="5"><?php echo count( $territory_economy_history_list )?> lignes</td>
+        </tr>
+      </tfoot>
+      <tbody>
+<?php
+      foreach( $territory_economy_history_list as $territory_economy_history ) {
+
+ 
+        $territory_id_territory = Territory::instance( $territory_economy_history['territory_id'] );        echo '
+        <tr>
+        <td><a href="'.get_page_url('admin_territory_view', true, array('id' => $territory_id_territory->id)).'">'.$territory_id_territory->name.'</a></td>
+        <td>'.$territory_economy_history['turn'].'</td>
+        <td>'.$territory_economy_history['delta'].'</td>
+        <td>'.$territory_economy_history['reason'].'</td>          <td>
+            <form action="'.get_page_url(PAGE_CODE, true, array('id' => $game->id)).'" method="post">
+              '.HTMLHelper::genererInputHidden('id', $game->id).'
+
+              '.HTMLHelper::genererInputHidden('territory_id', $territory_id_territory->id).'              '.HTMLHelper::genererButton('action',  'del_territory_economy_history', array('type' => 'submit'), 'Supprimer').'
+            </form>
+          </td>
+        </tr>';
+      }
+?>
+      </tbody>
+    </table>
+<?php
+  }else {
+    echo '<p>Il n\'y a pas d\'éléments à afficher</p>';
+  }
+
+  $liste_valeurs_territory = Territory::db_get_select_list();?>
+    <form action="<?php echo get_page_url(PAGE_CODE, true, array('id' => $game->id))?>" method="post" class="formulaire">
+      <?php echo HTMLHelper::genererInputHidden('id', $game->id )?>
+      <fieldset>
+        <legend>Ajouter un élément</legend>
+        <p class="field">
+          <?php echo HTMLHelper::genererSelect('territory_id', $liste_valeurs_territory, null, array(), 'Territory' )?><a href="<?php echo get_page_url('admin_territory_mod')?>">Créer un objet Territory</a>
+        </p>
+        <p class="field">
+          <?php echo HTMLHelper::genererInputText('turn', null, array(), 'Turn*' )?>
+          
+        </p>
+        <p class="field">
+          <?php echo HTMLHelper::genererInputText('delta', null, array(), 'Delta*' )?>
+          
+        </p>
+        <p class="field">
+          <?php echo HTMLHelper::genererInputText('reason', null, array(), 'Reason*' )?>
+          
+        </p>
+        <p><?php echo HTMLHelper::genererButton('action',  'set_territory_economy_history', array('type' => 'submit'), 'Ajouter un élément')?></p>
+      </fieldset>
+    </form>
     <h4>Territory Player Status</h4>
 <?php
 
@@ -470,7 +541,7 @@
           <th>Owner Id</th>
           <th>Contested</th>
           <th>Capital</th>
-          <th>Economy Ratio</th>          <th>Action</th>
+          <th>Revenue Suppression</th>          <th>Action</th>
         </tr>
       </thead>
       <tfoot>
@@ -491,7 +562,7 @@
         <td><a href="'.get_page_url('admin_player_view', true, array('id' => $owner_id_player->id)).'">'.$owner_id_player->name.'</a></td>
         <td>'.$territory_status['contested'].'</td>
         <td>'.$territory_status['capital'].'</td>
-        <td>'.$territory_status['economy_ratio'].'</td>          <td>
+        <td>'.$territory_status['revenue_suppression'].'</td>          <td>
             <form action="'.get_page_url(PAGE_CODE, true, array('id' => $game->id)).'" method="post">
               '.HTMLHelper::genererInputHidden('id', $game->id).'
 
@@ -535,7 +606,7 @@
           
         </p>
         <p class="field">
-          <?php echo HTMLHelper::genererInputText('economy_ratio', null, array(), 'Economy Ratio*' )?>
+          <?php echo HTMLHelper::genererInputText('revenue_suppression', null, array(), 'Revenue Suppression*' )?>
           
         </p>
         <p><?php echo HTMLHelper::genererButton('action',  'set_territory_status', array('type' => 'submit'), 'Ajouter un élément')?></p>

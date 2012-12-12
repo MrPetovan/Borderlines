@@ -636,7 +636,7 @@
           <th>Turn</th>
           <th>Contested</th>
           <th>Capital</th>
-          <th>Economy Ratio</th>          <th>Action</th>
+          <th>Revenue Suppression</th>          <th>Action</th>
         </tr>
       </thead>
       <tfoot>
@@ -657,7 +657,7 @@
         <td>'.$territory_status['turn'].'</td>
         <td>'.$territory_status['contested'].'</td>
         <td>'.$territory_status['capital'].'</td>
-        <td>'.$territory_status['economy_ratio'].'</td>          <td>
+        <td>'.$territory_status['revenue_suppression'].'</td>          <td>
             <form action="'.get_page_url(PAGE_CODE, true, array('id' => $player->id)).'" method="post">
               '.HTMLHelper::genererInputHidden('id', $player->id).'
 
@@ -701,7 +701,7 @@
           
         </p>
         <p class="field">
-          <?php echo HTMLHelper::genererInputText('economy_ratio', null, array(), 'Economy Ratio*' )?>
+          <?php echo HTMLHelper::genererInputText('revenue_suppression', null, array(), 'Revenue Suppression*' )?>
           
         </p>
         <p><?php echo HTMLHelper::genererButton('action',  'set_territory_status', array('type' => 'submit'), 'Ajouter un élément')?></p>

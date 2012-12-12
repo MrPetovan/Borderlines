@@ -182,7 +182,7 @@
             ($value = getValue('turn')) == ''?null:$value,
             ($value = getValue('contested')) == ''?null:$value,
             ($value = getValue('capital')) == ''?null:$value,
-            ($value = getValue('economy_ratio')) == ''?null:$value
+            ($value = getValue('revenue_suppression')) == ''?null:$value
           );
           if( ! $flag_set_territory_status ) {
             Page::add_message( '$player->set_territory_status : ' . mysql_error(), Page::PAGE_MESSAGE_ERROR );

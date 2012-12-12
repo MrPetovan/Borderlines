@@ -66,6 +66,26 @@
           );
         }
         break;
+      case 'set_territory_economy_history':
+        if( $game->id ) {
+          $flag_set_territory_economy_history = $game->set_territory_economy_history(
+            ($value = getValue('territory_id')) == ''?null:$value,
+            ($value = getValue('turn')) == ''?null:$value,
+            ($value = getValue('delta')) == ''?null:$value,
+            getValue('reason')
+          );
+          if( ! $flag_set_territory_economy_history ) {
+            Page::add_message( '$game->set_territory_economy_history : ' . mysql_error(), Page::PAGE_MESSAGE_ERROR );
+          }
+        }
+        break;
+      case 'del_territory_economy_history':
+        if( $game->id ) {
+          $flag_del_territory_economy_history = $game->del_territory_economy_history(
+            getValue('territory_id')
+          );
+        }
+        break;
       case 'set_territory_player_status':
         if( $game->id ) {
           $flag_set_territory_player_status = $game->set_territory_player_status(
@@ -121,7 +141,7 @@
             ($value = getValue('owner_id')) == ''?null:$value,
             ($value = getValue('contested')) == ''?null:$value,
             ($value = getValue('capital')) == ''?null:$value,
-            ($value = getValue('economy_ratio')) == ''?null:$value
+            ($value = getValue('revenue_suppression')) == ''?null:$value
           );
           if( ! $flag_set_territory_status ) {
             Page::add_message( '$game->set_territory_status : ' . mysql_error(), Page::PAGE_MESSAGE_ERROR );
