@@ -490,13 +490,14 @@
           <th>Turn</th>
           <th>Owner Id</th>
           <th>Contested</th>
+          <th>Conflict</th>
           <th>Capital</th>
           <th>Revenue Suppression</th>          <th>Action</th>
         </tr>
       </thead>
       <tfoot>
         <tr>
-          <td colspan="7"><?php echo count( $territory_status_list )?> lignes</td>
+          <td colspan="8"><?php echo count( $territory_status_list )?> lignes</td>
         </tr>
       </tfoot>
       <tbody>
@@ -511,6 +512,7 @@
         <td>'.$territory_status['turn'].'</td>
         <td><a href="'.get_page_url('admin_player_view', true, array('id' => $owner_id_player->id)).'">'.$owner_id_player->name.'</a></td>
         <td>'.$territory_status['contested'].'</td>
+        <td>'.$territory_status['conflict'].'</td>
         <td>'.$territory_status['capital'].'</td>
         <td>'.$territory_status['revenue_suppression'].'</td>          <td>
             <form action="'.get_page_url(PAGE_CODE, true, array('id' => $territory->id)).'" method="post">
@@ -549,6 +551,10 @@
         </p>
         <p class="field">
           <?php echo HTMLHelper::genererInputText('contested', null, array(), 'Contested*' )?>
+          
+        </p>
+        <p class="field">
+          <?php echo HTMLHelper::genererInputText('conflict', null, array(), 'Conflict*' )?>
           
         </p>
         <p class="field">

@@ -181,6 +181,7 @@
             ($value = getValue('game_id')) == ''?null:$value,
             ($value = getValue('turn')) == ''?null:$value,
             ($value = getValue('contested')) == ''?null:$value,
+            ($value = getValue('conflict')) == ''?null:$value,
             ($value = getValue('capital')) == ''?null:$value,
             ($value = getValue('revenue_suppression')) == ''?null:$value
           );
