@@ -18,8 +18,8 @@ class Give_Territory extends Player_Order {
       if( $territory->id == $parameters['territory_id'] && $to_player->id == $parameters['to_player_id'] ) {
         $owner = $territory->get_owner( $player->current_game, $player->current_game->current_turn + 1 );
         if( $owner == $player ) {
-          $territory_status_row = array_pop( $territory->get_territory_status_list($player->current_game->id, $player->current_game->current_turn + 1) );
-          $territory->set_territory_status($player->current_game->id, $player->current_game->current_turn + 1, $parameters['to_player_id'], $territory_status_row['contested'], 0, $territory_status_row['economic_ratio']);
+          $territory_status = $territory->get_territory_status($player->current_game, $player->current_game->current_turn + 1);
+          $territory->set_territory_status($player->current_game->id, $player->current_game->current_turn + 1, $parameters['to_player_id'], $territory_status['contested'], $territory_status['conflict'], 0, $territory_status['revenue_suppression']);
 
           if( $parameters['to_player_id'] === null ) {
             $message = 'You successfully left the territory';
