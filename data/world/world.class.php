@@ -426,32 +426,36 @@ class World extends World_Model {
       if( $area->background === null ) {
         $color = $black;
         if( $game_id !== null) {
-          if( $owner->id ) {
-            $color = imagecolortoalpha( $img, $player_colors[ $player_color_index[ $owner->id ] ], 85);
-          }
-          $is_capital = $area->is_capital($game, $turn);
-          $is_contested = $area->is_contested($game, $turn);
+          $territory_status = $area->get_territory_status( $game, $turn );
 
-          if( $owner->id && $is_capital ) {
-            $color = imagecolortoalpha( $img, $player_colors[ $player_color_index[ $owner->id ] ], 42);
-            imagefilledpolygon( $img, $polygon, count( $area->vertices ), $color );
+          $is_contested = $territory_status['contested'];
+          $is_conflict = $territory_status['conflict'];
+          $is_capital = $territory_status['capital'];
+
+
+          if( $owner->id ) {
+            if( $is_capital ) {
+              $color = imagecolortoalpha( $img, $player_colors[ $player_color_index[ $owner->id ] ], 42);
+            }else {
+              $color = imagecolortoalpha( $img, $player_colors[ $player_color_index[ $owner->id ] ], 85);
+            }
+
           }
-          if( $area->is_contested($game, $turn) ) {
+          imagefilledpolygon( $img, $polygon, count( $area->vertices ), $color );
+          if( $is_conflict ) {
+            $tile_conflict = imagecreatefrompng( DIR_ROOT.'img/img_css/conflict.png');
+            imagesettile($img, $tile_conflict);
+            imagefilledpolygon( $img, $polygon, count( $area->vertices ), IMG_COLOR_TILED );
+          }elseif( $is_contested ) {
             // Conflict overlay
             if( $owner->id ) {
-              if( !$is_capital ) {
-                $color = imagecolortoalpha( $img, $player_colors[ $player_color_index[ $owner->id ] ], 85);
-                imagefilledpolygon( $img, $polygon, count( $area->vertices ), $color );
-              }
-              $tile_contested = imagecreatefrompng( DIR_ROOT.'img/img_css/conflict.png');
+              $tile_contested = imagecreatefrompng( DIR_ROOT.'img/img_css/contested.png');
             }else {
               imagefilledpolygon( $img, $polygon, count( $area->vertices ), $color );
-              $tile_contested = imagecreatefrompng( DIR_ROOT.'img/img_css/conflict_inverse.png');
+              $tile_contested = imagecreatefrompng( DIR_ROOT.'img/img_css/contested_inverse.png');
             }
             imagesettile($img, $tile_contested);
             imagefilledpolygon( $img, $polygon, count( $area->vertices ), IMG_COLOR_TILED );
-          }else {
-            imagefilledpolygon( $img, $polygon, count( $area->vertices ), $color );
           }
         }else {
           imagefilledpolygon( $img, $polygon, count( $area->vertices ), $color );
