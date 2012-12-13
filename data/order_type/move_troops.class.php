@@ -246,6 +246,7 @@ class Move_Troops extends Player_Order {
       $image = 'territory_out_future.png';
 
       $destination_list = array();
+      $destination_id_list = array();
       $destination_status = array();
       $world = World::instance($params['from_territory']->world_id);
       $territory_distance = $world->get_territories_distances_from($params['from_territory']);
@@ -264,8 +265,8 @@ class Move_Troops extends Player_Order {
             }
           }
         }
+        array_multisort($territory_distance, $destination_list, $destination_id_list, $destination_status);
       }
-      array_multisort($territory_distance, $destination_list, $destination_id_list, $destination_status);
 
       $return = '
 <form action="'.Page::get_page_url( 'order' ).'" method="post">
