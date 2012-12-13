@@ -459,13 +459,16 @@ AND `game_id` = '.mysql_ureal_escape_string($game->id).$where;
 
     $game_parameters = $game->get_parameters();
     $last_owner = Player::instance();
-    $is_capital = false;
     $is_contested = false;
+    $is_conflict = false;
+    $is_capital = false;
     $economy_ratio = 0;
 
     $troops_disturbing = 0;
 
-    $player_supremacy = array();
+    $player_capturing_id = null;
+    $player_capturing_troops = null;
+
     $player_supremacy_troops = array();
 
     $territory_player_troops_list = $game->get_territory_player_troops_list($turn, $this->id);
@@ -483,7 +486,8 @@ AND `game_id` = '.mysql_ureal_escape_string($game->id).$where;
     if( count( $territory_player_troops_list ) == 1 ) {
       if( $last_owner->id === null ) {
         // Empty territory
-        $new_owner->id = $territory_player_troops_list[0]['player_id'];
+        $player_capturing_id = $territory_player_troops_list[0]['player_id'];
+        $player_capturing_troops = $territory_player_troops_list[0]['quantity'];
       }else {
         $invader = Player::instance( $territory_player_troops_list[0]['player_id'] );
         $player_diplomacy_list = $invader->get_last_player_diplomacy_list($game->id);
@@ -491,16 +495,14 @@ AND `game_id` = '.mysql_ureal_escape_string($game->id).$where;
         // If invader marked the previous owner as enemy, he captures the territory
         foreach( $player_diplomacy_list as $player_diplomacy ) {
           if( $player_diplomacy['to_player_id'] == $last_owner->id && $player_diplomacy['status'] == 'Enemy' ) {
-            $new_owner = $invader;
+            $player_capturing_id = $invader->id;
+            $player_capturing_troops = $territory_player_troops_list[0]['quantity'];
+            $troops_disturbing = $territory_player_troops_list[0]['quantity'];
           }
         }
       }
-      $this->set_territory_player_status(
-        $game->id,
-        $turn,
-        $territory_player_troops_list[0]['player_id'],
-        1
-      );
+
+      $player_supremacy_troops[ $territory_player_troops_list[0]['player_id'] ] = $territory_player_troops_list[0]['quantity'];
     }else {
       $all_allies = true;
       $all_allies_with_owner = true;
@@ -561,42 +563,55 @@ AND `game_id` = '.mysql_ureal_escape_string($game->id).$where;
             reset( $troops );
             list( $player_id, $troops ) = each( $troops );
 
-            $new_owner->id = $player_id;
+            $player_capturing_id = $player_id;
+            $player_capturing_troops = $troops;
           }
         }
       }else {
         // Contested territory
-        $is_contested = true;
-      }
-
-      // Supremacy
-      foreach( $player_supremacy_troops as $player_id => $supremacy_score ) {
-        $this->set_territory_player_status(
-          $game->id,
-          $turn,
-          $player_id,
-          $supremacy_score >= 0?1:0
-        );
+        $is_conflict = true;
+//        $is_contested = true;
       }
     }
+
+    // Supremacy
+    foreach( $player_supremacy_troops as $player_id => $supremacy_score ) {
+      $this->set_territory_player_status(
+        $game->id,
+        $turn,
+        $player_id,
+        $supremacy_score >= 0?1:0
+      );
+    }
+
+    $area = $this->get_area();
 
     // Capital status
     if( !$this->is_capturable() ) {
       $new_owner->id = null;
       $is_capital = false;
     }else {
+      // Capture try
+      if( $player_capturing_troops > 0 ) {
+        if( $player_capturing_troops * $game_parameters['TROOPS_CAPTURE_POWER'] >= $area ) {
+          $troops_disturbing = 0;
+          $new_owner->id = $player_capturing_id;
+        }else{
+          $is_contested = true;
+        }
+      }
+
       // In case of changed owner, reset the capital state
       $is_capital = $is_capital && ($last_owner->id == $new_owner->id);
     }
 
     // Revenue suppression
-    $area = $this->get_area();
     $revenue_suppression = min( 1, round( ($troops_disturbing * $game_parameters['TROOPS_CAPTURE_POWER']) / $area, 2) );
 
     // Status update
-    $this->set_territory_status($game->id, $turn, $new_owner->id, $is_contested?1:0, $is_capital?1:0, $revenue_suppression);
+    $this->set_territory_status($game->id, $turn, $new_owner->id, $is_contested?1:0, $is_conflict?1:0, $is_capital?1:0, $revenue_suppression);
 
-    $return = array('owner_id' => $new_owner->id, 'contested' => $is_contested, 'capital' => $is_capital, 'revenue_suppression' => $revenue_suppression);
+    $return = array('owner_id' => $new_owner->id, 'contested' => $is_contested, 'conflict' => $is_conflict, 'capital' => $is_capital, 'revenue_suppression' => $revenue_suppression);
 
     return $return;
   }
