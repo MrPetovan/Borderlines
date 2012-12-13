@@ -2,6 +2,8 @@
   $players = Player::db_get_by_member_id( $member->id );
   /* @var $current_player Player */
   /* @var $current_game Game */
+
+  $game_parameters = $current_game->get_parameters();
 ?>
 <h2><?php echo __('Dashboard')?></h2>
 <p><?php echo __('Welcome %s !', $current_player->get_name())?></p>
@@ -128,36 +130,60 @@
       <th>'.__('Area').'</th>
       <th>'.__('Status').'</th>
       <th>'.__('Troops').'</th>
+      <th>'.__('Economy').'</th>
+      <th>'.__('Corruption').'</th>
+      <th>'.__('Suppression').'</th>
+      <th>'.__('Revenue').'</th>
     </tr>';
 
       $total_troops = 0;
       $total_territory = 0;
-      $total_contested = 0;
+      $total_revenue = 0;
       foreach( $territory_summary as $territory_row ) {
         $territory = Territory::instance( $territory_row['territory_id'] );
         $owner = Player::instance( $territory_row['owner_id'] );
         $total_troops += $territory_row['quantity'];
+
+        $territory_revenue =
+          $game_parameters['TERRITORY_BASE_REVENUE']
+          * ( $territory_row['economy_ratio'] )
+          * ( 1 - $territory_row['corruption_ratio'] )
+          * ( 1 - $territory_row['revenue_suppression'] );
+
         if( $owner == $current_player ) {
-          if( $territory_row['contested'] ) {
-            $total_contested += $territory->area;
-          }
           $total_territory += $territory->area;
+          $total_revenue += $territory_revenue;
         }
+
+        if( $territory_row['conflict'] ) {
+          $status = '<img src="'.IMG.'img_html/bomb.png" alt=""/> '.__('Conflict');
+        }elseif( $territory_row['contested'] ) {
+          $status = '<img src="'.IMG.'img_html/flag_red.png" alt=""/> '.__('Contested');
+        }else {
+          $status = '<img src="'.IMG.'img_html/accept.png" alt=""/> '.__('Stable');
+        }
+
         echo '
     <tr>
       <td><a href="'.Page::get_url('show_territory', array('id' => $territory->id)).'">'.$territory->name.'</a></td>
       <td>';
         if( $owner == $current_player ) {
           echo 'Yourself';
-        }else {
+        }elseif( $owner->id ) {
           echo '<a href="'.Page::get_url('show_player', array('id' => $owner->id)).'">'.$owner->name.'</a>';
+        }else {
+          echo __('Nobody');
         }
         echo '
       </td>
       <td>'.($territory_row['capital']?'Capital':'Province').'</td>
       <td class="num">'.l10n_number( $territory->area ).' km²</td>
-      <td>'.($territory_row['contested']?'<img src="'.IMG.'img_html/bomb.png" alt=""/> '.__('Contested'):'<img src="'.IMG.'img_html/accept.png" alt=""/> '.__('Stable')).'</td>
+      <td>'.$status.'</td>
       <td class="num">'.l10n_number( $territory_row['quantity'] ).' <img src="'.IMG.'img_html/troops.png" alt="'.__('Troops').'" title="'.__('Troops').'"/></td>
+      <td class="num">'.l10n_number( $territory_row['economy_ratio'] * 100 ).' %</td>
+      <td class="num">'.l10n_number( $territory_row['corruption_ratio'] * 100 ).' %</td>
+      <td class="num">'.l10n_number( $territory_row['revenue_suppression'] * 100 ).' %</td>
+      <td class="num">'.l10n_number( $territory_revenue ).' <img src="'.IMG.'img_html/coins.png" alt="" title=""/></td>
     </tr>';
       }
       echo '
@@ -171,6 +197,8 @@
       <td class="num"><?php echo l10n_number( $total_territory )?> km²</td>
       <th><?php echo __('Total')?></th>
       <td class="num"><?php echo l10n_number( $total_troops ).' <img src="'.IMG.'img_html/troops.png" alt="'.__('Troops').'" title="'.__('Troops').'"/>' ?></td>
+      <th colspan="3"><?php echo __('Total')?></th>
+      <td class="num"><?php echo l10n_number( $total_revenue ).' <img src="'.IMG.'img_html/coins.png" alt="" title=""/>' ?></td>
     </tr>
   </tbody>
 </table>

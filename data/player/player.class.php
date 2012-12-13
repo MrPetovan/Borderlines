@@ -309,18 +309,24 @@ AND `turn` = `pd_max`.`max_turn`';
     $troops = array();
     $return = array();
     foreach( $territory_player_troops_list as $territory_player_troops_row ) {
-      $territory = array_pop( $game->get_territory_status_list($territory_player_troops_row['territory_id'], $turn) );
-      $territory['quantity'] = $territory_player_troops_row['quantity'];
-      $troops[ $territory['territory_id'] ] = $territory['quantity'];
-      $return[ $territory['territory_id'] ] = $territory;
+      $territory = Territory::instance($territory_player_troops_row['territory_id']);
+      $territory_row = array_pop( $game->get_territory_status_list($territory_player_troops_row['territory_id'], $turn) );
+      $territory_row['quantity'] = $territory_player_troops_row['quantity'];
+      $territory_row['economy_ratio'] = $territory->get_economy_ratio($game, $turn);
+      $territory_row['corruption_ratio'] = $territory->get_corruption_ratio($game, $turn);
+      $troops[ $territory_row['territory_id'] ] = $territory_row['quantity'];
+      $return[ $territory_row['territory_id'] ] = $territory_row;
+
     }
     //var_debug( $territory_status_list );
     foreach( $territory_status_list as $territory_status_row ) {
       if( !isset( $return[ $territory_status_row['territory_id'] ] ) ) {
-        $territory = $territory_status_row;
-        $territory['quantity'] = 0;
-        $troops[ $territory['territory_id'] ] = $territory['quantity'];
-        $return[ $territory['territory_id'] ] = $territory;
+        $territory = Territory::instance($territory_status_row['territory_id']);
+        $territory_status_row['economy_ratio'] = $territory->get_economy_ratio($game, $turn);
+        $territory_status_row['corruption_ratio'] = $territory->get_corruption_ratio($game, $turn);
+        $territory_status_row['quantity'] = 0;
+        $troops[ $territory_status_row['territory_id'] ] = $territory_status_row['quantity'];
+        $return[ $territory_status_row['territory_id'] ] = $territory_status_row;
       }
     }
 
@@ -349,7 +355,7 @@ AND `turn` = `pd_max`.`max_turn`';
     if( is_null( $turn ) ) {
       $turn = $game->current_turn;
     }
-    $game_options = $game->get_parameters();
+    $game_parameters = $game->get_parameters();
 
     $capital = $this->get_capital( $game, $turn );
 
@@ -360,12 +366,12 @@ AND `turn` = `pd_max`.`max_turn`';
       $corruption_ratio = $territory->get_corruption_ratio( $game, $turn );
 
       $territory_revenue =
-        $game_options['TERRITORY_BASE_REVENUE']
+        $game_parameters['TERRITORY_BASE_REVENUE']
         * ( 1 - $corruption_ratio )
         * ( $territory->get_economy_ratio( $game, $turn ) )
         * ( 1 - $territory_status_row['revenue_suppression'] );
 
-      //var_debug( $territory->name, $game_options['TERRITORY_BASE_REVENUE'], $corruption_ratio, $territory->get_economy_ratio( $game, $turn ), $territory_status_row['revenue_suppression'], $territory_revenue );
+      //var_debug( $territory->name, $game_parameters['TERRITORY_BASE_REVENUE'], $corruption_ratio, $territory->get_economy_ratio( $game, $turn ), $territory_status_row['revenue_suppression'], $territory_revenue );
 
       $revenue += $territory_revenue;
     }
