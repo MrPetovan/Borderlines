@@ -11,6 +11,12 @@
     $territory_owner = Player::instance($territory_status['owner_id']);
 
     $territory_params = array('game_id' => $current_game->id );
+
+    $orders = Player_Order::db_get_planned_by_player_id($current_player->id, $current_game->id);
+
+    $is_current_turn = $turn == $current_game->current_turn;
+
+    $game_parameters = $current_game->get_parameters();
   }
 
   $neighbour_list = array();
@@ -21,11 +27,16 @@
 
   $is_ajax = strrpos(PAGE_CODE, 'ajax') === strlen( PAGE_CODE ) - 4;
 
-  $orders = Player_Order::db_get_planned_by_player_id($current_player->id, $current_game->id);
-
-  $is_current_turn = $turn == $current_game->current_turn;
-
   $is_contested = $territory_status['contested'];
+  $is_conflict = $territory_status['conflict'];
+
+  if( $is_conflict ) {
+    $status = 'Conflict';
+  }elseif( $is_contested ) {
+    $status = 'Contested';
+  }else {
+    $status = 'Stable';
+  }
 ?>
 
 <?php if( $is_current_turn ) :?>
@@ -73,12 +84,15 @@
     <span class="label"><?php echo __('Corruption')?></span>
     <span class="value"><?php echo l10n_number( round( $corruption_ratio * 100 ) ).' %'?></span>
   </p>
-
   <p>
     <span class="label"><?php echo __('Status')?></span>
-    <span class="value"><?php echo $is_contested?__('Contested'):__('Stable')?></span>
+    <span class="value"><?php echo __($status)?></span>
   </p>
-<?php if( $is_contested ) :?>
+  <p>
+    <span class="label"><?php echo __('Troops needed for capture')?></span>
+    <span class="value"><?php echo l10n_number( $territory->area / $game_parameters['TROOPS_CAPTURE_POWER'] )?></span>
+  </p>
+<?php if( $is_conflict || $is_contested ) :?>
   <p>
     <span class="label"><?php echo __('Revenue Suppression')?></span>
     <span class="value"><?php echo l10n_number( $territory_status['revenue_suppression'] * 100 )?> %</span>
