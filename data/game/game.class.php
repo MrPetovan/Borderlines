@@ -9,7 +9,7 @@ require_once( DATA."model/game_model.class.php" );
 class Game extends Game_Model {
 
   // CUSTOM
-  protected $_version = 'world';
+  protected $_version = 'economy';
 
   public function get_territory_player_troops_list($turn = null, $territory_id = null, $player_id = null) {
     $return = array();
@@ -120,7 +120,7 @@ AND `owner_id` = '.mysql_ureal_escape_string($owner_id);
     }
 
     $sql = '
-SELECT `territory_id`, `game_id`, `turn`, `owner_id`, `contested`, `capital`, `revenue_suppression`
+SELECT `territory_id`, `game_id`, `turn`, `owner_id`, `contested`, `conflict`, `capital`, `revenue_suppression`
 FROM `territory_status`
 WHERE `game_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
     $res = mysql_uquery($sql);
@@ -265,7 +265,7 @@ WHERE `game_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
         $territory_status_previous = $territory->get_territory_status( $this, $current_turn );
         $territory_status = $territory->get_territory_status( $this, $next_turn );
 
-        if( $territory_status['contested'] ) {
+        if( $territory_status['conflict'] ) {
           // Diplomacy checking and parties forming
           $diplomacy = array();
           $attacks = array();
@@ -355,7 +355,7 @@ WHERE `game_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
         }
 
         // Economy ratio modification
-        if( ! $territory_status['contested'] ) {
+        if( ! $territory_status['conflict'] ) {
           if( $territory_status['owner_id'] == $territory_status_previous['owner_id'] ) {
             $modifier = $game_parameters['ECONOMY_MODIFIER_PEACE'];
             $reason = 'Peace';
@@ -369,7 +369,7 @@ WHERE `game_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
         }
         // Capping economy ratio for neutral territories
         if( $territory_status_previous['owner_id'] === null ) {
-          $max_economy_ratio = 0.5;
+          $max_economy_ratio = 0.6;
         }else {
           $max_economy_ratio = 1;
         }
@@ -702,6 +702,10 @@ WHERE `ended` IS NULL";
       <p class="field">'.HTMLHelper::genererInputText('parameters[AWAY_TROOPS_MAINTENANCE]', $game_parameters['AWAY_TROOPS_MAINTENANCE'], array(), __('Away troops cost')).'</p>
       <p class="field">'.HTMLHelper::genererInputText('parameters[RECRUIT_TROOPS_PRICE]', $game_parameters['RECRUIT_TROOPS_PRICE'], array(), __('Recruit troop price')).'</p>
       <p class="field">'.HTMLHelper::genererInputText('parameters[TROOPS_EFFICACITY]', $game_parameters['TROOPS_EFFICACITY'], array(), __('Troops efficacity (1 damage/x troops)')).'</p>
+      <p class="field">'.HTMLHelper::genererInputText('parameters[TROOPS_CAPTURE_POWER]', $game_parameters['TROOPS_CAPTURE_POWER'], array(), __('Troops capture power (in km²/troops)')).'</p>
+      <p class="field">'.HTMLHelper::genererInputText('parameters[TERRITORY_BASE_REVENUE]', $game_parameters['TERRITORY_BASE_REVENUE '], array(), __('Territory base revenue')).'</p>
+      <p class="field">'.HTMLHelper::genererInputText('parameters[ECONOMY_MODIFIER_WAR]', $game_parameters['ECONOMY_MODIFIER_WAR'], array(), __('Economy modifier (Conflict)')).'</p>
+      <p class="field">'.HTMLHelper::genererInputText('parameters[ECONOMY_MODIFIER_PEACE]', $game_parameters['ECONOMY_MODIFIER_PEACE'], array(), __('Economy modifier (Peace)')).'</p>
       <p class="field">'.HTMLHelper::genererInputCheckBox('parameters[ALLOW_JOIN_MIDGAME]', '0', $game_parameters['ALLOW_JOIN_MIDGAME'], array(), __('Allow players to join mid-game')).'</p>
     </fieldset>';
 
