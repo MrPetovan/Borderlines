@@ -89,8 +89,6 @@ class Move_Troops extends Player_Order {
             $player_order = new self();
             $valid = $player_order->plan($order_type, $player, $params, $turn++, $previous_player_order_id);
 
-            var_debug( $params, $valid );
-
             $previous_player_order_id = $player_order->id;
             $from = $to;
           }
