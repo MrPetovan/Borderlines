@@ -130,8 +130,12 @@
 <p><a href="'.Page::get_page_url(PAGE_CODE, false, array('action' => 'join', 'id' => $game->id)).'">'.__('Join this game').'</a></p>';
   }
 
-  if( is_admin() ) {
-    echo '<p><a href="'.Page::get_url('admin_game_view', array('id' => $game->id )).'">'.__('Manage game').'</a></p>';
-  }
+  if( is_admin() ) {?>
+<p><a href="<?php echo Page::get_url( PAGE_CODE, array('action' => 'revert', 'id' => $game->id, 'turn' => $game->current_turn - 1 ) )?>">Revert to previous turn</a></p>
+<p><a href="<?php echo Page::get_url( PAGE_CODE, array('action' => 'reset', 'id' => $game->id ) )?>">Reset game</a></p>
+<p><a href="<?php echo Page::get_url( PAGE_CODE, array('action' => 'start', 'id' => $game->id ) )?>">Start game</a></p>
+<p><a href="<?php echo Page::get_url( PAGE_CODE, array('action' => 'compute', 'id' => $game->id ) )?>">Compute orders</a></p>
+<p><a href="<?php echo Page::get_url('admin_game_view', array('id' => $game->id ))?>"><?php echo __('Manage game')?></a></p>
+<?php  }
 ?>
 <p><a href="<?php echo get_page_url('game_list')?>"><?php echo __('Return to game list')?></a></p>

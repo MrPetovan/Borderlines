@@ -19,7 +19,38 @@
         break;
       }
     }
-    Page::redirect( PAGE_CODE, array('id' => $game->id ) );
+    if( is_admin() ) {
+      switch( getValue('action') ) {
+        case "reset" : {
+          $game->reset();
+
+          Page::set_message('reset game OK');
+          break;
+        }
+        case "revert" : {
+          $turn = getValue('turn');
+          $game->revert( $turn );
+
+          Page::set_message('revert game to turn '.$turn.' OK');
+          break;
+        }
+        case "start" : {
+          $game->start();
+
+          Page::set_message('start game OK');
+          break;
+        }
+        case "compute" : {
+          if( $game->compute() ) {
+            Page::set_message('compute OK');
+          }else {
+            Page::set_message('compute KO', Page::PAGE_MESSAGE_ERROR);
+          }
+          break;
+        }
+      }
+    }
+    //Page::redirect( PAGE_CODE, array('id' => $game->id ) );
   }
 
   $game_player_list = $game->get_game_player_list();
