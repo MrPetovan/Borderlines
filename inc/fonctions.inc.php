@@ -1015,4 +1015,25 @@ function which_os ()
 
     return reset( array_keys( $array , min($array) ) );
   }
+
+  /*
+   * Gets the number of decimal digits
+   *
+   * Inspired by http://stackoverflow.com/a/12525070/757392
+   */
+  function get_dec_count($num) {
+    $dec = 0;
+    while (true) {
+        if ((string)$num === (string)round($num)) {
+            break;
+        }
+        if (is_infinite($num)) {
+            break;
+        }
+
+        $num *= 10;
+        $dec++;
+    }
+    return $dec;
+}
 ?>
