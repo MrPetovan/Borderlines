@@ -50,7 +50,7 @@ function mysql_ureal_escape_string() {
     if (is_null($value)) {
       $return = 'NULL';
     } elseif (is_numeric($value)) {
-      $return = $value;
+      $return = number_format($value, get_dec_count( $value ), '.','');
     } elseif (is_array($value)) {
       foreach ($value as $key => $value_item) {
         $values[$key] = mysql_ureal_escape_string($value_item);
@@ -142,13 +142,15 @@ function mysql_log($query = null) {
 function mysql_fetch_to_array($res) {
   $return = array();
 
-  while ($row = mysql_fetch_assoc($res)) {
-    foreach ($row as $param => $value) {
-      $row[$param] = correctype($value);
+  if( $res !== null ) {
+    while ($row = mysql_fetch_assoc($res)) {
+      foreach ($row as $param => $value) {
+        $row[$param] = correctype($value);
+      }
+      $return[] = $row;
     }
-    $return[] = $row;
+    mysql_free_result($res);
   }
-  mysql_free_result($res);
 
   return $return;
 }
