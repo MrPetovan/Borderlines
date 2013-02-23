@@ -65,7 +65,8 @@
 <?php if( $current_game->has_ended() ) {?>
 <p><?php echo __('This game is over, check <a href="%s">the final scoreboard</a> !', Page::get_url('show_game', array('id' => $current_game->id)))?></p>
 <?php }else {
-        $turn_ready = array_shift( $current_player->get_game_player_list( $current_game->id ) );?>
+        $turn_ready = array_shift( $current_player->get_game_player_list( $current_game->id ) );
+?>
   <p>
     <span class="label"><?php echo __('Your turn status')?></span>
     <span class="value">
@@ -121,7 +122,7 @@
       echo '
   <tbody class="archive'.($is_current?' current':'').'">
     <tr class="title">
-      <th colspan="6">'.__('Turn %s', $turn).'</th>
+      <th colspan="10">'.__('Turn %s', $turn).'</th>
     </tr>
     <tr>
       <th>'.__('Territory').'</th>
@@ -144,11 +145,14 @@
         $owner = Player::instance( $territory_row['owner_id'] );
         $total_troops += $territory_row['quantity'];
 
-        $territory_revenue =
-          $game_parameters['TERRITORY_BASE_REVENUE']
-          * ( $territory_row['economy_ratio'] )
-          * ( 1 - $territory_row['corruption_ratio'] )
-          * ( 1 - $territory_row['revenue_suppression'] );
+        $territory_revenue = 0;
+        if( $owner == $current_player ) {
+          $territory_revenue =
+            $game_parameters['TERRITORY_BASE_REVENUE']
+            * ( $territory_row['economy_ratio'] )
+            * ( 1 - $territory_row['corruption_ratio'] )
+            * ( 1 - $territory_row['revenue_suppression'] );
+        }
 
         if( $owner == $current_player ) {
           $total_territory += $territory->area;
@@ -265,6 +269,7 @@
   // Is there a capital ?
   $capital = $current_player->get_capital($current_game);
 
+  $troops_recruited = 0;
   if( $capital->id !== null ) {
     $troops_recruited = floor( $recruit_budget / $options['RECRUIT_TROOPS_PRICE'] );
   }
