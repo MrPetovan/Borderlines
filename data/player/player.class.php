@@ -99,11 +99,13 @@ AND g_p.`game_id` = '.mysql_ureal_escape_string($game_id);
 SELECT g_p.`game_id`, g_p.`player_id`, g_p.`turn_ready`, g_p.`turn_leave`
 FROM `game_player` g_p
 JOIN `game` g ON g.`id` = g_p.`game_id`
-WHERE g.`version` = "world"
+WHERE g.`version` IN ("world", "economy")
 AND g_p.`player_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
     $res = mysql_uquery($sql);
 
-    return mysql_fetch_to_array($res);
+    $return = mysql_fetch_to_array($res);
+
+    return $return;
   }
 
   public function get_last_spied_value( $value_guid, $game_id = null ) {
@@ -294,6 +296,7 @@ WHERE `from_player_id` = '.mysql_ureal_escape_string($this->get_id()).'
 AND `game_id` = '.mysql_ureal_escape_string($game_id).'
 AND `pd`.`to_player_id` = `pd_max`.`to_player_id`
 AND `turn` = `pd_max`.`max_turn`';
+    //var_debug( $sql );
     $res = mysql_uquery($sql);
 
     return mysql_fetch_to_array($res);
