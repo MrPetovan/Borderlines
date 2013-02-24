@@ -296,9 +296,9 @@
     public function save($flags = 0) {
       if($return = ($this->check_valid($flags) === true)) {
         if(is_null($this->get_id())) {
-          return $this->db_add();
+          $return = $this->db_add();
         }else {
-          return $this->db_update();
+          $return = $this->db_update();
         }
       }
       return $return;
@@ -317,9 +317,9 @@
     public function db_save($flags = 0) {
       if(($return = $this->check_valid($flags)) === true) {
         if(is_null($this->get_id())) {
-          return $this->db_add();
+          $return = $this->db_add();
         }else {
-          return $this->db_update();
+          $return = $this->db_update();
         }
       }
       return $return;
