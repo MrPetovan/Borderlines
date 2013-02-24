@@ -58,8 +58,8 @@ GROUP BY
         'TROOPS_CAPTURE_POWER' => 10,
         'ALLOW_JOIN_MIDGAME' => 1,
         'TERRITORY_BASE_REVENUE' => 10000,
-        'ECONOMY_MODIFIER_WAR' => -.2,
-        'ECONOMY_MODIFIER_PEACE' => .2
+        'ECONOMY_MODIFIER_WAR' => -20,
+        'ECONOMY_MODIFIER_PEACE' => 20
     );
 
     $game_parameters = unserialize($this->_parameters);
@@ -155,6 +155,8 @@ WHERE `game_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
     $sql = 'DELETE FROM `player_order` WHERE `game_id` = '.mysql_ureal_escape_string($this->id);
     mysql_uquery($sql);
 
+    $this->current_turn = 1;
+
     $territories = Territory::db_get_by_world_id( $this->world_id );
 
     $player_list = Player::db_get_by_game( $this->id );
@@ -166,6 +168,8 @@ WHERE `game_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
 
       $this->bootstrap_player( $player, $starting_territory->id );
     }
+
+    return $this->save();
   }
 
   public function revert($turn = null) {
@@ -185,8 +189,8 @@ WHERE `game_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
     mysql_uquery($sql);
     $sql = 'UPDATE `game_player` SET `turn_ready` = '.mysql_ureal_escape_string($turn).' WHERE `game_id` = '.mysql_ureal_escape_string($this->id).$where_ready;
     mysql_uquery($sql);
-    $sql = 'DELETE FROM `player_diplomacy` WHERE `game_id` = '.mysql_ureal_escape_string($this->id).$where;
-    mysql_uquery($sql);
+    //$sql = 'DELETE FROM `player_diplomacy` WHERE `game_id` = '.mysql_ureal_escape_string($this->id).$where;
+    //mysql_uquery($sql);
     $sql = 'DELETE FROM `player_history` WHERE `game_id` = '.mysql_ureal_escape_string($this->id).$where;
     mysql_uquery($sql);
     $sql = 'UPDATE `player_order` SET `datetime_execution` = NULL, `turn_executed` = NULL WHERE `game_id` = '.mysql_ureal_escape_string($this->id).$where_scheduled;
@@ -273,6 +277,15 @@ WHERE `game_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
 
           $player_troops = $this->get_territory_player_troops_list($next_turn, $territory->id);
           foreach( $player_troops as $key => $attacker_row ) {
+            /* @var $player Player */
+            $player = Player::instance($attacker_row['player_id']);
+            $last_diplomacy = $player->get_last_player_diplomacy_list($this->id);
+
+            foreach( $last_diplomacy as $diplomacy_row ) {
+              $diplomacy[ $diplomacy_row['from_player_id'] ][ $diplomacy_row['to_player_id'] ] = $diplomacy_row['status'] == 'Ally';
+            }
+          }
+          foreach( $player_troops as $key => $attacker_row ) {
             $this->set_player_history(
               $attacker_row['player_id'],
               $next_turn,
@@ -281,15 +294,6 @@ WHERE `game_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
               $territory->id
             );
 
-            /* @var $player Player */
-            $player = Player::instance($attacker_row['player_id']);
-            foreach( $player->get_last_player_diplomacy_list($this->id) as $diplomacy_row ) {
-              $diplomacy[ $diplomacy_row['from_player_id'] ][ $diplomacy_row['to_player_id'] ] = $diplomacy_row['status'] == 'Ally';
-            }
-            // Battle
-            $attacker_efficiency = 1 / $game_parameters['TROOPS_EFFICACITY'];
-            $attacker_damages = round($attacker_efficiency * $attacker_row['quantity']);
-
             // Building the attacks directions
             foreach( $player_troops as $defender_row ) {
               if( $attacker_row['player_id'] != $defender_row['player_id'] &&
@@ -297,6 +301,11 @@ WHERE `game_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
                 $attacks[ $attacker_row['player_id'] ][] = $defender_row['player_id'];
               }
             }
+          }
+          foreach( $player_troops as $key => $attacker_row ) {
+            // Battle
+            $attacker_efficiency = 1 / $game_parameters['TROOPS_EFFICACITY'];
+            $attacker_damages = round($attacker_efficiency * $attacker_row['quantity']);
 
             // Damages spread between the opposing forces
             foreach( $attacks[ $attacker_row['player_id'] ] as $defender_player_id ) {
@@ -357,14 +366,14 @@ WHERE `game_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
         // Economy ratio modification
         if( ! $territory_status['conflict'] ) {
           if( $territory_status['owner_id'] == $territory_status_previous['owner_id'] ) {
-            $modifier = $game_parameters['ECONOMY_MODIFIER_PEACE'];
+            $modifier = $game_parameters['ECONOMY_MODIFIER_PEACE'] / 100;
             $reason = 'Peace';
           }else {
             $modifier = 0;
             $reason = 'Capture';
           }
         }else {
-          $modifier = $game_parameters['ECONOMY_MODIFIER_WAR'];
+          $modifier = $game_parameters['ECONOMY_MODIFIER_WAR'] / 100;
           $reason = 'War';
         }
         // Capping economy ratio for neutral territories
@@ -603,13 +612,13 @@ WHERE `ended` IS NULL";
     $player_list = Player::db_get_by_game( $this->id );
     foreach( $player_list as $playerB ) {
       if( $player != $playerB ) {
-        $this->set_player_diplomacy( $this->current_turn, $player->id, $playerB->id, 'Enemy' );
-        $this->set_player_diplomacy( $this->current_turn, $playerB->id, $player->id, 'Enemy' );
+        $this->set_player_diplomacy( $this->current_turn, $player->id, $playerB->id, 'Ally' );
+        $this->set_player_diplomacy( $this->current_turn, $playerB->id, $player->id, 'Ally' );
       }
     }
 
     $this->set_territory_player_troops_history($this->current_turn, $territory_id, $player->id, 1000, 'Init');
-    $this->set_territory_status($territory_id, $this->current_turn, $player->id, 0, 1, 1);
+    $this->set_territory_status( $territory_id, $this->current_turn, $player->id, 0, 0, 1, 0 );
     $this->set_territory_economy_history($territory_id, $this->current_turn, 1, 'Init');
 
     $member = Member::instance( $player->member_id );
@@ -703,9 +712,9 @@ WHERE `ended` IS NULL";
       <p class="field">'.HTMLHelper::genererInputText('parameters[RECRUIT_TROOPS_PRICE]', $game_parameters['RECRUIT_TROOPS_PRICE'], array(), __('Recruit troop price')).'</p>
       <p class="field">'.HTMLHelper::genererInputText('parameters[TROOPS_EFFICACITY]', $game_parameters['TROOPS_EFFICACITY'], array(), __('Troops efficacity (1 damage/x troops)')).'</p>
       <p class="field">'.HTMLHelper::genererInputText('parameters[TROOPS_CAPTURE_POWER]', $game_parameters['TROOPS_CAPTURE_POWER'], array(), __('Troops capture power (in km²/troops)')).'</p>
-      <p class="field">'.HTMLHelper::genererInputText('parameters[TERRITORY_BASE_REVENUE]', $game_parameters['TERRITORY_BASE_REVENUE '], array(), __('Territory base revenue')).'</p>
-      <p class="field">'.HTMLHelper::genererInputText('parameters[ECONOMY_MODIFIER_WAR]', $game_parameters['ECONOMY_MODIFIER_WAR'], array(), __('Economy modifier (Conflict)')).'</p>
-      <p class="field">'.HTMLHelper::genererInputText('parameters[ECONOMY_MODIFIER_PEACE]', $game_parameters['ECONOMY_MODIFIER_PEACE'], array(), __('Economy modifier (Peace)')).'</p>
+      <p class="field">'.HTMLHelper::genererInputText('parameters[TERRITORY_BASE_REVENUE]', $game_parameters['TERRITORY_BASE_REVENUE'], array(), __('Territory base revenue')).'</p>
+      <p class="field">'.HTMLHelper::genererInputText('parameters[ECONOMY_MODIFIER_WAR]', $game_parameters['ECONOMY_MODIFIER_WAR'], array(), __('Economy modifier (Conflict)')).' %</p>
+      <p class="field">'.HTMLHelper::genererInputText('parameters[ECONOMY_MODIFIER_PEACE]', $game_parameters['ECONOMY_MODIFIER_PEACE'], array(), __('Economy modifier (Peace)')).' %</p>
       <p class="field">'.HTMLHelper::genererInputCheckBox('parameters[ALLOW_JOIN_MIDGAME]', '0', $game_parameters['ALLOW_JOIN_MIDGAME'], array(), __('Allow players to join mid-game')).'</p>
     </fieldset>';
 
