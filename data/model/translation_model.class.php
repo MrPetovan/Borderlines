@@ -10,6 +10,9 @@ class Translation_Model extends DBObject {
   protected $_locale = null;
   protected $_translation = null;
   protected $_context = null;
+  protected $_translator_id = null;
+  protected $_created = null;
+  protected $_updated = null;
 
   public function __construct($id = null) {
     parent::__construct($id);
@@ -18,11 +21,18 @@ class Translation_Model extends DBObject {
   /* ACCESSEURS */
   public static function get_table_name() { return "translation"; }
 
+  public function get_created()    { return guess_time($this->_created);}
+  public function get_updated()    { return guess_time($this->_updated);}
 
   /* MUTATEURS */
   public function set_id($id) {
     if( is_numeric($id) && (int)$id == $id) $data = intval($id); else $data = null; $this->_id = $data;
   }
+  public function set_translator_id($translator_id) {
+    if( is_numeric($translator_id) && (int)$translator_id == $translator_id) $data = intval($translator_id); else $data = null; $this->_translator_id = $data;
+  }
+  public function set_created($date) { $this->_created = guess_time($date, GUESS_DATE_MYSQL);}
+  public function set_updated($date) { $this->_updated = guess_time($date, GUESS_DATE_MYSQL);}
 
   /* FONCTIONS SQL */
 
@@ -31,6 +41,13 @@ class Translation_Model extends DBObject {
     $sql = "
 SELECT `id` FROM `".self::get_table_name()."`
 WHERE `code` = ".mysql_ureal_escape_string($code);
+
+    return self::sql_to_list($sql);
+  }
+  public static function db_get_by_translator_id($translator_id) {
+    $sql = "
+SELECT `id` FROM `".self::get_table_name()."`
+WHERE `translator_id` = ".mysql_ureal_escape_string($translator_id);
 
     return self::sql_to_list($sql);
   }
@@ -76,6 +93,18 @@ WHERE `code` = ".mysql_ureal_escape_string($code);
           HTMLHelper::genererTextArea( "context", parameters_to_string( $this->get_context() ), array(), "Context" ):
           HTMLHelper::genererInputText( "context", $this->get_context(), array(), "Context")).'
         </p>
+        <p class="field">'.(is_array($this->get_translator_id())?
+          HTMLHelper::genererTextArea( "translator_id", parameters_to_string( $this->get_translator_id() ), array(), "Translator Id" ):
+          HTMLHelper::genererInputText( "translator_id", $this->get_translator_id(), array(), "Translator Id")).'
+        </p>
+        <p class="field">'.(is_array($this->get_created())?
+          HTMLHelper::genererTextArea( "created", parameters_to_string( $this->get_created() ), array(), "Created *" ):
+          HTMLHelper::genererInputText( "created", $this->get_created(), array(), "Created *")).'
+        </p>
+        <p class="field">'.(is_array($this->get_updated())?
+          HTMLHelper::genererTextArea( "updated", parameters_to_string( $this->get_updated() ), array(), "Updated *" ):
+          HTMLHelper::genererInputText( "updated", $this->get_updated(), array(), "Updated *")).'
+        </p>
 
     </fieldset>';
 
@@ -93,6 +122,8 @@ WHERE `code` = ".mysql_ureal_escape_string($code);
     switch($num_error) { 
       case 1 : $return = "Le champ <strong>Code</strong> est obligatoire."; break;
       case 2 : $return = "Le champ <strong>Locale</strong> est obligatoire."; break;
+      case 3 : $return = "Le champ <strong>Created</strong> est obligatoire."; break;
+      case 4 : $return = "Le champ <strong>Updated</strong> est obligatoire."; break;
       default: $return = "Erreur de saisie, veuillez vérifier les champs.";
     }
     return $return;
@@ -110,6 +141,8 @@ WHERE `code` = ".mysql_ureal_escape_string($code);
 
     $return[] = Member::check_compulsory($this->get_code(), 1);
     $return[] = Member::check_compulsory($this->get_locale(), 2);
+    $return[] = Member::check_compulsory($this->get_created(), 3);
+    $return[] = Member::check_compulsory($this->get_updated(), 4);
 
     $return = array_unique($return);
     if(($true_key = array_search(true, $return, true)) !== false) {

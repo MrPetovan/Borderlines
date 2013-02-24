@@ -21,6 +21,9 @@
           <th>Locale</th>
           <th>Translation</th>
           <th>Context</th>
+          <th>Translator Id</th>
+          <th>Created</th>
+          <th>Updated</th>
         </tr>
       </thead>
       <tfoot>
@@ -40,6 +43,9 @@
           <td>'.(is_array($translation->locale)?nl2br(parameters_to_string($translation->locale)):$translation->locale).'</td>
           <td>'.(is_array($translation->translation)?nl2br(parameters_to_string($translation->translation)):$translation->translation).'</td>
           <td>'.(is_array($translation->context)?nl2br(parameters_to_string($translation->context)):$translation->context).'</td>
+          <td>'.(is_array($translation->translator_id)?nl2br(parameters_to_string($translation->translator_id)):$translation->translator_id).'</td>
+          <td>'.guess_time($translation->created, GUESS_DATETIME_LOCALE).'</td>
+          <td>'.guess_time($translation->updated, GUESS_DATETIME_LOCALE).'</td>
           <td><a href="'.htmlentities_utf8(Page::get_url('admin_translation_mod', array('id' => $translation->id))).'"><img src="'.IMG.'img_html/pencil.png" alt="Modifier" title="Modifier"/></a></td>
         </tr>';
     }

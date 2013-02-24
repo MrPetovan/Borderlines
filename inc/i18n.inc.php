@@ -36,6 +36,8 @@
         $translation->code = $format;
         $translation->locale = LOCALE;
         $translation->context = PAGE_CODE;
+        $translation->created = time();
+        $translation->updated = time();
 
         $success = $translation->save();
 

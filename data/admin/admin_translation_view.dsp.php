@@ -25,6 +25,18 @@
             <p class="field">
               <span class="libelle">Context</span>
               <span class="value"><?php echo is_array($translation->context)?nl2br(parameters_to_string( $translation->context )):$translation->context?></span>
+            </p>
+            <p class="field">
+              <span class="libelle">Translator Id</span>
+              <span class="value"><?php echo is_array($translation->translator_id)?nl2br(parameters_to_string( $translation->translator_id )):$translation->translator_id?></span>
+            </p>
+            <p class="field">
+              <span class="libelle">Created</span>
+              <span class="value"><?php echo guess_time($translation->created, GUESS_DATETIME_LOCALE)?></span>
+            </p>
+            <p class="field">
+              <span class="libelle">Updated</span>
+              <span class="value"><?php echo guess_time($translation->updated, GUESS_DATETIME_LOCALE)?></span>
             </p>    </div>
     <p><a href="<?php echo get_page_url('admin_translation_mod', true, array('id' => $translation->id))?>">Modifier cet objet Translation</a></p>
 <?php
