@@ -39,15 +39,6 @@ class Quit_Game extends Player_Order {
       $current_game->set_territory_player_troops_history($next_turn, $territory_id, $player_id, - $quantity, 'Leave game', $player_id);
     }
 
-    $territory_status_list = $current_game->get_territory_status_list(null, $current_turn, $player->id);
-    foreach( $territory_status_list as $territory_status) {
-      $territory = Territory::instance($territory_status['territory_id']);
-      $ownership_array = $territory->compute_territory_status( $current_game, $next_turn );
-      if( $ownership_array['owner_id'] == $player->id ) {
-        $current_game->set_territory_status($territory_status['territory_id'], $next_turn, null, 0, 0, 0);
-      }
-    }
-
     $game_player = array_pop( $current_game->get_game_player_list( $player->id ) );
     $current_game->set_game_player($player->id, $game_player['turn_ready'], $current_game->current_turn);
 
