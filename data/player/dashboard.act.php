@@ -9,6 +9,8 @@
     }
   }
 
+  $redirect_page = false;
+
   $current_player = Player::get_current( $member );
 
   if( $current_player ) {
@@ -36,20 +38,24 @@
                 break;
               }
             }
-            Page::redirect(PAGE_CODE);
+            $redirect_page = PAGE_CODE;
           }
         }
       }else {
         Page::set_message(__('You quit during your last game, please join another one.'), Page::PAGE_MESSAGE_WARNING);
         // Left the game
-        Page::redirect( 'game_list' );
+        $redirect_page = 'game_list';
       }
     }else {
       // No game ever played
-      Page::redirect( 'game_list' );
+      $redirect_page = 'game_list';
     }
   }else {
     // No player created
-    Page::redirect( 'create_player' );
+    $redirect_page = 'create_player';
+  }
+
+  if( $redirect_page ) {
+    Page::redirect($redirect_page);
   }
 ?>
