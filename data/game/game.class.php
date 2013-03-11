@@ -284,11 +284,11 @@ WHERE `game_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
           $reason = 'War';
         }
         // Capping economy ratio for neutral territories
-        if( $territory_status_previous['owner_id'] === null ) {
-          $max_economy_ratio = 0.6;
-        }else {
+        //if( $territory_status_previous['owner_id'] === null ) {
+        //  $max_economy_ratio = 0.6;
+        //}else {
           $max_economy_ratio = 1;
-        }
+        //}
 
         $previous_ratio = $territory->get_economy_ratio( $this, $current_turn );
         $next_ratio = $previous_ratio + $modifier;
