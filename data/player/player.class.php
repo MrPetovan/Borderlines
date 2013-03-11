@@ -302,6 +302,33 @@ AND `turn` = `pd_max`.`max_turn`';
     return mysql_fetch_to_array($res);
   }
 
+  public function get_last_player_diplomacy( Game $game, $turn = null ) {
+    if( is_null( $turn ) ) {
+      $turn = $game->current_turn;
+    }
+
+    $sql = '
+SELECT `game_id`, `turn`, `from_player_id`, `pd`.`to_player_id`, `status`
+FROM `player_diplomacy` pd
+JOIN (
+  SELECT `to_player_id`, MAX( `turn` ) AS `max_turn`
+  FROM `player_diplomacy`
+  WHERE `from_player_id` = '.mysql_ureal_escape_string( $this->id ).'
+  AND `game_id` = '.mysql_ureal_escape_string( $game->id ).'
+  AND `from_player_id` != `to_player_id`
+  AND `turn` <= '.$turn.'
+  GROUP BY `to_player_id`
+) AS `pd_max`
+WHERE `from_player_id` = '.mysql_ureal_escape_string( $this->id ).'
+AND `game_id` = '.mysql_ureal_escape_string( $game->id ).'
+AND `pd`.`to_player_id` = `pd_max`.`to_player_id`
+AND `turn` = `pd_max`.`max_turn`';
+    //var_debug( $sql );
+    $res = mysql_uquery($sql);
+
+    return mysql_fetch_to_array($res);
+  }
+
   public function get_territory_summary( Game $game, $turn = null ) {
     if( is_null( $turn ) ) {
       $turn = $game->current_turn;
