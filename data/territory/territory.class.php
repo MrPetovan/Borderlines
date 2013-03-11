@@ -435,7 +435,107 @@ AND `game_id` = '.mysql_ureal_escape_string($game->id).$where;
     return $return;
   }
 
+  public function resolve_combat( Game $game, $turn = null ) {
+    //var_debug( "{$this->name}->resolve_combat( {$game->name}, $turn ) ");
+    $return = null;
+
+    if( is_null( $turn ) ) {
+      $turn = $game->current_turn;
+    }
+
+    $game_parameters = $game->get_parameters();
+
+    // Diplomacy checking and parties forming
+    $diplomacy = array();
+    $attacks = array();
+    $losses = array();
+
+    $player_troops = $game->get_territory_player_troops_list($turn, $this->id);
+    foreach( $player_troops as $key => $attacker_row ) {
+      /* @var $player Player */
+      $player = Player::instance($attacker_row['player_id']);
+      $last_diplomacy = $player->get_last_player_diplomacy( $game, $turn );
+
+      foreach( $last_diplomacy as $diplomacy_row ) {
+        $diplomacy[ $diplomacy_row['from_player_id'] ][ $diplomacy_row['to_player_id'] ] = $diplomacy_row['status'] == 'Ally';
+      }
+    }
+    foreach( $player_troops as $key => $attacker_row ) {
+      $game->set_player_history(
+        $attacker_row['player_id'],
+        $turn,
+        time(),
+        "There's a battle for the control of this territory",
+        $this->id
+      );
+
+      // Building the attacks directions
+      foreach( $player_troops as $defender_row ) {
+        if( $attacker_row['player_id'] != $defender_row['player_id'] &&
+          ! $diplomacy[ $attacker_row['player_id'] ][ $defender_row['player_id'] ] ) {
+          $attacks[ $attacker_row['player_id'] ][] = $defender_row['player_id'];
+        }
+      }
+    }
+    foreach( $player_troops as $key => $attacker_row ) {
+      // Battle
+      $attacker_efficiency = 1 / $game_parameters['TROOPS_EFFICACITY'];
+      $attacker_damages = round($attacker_efficiency * $attacker_row['quantity']);
+
+      // Damages spread between the opposing forces
+      foreach( $attacks[ $attacker_row['player_id'] ] as $defender_player_id ) {
+        if( !isset( $losses[ $defender_player_id ][ $attacker_row['player_id'] ] ) ) {
+          $losses[ $defender_player_id ][ $attacker_row['player_id'] ] = 0;
+        }
+        // Backstabbing (defender consider attacker as an ally)
+        if( $diplomacy[ $defender_player_id ][ $attacker_row['player_id'] ] ) {
+          $attack_mul = 2;
+        }else {
+          $attack_mul = 1;
+        }
+
+        $losses[ $defender_player_id ][ $attacker_row['player_id'] ] =
+          round($attacker_damages * $attack_mul / count( $attacks[ $attacker_row['player_id'] ] ) );
+      }
+    }
+
+    // Cleaning up
+    foreach( $player_troops as $key => $player_row ) {
+
+      $total_damages = array_sum( $losses[ $player_row['player_id'] ] );
+      $total_losses = min( $player_row['quantity'], $total_damages );
+      $ratio = 1;
+      if( $total_damages > $total_losses ) {
+        $ratio = $total_losses / $total_damages;
+      }
+
+      foreach( $losses[ $player_row['player_id'] ] as $attacker_player_id => $damages ) {
+        $player = Player::instance($attacker_player_id);
+        if( $diplomacy[ $player_row['player_id'] ][ $attacker_player_id ] ) {
+          $game->set_player_history(
+            $player_row['player_id'],
+            $turn,
+            time(),
+            $player->name . "'s troops backstabbed yours !",
+            $this->id
+          );
+        }
+        $game->set_territory_player_troops_history($turn, $player_row['territory_id'], $player_row['player_id'], round( - $damages * $ratio ), 'Combat', $player->id);
+      }
+
+      if( $total_losses == $player_row['quantity'] ) {
+        $game->set_player_history(
+          $player_row['player_id'],
+          $turn,
+          time(),
+          "All of your ".$player_row['quantity']." troops have been killed",
+          $this->id
+        );
+      }
+    }
+  }
   public function get_territory_status( Game $game, $turn = null ) {
+    //var_debug( "{$this->name}->get_territory_status( {$game->name}, $turn ) ");
     $return = null;
 
     if( is_null( $turn ) ) {
@@ -453,6 +553,7 @@ AND `game_id` = '.mysql_ureal_escape_string($game->id).$where;
   }
 
   public function compute_territory_status( Game $game, $turn = null ) {
+    //var_debug( "{$this->name}->compute_territory_status( {$game->name}, $turn ) ");
     if( is_null( $turn ) ) {
       $turn = $game->current_turn;
     }
@@ -486,6 +587,8 @@ AND `game_id` = '.mysql_ureal_escape_string($game->id).$where;
       $territory_status_list = $this->get_territory_status_list( $game->id, $turn - 1 );
       $is_capital = $territory_status_list[0]['capital'] == 1;
     }
+
+    //var_debug( "Last owner : {$last_owner->name}", $territory_player_troops_list);
 
     // Default : ownership continues
     //$new_owner = $last_owner;
@@ -579,6 +682,8 @@ AND `game_id` = '.mysql_ureal_escape_string($game->id).$where;
         // Contested territory
         $is_conflict = true;
 //        $is_contested = true;
+
+        $this->resolve_combat($game, $turn);
       }
     }
 
