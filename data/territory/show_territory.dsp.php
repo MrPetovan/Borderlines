@@ -90,7 +90,7 @@
   </p>
   <p>
     <span class="label"><?php echo __('Troops needed for capture')?></span>
-    <span class="value"><?php echo l10n_number( $territory->area / $game_parameters['TROOPS_CAPTURE_POWER'] )?></span>
+    <span class="value"><?php echo l10n_number( ceil( $territory->area / $game_parameters['TROOPS_CAPTURE_POWER'] ) )?></span>
   </p>
 <?php if( $is_conflict || $is_contested ) :?>
   <p>
@@ -204,8 +204,82 @@
 ?>
   </tbody>
 </table>
+<?php /*
+<h3><?php echo __('Troops')?></h3>
+<table class="accordion">
+  <thead>
+    <tr>
+      <th><?php echo __('Player')?></th>
+      <th colspan="2"><?php echo __('Quantity')?></th>
+    </tr>
+  </thead>
+<?php
+    $current_turn = null;
+    $current_player = null;
+    $player_troops = array();
 
-<?php if( $is_current_turn && $current_game && !$current_game->has_ended() ) :?>
+    $territory_player_status_list = $current_game->get_territory_player_status_list(null, $territory->id);
+
+    $supremacy = array();
+    foreach( $territory_player_status_list as $territory_player_status_row ) {
+      $supremacy[ $territory_player_status_row['turn'] ][ $territory_player_status_row['player_id'] ] = $territory_player_status_row['supremacy'];
+    }
+
+    $troops_history = $current_game->get_territory_player_troops_history_list(null, $territory->id);
+
+    foreach( $troops_history as $troops_history_row ) {
+      if( $current_turn !== $troops_history_row['turn']) {
+        $is_current = $troops_history_row['turn'] == $turn;
+
+        if( $current_turn !== null ) {
+          echo '
+  </tbody>';
+        }
+        echo '
+  <tbody class="archive'.($is_current?' current':'').'">
+    <tr class="title">
+      <th colspan="3">'.__('Turn %s', $troops_history_row['turn']).'</th>
+    </tr>';
+
+        $current_turn = $troops_history_row['turn'];
+      }
+
+      if( $current_player !== $troops_history_row['player_id'] ) {
+        /* @var $player Player * /
+        $player = Player::instance( $troops_history_row['player_id'] );
+
+        if( !isset( $player_troops[ $troops_history_row['player_id'] ] ) ) {
+          $player_troops[ $troops_history_row['player_id'] ] = 0;
+        }
+        if( $current_player !== null ) {
+          echo '
+    <tr>
+      <td><a href="'.Page::get_url('show_player', array('id' => $player->id)).'">'.$player->name.'</a></td>
+      <td class="num">'.(!isset( $supremacy[$current_turn][$current_player] ) || $supremacy[$current_turn][$current_player]?__('Supremacy').' <img src="'.IMG.'img_html/lightning.png" alt=""/>':__('Retreat').' <img src="'.IMG.'img_html/link_break.png" alt=""/>'). '</td>
+      <td class="num">' . l10n_number( $player_troops[ $current_player ] ).' <img src="'.IMG.'img_html/troops.png" alt="'.__('Troops').'" title="'.__('Troops').'"/></td>
+    </tr>';
+        }
+        $current_player = $troops_history_row['player_id'];
+      }
+
+      echo '
+    <tr>
+      <td></td>
+      <td>'.__( $troops_history_row['reason'] ).'</td>
+      <td class="num">'.($troops_history_row['delta']>=0?'+':'').l10n_number( $troops_history_row['delta'] ).' <img src="'.IMG.'img_html/troops.png" alt="'.__('Troops').'" title="'.__('Troops').'"/></td>
+    </tr>';
+
+      $player_troops[ $troops_history_row['player_id'] ] += $troops_history_row['delta'];
+    }
+?>
+  </tbody>
+</table>
+
+*/
+?>
+
+
+<?php if( $is_current_turn && $current_game && !$current_game->has_ended() && $territory->is_passable() ) :?>
 
 <h3><?php echo __('Planned movements')?></h3>
 <?php
