@@ -280,6 +280,10 @@ WHERE `game_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
             $reason = 'Capture';
           }
         }else {
+          $territory->resolve_combat($this, $next_turn);
+
+          $territory->compute_territory_status($this, $next_turn);
+
           $modifier = $game_parameters['ECONOMY_MODIFIER_WAR'] / 100;
           $reason = 'War';
         }

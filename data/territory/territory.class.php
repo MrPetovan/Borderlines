@@ -681,9 +681,6 @@ AND `game_id` = '.mysql_ureal_escape_string($game->id).$where;
       }else {
         // Contested territory
         $is_conflict = true;
-//        $is_contested = true;
-
-        $this->resolve_combat($game, $turn);
       }
     }
 
