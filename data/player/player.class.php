@@ -329,6 +329,45 @@ AND `turn` = `pd_max`.`max_turn`';
     return mysql_fetch_to_array($res);
   }
 
+  public function get_last_player_diplomacy_player( Player $to_player, Game $game, $turn = null ) {
+    if( is_null( $turn ) ) {
+      $turn = $game->current_turn;
+    }
+
+    $sql = '
+SELECT `status`
+FROM `player_diplomacy`
+WHERE `from_player_id` = '.mysql_ureal_escape_string( $this->id ).'
+AND `game_id` = '.mysql_ureal_escape_string( $game->id ).'
+AND `to_player_id` = '.mysql_ureal_escape_string( $to_player->id ).'
+AND `turn` <= '.$turn.'
+ORDER BY `turn` DESC
+LIMIT 1';
+    //var_debug( $sql );
+
+    return mysql_fetch_one($sql);
+  }
+
+  public function get_player_name_with_diplomacy( Game $game = null, $turn = null, Player $to_player = null ) {
+    if( is_null( $turn ) ) {
+      $turn = $game->current_turn;
+    }
+
+    $return = $this->name;
+
+    if( $to_player !== null && $game !== null && !$game->has_ended() ) {
+      $status = $this->get_last_player_diplomacy_player( $to_player, $game, $turn );
+
+      if( $status ) {
+        $prepend = '<img src="'.IMG.'/img_html/diplomacy_'.strtolower($status).'.png" alt="['.__($status).']" title="'.__($status).'"/> ';
+
+        $return = $prepend . $this->name;
+      }
+    }
+
+    return $return;
+  }
+
   public function get_territory_summary( Game $game, $turn = null ) {
     if( is_null( $turn ) ) {
       $turn = $game->current_turn;

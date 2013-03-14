@@ -34,7 +34,7 @@
                 break;
               }
               case 'change_diplomacy_status' : {
-                $current_player->set_player_diplomacy( $current_game->id, $current_game->current_turn, getValue('to_player_id'), getValue('new_status'));
+                $current_player->set_player_diplomacy( $current_game->id, $current_game->current_turn + 1, getValue('to_player_id'), getValue('new_status'));
                 break;
               }
             }

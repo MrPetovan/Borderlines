@@ -457,7 +457,7 @@ AND `game_id` = '.mysql_ureal_escape_string($game->id).$where;
       $last_diplomacy = $player->get_last_player_diplomacy( $game, $turn );
 
       foreach( $last_diplomacy as $diplomacy_row ) {
-        $diplomacy[ $diplomacy_row['from_player_id'] ][ $diplomacy_row['to_player_id'] ] = $diplomacy_row['status'] == 'Ally';
+        $diplomacy[ $diplomacy_row['from_player_id'] ][ $diplomacy_row['to_player_id'] ] = $diplomacy_row['status'];
       }
     }
     foreach( $player_troops as $key => $attacker_row ) {
@@ -472,7 +472,7 @@ AND `game_id` = '.mysql_ureal_escape_string($game->id).$where;
       // Building the attacks directions
       foreach( $player_troops as $defender_row ) {
         if( $attacker_row['player_id'] != $defender_row['player_id'] &&
-          ! $diplomacy[ $attacker_row['player_id'] ][ $defender_row['player_id'] ] ) {
+          $diplomacy[ $attacker_row['player_id'] ][ $defender_row['player_id'] ] == 'Enemy' ) {
           $attacks[ $attacker_row['player_id'] ][] = $defender_row['player_id'];
         }
       }
@@ -488,7 +488,7 @@ AND `game_id` = '.mysql_ureal_escape_string($game->id).$where;
           $losses[ $defender_player_id ][ $attacker_row['player_id'] ] = 0;
         }
         // Backstabbing (defender consider attacker as an ally)
-        if( $diplomacy[ $defender_player_id ][ $attacker_row['player_id'] ] ) {
+        if( $diplomacy[ $defender_player_id ][ $attacker_row['player_id'] ] == 'Ally' ) {
           $attack_mul = 2;
         }else {
           $attack_mul = 1;
@@ -511,7 +511,7 @@ AND `game_id` = '.mysql_ureal_escape_string($game->id).$where;
 
       foreach( $losses[ $player_row['player_id'] ] as $attacker_player_id => $damages ) {
         $player = Player::instance($attacker_player_id);
-        if( $diplomacy[ $player_row['player_id'] ][ $attacker_player_id ] ) {
+        if( $diplomacy[ $player_row['player_id'] ][ $attacker_player_id ] == 'Ally' ) {
           $game->set_player_history(
             $player_row['player_id'],
             $turn,

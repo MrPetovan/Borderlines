@@ -219,18 +219,30 @@
 <table>
   <tr>
     <th><?php echo __('Player')?></th>
-    <th><?php echo __('Status')?></th>
-    <th><?php echo __('Change')?></th>
+    <th colspan="3"><?php echo __('Status')?></th>
   </tr>
 <?php
+    $diplo = array('Ally', 'Neutral', 'Enemy');
     foreach( $player_diplomacy_list as $player_diplomacy ) {
       $player = Player::instance( $player_diplomacy['to_player_id'] );
       $new_status = $player_diplomacy['status'] == 'Enemy'?'Ally':'Enemy';
       echo '
   <tr>
-    <td><a href="'.Page::get_url('show_player', array('id' => $player->id)).'">'.$player->name.'</a></td>
-    <td>'.__($player_diplomacy['status']).'</td>
-    <td><a href="'.Page::get_url( PAGE_CODE, array('action' => 'change_diplomacy_status', 'to_player_id' => $player->id, 'new_status' => $new_status)).'">'.__('Change').'</a></td>
+    <td><a href="'.Page::get_url('show_player', array('id' => $player->id)).'">'.$player->get_player_name_with_diplomacy($current_game, $current_game->current_turn, $current_player).'</a></td>';
+      foreach( $diplo as $status ) {
+        echo '
+    <td>';
+      if( $player_diplomacy['status'] == $status ) {
+        echo '
+      <strong>'.__($status).'</strong>';
+      }else {
+        echo '
+      <a href="'.Page::get_url( PAGE_CODE, array('action' => 'change_diplomacy_status', 'to_player_id' => $player->id, 'new_status' => $status)).'">'.__($status).'</a>';
+      }
+      echo '
+    </td>';
+      }
+      echo '
   </tr>';
     }
 ?>

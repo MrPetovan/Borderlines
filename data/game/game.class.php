@@ -523,8 +523,8 @@ WHERE `ended` IS NULL";
     $player_list = Player::db_get_by_game( $this->id );
     foreach( $player_list as $playerB ) {
       if( $player != $playerB ) {
-        $this->set_player_diplomacy( $this->current_turn, $player->id, $playerB->id, 'Ally' );
-        $this->set_player_diplomacy( $this->current_turn, $playerB->id, $player->id, 'Ally' );
+        $this->set_player_diplomacy( $this->current_turn, $player->id, $playerB->id, 'Neutral' );
+        $this->set_player_diplomacy( $this->current_turn, $playerB->id, $player->id, 'Neutral' );
       }
     }
 

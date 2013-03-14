@@ -19,7 +19,7 @@
         'get_world'                         => array('[world_id]' => 'World Id (optional)'),
         'get_territory'                     => array('territory_id' => 'Territory Id'),
         'get_last_player_diplomacy_list'    => array(),
-        'change_diplomacy_status'           => array('player_id' => 'Player Id', 'status' => 'New diplomatic status (Ally/Enemy)'),
+        'change_diplomacy_status'           => array('player_id' => 'Player Id', 'status' => 'New diplomatic status (Ally/Neutral/Enemy)'),
         'ready'                             => array(),
         'notready'                          => array(),
         'get_game_player_list'              => array('[game_id]' => 'Game Id (optional)'),
