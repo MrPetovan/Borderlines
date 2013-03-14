@@ -154,5 +154,20 @@ function mysql_fetch_to_array($res) {
 
   return $return;
 }
+function mysql_fetch_one($query) {
+  $return = null;
+
+  $res = mysql_uquery($query);
+
+  if( $res !== null ) {
+    $row = mysql_fetch_row($res);
+    if( is_array($row) ) {
+      $return = correctype($row[0]);
+    }
+    mysql_free_result($res);
+  }
+
+  return $return;
+}
 
 ?>
