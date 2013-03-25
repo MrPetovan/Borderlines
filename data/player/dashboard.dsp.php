@@ -107,7 +107,7 @@
     }
 ?>
 </div>
-<h3>Territory Summary</h3>
+<h3><?php echo __('Territory Summary')?></h3>
 <?php
     $territory_summaries = array();
     $territory_summaries[ $current_game->current_turn - 1 ] = $current_player->get_territory_summary($current_game, $current_game->current_turn - 1);
