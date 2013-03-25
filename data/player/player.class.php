@@ -296,7 +296,6 @@ WHERE `from_player_id` = '.mysql_ureal_escape_string($this->get_id()).'
 AND `game_id` = '.mysql_ureal_escape_string($game_id).'
 AND `pd`.`to_player_id` = `pd_max`.`to_player_id`
 AND `turn` = `pd_max`.`max_turn`';
-    //var_debug( $sql );
     $res = mysql_uquery($sql);
 
     return mysql_fetch_to_array($res);
@@ -323,7 +322,6 @@ WHERE `from_player_id` = '.mysql_ureal_escape_string( $this->id ).'
 AND `game_id` = '.mysql_ureal_escape_string( $game->id ).'
 AND `pd`.`to_player_id` = `pd_max`.`to_player_id`
 AND `turn` = `pd_max`.`max_turn`';
-    //var_debug( $sql );
     $res = mysql_uquery($sql);
 
     return mysql_fetch_to_array($res);
@@ -426,18 +424,16 @@ LIMIT 1';
     }
     $game_parameters = $game->get_parameters();
 
-    $capital = $this->get_capital( $game, $turn );
-
     $revenue = 0;
     $territory_previous_owner_list = $this->get_territory_status_list(null, $game->id, $turn - 1);
     foreach( $territory_previous_owner_list as $territory_status_row ) {
       $territory = Territory::instance($territory_status_row['territory_id']);
-      $corruption_ratio = $territory->get_corruption_ratio( $game, $turn );
+      $corruption_ratio = $territory->get_corruption_ratio( $game, $turn - 1 );
 
       $territory_revenue =
         $game_parameters['TERRITORY_BASE_REVENUE']
         * ( 1 - $corruption_ratio )
-        * ( $territory->get_economy_ratio( $game, $turn ) )
+        * ( $territory->get_economy_ratio( $game, $turn - 1 ) )
         * ( 1 - $territory_status_row['revenue_suppression'] );
 
       //var_debug( $territory->name, $game_parameters['TERRITORY_BASE_REVENUE'], $corruption_ratio, $territory->get_economy_ratio( $game, $turn ), $territory_status_row['revenue_suppression'], $territory_revenue );
