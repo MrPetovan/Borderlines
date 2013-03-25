@@ -134,6 +134,8 @@ WHERE `game_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
     $this->ended = null;
     $this->updated = null;
 
+    $this->revert();
+
     Player_Order::db_truncate_by_game( $this->id );
 
     /*$world = new World();
@@ -189,8 +191,10 @@ WHERE `game_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
     mysql_uquery($sql);
     $sql = 'UPDATE `game_player` SET `turn_ready` = '.mysql_ureal_escape_string($turn).' WHERE `game_id` = '.mysql_ureal_escape_string($this->id).$where_ready;
     mysql_uquery($sql);
-    //$sql = 'DELETE FROM `player_diplomacy` WHERE `game_id` = '.mysql_ureal_escape_string($this->id).$where;
-    //mysql_uquery($sql);
+    if( $turn === null ) {
+      $sql = 'DELETE FROM `player_diplomacy` WHERE `game_id` = '.mysql_ureal_escape_string($this->id);
+      mysql_uquery($sql);
+    }
     $sql = 'DELETE FROM `player_history` WHERE `game_id` = '.mysql_ureal_escape_string($this->id).$where;
     mysql_uquery($sql);
     $sql = 'UPDATE `player_order` SET `datetime_execution` = NULL, `turn_executed` = NULL WHERE `game_id` = '.mysql_ureal_escape_string($this->id).$where_scheduled;
@@ -198,6 +202,8 @@ WHERE `game_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
     $sql = 'DELETE FROM `player_spygame_value` WHERE `game_id` = '.mysql_ureal_escape_string($this->id).$where;
     mysql_uquery($sql);
     $sql = 'DELETE FROM `territory_status` WHERE `game_id` = '.mysql_ureal_escape_string($this->id).$where;
+    mysql_uquery($sql);
+    $sql = 'DELETE FROM `territory_player_status` WHERE `game_id` = '.mysql_ureal_escape_string($this->id).$where;
     mysql_uquery($sql);
     $sql = 'DELETE FROM `territory_economy_history` WHERE `game_id` = '.mysql_ureal_escape_string($this->id).$where;
     mysql_uquery($sql);
@@ -238,6 +244,8 @@ WHERE `game_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
     if( !$this->has_ended() ) {
       $current_turn = $this->current_turn;
       $next_turn = $this->current_turn + 1;
+
+      echo 'Computing turn '.$next_turn.' of game '.$this->name."\n";
 
       $game_parameters = $this->get_parameters();
 
