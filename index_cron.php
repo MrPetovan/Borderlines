@@ -76,7 +76,7 @@
   require_once( DATA.'order_type/iorder.php');
   require_once( INC.'borderlines.inc.php');
 
-  if( isset( $_SERVER['REMOTE_ADDR'] ) ) redirect('/');
+  if( isset( $_SERVER['REMOTE_ADDR'] ) ) redirect(URL_ROOT);
 
   $flag_action = false;
   if(! mysql_uconnect(DB_HOST, DB_USER, DB_PASS, DB_BASE)) {
@@ -88,28 +88,19 @@
 
   $options = getopt('cgw:');
 
+  echo date('[Y-m-d H:i:s]').' '.implode(' ', $_SERVER['argv'])."\n";
+
   if( isset($options['c'])) {
     $game_list = Game::db_get_nonended_game_list();
 
     foreach( $game_list as $game ) {
       if( $game->started ) {
-        echo date('[Y-m-d H:i:s]').' Game "'.$game->name .'" => ';
-        if( $game->compute_auto() ) {
-          echo "turn computed\n";
-        }else {
-          echo "turn failed\n";
-        }
+        $game->compute_auto();
       }else {
         if( $game->min_players && count( $game->get_game_player_list() ) >= $game->min_players ) {
           $game->start();
         }
       }
-
-      /*if( $game->has_ended( ) ) {
-        $new_game = clone $game;
-        $new_game->id = null;
-        $new_game->reset();
-      }*/
     }
   }
 
