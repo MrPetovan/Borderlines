@@ -469,6 +469,9 @@ AND `game_id` = '.mysql_ureal_escape_string($game->id).$where;
         $this->id
       );
 
+      $attacks[ $attacker_row['player_id'] ] = array();
+      $losses[ $attacker_row['player_id'] ] = array();
+
       // Building the attacks directions
       foreach( $player_troops as $defender_row ) {
         if( $attacker_row['player_id'] != $defender_row['player_id'] &&
@@ -553,7 +556,7 @@ AND `game_id` = '.mysql_ureal_escape_string($game->id).$where;
   }
 
   public function compute_territory_status( Game $game, $turn = null ) {
-    //var_debug( "{$this->name}->compute_territory_status( {$game->name}, $turn ) ");
+    //echo "{$this->name}->compute_territory_status( {$game->name}, $turn )\n";
     if( is_null( $turn ) ) {
       $turn = $game->current_turn;
     }
@@ -601,7 +604,7 @@ AND `game_id` = '.mysql_ureal_escape_string($game->id).$where;
         $player_capturing_troops = $territory_player_troops_list[0]['quantity'];
       }else {
         $invader = Player::instance( $territory_player_troops_list[0]['player_id'] );
-        $player_diplomacy_list = $invader->get_last_player_diplomacy_list($game->id);
+        $player_diplomacy_list = $invader->get_last_player_diplomacy($game, $turn);
 
         // If invader marked the previous owner as enemy, he captures the territory
         foreach( $player_diplomacy_list as $player_diplomacy ) {
@@ -625,7 +628,7 @@ AND `game_id` = '.mysql_ureal_escape_string($game->id).$where;
         $troops[ $player_territory_from['player_id'] ] = $player_territory_from['quantity'];
         $player_supremacy_troops[ $player_territory_from['player_id'] ] = $player_territory_from['quantity'];
 
-        $player_diplomacy_list = $player_from->get_last_player_diplomacy_list($game->id);
+        $player_diplomacy_list = $player_from->get_last_player_diplomacy($game, $turn);
 
         foreach( $territory_player_troops_list as $player_territory_to ) {
           foreach( $player_diplomacy_list as $key => $player_diplomacy ) {
@@ -652,7 +655,9 @@ AND `game_id` = '.mysql_ureal_escape_string($game->id).$where;
         }
       }
 
+      // All present troops' players are allies with each other
       if( $all_allies ) {
+        // If neutral territory or current owner is not allied with at least one player
         if($last_owner->id === null || !$all_allies_with_owner ) {
           $troops = array();
 
