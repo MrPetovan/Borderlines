@@ -63,7 +63,7 @@
       'game_id' => $current_game->id,
       'turn' => $turn,
       'ratio' => $ratio,
-      'force' => is_admin() && getValue('force') !== null
+      'force' => is_admin()
     ));
   }
 
