@@ -316,6 +316,11 @@ WHERE `game_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
       }
       $player_list = Player::db_get_by_game($this->id, true);
 
+      $order_list = $this->get_ready_orders( 'give_tribute' );
+      foreach( $order_list as $order ) {
+        $order->execute();
+      }
+
       // Revenues and recruit
       foreach( $player_list as $player ) {
         $territory_previous_owner_list = $player->get_territory_status_list(null, $this->id, $current_turn);

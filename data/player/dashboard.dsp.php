@@ -373,6 +373,25 @@
     if( ! $current_game->has_ended() ) {
 ?>
 <h3><?php echo __('Orders')?></h3>
+<h3>Issue an order</h3>
+<script>
+  $( function () {
+    $( ".orders" ).accordion({
+      collapsible: true,
+      header: "legend",
+      fillSpace: 0,
+      autoHeight: 0,
+      active: false
+    });
+  })
+</script>
+<div class="orders">
+<?php
+    echo Player_Order::get_html_form_by_class(
+      'give_tribute',
+      array('current_player' => $current_player)
+    );
+?>
 <h4><?php echo __('Orders planned')?></h4>
 <?php
       $orders = Player_Order::db_get_planned_by_player_id( $current_player->id, $current_game->id );

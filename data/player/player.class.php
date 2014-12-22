@@ -425,6 +425,8 @@ LIMIT 1';
     $game_parameters = $game->get_parameters();
 
     $revenue = 0;
+
+    // Territory revenue
     $territory_previous_owner_list = $this->get_territory_status_list(null, $game->id, $turn - 1);
     foreach( $territory_previous_owner_list as $territory_status_row ) {
       $territory = Territory::instance($territory_status_row['territory_id']);
@@ -439,6 +441,21 @@ LIMIT 1';
       //var_debug( $territory->name, $game_parameters['TERRITORY_BASE_REVENUE'], $corruption_ratio, $territory->get_economy_ratio( $game, $turn ), $territory_status_row['revenue_suppression'], $territory_revenue );
 
       $revenue += $territory_revenue;
+    }
+
+    $orders = Player_Order::db_get_executed( $game->id, $turn, 11 );
+    //Giving tribute
+    foreach($orders as $order) {
+      if( $order->player_id == $this->id ) {
+        $revenue -= $order->parameters['count'];
+      }
+    }
+
+    //Receiving tribute
+    foreach($orders as $order) {
+      if( $order->parameters['to_player_id'] == $this->id ) {
+        $revenue += $order->parameters['count'];
+      }
     }
 
     return $revenue;

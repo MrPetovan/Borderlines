@@ -29,6 +29,15 @@ AND `turn_executed` IS NULL";
     return self::sql_to_list($sql);
   }
 
+  public static function db_get_executed( $game_id, $turn, $order_type_id ) {
+    $sql = '
+SELECT `id` FROM `'.self::get_table_name().'`
+WHERE `game_id` = '.mysql_ureal_escape_string($game_id).'
+AND `turn_executed` = '.mysql_ureal_escape_string($turn).'
+AND `order_type_id` = '.mysql_ureal_escape_string($order_type_id);
+    return self::sql_to_list($sql);
+  }
+
   public function plan( Order_Type $order_type, Player $player, $params = array(), $turn = null, $player_order_id = null ) {
     if( is_null( $turn ) ) {
       $turn = $player->current_game->current_turn;
