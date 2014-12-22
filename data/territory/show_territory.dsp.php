@@ -73,16 +73,11 @@
   </p>
 <?php
   }
-  $corruption_ratio = $territory->get_corruption_ratio_from_distance( $distance );
   $economy_ratio = $territory->get_economy_ratio( $current_game, $turn );
 ?>
   <p>
     <span class="label"><?php echo __('Economy ratio')?></span>
     <span class="value"><?php echo l10n_number( round( $economy_ratio * 100 ) ).' %'?></span>
-  </p>
-  <p>
-    <span class="label"><?php echo __('Corruption')?></span>
-    <span class="value"><?php echo l10n_number( round( $corruption_ratio * 100 ) ).' %'?></span>
   </p>
   <p>
     <span class="label"><?php echo __('Status')?></span>

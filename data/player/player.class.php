@@ -380,7 +380,6 @@ LIMIT 1';
       $territory_row = array_pop( $game->get_territory_status_list($territory_player_troops_row['territory_id'], $turn) );
       $territory_row['quantity'] = $territory_player_troops_row['quantity'];
       $territory_row['economy_ratio'] = $territory->get_economy_ratio($game, $turn);
-      $territory_row['corruption_ratio'] = $territory->get_corruption_ratio($game, $turn);
       $troops[ $territory_row['territory_id'] ] = $territory_row['quantity'];
       $return[ $territory_row['territory_id'] ] = $territory_row;
 
@@ -390,7 +389,6 @@ LIMIT 1';
       if( !isset( $return[ $territory_status_row['territory_id'] ] ) ) {
         $territory = Territory::instance($territory_status_row['territory_id']);
         $territory_status_row['economy_ratio'] = $territory->get_economy_ratio($game, $turn);
-        $territory_status_row['corruption_ratio'] = $territory->get_corruption_ratio($game, $turn);
         $territory_status_row['quantity'] = 0;
         $troops[ $territory_status_row['territory_id'] ] = $territory_status_row['quantity'];
         $return[ $territory_status_row['territory_id'] ] = $territory_status_row;
@@ -430,15 +428,11 @@ LIMIT 1';
     $territory_previous_owner_list = $this->get_territory_status_list(null, $game->id, $turn - 1);
     foreach( $territory_previous_owner_list as $territory_status_row ) {
       $territory = Territory::instance($territory_status_row['territory_id']);
-      $corruption_ratio = $territory->get_corruption_ratio( $game, $turn - 1 );
 
       $territory_revenue =
         $game_parameters['TERRITORY_BASE_REVENUE']
-        * ( 1 - $corruption_ratio )
         * ( $territory->get_economy_ratio( $game, $turn - 1 ) )
         * ( 1 - $territory_status_row['revenue_suppression'] );
-
-      //var_debug( $territory->name, $game_parameters['TERRITORY_BASE_REVENUE'], $corruption_ratio, $territory->get_economy_ratio( $game, $turn ), $territory_status_row['revenue_suppression'], $territory_revenue );
 
       $revenue += $territory_revenue;
     }

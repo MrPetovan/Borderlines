@@ -49,6 +49,31 @@ GROUP BY
     return $return;
   }
 
+  public function get_territory_status_list($territory_id = null, $turn = null, $owner_id = null) {
+    $where = '';
+    if( ! is_null( $territory_id )) $where .= '
+AND `territory_id` = '.mysql_ureal_escape_string($territory_id);
+    if( ! is_null( $turn )) $where .= '
+AND `turn` = '.mysql_ureal_escape_string($turn);
+    if( ! is_null( $owner_id )) {
+      if( $owner_id === false ) {
+        $where .= '
+AND `owner_id` IS NULL';
+      }else {
+        $where .= '
+AND `owner_id` = '.mysql_ureal_escape_string($owner_id);
+      }
+    }
+
+    $sql = '
+SELECT `territory_id`, `game_id`, `turn`, `owner_id`, `contested`, `conflict`, `capital`, `revenue_suppression`
+FROM `territory_status`
+WHERE `game_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
+    $res = mysql_uquery($sql);
+
+    return mysql_fetch_to_array($res);
+  }
+
   public function get_parameters() {
     $defaults = array(
         'HOME_TROOPS_MAINTENANCE' => 2,
@@ -69,6 +94,7 @@ GROUP BY
     }
     return $game_parameters;
   }
+
   public function set_parameters($params) { $this->_parameters = serialize($params);}
 
   public function can_join( Player $player ) {
@@ -101,31 +127,6 @@ GROUP BY
 
   public function has_ended() {
     return ($this->current_turn >= $this->turn_limit);
-  }
-
-  public function get_territory_status_list($territory_id = null, $turn = null, $owner_id = null) {
-    $where = '';
-    if( ! is_null( $territory_id )) $where .= '
-AND `territory_id` = '.mysql_ureal_escape_string($territory_id);
-    if( ! is_null( $turn )) $where .= '
-AND `turn` = '.mysql_ureal_escape_string($turn);
-    if( ! is_null( $owner_id )) {
-      if( $owner_id === false ) {
-        $where .= '
-AND `owner_id` IS NULL';
-      }else {
-        $where .= '
-AND `owner_id` = '.mysql_ureal_escape_string($owner_id);
-      }
-    }
-
-    $sql = '
-SELECT `territory_id`, `game_id`, `turn`, `owner_id`, `contested`, `conflict`, `capital`, `revenue_suppression`
-FROM `territory_status`
-WHERE `game_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
-    $res = mysql_uquery($sql);
-
-    return mysql_fetch_to_array($res);
   }
 
   public function reset() {

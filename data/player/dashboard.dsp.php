@@ -132,7 +132,6 @@
       <th>'.__('Status').'</th>
       <th>'.__('Troops').'</th>
       <th>'.__('Economy').'</th>
-      <th>'.__('Corruption').'</th>
       <th>'.__('Suppression').'</th>
       <th>'.__('Revenue').'</th>
     </tr>';
@@ -150,7 +149,6 @@
           $territory_revenue =
             $game_parameters['TERRITORY_BASE_REVENUE']
             * ( $territory_row['economy_ratio'] )
-            * ( 1 - $territory_row['corruption_ratio'] )
             * ( 1 - $territory_row['revenue_suppression'] );
         }
 
@@ -185,7 +183,6 @@
       <td>'.$status.'</td>
       <td class="num">'.l10n_number( $territory_row['quantity'] ).' <img src="'.IMG.'img_html/troops.png" alt="'.__('Troops').'" title="'.__('Troops').'"/></td>
       <td class="num">'.l10n_number( $territory_row['economy_ratio'] * 100 ).' %</td>
-      <td class="num">'.l10n_number( $territory_row['corruption_ratio'] * 100 ).' %</td>
       <td class="num">'.l10n_number( $territory_row['revenue_suppression'] * 100 ).' %</td>
       <td class="num">'.l10n_number( $territory_revenue ).' <img src="'.IMG.'img_html/coins.png" alt="" title=""/></td>
     </tr>';
@@ -201,7 +198,7 @@
       <td class="num"><?php echo l10n_number( $total_territory )?> km²</td>
       <th><?php echo __('Total')?></th>
       <td class="num"><?php echo l10n_number( $total_troops ).' <img src="'.IMG.'img_html/troops.png" alt="'.__('Troops').'" title="'.__('Troops').'"/>' ?></td>
-      <th colspan="3"><?php echo __('Total')?></th>
+      <th colspan="2"><?php echo __('Total')?></th>
       <td class="num"><?php echo l10n_number( $total_revenue ).' <img src="'.IMG.'img_html/coins.png" alt="" title=""/>' ?></td>
     </tr>
   </tbody>

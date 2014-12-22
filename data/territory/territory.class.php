@@ -747,27 +747,6 @@ AND `game_id` = '.mysql_ureal_escape_string($game->id).$where;
     return $return;
   }
 
-  public function get_corruption_ratio( Game $game, $turn = null ) {
-    if( is_null( $turn ) ) {
-      $turn = $game->current_turn;
-    }
-    $distance_to_capital = $this->get_distance_to_capital( $game, $turn );
-
-    $return = $this->get_corruption_ratio_from_distance($distance_to_capital);
-
-    return $return;
-  }
-
-  public function get_corruption_ratio_from_distance( $distance_to_capital ) {
-    $return = null;
-    if( $distance_to_capital !== null ) {
-      $return = $distance_to_capital / 10000;
-    }else {
-      $return = .5;
-    }
-    return $return;
-  }
-
   public static function get_by_world(World $world, Game $game = null, $turn = null, $sort_field = null, $sort_direction = null) {
     $return = null;
 
