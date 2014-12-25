@@ -1,6 +1,5 @@
 <?php
   $PAGE_TITRE = "Administration des utilisateurs";
-  include_once('data/static/html_functions.php');
 
   if(isset($_GET['p'])) {
     $page = $_GET['p'];
@@ -12,16 +11,12 @@
   $nb_total = Member::db_count_all();
 
     echo '
-<div class="texte_contenu">';
-
-	admin_menu(PAGE_CODE);
-
-	echo '
+<div class="texte_contenu">
   <div class="texte_texte">
     <h3>Liste des utilisateurs</h3>
     '.nav_page(PAGE_CODE, $nb_total, $page, $nb_per_page).'
     <form action="'.get_page_url(PAGE_CODE).'" method="post">
-    <table width="100%">
+    <table class="table table-condensed table-striped table-hover">
       <thead>
         <tr>
           <!--<th>Sel.</th>-->

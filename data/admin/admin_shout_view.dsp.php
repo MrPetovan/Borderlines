@@ -1,20 +1,18 @@
 <?php
-  include_once('data/static/html_functions.php');
 
   $tab_visible = array('0' => 'Non', '1' => 'Oui');
 
-  $form_url = get_page_url($PAGE_CODE).'&id='.$shout->id;
+  $form_url = get_page_url(PAGE_CODE).'&id='.$shout->id;
   $PAGE_TITRE = 'Shout : Showing "'.$shout->id.'"';
 ?>
 <div class="texte_contenu">
-<?php echo admin_menu(PAGE_CODE);?>
   <div class="texte_texte">
     <h3>Showing "<?php echo $shout->id?>"</h3>
     <div class="informations formulaire">
 
             <p class="field">
               <span class="libelle">Date Sent</span>
-              <span class="value"><?php echo guess_time($shout->date_sent, GUESS_DATE_FR)?></span>
+              <span class="value"><?php echo guess_time($shout->date_sent, GUESS_DATETIME_LOCALE)?></span>
             </p>
 <?php
       $option_list = array();
@@ -29,7 +27,7 @@
 
             <p class="field">
               <span class="libelle">Text</span>
-              <span class="value"><?php echo $shout->text?></span>
+              <span class="value"><?php echo is_array($shout->text)?nl2br(parameters_to_string( $shout->text )):$shout->text?></span>
             </p>
 <?php
       $option_list = array(null => 'Pas de choix');

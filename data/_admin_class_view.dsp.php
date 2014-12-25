@@ -1,12 +1,10 @@
-  include_once('data/static/html_functions.php');
 
   $tab_visible = array('0' => 'Non', '1' => 'Oui');
 
-  $form_url = get_page_url($PAGE_CODE).'&id='.$<?php echo $class_db_identifier ?>->id;
+  $form_url = get_page_url(PAGE_CODE).'&id='.$<?php echo $class_db_identifier ?>->id;
   $PAGE_TITRE = '<?php echo $class_name ?> : Showing "'.$<?php echo $class_db_identifier ?>-><?php echo $name_field?>.'"';
 ?>
 <div class="texte_contenu">
-<_?php echo admin_menu(PAGE_CODE);?>
   <div class="texte_texte">
     <h3>Showing "<_?php echo $<?php echo $class_db_identifier ?>-><?php echo $name_field?>?>"</h3>
     <div class="informations formulaire">
@@ -37,7 +35,7 @@ foreach( $table_columns as $column_name => $column_props ) {
           echo '
             <p class="field">
               <span class="libelle">'.$column_props['Comment'].'</span>
-              <span class="value"><?php echo $'.$class_db_identifier.'->'.$column_name.'?></span>
+              <span class="value"><?php echo is_array($'.$class_db_identifier.'->'.$column_name.')?nl2br(parameters_to_string( $'.$class_db_identifier.'->'.$column_name.' )):$'.$class_db_identifier.'->'.$column_name.'?></span>
             </p>';
           break;
         case 'datetime':
@@ -46,7 +44,7 @@ foreach( $table_columns as $column_name => $column_props ) {
           echo '
             <p class="field">
               <span class="libelle">'.$column_props['Comment'].'</span>
-              <span class="value"><?php echo guess_time($'.$class_db_identifier.'->'.$column_name.', GUESS_DATE_FR)?></span>
+              <span class="value"><?php echo guess_time($'.$class_db_identifier.'->'.$column_name.', GUESS_DATETIME_LOCALE)?></span>
             </p>';
           break;
         case 'tinyint' :
@@ -160,7 +158,7 @@ foreach( $table_columns as $column_name => $column_props ) {
       $form_field .= '
         <p class="field">
           <_?php echo HTMLHelper::genererInputText(\''.$field_name.'\', null, array(), \''.$table_columns_list[$sub_table][$field_name]['Comment'].($field['Null'] == 'NO'?'*':'').'\' )?>
-          '.(in_array( $field['SimpleType'], array('date', 'datetime', 'timestamp'))?'<span><_?php echo guess_time(time(), GUESS_TIME_MYSQL)?></span>':'').' 
+          '.(in_array( $field['SimpleType'], array('date', 'datetime', 'timestamp'))?'<span><_?php echo guess_time(time(), GUESS_TIME_MYSQL)?></span>':'').'
         </p>';
     }
   }

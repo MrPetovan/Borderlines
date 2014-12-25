@@ -1,0 +1,6 @@
+.num,
+th.num,
+td.num,
+.table td.num {
+  text-align: right;
+}

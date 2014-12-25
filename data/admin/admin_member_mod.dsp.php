@@ -1,7 +1,4 @@
 <?php
-
-  include_once('data/static/html_functions.php');
-
   if(!isset($member_mod)) {
     if(isset($_GET['id'])) {
       $id = $_GET['id'];
@@ -29,10 +26,8 @@
   }
 
   echo '
-  <div class="texte_contenu">';
-    admin_menu(PAGE_CODE);
-
-    echo '<div class="texte_texte">
+  <div class="texte_contenu">
+    <div class="texte_texte">
       <h3>'.$PAGE_TITRE.'</h3>
       '.$html_msg.'
       <form class="formulaire" action="'.get_page_url(PAGE_CODE, true, array('id' => $member_mod->get_id())).'" method="post">

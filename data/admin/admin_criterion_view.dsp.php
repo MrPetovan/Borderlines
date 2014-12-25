@@ -1,13 +1,11 @@
 <?php
-  include_once('data/static/html_functions.php');
 
   $tab_visible = array('0' => 'Non', '1' => 'Oui');
 
-  $form_url = get_page_url($PAGE_CODE).'&id='.$criterion->id;
+  $form_url = get_page_url(PAGE_CODE).'&id='.$criterion->id;
   $PAGE_TITRE = 'Criterion : Showing "'.$criterion->name.'"';
 ?>
 <div class="texte_contenu">
-<?php echo admin_menu(PAGE_CODE);?>
   <div class="texte_texte">
     <h3>Showing "<?php echo $criterion->name?>"</h3>
     <div class="informations formulaire">
@@ -78,7 +76,7 @@
         </p>
         <p class="field">
           <?php echo HTMLHelper::genererInputText('percentage', null, array(), 'Percentage*' )?>
-           
+          
         </p>
         <p><?php echo HTMLHelper::genererButton('action',  'set_territory_criterion', array('type' => 'submit'), 'Ajouter un élément')?></p>
       </fieldset>

@@ -5,7 +5,7 @@
 
   $error_code_login = null;
 
-  if($_GET[PARAM_PAGE] != 'logout') {
+  if(PAGE_CODE != 'logout') {
     if(isset($_POST['submit_login']) || isset($_POST['submit_login_x'])) {
       if(isset($_POST['email'])) {
         if(isset($_POST['pass'])) {

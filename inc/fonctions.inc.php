@@ -396,7 +396,7 @@ function guess_date($date, $return_flag = GUESS_DATE_TIMESTAMP) {
       $data_input = false;
     }
   }
-  
+
   if($data_input !== false) {
     $return = $date;
     if(isset($array_actions[$data_input][$return_flag])) {
@@ -417,7 +417,9 @@ function guess_date($date, $return_flag = GUESS_DATE_TIMESTAMP) {
 
 define("GUESS_TIME_TIMESTAMP", 1);
 define("GUESS_TIME_MYSQL", 2);
-define("GUESS_TIME_LOCALE", 3);
+define("GUESS_DATETIME_LOCALE", 3);
+define("GUESS_DATE_LOCALE", 4);
+define("GUESS_TIME_LOCALE", 5);
 /**
    * Teste timestamp, date mysql (YYYY-MM-DD HH:MM:SS) et date FR (JJ/MM/AAAA)
    * Retourne par défaut un timestamp (possiblement négatif), ou une date mysql ou une date FR
@@ -444,7 +446,9 @@ function guess_time($date, $return_flag = GUESS_TIME_TIMESTAMP) {
     switch($return_flag) {
       case GUESS_TIME_TIMESTAMP : $return = $timestamp; break;
       case GUESS_TIME_MYSQL     : $return = mysql_timestamp_to_mysql_date($timestamp); break;
-      case GUESS_TIME_LOCALE    : $return = strftime('%x %X', $timestamp); break;
+      case GUESS_DATETIME_LOCALE    : $return = strftime('%x %X', $timestamp); break;
+      case GUESS_DATE_LOCALE    : $return = strftime('%x', $timestamp); break;
+      case GUESS_TIME_LOCALE    : $return = strftime('%X', $timestamp); break;
     }
   }
   return $return;
@@ -646,7 +650,11 @@ function php_mail($address, $subject, $body, $html_template = false, $debug = fa
     if($debug) {
       var_dump($body);
     }else {
-      return $mail->Send();
+      if( PROD ) {
+        return $mail->Send();
+      }else {
+        return true;
+      }
     }
   }
 }
@@ -831,16 +839,17 @@ function which_os ()
     $nb_page = ceil($nb_total / $nb_per_page);
 
     $return = '
-    <ul class="nav">';
+    <div class="pagination">
+      <ul class="nav">';
 
     if($nb_page == 1 || $current_page == 1) {
       $return .= '
-      <li><a href="#" class="inactive" onclick="return false">&lt; &lt;</a></li>
-      <li><a href="#" class="inactive" onclick="return false">&lt;</a></li>';
+        <li class="disabled"><span>&lt; &lt;</span></li>
+        <li class="disabled"><span>&lt;</span></li>';
     }else {
       $return .= '
-      <li><a href="'.get_page_url($codepage, true, array('p' => 1, 'nb_per_page' => $nb_per_page)).'">&lt; &lt;</a></li>
-      <li><a href="'.get_page_url($codepage, true, array('p' => $current_page - 1, 'nb_per_page' => $nb_per_page)).'">&lt;</a></li>';
+        <li><a href="'.get_page_url($codepage, true, array('p' => 1, 'nb_per_page' => $nb_per_page)).'">&lt; &lt;</a></li>
+        <li><a href="'.get_page_url($codepage, true, array('p' => $current_page - 1, 'nb_per_page' => $nb_per_page)).'">&lt;</a></li>';
     }
 
     if($nb_page > NB_VISIBLE_LINKS) {
@@ -858,21 +867,22 @@ function which_os ()
         $j = $current_page - ceil(NB_VISIBLE_LINKS / 2) + $i;
       }
       $return .= '
-      <li><a href="'.get_page_url($codepage, true, array('p' => $j, 'nb_per_page' => $nb_per_page)).'"'.($j == $current_page?' class="inactive"':'').'>'.$j.'</a></li>';
+        <li'.($j == $current_page?' class="active"':'').'><a href="'.get_page_url($codepage, true, array('p' => $j, 'nb_per_page' => $nb_per_page)).'">'.$j.'</a></li>';
     }
 
     if($nb_page == 1 || $current_page == $nb_page) {
       $return .= '
-      <li><a href="#" class="inactive" onclick="return false">&gt;</a></li>
-      <li><a href="#" class="inactive" onclick="return false">&gt; &gt;</a></li>';
+        <li class="disabled"><span>&gt;</span></li>
+        <li class="disabled"><span>&gt; &gt;</span></li>';
     }else {
       $return .= '
-      <li><a href="'.get_page_url($codepage, true, array('p' => $current_page + 1, 'nb_per_page' => $nb_per_page)).'">&gt;</a></li>
-      <li><a href="'.get_page_url($codepage, true, array('p' => $nb_page, 'nb_per_page' => $nb_per_page)).'">&gt; &gt;</a></li>';
+        <li><a href="'.get_page_url($codepage, true, array('p' => $current_page + 1, 'nb_per_page' => $nb_per_page)).'">&gt;</a></li>
+        <li><a href="'.get_page_url($codepage, true, array('p' => $nb_page, 'nb_per_page' => $nb_per_page)).'">&gt; &gt;</a></li>';
     }
 
     $return .= '
-    </ul>';
+      </ul>
+    </div>';
 
     return $return;
   }
@@ -913,8 +923,7 @@ function which_os ()
   * @param mixed $defaultValue (optional)
   * @return mixed Value
   */
-  function getValue($key, $defaultValue = null)
-  {
+  function getValue($key, $defaultValue = null) {
     if (!isset($key) OR empty($key) OR !is_string($key))
       return false;
     $ret = (isset($_POST[$key]) ? $_POST[$key] : (isset($_GET[$key]) ? $_GET[$key] : $defaultValue));
@@ -923,7 +932,30 @@ function which_os ()
       $ret = urldecode(preg_replace('/((\%5C0+)|(\%00+))/i', '', urlencode($ret)));
     return !is_string($ret)? $ret : stripslashes($ret);
   }
-  
+
+  /**
+  * Get all values $_POST / $_GET
+  *
+  * @return array Values
+  */
+  function getValues() {
+    $return = array();
+    $keys = array_keys( $_REQUEST );
+    foreach( $keys as $key ) {
+      $return[$key] = getValue( $key );
+    }
+    return $return;
+  }
+
+  function correctype($var) {
+    if( strval( intval( $var ) ) === $var ) {
+      $var = (int)$var;
+    }elseif( strval(floatval($var)) === $var ) {
+      $var = (float)$var;
+    }
+    return $var;
+  }
+
   /**
    * Generates a random gaussian number
    *
@@ -937,4 +969,71 @@ function which_os ()
       ( mt_rand() / $randmax * 2 - 1 );
   }
 
+  /*
+   * Convert an integer to a string of uppercase letters (A-Z, AA-ZZ, AAA-ZZZ, etc.)
+   *
+   * @see http://stackoverflow.com/questions/5554369/php-how-to-output-list-like-this-aa-ab-ac-all-the-way-to-zzzy-zzzz-zzzza
+   */
+  function num2alpha($n)
+  {
+      for($r = ""; $n >= 0; $n = intval($n / 26) - 1)
+          $r = chr($n%26 + 0x41) . $r;
+      return $r;
+  }
+
+  function toColorCode($string){
+    $checksum = md5($string);
+    return array(
+      "R" => hexdec(substr($checksum, 0, 2)),
+      "G" => hexdec(substr($checksum, 2, 2)),
+      "B" => hexdec(substr($checksum, 4, 2))
+    );
+  }
+
+  function parameters_to_string( array $hash ) {
+    $string = '';
+    foreach( $hash as $key => $value ) {
+      $string .= $key . '=' . $value ."\n";
+    }
+    return $string;
+  }
+
+  function string_to_parameters( $string ) {
+    $hash = array();
+    $temp = explode("\n", str_replace("\r\n", "\n", trim( $string )));
+    foreach( $temp as $substring ) {
+      list($key, $value) = explode('=', $substring, 2);
+      $hash[$key] = $value;
+    }
+    return $hash;
+  }
+
+  function get_key_for_minimum_value( $array, $exclusions = null ) {
+    if( !is_null( $exclusions ) ) {
+      $array = array_diff_key( $array, $exclusions );
+    }
+
+    return reset( array_keys( $array , min($array) ) );
+  }
+
+  /*
+   * Gets the number of decimal digits
+   *
+   * Inspired by http://stackoverflow.com/a/12525070/757392
+   */
+  function get_dec_count($num) {
+    $dec = 0;
+    while (true) {
+        if ((string)$num === (string)round($num)) {
+            break;
+        }
+        if (is_infinite($num)) {
+            break;
+        }
+
+        $num *= 10;
+        $dec++;
+    }
+    return $dec;
+}
 ?>

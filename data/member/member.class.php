@@ -301,11 +301,8 @@ AND ".$attribute." <= $str_fin";
     </fieldset>
     <fieldset>
       <legend>Change Password</legend>
-      <p class="field">'.HTMLHelper::genererInputText('password', null, array(), "Password").'</p>
-      <p class="field">'.HTMLHelper::genererInputText('password2', null, array(), "Re-Type Password").'</p>
-    </fieldset>
-    <fieldset>
-      '.HTMLHelper::genererInputSubmit('member_submit', 'Save Changes').'
+      <p class="field">'.HTMLHelper::genererInputText('password_admin', null, array(), "Password").'</p>
+      <!--<p class="field">'.HTMLHelper::genererInputText('password2', null, array(), "Re-Type Password").'</p>-->
     </fieldset>';
 
     return $return;
@@ -567,10 +564,6 @@ AND ".$attribute." <= $str_fin";
     if(isset($post_data['date_naissance_jour']) && isset($post_data['date_naissance_mois']) && isset($post_data['date_naissance_annee'])) {
       $post_data['date_naissance'] = mktime( 0, 0, 0, $post_data['date_naissance_mois'], $post_data['date_naissance_jour'], $_POST['date_naissance_annee']);
     }
-
-    if(isset($post_data['password_admin'])) {
-      $this->set_password($post_data['password_admin'], false);
-    }
     if(isset($post_data['email2'])) {
       $this->email2 = $post_data['email2'];
     }
@@ -597,7 +590,7 @@ AND ".$attribute." <= $str_fin";
     $return = '
       <td width="698" style="vertical-align:top; padding-left:80px; padding-right:80px; font-size: 14px; color:#444444;">
         <p>Bonjour '.wash_utf8($this->prenom).',</p>
-        <p>Vous recevez cet email car vous avez demandé un nouveau mot de passe sur le site Geo.</p>
+        <p>Vous recevez cet email car vous avez demandé un nouveau mot de passe sur le site '.SITE_NAME.'</p>
         <table border="0" cellspacing="0" cellpadding="0" style="color:#FFFFFF; background-color:#ff569d; margin:20px 70px 20px 70px; width: 350px; font-family: Arial, sans serif; height:100%">
           <tr>
             <td style="border-bottom:solid thin #FFFFFF; height:35px; padding:2px 5px 0 10px;">
@@ -629,7 +622,7 @@ AND ".$attribute." <= $str_fin";
     $return = '
       <td width="698" style="vertical-align:top; padding-left:80px; padding-right:80px; font-size: 14px; color:#444444;">
         <p>Bonjour '.wash_utf8($this->prenom).',</p>
-        <p>Votre inscription a bien été prise en compte. Merci d\'avoir choisi Geo !</p>
+        <p>Votre inscription a bien été prise en compte. Merci d\'avoir choisi '.SITE_NAME.' !</p>
         <table border="0" cellspacing="0" cellpadding="0" style="color:#FFFFFF; background-color:#ff569d; margin:20px 70px 20px 70px; width: 350px; font-family: Arial, sans serif; height:100%">
           <tr>
             <td style="border-bottom:solid thin #FFFFFF; height:35px; padding:2px 5px 0 10px;">

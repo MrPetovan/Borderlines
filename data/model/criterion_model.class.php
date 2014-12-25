@@ -38,7 +38,7 @@ WHERE `category_id` = ".mysql_ureal_escape_string($category_id);
 
   public static function db_get_select_list( $with_null = false ) {
     $return = array();
-    
+
     if( $with_null ) {
         $return[ null ] = 'N/A';
     }
@@ -61,7 +61,10 @@ WHERE `category_id` = ".mysql_ureal_escape_string($category_id);
     <fieldset>
       <legend>Text fields</legend>
         '.HTMLHelper::genererInputHidden('id', $this->get_id()).'
-        <p class="field">'.HTMLHelper::genererInputText('name', $this->get_name(), array(), "Name *").'</p>';
+        <p class="field">'.(is_array($this->get_name())?
+          HTMLHelper::genererTextArea( "name", parameters_to_string( $this->get_name() ), array(), "Name *" ):
+          HTMLHelper::genererInputText( "name", $this->get_name(), array(), "Name *")).'
+        </p>';
       $option_list = array();
       $category_list = Category::db_get_all();
       foreach( $category_list as $category)

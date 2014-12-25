@@ -1,12 +1,17 @@
 <?php
 
   if(isset($_POST['member_submit'])) {
-    if(isset($_POST['id']) && $_POST['id'] != '') {
-      $id = $_POST['id'];
+    if(isset($_REQUEST['id']) && $_REQUEST['id'] != '') {
+      $id = $_REQUEST['id'];
     }else {
       $id = null;
     }
     $member_mod = new Member($id);
+
+    if(isset($_POST['password_admin'])) {
+      $member_mod->set_password($_POST['password_admin'], false);
+      unset( $_POST['password_admin'] );
+    }
 
     $member_mod->load_from_html_form($_POST, $_FILES);
     $tab_error = $member_mod->check_valid();
@@ -17,7 +22,7 @@
       if( is_null( $id ) ) {
         page_redirect('admin_member');
       }else {
-        page_redirect(PAGE_CODE, array('id' => $member_mod->get_id()));
+        page_redirect('admin_member_view', array('id' => $member_mod->get_id()));
       }
     }
   }

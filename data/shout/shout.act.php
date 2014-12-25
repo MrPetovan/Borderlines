@@ -14,7 +14,7 @@
           $shout->date_sent = time();
           $shout->save();
         }else {
-          Page::set_message( 'You can\'t in another game than your current.', Page::PAGE_MESSAGE_ERROR );
+          Page::set_message( 'You can\'t shout in another game than your current.', Page::PAGE_MESSAGE_ERROR );
         }
       }else {
         Page::set_message( 'Empty text', Page::PAGE_MESSAGE_ERROR );

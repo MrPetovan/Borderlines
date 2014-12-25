@@ -27,7 +27,7 @@ class Category_Model extends DBObject {
 
   public static function db_get_select_list( $with_null = false ) {
     $return = array();
-    
+
     if( $with_null ) {
         $return[ null ] = 'N/A';
     }
@@ -50,7 +50,10 @@ class Category_Model extends DBObject {
     <fieldset>
       <legend>Text fields</legend>
         '.HTMLHelper::genererInputHidden('id', $this->get_id()).'
-        <p class="field">'.HTMLHelper::genererInputText('name', $this->get_name(), array(), "Name *").'</p>
+        <p class="field">'.(is_array($this->get_name())?
+          HTMLHelper::genererTextArea( "name", parameters_to_string( $this->get_name() ), array(), "Name *" ):
+          HTMLHelper::genererInputText( "name", $this->get_name(), array(), "Name *")).'
+        </p>
 
     </fieldset>';
 

@@ -1,35 +1,61 @@
 <?php
-  $member = Member::instance( Member::get_current_user_id() );
-  
-  // TODO : Create player page
-  $player_list = Player::db_get_by_member_id( $member->get_id() );
-  if( count( $player_list ) ) {
-    $current_player = array_shift( $player_list );
-    
+  $member = Member::get_current_user();
+
+  if( getValue('player_id') ) {
+    $player = Player::instance(getValue('player_id'));
+    if( $player->member_id == $member->id ) {
+      Page::set_message(__('You are now playing as %s', $player->name), Page::PAGE_MESSAGE_NOTICE);
+      Player::set_current( $player );
+    }
+  }
+
+  $redirect_page = false;
+
+  $current_player = Player::get_current( $member );
+
+  if( $current_player ) {
     // Game retrival
     if( $current_game = $current_player->last_game ) {
       // In game OR game ended
-      if( $current_game->has_ended() ) {
-      }else {
-        if( $action = getValue('action') ) {
-          switch( $action ) {
-            case 'ready' : {
-              $turn_ready = array_shift( $current_player->get_game_player_list( $current_game->id ) );
-              if( $turn_ready['turn_ready'] <= $current_game->current_turn ) {
+      $game_player = array_pop( $current_game->get_game_player_list( $current_player->id) );
+
+      if( !$game_player['turn_leave'] ) {
+        // In game OR game ended
+        if( $current_game->has_ended() ) {
+        }else {
+          if( $action = getValue('action') ) {
+            switch( $action ) {
+              case 'ready' : {
                 $current_player->set_game_player( $current_game->id, $current_game->current_turn + 1 );
-              }else {
+                break;
+              }
+              case 'notready' : {
                 $current_player->set_game_player( $current_game->id, $current_game->current_turn );
+                break;
+              }
+              case 'change_diplomacy_status' : {
+                $current_player->set_player_diplomacy( $current_game->id, $current_game->current_turn + 1, getValue('to_player_id'), getValue('new_status'));
+                break;
               }
             }
+            $redirect_page = PAGE_CODE;
           }
         }
+      }else {
+        Page::set_message(__('You quit during your last game, please join another one.'), Page::PAGE_MESSAGE_WARNING);
+        // Left the game
+        $redirect_page = 'game_list';
       }
     }else {
       // No game ever played
-      Page::redirect( 'game_list' );
+      $redirect_page = 'game_list';
     }
   }else {
     // No player created
-    Page::redirect( 'create_player' );
+    $redirect_page = 'create_player';
+  }
+
+  if( $redirect_page ) {
+    Page::redirect($redirect_page);
   }
 ?>

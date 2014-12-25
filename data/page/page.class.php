@@ -46,8 +46,8 @@ class Page extends DBObject {
   }
 
   /**
-   * Syst�me de message simple : On remplit la variable de session avec un message.
-   * D�s qu'une page demande � afficher les messages, on vide la variable.
+   * Système de message simple : On remplit la variable de session avec un message.
+   * Dès qu'une page demande à afficher les messages, on vide la variable.
    *
    * @param string $message
    * @param int $type
@@ -55,7 +55,7 @@ class Page extends DBObject {
   public static function set_message( $message, $type = self::PAGE_MESSAGE_NOTICE ) {
     self::add_message( $message, $type );
   }
-  
+
   public static function add_message( $message, $type = self::PAGE_MESSAGE_NOTICE ) {
     $_SESSION['page']['message'][$type][] = $message;
   }
@@ -121,7 +121,7 @@ LIMIT 0,1";
       <p>'.HTMLHelper::genererInputText('tpl', $tpl, array('style' => 'width: 300px'), "Fichier TemPLate").'</p>
       <p>'.HTMLHelper::genererInputCheckBox('login_required', '1', $login_required, array(), "Page membre").'</p>
       <p>'.HTMLHelper::genererInputCheckBox('admin_required', '1', $admin_required, array(), "Page Administtrateur").'</p>
-      <p>'.HTMLHelper::genererInputText('rewrite_pattern', $rewrite_pattern, array('style' => 'width: 300px'), "Schéma Rewrite URL").'</p>
+      <p>'.HTMLHelper::genererInputText('rewrite_pattern', $rewrite_pattern, array('style' => 'width: 300px'), "SchÃ©ma Rewrite URL").'</p>
     </fieldset>
     <fieldset>
       '.HTMLHelper::genererInputSubmit('page_submit', 'Enregistrer').'
@@ -147,16 +147,38 @@ LIMIT 0,1";
     return $return;
   }
 
+  public static function display_messages() {
+    $messages['error'] = Page::get_message(Page::PAGE_MESSAGE_ERROR);
+    $messages['warning'] = Page::get_message(Page::PAGE_MESSAGE_WARNING);
+    $messages['notice'] = Page::get_message(Page::PAGE_MESSAGE_NOTICE);
+
+    if( count( $messages['error'] ) || count( $messages['warning'] ) || count( $messages['notice'] ) ) {
+      echo '
+        <div id="messages">';
+      foreach( $messages as $message_class => $message_list ) {
+        if( $message_list ) {
+          echo '
+            <ul class="'.$message_class.'">
+              <li>'.implode('</li>
+              <li>', $message_list ).'</li>
+            </ul>';
+        }
+      }
+      echo '
+        </div>';
+    }
+  }
+
   /**
-   * Mets à jour les champs de l'objet en fonctions des données POST et FILES présente.
-   * Effectue les vérifications basiques pour mettre à jour les champs
+   * Mets Ã  jour les champs de l'objet en fonctions des donnÃ©es POST et FILES prÃ©sente.
+   * Effectue les vÃ©rifications basiques pour mettre Ã  jour les champs
    * Retourne une liste de codes d'erreur :
    * - vide : Pas d'erreur
    * -  1 : Code vide.
    * -  2 : Fichier DSP vide
    *
-   * @param array $post_data Donnée POST ($_POST)
-   * @param array $file_data Donnée FILES ($_FILES)
+   * @param array $post_data DonnÃ©e POST ($_POST)
+   * @param array $file_data DonnÃ©e FILES ($_FILES)
    */
   public function load_from_html_form($post_data, $file_data) {
     parent::load_from_html_form($post_data, $file_data);
@@ -180,7 +202,7 @@ LIMIT 0,1";
   public static function get_url($code_page, $params = array(), $root = true) {
     return self::get_page_url($code_page, $root, $params);
   }
-  
+
   /**
    * Retourne l'URL de la page selon son code
    *
@@ -207,7 +229,7 @@ LIMIT 0,1";
                 unset($params[$name]);
               }
             }
-            //Paramètres supplémentaires : ?param1=value1&param2=value2...
+            //ParamÃ¨tres supplÃ©mentaires : ?param1=value1&param2=value2...
             if(count($params)) {
               $rewrite_pattern .= "?";
             }
@@ -224,7 +246,7 @@ LIMIT 0,1";
             $return .= "&";
           }
         }
-        
+
         if(count($params)) {
           //param1=value1&param2=value2...
           $params_url = array();
@@ -290,7 +312,7 @@ LIMIT 0,1";
       redirect($redirect);
     }
   }
-  
+
   public static function redirect( $page, $params = array()) {
     self::page_redirect($page, $params );
   }

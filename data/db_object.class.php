@@ -56,7 +56,7 @@
      */
     public static function instance( $id = null ) {
       $class = get_called_class ( );
-    
+
       if( !is_null( $id )) {
         //$array = debug_backtrace();
 
@@ -138,7 +138,8 @@
           // Appelle __get
           return $this->$var;
         }else {
-          error_log('[Framework] __call:get : Class variable doesn\'t exist : '.$var);
+          $debug_backtrace = debug_backtrace();
+          error_log('[Framework] __call:get : Class variable doesn\'t exist : '.$var.' '. $debug_backtrace[2]['file']. ' ['. $debug_backtrace[2]['line'].']');
           throw new Exception('[Framework] __call:get : Class variable doesn\'t exist : '.$var);
           return null;
         }
@@ -152,7 +153,8 @@
           $this->$var = $value;
           $return = true;
         }else {
-          error_log('[Framework] __call:set : Class variable doesn\'t exist : '.$var);
+          $debug_backtrace = debug_backtrace();
+          error_log('[Framework] __call:set : Class variable doesn\'t exist : '.$var.' '. $debug_backtrace[2]['file']. ' ['. $debug_backtrace[2]['line'].']');
           throw new Exception('[Framework] __call:set : Class variable doesn\'t exist : '.$var);
           return null;
         }
@@ -174,7 +176,24 @@
       $array = get_object_vars($this);
       foreach ( $array as $key => $value ) {
         if( strpos( $key, '_' ) === 0 ) {
-          $return[ substr( $key, 1 ) ] = $value;
+          $return[ substr( $key, 1 ) ] = $this->__get(substr( $key, 1 ));
+        }
+      }
+      return $return;
+    }
+
+    /**
+     * Retourne un tableau clé->valeur de toutes les propriétés innées (=SQL)
+     * de l'objet. Ces propriétés sont indiquées par un _ devant le nom SQL
+     *
+     * @return array
+     */
+    public function get_public_vars() {
+      $return = array();
+      $array = get_object_vars($this);
+      foreach ( $array as $key => $value ) {
+        if( strpos( $key, '_' ) === 0 ) {
+          $return[ substr( $key, 1 ) ] = $this->__get(substr( $key, 1 ));
         }
       }
       return $return;
@@ -188,7 +207,7 @@
      */
     public static function db_exists($id){
       $return = false;
-      
+
       $sql = "SELECT * FROM `".static::get_table_name()."` WHERE `id` = ".mysql_ureal_escape_string($id);
 
       $res = mysql_uquery($sql);
@@ -253,7 +272,8 @@
 
         foreach($data as $var_name => $value) {
           $var_name = "_$var_name";
-          $this->$var_name = $value;
+
+          $this->$var_name = correctype( $value );
         }
 
         $return = true;
@@ -276,14 +296,14 @@
     public function save($flags = 0) {
       if($return = ($this->check_valid($flags) === true)) {
         if(is_null($this->get_id())) {
-          return $this->db_add();
+          $return = $this->db_add();
         }else {
-          return $this->db_update();
+          $return = $this->db_update();
         }
       }
       return $return;
     }
-    
+
     /**
      * Standard database write function. Check object validity given flags,
      * create the object in database if it did not exist or update it if it
@@ -297,9 +317,9 @@
     public function db_save($flags = 0) {
       if(($return = $this->check_valid($flags)) === true) {
         if(is_null($this->get_id())) {
-          return $this->db_add();
+          $return = $this->db_add();
         }else {
-          return $this->db_update();
+          $return = $this->db_update();
         }
       }
       return $return;
@@ -374,9 +394,9 @@ WHERE `id` = ".mysql_ureal_escape_string($this->get_id());
       if( !$include_inactive && property_exists( get_called_class(), '_active' ) ) {
         $where = 'WHERE `active` = 1';
       }
-      
+
       $sql = $sql."\n".$where."\n".$order_by;
-      
+
       if(!is_null($page) && is_numeric($page)) {
         $start = ($page - 1) * $limit;
         $sql .= "\n".'LIMIT '.$start.','.$limit;
@@ -384,15 +404,15 @@ WHERE `id` = ".mysql_ureal_escape_string($this->get_id());
 
       return static::sql_to_list( $sql );
     }
-    
+
     public static function db_count_all($include_inactive = false) {
       $sql = "SELECT COUNT(`id`) FROM `".static::get_table_name().'`';
-      
+
       $where = '';
       if( !$include_inactive && property_exists( get_called_class(), '_active' ) ) {
         $where = 'WHERE `active` = 1';
       }
-      
+
       $res = mysql_uquery($sql."\n".$where);
       return array_pop(mysql_fetch_row($res));
     }
@@ -561,11 +581,14 @@ WHERE `id` = ".mysql_ureal_escape_string($this->get_id());
       if(ini_get('magic_quote_gpc')) {
         $post_data = rstripslashes($post_data);
       }
-      
+
       foreach ($post_data as $name => $value) {
         $sql_name = '_'.$name;
-        
+
         if($name != "id" && property_exists( $this, $sql_name ) ) {
+          if( is_array( $this->$name ) && is_string( $value ) ) {
+            $value = string_to_parameters( $value );
+          }
           $this->$name = $value;
         }
       }
@@ -610,7 +633,7 @@ WHERE `id` = ".mysql_ureal_escape_string($this->get_id());
       return $return;
     }
 
-     
+
     /**
      * Vérifie la validité syntaxique d'une adresse email.
      *

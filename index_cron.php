@@ -1,14 +1,17 @@
 <?php
 /**
- * Dispatcher général du site
+ * Dispatcher gÃ©nÃ©ral du site
  *
  *
  */
 
   session_start();
 
+  ini_set('display_errors', 1);
+  error_reporting(E_ALL);
+
   /**
-   * Détermination des PATH et URL absolus pour être utilisés dans tout le site
+   * DÃ©termination des PATH et URL absolus pour Ãªtre utilisÃ©s dans tout le site
    *
    * Note : tous les PATH et URL se finissent par '/'
    */
@@ -21,17 +24,17 @@
   define('URL_ROOT_RELATIVE', $URL_ROOT_RELATIVE);
 
   // Constante principale, c'est l'URL absolue de la base du site
-  define("URL_ROOT", 'http://borderlines.mrpetovan.com/');
+  define("URL_ROOT", 'http://scramblednations.com/');
   // PATH absolu de la base du site
   define('DIR_ROOT', dirname($_SERVER['SCRIPT_FILENAME']) .'/');
-  // PATH du répertoire d'inclusions
+  // PATH du rÃ©pertoire d'inclusions
   define('DATA', DIR_ROOT.'data/');
-  // PATH du répertoire d'inclusions
+  // PATH du rÃ©pertoire d'inclusions
   define('INC', DIR_ROOT.'inc/');
-  // PATH du répertoire des templates
+  // PATH du rÃ©pertoire des templates
   define('TPL', DIR_ROOT.'template/');
 
-  // Constante de debug SQL général
+  // Constante de debug SQL gÃ©nÃ©ral
   define('DEBUG_SQL', false);
 
   // Suppression des antislashes
@@ -50,52 +53,66 @@
   }
 
   $flag_prod = true;
-  // Fichier de paramétrage
+  // Fichier de paramÃ©trage
   require_once(INC.'constantes.inc.php');
   // Fonctions MySQL
   require_once(INC.'db.inc.php');
-  // Fonctions générales
+  // Fonctions gÃ©nÃ©rales
   require_once(INC.'fonctions.inc.php');
-  // Fonctions liées aux pages
+  // i18n functions
+  require_once(INC.'i18n.inc.php');
+  // Extending GD functions
+  require_once(INC.'gd.inc.php');
+  // Fonctions liÃ©es aux pages
   require_once(INC.'page.inc.php');
-  // Fonctions système de fichier
+  // Fonctions systÃ¨me de fichier
   require_once(INC.'files.inc.php');
   // Fonctions envoi de mail
   require_once(INC.'PHPMailer/class.phpmailer.php');
 
   //Includes classes
   require_once('data/db_object.class.php');
-  
+
   require_once( DATA.'order_type/iorder.php');
   require_once( INC.'borderlines.inc.php');
-  
-  if( isset( $_SERVER['REMOTE_ADDR'] ) ) redirect('/');
-  
+
+  if( isset( $_SERVER['REMOTE_ADDR'] ) ) redirect(URL_ROOT);
+
   $flag_action = false;
   if(! mysql_uconnect(DB_HOST, DB_USER, DB_PASS, DB_BASE)) {
     echo "DB connection error";
     die();
   }else {
-    mysql_uquery("SET NAMES 'utf8'");    
+    mysql_uquery("SET NAMES 'utf8'");
   }
 
-  $game_list = Game::db_get_nonended_game_list();
+  $options = getopt('cgw:');
 
-  foreach( $game_list as $game ) {
-    if( $game->started ) {
-      $game->compute_auto();
-    }else {
-      if( $game->min_players && count( $game->get_game_player_list() ) >= $game->min_players ) {
-        $game->start();
+  echo date('[Y-m-d H:i:s]').' '.implode(' ', $_SERVER['argv'])."\n";
+
+  if( isset($options['c'])) {
+    $game_list = Game::db_get_nonended_game_list();
+
+    foreach( $game_list as $game ) {
+      if( $game->started ) {
+        $game->compute_auto();
+      }else {
+        if( $game->min_players && count( $game->get_game_player_list() ) >= $game->min_players ) {
+          $game->start();
+        }
       }
     }
-    
-    /*if( $game->has_ended( ) ) {
-      $new_game = clone $game;
-      $new_game->id = null;
-      $new_game->reset();
-    }*/
   }
-  
-  
+
+  if( isset($options['g'])) {
+    echo "Generating worlds\n";
+    var_dump($options);
+    if( isset($options['w'])) {
+      $world = World::instance( $options['w'] );
+      echo $world->name."\n";
+      $world->initialize_territories();
+    }
+  }
+
+
 ?>

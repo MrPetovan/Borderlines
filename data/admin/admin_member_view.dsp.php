@@ -1,6 +1,4 @@
 <?php
-  include_once('data/static/html_functions.php');
-
   if(isset($_GET['id'])) {
     $id = $_GET['id'];
     $member = new Member($id);
@@ -23,7 +21,6 @@
   </div>
 </div>-->
 <div class="texte_contenu">
-<?php echo admin_menu(PAGE_CODE);?>
   <div class="texte_texte">
     <h3>Consultation des données pour "<?php echo $member->get_prenom().' '.$member->get_nom()?>"</h3>
     <div class="informations formulaire">
@@ -42,6 +39,10 @@
       <p class="field">
         <span class="libelle">Email</span>
         <span class="value"><?php echo $member->get_email()?></span>
+      </p>
+      <p class="field">
+        <span class="libelle">Password</span>
+        <span class="value"><?php echo $member->get_password()?></span>
       </p>
       <p class="field">
         <span class="libelle">Date inscription</span>
