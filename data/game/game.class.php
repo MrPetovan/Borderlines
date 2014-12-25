@@ -11,6 +11,9 @@ class Game extends Game_Model {
   // CUSTOM
   protected $_version = 'economy';
 
+  protected $capturable_territories_count;
+  protected $players_count;
+
   public function get_territory_player_troops_list($turn = null, $territory_id = null, $player_id = null) {
     $return = array();
     if( is_null( $turn ) ) {
@@ -74,6 +77,48 @@ WHERE `game_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
     return mysql_fetch_to_array($res);
   }
 
+  public function get_bureaucracy_ratio( $territory_number ) {
+    $game_parameters = $this->get_parameters();
+    $return = $game_parameters['BUREAUCRACY_MAX_RATIO'];
+
+    if( $territory_number > 1 && $this->get_capturable_territories_count() > 0 && $this->get_players_count() > 0 ) {
+      $return = s($territory_number, $game_parameters['BUREAUCRACY_MAX_RATIO'], $game_parameters['BUREAUCRATY_MIN_RATIO'], 0, $this->get_average_territories_by_player() + 1 );
+    }
+
+    return $return;
+  }
+
+  public function get_capturable_territories_count() {
+    if( !isset( $this->capturable_territories_count ) ) {
+      $total_capturable_territories = 0;
+
+      /* @TODO: Terribly innefficient, init Bureaucracy parameters at the start of the game instead.*/
+      $territories = Territory::db_get_by_world_id( $this->world_id );
+
+      foreach( $territories as $territory ) {
+        if( $territory->is_capturable() ) {
+          $total_capturable_territories++;
+        }
+      }
+
+      $this->capturable_territories_count = $total_capturable_territories;
+    }
+
+    return $this->capturable_territories_count;
+  }
+
+  public function get_players_count() {
+    if( !isset( $this->players_count ) ) {
+      $this->players_count = count($this->get_game_player_list());
+    }
+
+    return $this->players_count;
+  }
+
+  public function get_average_territories_by_player() {
+    return floor($this->get_capturable_territories_count() / $this->get_players_count());
+  }
+
   public function get_parameters() {
     $defaults = array(
         'HOME_TROOPS_MAINTENANCE' => 2,
@@ -84,7 +129,9 @@ WHERE `game_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
         'ALLOW_JOIN_MIDGAME' => 1,
         'TERRITORY_BASE_REVENUE' => 10000,
         'ECONOMY_MODIFIER_WAR' => -20,
-        'ECONOMY_MODIFIER_PEACE' => 20
+        'ECONOMY_MODIFIER_PEACE' => 20,
+        'BUREAUCRACY_MAX_RATIO' => 1,
+        'BUREAUCRATY_MIN_RATIO' => .5
     );
 
     $game_parameters = unserialize($this->_parameters);

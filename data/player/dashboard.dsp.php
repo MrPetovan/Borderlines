@@ -246,7 +246,11 @@
 </table>
 <h3><?php echo __('Economy')?></h3>
 <?php
-  $revenue = $current_player->get_revenue( $current_game, $current_game->current_turn + 1 );
+  $revenue_before_bureaucracy = $current_player->get_revenue( $current_game, $current_game->current_turn + 1 );
+
+  $bureaucracy_ratio = $current_game->get_bureaucracy_ratio(count($current_player->get_territory_status_list(null, $current_game->id, $current_game->current_turn )));
+
+  $revenue = $revenue_before_bureaucracy * $bureaucracy_ratio;
 
   $troops_home = 0;
   $troops_away = 0;
@@ -286,6 +290,14 @@
 <div class="informations formulaire">
   <p>
     <span class="label"><?php echo __('Total revenue for turn %s', $current_game->current_turn)?></span>
+    <span class="value num"><?php echo l10n_number( $revenue_before_bureaucracy, 0 )?>  <img src="<?php echo IMG.'img_html/coins.png'?>" alt="" title="" /></span>
+  </p>
+  <p>
+    <span class="label"><?php echo __('Bureaucracy ratio for turn %s', $current_game->current_turn)?></span>
+    <span class="value num"><?php echo l10n_number( round($bureaucracy_ratio * 100), 0 )?>%  <img src="<?php echo IMG.'img_html/bureaucracy.png'?>" alt="" title="<?php echo __('Bureaucracy')?>" /></span>
+  </p>
+  <p>
+    <span class="label"><?php echo __('Revenue after bureaucracy')?></span>
     <span class="value num"><?php echo l10n_number( $revenue, 0 )?>  <img src="<?php echo IMG.'img_html/coins.png'?>" alt="" title="" /></span>
   </p>
   <p>

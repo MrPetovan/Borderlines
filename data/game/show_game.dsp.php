@@ -73,6 +73,22 @@
     <span class="value"><?php echo $value?></span>
   </p>
 <?php  endforeach;?>
+<h3><?php echo __('Bureaucracy table')?></h3>
+<table>
+  <tr>
+    <th><?php echo __('Territories')?></th>
+  <?php for($i = 1; $i < $game->get_average_territories_by_player(); $i++ ):?>
+    <th class="num"><?php echo $i?></th>
+  <?php endfor;?>
+    <th class="num"><?php echo $game->get_average_territories_by_player()?>+</th>
+  </tr>
+  <tr>
+    <th><?php echo __('Revenue ratio')?></th>
+  <?php for($i = 1; $i <= $game->get_average_territories_by_player(); $i++ ):?>
+    <td class="num"><?php echo round($game->get_bureaucracy_ratio($i) * 100)?>%</td>
+  <?php endfor;?>
+  </tr>
+</table>
 </div>
 <h3><?php echo __('Players')?></h3>
 <?php

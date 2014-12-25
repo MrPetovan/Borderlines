@@ -437,6 +437,8 @@ LIMIT 1';
       $revenue += $territory_revenue;
     }
 
+    $revenue *= $game->get_bureaucracy_ratio( count($territory_previous_owner_list) );
+
     $orders = Player_Order::db_get_executed( $game->id, $turn, 11 );
     //Giving tribute
     foreach($orders as $order) {
