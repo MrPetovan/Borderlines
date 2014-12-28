@@ -14,13 +14,13 @@ function __autoload($classname) {
   include_once('data/'.strtolower($classname).'/'.strtolower($classname).'.class.php');
 }
 
-define('SITE_NAME', 'Borderlines');
+define('SITE_NAME', 'Site');
 
 define('PARAM_PAGE', 'page');
 define('PARAM_ACTION', 'action');
 
 // Liste des hostname de prod, séparer par des |
-define("PROD_HOST", 'borderlines.host.com|xxx.net' );
+define("PROD_HOST", 'host.com|xxx.net' );
 
 define("DB_CHARSET", "utf8");
 
@@ -29,6 +29,8 @@ define('PAGE_DEFAUT', 'accueil');
 define('PAGE_LOGIN', 'login');
 define('PAGE_ERROR', 'erreur');
 
+// Available languages, comma-separated
+define('LOCALES', 'en_US');
 
 // Vérification du nom de domaine pour détermination PROD/DEV
 function match_host($host, $match) {
@@ -60,7 +62,7 @@ if( $flag_prod) {
   define('DB_HOST', 'localhost');
   define('DB_USER', 'user');
   define('DB_PASS', 'password');
-  define('DB_BASE', 'borderlines');
+  define('DB_BASE', 'base');
   define('MYSQLDUMP_PATH', '');
 
   // Configuration envoi de mail
@@ -78,7 +80,7 @@ if( $flag_prod) {
   define('DB_HOST', 'localhost');
   define('DB_USER', 'user');
   define('DB_PASS', 'password');
-  define('DB_BASE', 'borderlines');
+  define('DB_BASE', 'base');
   define('MYSQLDUMP_PATH', 'path/to/mysqldump');
 
   define("SMTP_HOST", "smtp.example.com");
@@ -98,7 +100,7 @@ define("ADMIN_LEVEL", 1);
 define('MAIL_WORDWRAP', 80);
 
 // Paramètre expéditeur des mails
-define("ADMIN_EMAIL", "admin@borderlines.com");
+define("ADMIN_EMAIL", "admin@host.com");
 define("ADMIN_EMAIL_SENDER", SITE_NAME);
 // Template de page par défaut
 define('PAGELAYOUT_DEFAUT' , 'pagelayout.tpl.php');
