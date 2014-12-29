@@ -84,6 +84,12 @@ body.clean {
   border-bottom: 1px solid #FFFFFF;
 }
 
+.archive.fogofwar .title th {
+  cursor: not-allowed;
+  background-color: #CCCCCC;
+  color: #FFFFF;
+}
+
 #shoutwall {
   height: 300px;
   overflow-y: scroll;

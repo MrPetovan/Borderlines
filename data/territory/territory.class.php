@@ -537,6 +537,7 @@ AND `game_id` = '.mysql_ureal_escape_string($game->id).$where;
       }
     }
   }
+
   public function get_territory_status( Game $game, $turn = null ) {
     //var_debug( "{$this->name}->get_territory_status( {$game->name}, $turn ) ");
     $return = null;
