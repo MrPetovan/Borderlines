@@ -175,7 +175,8 @@
       $is_current = $territory_status_row['turn'] == $turn;
 
       $can_see_troops =
-        isset( $troops_history[ $territory_status_row['turn'] ][ $current_player->id ] )
+        $current_game->has_ended()
+        || isset( $troops_history[ $territory_status_row['turn'] ][ $current_player->id ] )
         || isset( $troops_current[ $territory_status_row['turn'] ][ $current_player->id ] )
         || $territory_status_row['owner_id'] == $current_player->id;
 
