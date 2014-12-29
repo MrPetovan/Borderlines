@@ -79,10 +79,10 @@ WHERE `game_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
 
   public function get_bureaucracy_ratio( $territory_number ) {
     $game_parameters = $this->get_parameters();
-    $return = $game_parameters['BUREAUCRACY_MAX_RATIO'];
+    $return = $game_parameters['BUREAUCRACY_MAX_RATIO'] / 100;
 
     if( $territory_number > 1 && $this->get_capturable_territories_count() > 0 && $this->get_players_count() > 0 ) {
-      $return = s($territory_number, $game_parameters['BUREAUCRACY_MAX_RATIO'], $game_parameters['BUREAUCRATY_MIN_RATIO'], 0, $this->get_average_territories_by_player() + 1 );
+      $return = s($territory_number, $game_parameters['BUREAUCRACY_MAX_RATIO'] / 100, $game_parameters['BUREAUCRACY_MIN_RATIO'] / 100, 0, $this->get_average_territories_by_player() + 1 );
     }
 
     return $return;
@@ -130,8 +130,8 @@ WHERE `game_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
         'TERRITORY_BASE_REVENUE' => 10000,
         'ECONOMY_MODIFIER_WAR' => -20,
         'ECONOMY_MODIFIER_PEACE' => 20,
-        'BUREAUCRACY_MAX_RATIO' => 1,
-        'BUREAUCRATY_MIN_RATIO' => .5
+        'BUREAUCRACY_MAX_RATIO' => 100,
+        'BUREAUCRACY_MIN_RATIO' => 50
     );
 
     $game_parameters = unserialize($this->_parameters);
@@ -687,6 +687,8 @@ WHERE `ended` IS NULL";
       <p class="field">'.HTMLHelper::genererInputText('parameters[TERRITORY_BASE_REVENUE]', $game_parameters['TERRITORY_BASE_REVENUE'], array(), __('Territory base revenue')).'</p>
       <p class="field">'.HTMLHelper::genererInputText('parameters[ECONOMY_MODIFIER_WAR]', $game_parameters['ECONOMY_MODIFIER_WAR'], array(), __('Economy modifier (Conflict)')).' %</p>
       <p class="field">'.HTMLHelper::genererInputText('parameters[ECONOMY_MODIFIER_PEACE]', $game_parameters['ECONOMY_MODIFIER_PEACE'], array(), __('Economy modifier (Peace)')).' %</p>
+      <p class="field">'.HTMLHelper::genererInputText('parameters[BUREAUCRACY_MAX_RATIO]', $game_parameters['BUREAUCRACY_MAX_RATIO'], array(), __('BUREAUCRACY_MAX_RATIO')).' %</p>
+      <p class="field">'.HTMLHelper::genererInputText('parameters[BUREAUCRACY_MIN_RATIO]', $game_parameters['BUREAUCRACY_MIN_RATIO'], array(), __('BUREAUCRACY_MIN_RATIO')).' %</p>
       <p class="field">'.HTMLHelper::genererInputCheckBox('parameters[ALLOW_JOIN_MIDGAME]', '0', $game_parameters['ALLOW_JOIN_MIDGAME'], array(), __('Allow players to join mid-game')).'</p>
     </fieldset>';
 
