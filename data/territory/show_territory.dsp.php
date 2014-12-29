@@ -206,7 +206,7 @@
           echo '
     <tr>
       <td><a href="'.Page::get_url('show_player', array('id' => $player->id)).'">'.$player->name.'</a></td>
-      <td class="num">'.(!isset( $supremacy[$current_turn][$player->id] ) || $supremacy[$current_turn][$player->id]?__('Supremacy').' <img src="'.IMG.'img_html/lightning.png" alt="'.__('Supremacy').'" title="'.__('Supremacy').'"/>':__('Retreat').' <img src="'.IMG.'img_html/link_break.png" alt="'.__('Retreat').'" title="'.__('Retreat').'"/>'). '</td>
+      <td class="num">'.(!isset( $supremacy[$territory_status_row['turn']][$player->id] ) || $supremacy[$territory_status_row['turn']][$player->id]?__('Supremacy').' <img src="'.IMG.'img_html/lightning.png" alt="'.__('Supremacy').'" title="'.__('Supremacy').'"/>':__('Retreat').' <img src="'.IMG.'img_html/link_break.png" alt="'.__('Retreat').'" title="'.__('Retreat').'"/>'). '</td>
       <td class="num">' . l10n_number( $player_troops_quantity ).' <img src="'.IMG.'img_html/troops.png" alt="'.__('Troops').'" title="'.__('Troops').'"/></td>
     </tr>';
         }
