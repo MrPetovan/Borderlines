@@ -136,6 +136,8 @@
 
 <?php endif; //if( !$is_ajax )?>
 
+<?php if( $current_game ) :?>
+
 <h3><?php echo __('Troops')?></h3>
 <table class="accordion">
   <thead>
@@ -215,7 +217,7 @@
   </tbody>
 </table>
 
-<?php if( $is_current_turn && $current_game && !$current_game->has_ended() && $territory->is_passable() ) :?>
+<?php if( $is_current_turn && !$current_game->has_ended() && $territory->is_passable() ) :?>
 
 <h3><?php echo __('Planned movements')?></h3>
 <?php
@@ -345,6 +347,7 @@
 ?>
 </div>
 <?php endif; //if( $is_current_turn && !$game->has_ended() )?>
+<?php endif; //if( $current_game ) :?>
 
 <?php if( !$is_ajax ) :?>
 <p><a href="<?php echo Page::get_url('show_world', array('id' => $territory->world_id, 'game_id' => $current_game->id, 'turn' => $turn ) )?>"><?php echo __('Return to world map')?></a></p>
