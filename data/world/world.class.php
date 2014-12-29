@@ -566,8 +566,8 @@ class World extends World_Model {
     }
 
     if( $options['game_id'] !== null ) {
-        $game = Game::instance($options['game_id']);
-        if( $options['turn'] === null ) $options['turn'] = $game->current_turn;
+      $game = Game::instance($options['game_id']);
+      if( $options['turn'] === null ) $options['turn'] = $game->current_turn;
     }
 
     if( $options['territories'] === null ) {
@@ -628,7 +628,7 @@ class World extends World_Model {
           territory="'.$territory->id.'"
           shape="polygon"
           coords="'.implode(',', $coords).'"
-          href="'.Page::get_url('show_territory', array('id' => $territory->id)).'"
+          href="'.Page::get_url('show_territory', array('game_id' => $game_id, 'id' => $territory->id)).'"
           title="'.$territory->name.' ('.($owner->id?$owner->name:__('Nobody')).')'.
                   ($territory->is_capital( $game, $turn )?' ['.__('Capital').']':'').
                   ($territory->is_contested( $game, $turn )?' <'.__('Contested').'>':'').

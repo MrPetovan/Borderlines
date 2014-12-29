@@ -275,9 +275,9 @@
   foreach( $planned_orders as $planned_order ) {
     echo '
     <tr>
-      <td>'.($planned_order['origin']?'<a href="'.Page::get_url('show_territory', array('id' => $planned_order['origin']->id)).'">'.$planned_order['origin']->name.'</a>':'').'</td>
+      <td>'.($planned_order['origin']?'<a href="'.Page::get_url('show_territory', array_merge( $territory_params, array('id' => $planned_order['origin']->id))).'">'.$planned_order['origin']->name.'</a>':'').'</td>
       <td class="num">'.l10n_number( $planned_order['count'] ).' <img src="'.IMG.'img_html/troops.png" alt="'.__('Troops').'" title="'.__('Troops').'"/></td>
-      <td>'.($planned_order['destination']?'<a href="'.Page::get_url('show_territory', array('id' => $planned_order['destination']->id)).'">'.$planned_order['destination']->name.'</a>':'').'</td>
+      <td>'.($planned_order['destination']?'<a href="'.Page::get_url('show_territory', array_merge( $territory_params, array('id' => $planned_order['destination']->id))).'">'.$planned_order['destination']->name.'</a>':'').'</td>
       <td>
         <form action="'.Page::get_url('order').'" method="post">
           '.HTMLHelper::genererInputHidden('url_return', Page::get_url( PAGE_CODE, array('id' => $territory->id) ) ).'

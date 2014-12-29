@@ -167,7 +167,7 @@
 
         echo '
     <tr>
-      <td><a href="'.Page::get_url('show_territory', array('id' => $territory->id)).'">'.$territory->name.'</a></td>
+      <td><a href="'.Page::get_url('show_territory', array('game_id' => $current_game->id, 'id' => $territory->id)).'">'.$territory->name.'</a></td>
       <td>';
         if( $owner == $current_player ) {
           echo 'Yourself';
@@ -369,7 +369,7 @@
       }
       echo '
     <tr>
-      <td>'.($territory?'<a href="'.Page::get_url('show_territory', array('id' => $territory->id)).'">'.$territory->name.'</a>':'').'</td>
+      <td>'.($territory?'<a href="'.Page::get_url('show_territory', array('game_id' => $current_game->id, 'id' => $territory->id)).'">'.$territory->name.'</a>':'').'</td>
       <td>'.$player_history_row['reason'].'</td>
     </tr>';
     }
@@ -425,7 +425,7 @@
           }
           if( strpos($key, 'territory_id') !== false ) {
             $territory = Territory::instance( $value );
-            $value = '<a href="'.Page::get_url('show_territory', array('id' => $territory->id)).'">'.$territory->name.'</a>';
+            $value = '<a href="'.Page::get_url('show_territory', array('game_id' => $current_game->id, 'id' => $territory->id)).'">'.$territory->name.'</a>';
           }
           $param_string[] = ucwords( str_replace( array('_id','_'), array('', ' '), $key ) ).' : '.$value;
         }
