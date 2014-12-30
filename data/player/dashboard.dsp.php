@@ -211,7 +211,7 @@
 </p>
 <h3><?php echo __('Diplomacy')?></h3>
 <?php
-    $player_diplomacy_list = $current_player->get_last_player_diplomacy_list($current_game->id, $current_game->current_turn );
+    $player_diplomacy_list = $current_player->get_last_player_diplomacy_list($current_game->id);
 ?>
 <table>
   <tr>

@@ -341,7 +341,6 @@ AND `to_player_id` = '.mysql_ureal_escape_string( $to_player->id ).'
 AND `turn` <= '.$turn.'
 ORDER BY `turn` DESC
 LIMIT 1';
-    //var_debug( $sql );
 
     return mysql_fetch_one($sql);
   }
