@@ -35,6 +35,7 @@
         'get_territory_list'                => array('[world_id]' => 'World Id (optional)', '[game_id]' => 'Game Id (optional)', '[turn]' => 'Turn (optional)', '[sort_field]' => 'Sort field (name/owner)(optional)', '[sort_direction]' => 'Sort Direction (1/0)(optional)'),
         'move_troops'                       => array('from_territory_id' => 'Source Territory Id', 'to_territory_id' => 'Destination Territory Id', 'count' => 'Number of troops moved'),
         'give_troops'                       => array('from_territory_id' => 'Source Territory Id', 'to_player_id' => 'Recipient Player Id', 'count' => 'Number of troops gifted'),
+        'give_tribute'                      => array('to_player_id' => 'Recipient Player Id', 'count' => 'Tribute amount'),
         'change_capital'                    => array('territory_id' => 'Destination Territory Id'),
         'quit_game'                         => array(),
         'get_planned_orders'                => array(),
@@ -308,6 +309,7 @@
         }
         case 'move_troops' :
         case 'give_troops' :
+        case 'give_tribute' :
         case 'change_capital' :
         case 'quit_game' :
         {
