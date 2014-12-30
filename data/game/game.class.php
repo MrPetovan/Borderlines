@@ -109,7 +109,11 @@ WHERE `game_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
 
   public function get_players_count() {
     if( !isset( $this->players_count ) ) {
-      $this->players_count = count($this->get_game_player_list());
+      if( $this->started ) {
+        $this->players_count = count($this->get_game_player_list());
+      }else {
+        $this->players_count = $this->max_players;
+      }
     }
 
     return $this->players_count;
