@@ -151,6 +151,15 @@
     $current_turn = null;
 
     $territory_status_list = $current_game->get_territory_status_list($territory->id);
+    /* @var $current_player Player */
+    $diplomacy_list = $current_player->get_to_player_last_diplomacy_list($current_game->id);
+
+    $shared_vision = array($current_player->id);
+    foreach( $diplomacy_list as $diplomacy_row ) {
+      if( $diplomacy_row['status'] == 'Ally' ) {
+        $shared_vision[] = $diplomacy_row['from_player_id'];
+      }
+    }
 
     $supremacy = array();
     foreach( $current_game->get_territory_player_status_list(null, $territory->id) as $territory_player_status_row ) {
@@ -174,11 +183,14 @@
     foreach( $territory_status_list as $territory_status_row ) {
       $is_current = $territory_status_row['turn'] == $turn;
 
-      $can_see_troops =
-        $current_game->has_ended()
-        || isset( $troops_history[ $territory_status_row['turn'] ][ $current_player->id ] )
-        || isset( $troops_current[ $territory_status_row['turn'] ][ $current_player->id ] )
-        || $territory_status_row['owner_id'] == $current_player->id;
+      $can_see_troops = $current_game->has_ended();
+
+      foreach( $shared_vision as $shared_vision_player_id ) {
+        $can_see_troops = $can_see_troops
+          || isset( $troops_history[ $territory_status_row['turn'] ][ $shared_vision_player_id ] )
+          || isset( $troops_current[ $territory_status_row['turn'] ][ $shared_vision_player_id ] )
+          || $territory_status_row['owner_id'] == $shared_vision_player_id;
+      }
 
       echo '
   <tbody class="archive'.($is_current?' current':'').($can_see_troops?'':' fogofwar').'"'.($can_see_troops?'':' title="'. __('No vision').'"').'">
