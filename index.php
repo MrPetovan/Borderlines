@@ -92,6 +92,27 @@
   require_once( DATA.'order_type/iorder.php');
   require_once( INC.'borderlines.inc.php');
 
+  $locale = null;
+  if( isset($_POST['setlocale']) ) {
+    $locale = $_POST['locale'];
+  }else {
+    if( isset($_COOKIE['locale']) ) {
+      $locale = $_COOKIE['locale'];
+    }elseif( isset( $_SERVER['HTTP_ACCEPT_LANGUAGE'] )) {
+      $locale = str_replace( '-', '_', array_pop( array_reverse( explode( ',', $_SERVER['HTTP_ACCEPT_LANGUAGE']) ) ) );
+    }
+  }
+
+  if( !in_array( $locale, $locale_array = explode(',', LOCALES ) ) ) {
+    $locale = $locale_array[0];
+  }
+
+  setcookie("locale", $locale, time() + 30 * 24 * 3600);
+
+  define('LOCALE', $locale);
+
+  setlocale(LC_ALL, $locale .'.utf8');
+
   $flag_action = false;
   if(! mysql_uconnect(DB_HOST, DB_USER, DB_PASS, DB_BASE)) {
     //$data_include['dsp'] = 'error_db.php';
@@ -167,29 +188,7 @@
 
   $CURRENT_USER = Member::get_current_user();
 
-  //setlocale( LC_TIME, 'en_US.UTF8');
-  $locale = null;
-  if( isset($_POST['setlocale']) ) {
-    $locale = $_POST['locale'];
-  }else {
-    if( isset($_COOKIE['locale']) ) {
-      $locale = $_COOKIE['locale'];
-    }elseif( isset( $_SERVER['HTTP_ACCEPT_LANGUAGE'] )) {
-      $locale = str_replace( '-', '_', array_pop( array_reverse( explode( ',', $_SERVER['HTTP_ACCEPT_LANGUAGE']) ) ) );
-    }
-  }
-
-  if( !in_array( $locale, $locale_array = explode(',', LOCALES ) ) ) {
-    $locale = $locale_array[0];
-  }
-
-  setcookie("locale", $locale, time() + 30 * 24 * 3600);
-
-  define('LOCALE', $locale);
-
   $i18n_replacements = load_translations( $locale );
-
-  setlocale(LC_ALL, $locale . '.utf8' );
 
   define('PAGE_CODE', $PAGE_CODE);
   // ACT

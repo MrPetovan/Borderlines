@@ -75,12 +75,13 @@ function mysql_uquery($query, $link_identifier = null) {
       mysql_uquery($subquery, $link_identifier);
     }
   }
-
+  setlocale(LC_NUMERIC, 'en_US.utf8');
   if (is_null($link_identifier)) {
     $res = mysql_query($query);
   } else {
     $res = mysql_query($query, $link_identifier);
   }
+  setlocale(LC_NUMERIC, LOCALE.'.utf8');
   if ($res) {
     return $res;
   } else {
