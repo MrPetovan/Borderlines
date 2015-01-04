@@ -49,6 +49,11 @@
       if(! is_null($valeur_defaut)) {
         $attributs['value'] = $valeur_defaut;
       }
+      if(isset($attributs['class'])) {
+        $attributs['class'] .= ' input';
+      }else {
+        $attributs['class'] = 'input';
+      }
 
       $label_position_right = 0;
       if(isset($attributs['label_position'])) {
@@ -149,6 +154,9 @@
       return self::genererInputHidden($name, '0').self::genererInput( 'checkbox', $name, $valeur_defaut, $attributs, $label_text );
     }
 
+    public static function radio( $name = null, $valeur_defaut = null, $valeur = null, $attributs = array(), $label_text = null) {
+      return self::genererInputRadio( $name, $valeur_defaut, $valeur, $attributs, $label_text);
+    }
     public static function genererInputRadio( $name = null, $valeur_defaut = null, $valeur = null, $attributs = array(), $label_text = null)
     {
       if(isset($attributs['class'])) {
