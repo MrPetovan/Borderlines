@@ -195,7 +195,7 @@
       echo '
   <tbody class="archive'.($is_current?' current':'').($can_see_troops?'':' fogofwar').'"'.($can_see_troops?'':' title="'. __('No vision').'"').'">
     <tr class="title">
-      <th colspan="3">'.__('Turn %s', $territory_status_row['turn']).' '.($can_see_troops?'<img src="'.IMG.'img_html/vision_clear.png" alt="('. __('Clear vision').')" title="'. __('Clear vision').'"/>':'<img src="'.IMG.'img_html/vision_fogofwar.png" alt="('. __('No vision').')" title="'. __('No vision').'"/>').'</th>
+      <th colspan="3">'.__('Turn %s', $territory_status_row['turn']).($can_see_troops?icon('vision_clear'):icon('vision_fogofwar')).'</th>
     </tr>';
 
       if( $can_see_troops && isset( $player_troops[ $territory_status_row['turn'] ] ) ) {
@@ -210,7 +210,7 @@
     <tr>
       <td></td>
       <td>'.__( $troops_history_row['reason'] ).'</td>
-      <td class="num">'.($troops_history_row['delta']>=0?'+':'').l10n_number( $troops_history_row['delta'] ).' <img src="'.IMG.'img_html/troops.png" alt="'.__('Troops').'" title="'.__('Troops').'"/></td>
+      <td class="num">'.($troops_history_row['delta']>=0?'+':'').l10n_number( $troops_history_row['delta'] ).icon('troops').'</td>
     </tr>';
             }
           }
@@ -218,8 +218,8 @@
           echo '
     <tr>
       <td><a href="'.Page::get_url('show_player', array('id' => $player->id)).'">'.$player->name.'</a></td>
-      <td class="num">'.(!isset( $supremacy[$territory_status_row['turn']][$player->id] ) || $supremacy[$territory_status_row['turn']][$player->id]?__('Supremacy').' <img src="'.IMG.'img_html/lightning.png" alt="'.__('Supremacy').'" title="'.__('Supremacy').'"/>':__('Retreat').' <img src="'.IMG.'img_html/link_break.png" alt="'.__('Retreat').'" title="'.__('Retreat').'"/>'). '</td>
-      <td class="num">' . l10n_number( $player_troops_quantity ).' <img src="'.IMG.'img_html/troops.png" alt="'.__('Troops').'" title="'.__('Troops').'"/></td>
+      <td class="num">'.(!isset( $supremacy[$territory_status_row['turn']][$player->id] ) || $supremacy[$territory_status_row['turn']][$player->id]?__('Supremacy').icon('supremacy'):__('Retreat').icon('supremacy_retreat')). '</td>
+      <td class="num">' . l10n_number( $player_troops_quantity ).icon('troops').'</td>
     </tr>';
         }
       }
@@ -280,7 +280,7 @@
   <tfoot>
     <tr>
       <th><?php echo __('On turn %s', $current_game->current_turn + 1 )?></th>
-      <td class="num"><?php echo l10n_number( $current_player_troops ).' <img src="'.IMG.'img_html/troops.png" alt="'.__('Troops').'" title="'.__('Troops').'"/>'?></td>
+      <td class="num"><?php echo l10n_number( $current_player_troops ) . icon('troops')?></td>
       <td></td>
       <td></td>
     </tr>
@@ -291,7 +291,7 @@
     echo '
     <tr>
       <td>'.($planned_order['origin']?'<a href="'.Page::get_url('show_territory', array_merge( $territory_params, array('id' => $planned_order['origin']->id))).'">'.$planned_order['origin']->name.'</a>':'').'</td>
-      <td class="num">'.l10n_number( $planned_order['count'] ).' <img src="'.IMG.'img_html/troops.png" alt="'.__('Troops').'" title="'.__('Troops').'"/></td>
+      <td class="num">'.l10n_number( $planned_order['count'] ) . icon('troops').'</td>
       <td>'.($planned_order['destination']?'<a href="'.Page::get_url('show_territory', array_merge( $territory_params, array('id' => $planned_order['destination']->id))).'">'.$planned_order['destination']->name.'</a>':'').'</td>
       <td>
         <form action="'.Page::get_url('order').'" method="post">

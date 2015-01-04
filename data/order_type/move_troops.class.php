@@ -344,7 +344,7 @@ class Move_Troops extends Player_Order {
               if( $territory_occupied_array['territory_id'] == $neighbour_array['neighbour_id'] ) {
                 if( self::check_move($neighbour, $params['to_territory'], $player, $game)) {
                   $neighbour_status[ $neighbour->id ] = 0;
-                  $neighbour_list[ $neighbour->id ] = $neighbour->name. ' ('.l10n_number($territory_occupied_array['quantity']).' <img src="'.IMG.'img_html/troops.png" alt="'.__('Troops').'" title="'.__('Troops').'"/>)';
+                  $neighbour_list[ $neighbour->id ] = $neighbour->name. ' ('.l10n_number($territory_occupied_array['quantity']).icon('troops').')';
                 }else {
                   // Move not allowed
                   $neighbour_status[ $neighbour->id ] = 2;

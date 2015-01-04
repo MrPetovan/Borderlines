@@ -106,12 +106,21 @@
       }else {
         echo '<a href="'.Page::get_url('show_player', array('id' => $owner->id)).'">'.$owner->name.'</a>';
       }
+
+      if( $territory_row['conflict'] ) {
+        $status = icon('territory_conflict').__('Conflict');
+      }elseif( $territory_row['contested'] ) {
+        $status = icon('territory_contested').__('Contested');
+      }else {
+        $status = icon('territory_stable').__('Stable');
+      }
+
       echo '
     </td>
     <td>'.($territory_row['capital']?'Capital':'Province').'</td>
     <td class="num">'.l10n_number( $territory->area ).' km²</td>
-    <td>'.($territory_row['contested']?'<img src="'.IMG.'img_html/bomb.png" alt=""/> '.__('Contested'):'<img src="'.IMG.'img_html/accept.png" alt=""/> '.__('Stable')).'</td>
-    <td class="num">'.l10n_number( $territory_row['quantity'] ).' <img src="'.IMG.'img_html/troops.png" alt="'.__('Troops').'" title="'.__('Troops').'"/></td>
+    <td>' . $status . '</td>
+    <td class="num">'.l10n_number( $territory_row['quantity'] ).icon('troops').'</td>
   </tr>';
     }
 ?>
@@ -121,7 +130,7 @@
       <th><?php echo __('Total')?></th>
       <td class="num"><?php echo l10n_number( $total_territory )?> km²</td>
       <th><?php echo __('Total')?></th>
-      <td class="num"><?php echo l10n_number( $total_troops )?> <img src="<?php echo IMG?>img_html/troops.png" alt="<?php echo __('Troops')?>" title="<?php echo __('Troops')?>"/></td>
+      <td class="num"><?php echo l10n_number( $total_troops ) . icon('troops')?></td>
     </tr>
   </tbody>
 </table>

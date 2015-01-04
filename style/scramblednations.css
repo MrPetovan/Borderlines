@@ -101,3 +101,7 @@ body.clean {
   padding: 0;
   margin: 0;
 }
+
+.icon {
+  margin: 0 5px;
+}

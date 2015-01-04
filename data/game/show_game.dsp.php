@@ -125,7 +125,7 @@
         echo '
       <td class="num">'.$game_player_row['turn_ready'].'</td>
       <td class="num">'.l10n_number( $player_area[ 'player_' . $game_player_row['player_id'] ] ).' km²</td>
-      <td class="num">'.l10n_number( $player_troops[ $game_player_row['player_id'] ] ).' <img src="'.IMG.'img_html/troops.png" alt="'.__('Troops').'" title="'.__('Troops').'"/></td>';
+      <td class="num">'.l10n_number( $player_troops[ $game_player_row['player_id'] ] ).icon('troops').'</td>';
       }
       echo '
     </tr>';

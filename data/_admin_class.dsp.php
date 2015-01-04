@@ -65,7 +65,7 @@ foreach( $table_columns as $column_name => $column_props ) {
     }
 } ?>
 
-          <td><a href="'.htmlentities_utf8(Page::get_url('admin_<?php echo $class_db_identifier?>_mod', array('id' => $<?php echo $class_db_identifier?>->id))).'"><img src="'.IMG.'img_html/pencil.png" alt="Modifier" title="Modifier"/></a></td>
+          <td><a href="'.htmlentities_utf8(Page::get_url('admin_<?php echo $class_db_identifier?>_mod', array('id' => $<?php echo $class_db_identifier?>->id))).'">'.icon('edit').'</a></td>
         </tr>';
     }
     echo '

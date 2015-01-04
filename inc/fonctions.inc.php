@@ -206,6 +206,33 @@ function is_image_ext($file) {
   return in_array($extension, $extension_autorise);
 }
 
+function icon($name) {
+  $return = '';
+  $icons = array(
+      'bureaucracy' => 'Bureaucracy',
+      'coins' => 'Money',
+      'diplomacy_ally' => 'Ally',
+      'diplomacy_enemy' => 'Enemy',
+      'diplomacy_neutral' => 'Neutral',
+      'supremacy' => 'Supremacy',
+      'supremacy_retreat' => 'Retreat',
+      'territory_conflict' => 'Conflict',
+      'territory_contested' => 'Contested',
+      'territory_stable' => 'Stable',
+      'troops' => 'Troops',
+      'vision_blocked' => 'Blocked vision',
+      'vision_clear' => 'Direct vision',
+      'vision_fogofwar' => 'No vision',
+      'vision_shared' => 'Shared vision',
+
+      'edit' => 'Edit',
+  );
+  if( isset( $icons[$name] ) ) {
+    $return = '<img src="' . IMG . 'img_html/' . $name . '.png" class="icon" alt="' . __($icons[$name]) . '" title="' . __($icons[$name]) . '"/>';
+  }
+  return $return;
+}
+
 function rstripslashes($array) {
   if(is_array($array)) {
     foreach($array as $key => $value) {

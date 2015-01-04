@@ -158,11 +158,11 @@
         }
 
         if( $territory_row['conflict'] ) {
-          $status = '<img src="'.IMG.'img_html/bomb.png" alt=""/> '.__('Conflict');
+          $status = icon('territory_conflict').__('Conflict');
         }elseif( $territory_row['contested'] ) {
-          $status = '<img src="'.IMG.'img_html/flag_red.png" alt=""/> '.__('Contested');
+          $status = icon('territory_contested').__('Contested');
         }else {
-          $status = '<img src="'.IMG.'img_html/accept.png" alt=""/> '.__('Stable');
+          $status = icon('territory_stable').__('Stable');
         }
 
         echo '
@@ -181,10 +181,10 @@
       <td>'.($territory_row['capital']?'Capital':'Province').'</td>
       <td class="num">'.l10n_number( $territory->area ).' km²</td>
       <td>'.$status.'</td>
-      <td class="num">'.l10n_number( $territory_row['quantity'] ).' <img src="'.IMG.'img_html/troops.png" alt="'.__('Troops').'" title="'.__('Troops').'"/></td>
+      <td class="num">'.l10n_number( $territory_row['quantity'] ) . icon('troops') . '</td>
       <td class="num">'.l10n_number( $territory_row['economy_ratio'] * 100 ).' %</td>
       <td class="num">'.l10n_number( $territory_row['revenue_suppression'] * 100 ).' %</td>
-      <td class="num">'.l10n_number( $territory_revenue ).' <img src="'.IMG.'img_html/coins.png" alt="" title=""/></td>
+      <td class="num">'.l10n_number( $territory_revenue ) . icon('coins') . '</td>
     </tr>';
       }
       echo '
@@ -197,9 +197,9 @@
       <th><?php echo __('Total')?></th>
       <td class="num"><?php echo l10n_number( $total_territory )?> km²</td>
       <th><?php echo __('Total')?></th>
-      <td class="num"><?php echo l10n_number( $total_troops ).' <img src="'.IMG.'img_html/troops.png" alt="'.__('Troops').'" title="'.__('Troops').'"/>' ?></td>
+      <td class="num"><?php echo l10n_number( $total_troops ) . icon('troops') ?></td>
       <th colspan="2"><?php echo __('Total')?></th>
-      <td class="num"><?php echo l10n_number( $total_revenue ).' <img src="'.IMG.'img_html/coins.png" alt="" title=""/>' ?></td>
+      <td class="num"><?php echo l10n_number( $total_revenue ) . icon('coins')?></td>
     </tr>
   </tbody>
 </table>
@@ -290,49 +290,49 @@
 <div class="informations formulaire">
   <p>
     <span class="label"><?php echo __('Total revenue for turn %s', $current_game->current_turn)?></span>
-    <span class="value num"><?php echo l10n_number( $revenue_before_bureaucracy, 0 )?>  <img src="<?php echo IMG.'img_html/coins.png'?>" alt="" title="" /></span>
+    <span class="value num"><?php echo l10n_number( $revenue_before_bureaucracy, 0 ) . icon('coins')?></span>
   </p>
   <p>
     <span class="label"><?php echo __('Bureaucracy ratio for turn %s', $current_game->current_turn)?></span>
-    <span class="value num"><?php echo l10n_number( round($bureaucracy_ratio * 100), 0 )?>%  <img src="<?php echo IMG.'img_html/bureaucracy.png'?>" alt="" title="<?php echo __('Bureaucracy')?>" /></span>
+    <span class="value num"><?php echo l10n_number( round($bureaucracy_ratio * 100), 0 ) . '%' . icon('bureaucracy')?></span>
   </p>
   <p>
     <span class="label"><?php echo __('Revenue after bureaucracy')?></span>
-    <span class="value num"><?php echo l10n_number( $revenue, 0 )?>  <img src="<?php echo IMG.'img_html/coins.png'?>" alt="" title="" /></span>
+    <span class="value num"><?php echo l10n_number( $revenue, 0 ) . icon('coins')?></span>
   </p>
   <p>
     <span class="label"><?php echo __('Troops home')?></span>
     <span class="value num">
-      <?php echo l10n_number( $troops_home, 0 )?> <img src="<?php echo IMG.'img_html/troops.png'?>" alt="Troops" title="Troops" />
-      @ <?php echo l10n_number( $options['HOME_TROOPS_MAINTENANCE'], 0 )?> <img src="<?php echo IMG.'img_html/coins.png'?>" alt="" title="" />
-      = <?php echo l10n_number( $troops_home * $options['HOME_TROOPS_MAINTENANCE'], 0 )?> <img src="<?php echo IMG.'img_html/coins.png'?>" alt="" title="" />
+      <?php echo l10n_number( $troops_home, 0 ) . icon('troops')?>@
+      <?php echo l10n_number( $options['HOME_TROOPS_MAINTENANCE'], 0 ) . icon('coins')?>=
+      <?php echo l10n_number( $troops_home * $options['HOME_TROOPS_MAINTENANCE'], 0 ) . icon('coins')?>
     </span>
   </p>
   <p>
     <span class="label"><?php echo __('Troops away')?></span>
     <span class="value num">
-      <?php echo l10n_number( $troops_away, 0 )?> <img src="<?php echo IMG.'img_html/troops.png'?>" alt="Troops" title="Troops" />
-      @ <?php echo l10n_number( $options['AWAY_TROOPS_MAINTENANCE'], 0)?> <img src="<?php echo IMG.'img_html/coins.png'?>" alt="" title="" />
-      = <?php echo l10n_number( $troops_away * $options['AWAY_TROOPS_MAINTENANCE'], 0)?> <img src="<?php echo IMG.'img_html/coins.png'?>" alt="" title="" />
+      <?php echo l10n_number( $troops_away, 0 ) . icon('troops')?>@
+      <?php echo l10n_number( $options['AWAY_TROOPS_MAINTENANCE'], 0) . icon('coins')?>=
+      <?php echo l10n_number( $troops_away * $options['AWAY_TROOPS_MAINTENANCE'], 0) . icon('coins')?>
     </span>
   </p>
   <p>
     <span class="label"><?php echo __('Total troops maintenance')?></span>
     <span class="value num">
-      <?php echo l10n_number( $troops_maintenance, 0 )?> <img src="<?php echo IMG.'img_html/coins.png'?>" alt="" title="" />
+      <?php echo l10n_number( $troops_maintenance, 0 ) . icon('coins')?>
     </span>
   </p>
   <p>
     <span class="label"><?php echo __('Recruiting budget')?></span>
     <span class="value num">
-      <?php echo l10n_number( $recruit_budget, 0 )?> <img src="<?php echo IMG.'img_html/coins.png'?>" alt="" title="" />
+      <?php echo l10n_number( $recruit_budget, 0 ) . icon('coins')?>
     </span>
   </p>
   <p>
     <span class="label"><?php echo __('Total troops recruited')?></span>
     <span class="value num">
-      <?php echo l10n_number( $troops_recruited, 0 )?> <img src="<?php echo IMG.'img_html/troops.png'?>" alt="Troops" title="Troops" />
-      @ <?php echo l10n_number( $options['RECRUIT_TROOPS_PRICE'], 0)?> <img src="<?php echo IMG.'img_html/coins.png'?>" alt="" title="" />
+      <?php echo l10n_number( $troops_recruited, 0 ) . icon('troops')?>@
+      <?php echo l10n_number( $options['RECRUIT_TROOPS_PRICE'], 0) . icon('coins')?>
     </span>
   </p>
 </div>
