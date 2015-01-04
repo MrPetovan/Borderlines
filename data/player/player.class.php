@@ -378,7 +378,7 @@ LIMIT 1';
       $status = $this->get_last_player_diplomacy_player( $to_player, $game, $turn );
 
       if( $status ) {
-        $prepend = '<img src="'.IMG.'/img_html/diplomacy_'.strtolower($status).'.png" alt="['.__($status).']" title="'.__($status).'"/> ';
+        $prepend = icon('diplomacy_'.strtolower($status));
 
         $return = $prepend . $this->name;
       }
