@@ -34,7 +34,12 @@
                 break;
               }
               case 'change_diplomacy_status' : {
-                $current_player->set_player_diplomacy( $current_game->id, $current_game->current_turn + 1, getValue('to_player_id'), getValue('new_status'));
+                $new_status = getValue('status');
+                $new_shared_vision = getValue('shared_vision');
+                foreach( $new_status as $player_id => $status ) {
+                  $current_player->set_player_diplomacy( $current_game->id, $current_game->current_turn + 1, $player_id, $status, $new_shared_vision[$player_id]);
+                }
+ 
                 break;
               }
             }

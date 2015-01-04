@@ -282,7 +282,7 @@ WHERE `game_id` = '.mysql_ureal_escape_string($game_id).$where;
 
   public function get_last_player_diplomacy_list($game_id) {
     $sql = '
-SELECT `game_id`, `turn`, `from_player_id`, `pd`.`to_player_id`, `status`
+SELECT `game_id`, `turn`, `from_player_id`, `pd`.`to_player_id`, `status`, `shared_vision`
 FROM `player_diplomacy` pd
 JOIN (
   SELECT `to_player_id`, MAX( `turn` ) AS `max_turn`

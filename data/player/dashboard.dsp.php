@@ -213,37 +213,40 @@
 <?php
     $player_diplomacy_list = $current_player->get_last_player_diplomacy_list($current_game->id, $current_game->current_turn );
 ?>
-<table>
-  <tr>
-    <th><?php echo __('Player')?></th>
-    <th colspan="3"><?php echo __('Status')?></th>
-  </tr>
+<form action="<?php echo Page::get_url( PAGE_CODE )?>" method="POST">
+  <table>
+    <tr>
+      <th><?php echo __('Player')?></th>
+      <th colspan="3"><?php echo __('Status')?></th>
+      <th><?php echo icon('vision_clear') . __('Shared vision')?></th>
+    </tr>
 <?php
     $diplo = array('Ally', 'Neutral', 'Enemy');
     foreach( $player_diplomacy_list as $player_diplomacy ) {
       $player = Player::instance( $player_diplomacy['to_player_id'] );
       $new_status = $player_diplomacy['status'] == 'Enemy'?'Ally':'Enemy';
       echo '
-  <tr>
-    <td><a href="'.Page::get_url('show_player', array('id' => $player->id)).'">'.$player->get_player_name_with_diplomacy($current_game, $current_game->current_turn, $current_player).'</a></td>';
+    <tr>
+      <td><a href="'.Page::get_url('show_player', array('id' => $player->id)).'">'.$player->get_player_name_with_diplomacy($current_game, $current_game->current_turn, $current_player).'</a></td>';
       foreach( $diplo as $status ) {
         echo '
-    <td>';
-      if( $player_diplomacy['status'] == $status ) {
-        echo '
-      <strong>'.__($status).'</strong>';
-      }else {
-        echo '
-      <a href="'.Page::get_url( PAGE_CODE, array('action' => 'change_diplomacy_status', 'to_player_id' => $player->id, 'new_status' => $status)).'">'.__($status).'</a>';
+      <td>
+        '.HTMLHelper::radio('status[' . $player->id . ']', $status, $player_diplomacy['status'], array('label_position' => 'right', 'id' => 'status_' . $player->id . '_' . $status), __($status) ).'
+      </td>';
       }
       echo '
-    </td>';
-      }
+      <td>
+      '.HTMLHelper::checkbox('shared_vision[' . $player->id . ']', 1, $player_diplomacy['shared_vision'], array('label_position' => 'right'), icon('vision_shared').__('Shared vision') ).'';
       echo '
-  </tr>';
+      </td>
+    </tr>';
     }
 ?>
-</table>
+  </table>
+  <p>
+    <?php echo HTMLHelper::button('action', 'change_diplomacy_status', array('type' => 'submit'), __('Update diplomatic status'))?>
+  </p>
+</form>
 <h3><?php echo __('Economy')?></h3>
 <?php
   $revenue_before_bureaucracy = $current_player->get_revenue( $current_game, $current_game->current_turn + 1 );
