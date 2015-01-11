@@ -236,12 +236,13 @@
           <th>Game Id</th>
           <th>Turn</th>
           <th>To Player Id</th>
-          <th>Status</th>          <th>Action</th>
+          <th>Status</th>
+          <th>Shared Vision</th>          <th>Action</th>
         </tr>
       </thead>
       <tfoot>
         <tr>
-          <td colspan="5"><?php echo count( $player_diplomacy_list )?> lignes</td>
+          <td colspan="6"><?php echo count( $player_diplomacy_list )?> lignes</td>
         </tr>
       </tfoot>
       <tbody>
@@ -254,7 +255,8 @@
         <td><a href="'.get_page_url('admin_game_view', true, array('id' => $game_id_game->id)).'">'.$game_id_game->name.'</a></td>
         <td>'.$player_diplomacy['turn'].'</td>
         <td>'.$player_diplomacy['to_player_id'].'</td>
-        <td>'.$player_diplomacy['status'].'</td>          <td>
+        <td>'.$player_diplomacy['status'].'</td>
+        <td>'.$player_diplomacy['shared_vision'].'</td>          <td>
             <form action="'.get_page_url(PAGE_CODE, true, array('id' => $player->id)).'" method="post">
               '.HTMLHelper::genererInputHidden('id', $player->id).'
 
@@ -291,6 +293,10 @@
         </p>
         <p class="field">
           <?php echo HTMLHelper::genererInputText('status', null, array(), 'Status*' )?>
+          
+        </p>
+        <p class="field">
+          <?php echo HTMLHelper::genererInputText('shared_vision', null, array(), 'Shared Vision*' )?>
           
         </p>
         <p><?php echo HTMLHelper::genererButton('action',  'set_player_diplomacy', array('type' => 'submit'), 'Ajouter un élément')?></p>

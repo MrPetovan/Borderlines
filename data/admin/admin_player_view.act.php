@@ -65,7 +65,8 @@
             ($value = getValue('game_id')) == ''?null:$value,
             ($value = getValue('turn')) == ''?null:$value,
             ($value = getValue('to_player_id')) == ''?null:$value,
-            ($value = getValue('status')) == ''?null:$value
+            ($value = getValue('status')) == ''?null:$value,
+            ($value = getValue('shared_vision')) == ''?null:$value
           );
           if( ! $flag_set_player_diplomacy ) {
             Page::add_message( '$player->set_player_diplomacy : ' . mysql_error(), Page::PAGE_MESSAGE_ERROR );

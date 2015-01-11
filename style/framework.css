@@ -107,7 +107,7 @@ footer {
 
 .input[type=checkbox],
 .input[type=radio] {
-  margin-right:10px;
+  vertical-align: inherit;
 }
 
 .img_left {

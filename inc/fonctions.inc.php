@@ -223,6 +223,7 @@ function icon($name) {
       'vision_blocked' => 'Blocked vision',
       'vision_clear' => 'Direct vision',
       'vision_fogofwar' => 'No vision',
+      'vision_history' => 'Vision history',
       'vision_shared' => 'Shared vision',
 
       'edit' => 'Edit',

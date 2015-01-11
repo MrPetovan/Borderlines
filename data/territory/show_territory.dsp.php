@@ -154,10 +154,12 @@
     /* @var $current_player Player */
     $diplomacy_list = $current_player->get_to_player_last_diplomacy_list($current_game->id);
 
-    $shared_vision = array($current_player->id);
+    $shared_vision = array($current_player->id => $current_game->current_turn);
     foreach( $diplomacy_list as $diplomacy_row ) {
-      if( $diplomacy_row['status'] == 'Ally' ) {
-        $shared_vision[] = $diplomacy_row['from_player_id'];
+      if( $diplomacy_row['shared_vision'] == 1 ) {
+        $shared_vision[$diplomacy_row['from_player_id']] = $current_game->current_turn;
+      }elseif( $diplomacy_row['last_shared_vision'] != 0 ) {
+        $shared_vision[$diplomacy_row['from_player_id']] = $diplomacy_row['last_shared_vision'];
       }
     }
 
@@ -184,18 +186,42 @@
       $is_current = $territory_status_row['turn'] == $turn;
 
       $can_see_troops = $current_game->has_ended();
+      $vision_is_current = false;
+      $vision_is_direct = true;
 
-      foreach( $shared_vision as $shared_vision_player_id ) {
-        $can_see_troops = $can_see_troops
-          || isset( $troops_history[ $territory_status_row['turn'] ][ $shared_vision_player_id ] )
-          || isset( $troops_current[ $territory_status_row['turn'] ][ $shared_vision_player_id ] )
-          || $territory_status_row['owner_id'] == $shared_vision_player_id;
+      if( !$can_see_troops ) {
+        foreach( $shared_vision as $shared_vision_player_id => $last_shared_vision_turn ) {
+          $can_see_troops = $can_see_troops
+            || $last_shared_vision_turn >= $territory_status_row['turn']
+            && (
+              isset( $troops_history[ $territory_status_row['turn'] ][ $shared_vision_player_id ] )
+              || isset( $troops_current[ $territory_status_row['turn'] ][ $shared_vision_player_id ] )
+              || $territory_status_row['owner_id'] == $shared_vision_player_id
+            );
+          $vision_is_direct = $shared_vision_player_id == $current_player->id;
+
+          $vision_is_current = $last_shared_vision_turn == $current_game->current_turn;
+
+          if( $can_see_troops ) break;
+        }
+      }
+
+      if( $can_see_troops ) {
+        if( $vision_is_direct ) {
+          $icon = icon('vision_clear');
+        }elseif($vision_is_current) {
+          $icon = icon('vision_shared');
+        }else {
+          $icon = icon('vision_history');
+        }
+      }else {
+        $icon = icon('vision_fogofwar');
       }
 
       echo '
   <tbody class="archive'.($is_current?' current':'').($can_see_troops?'':' fogofwar').'"'.($can_see_troops?'':' title="'. __('No vision').'"').'">
     <tr class="title">
-      <th colspan="3">'.__('Turn %s', $territory_status_row['turn']).($can_see_troops?icon('vision_clear'):icon('vision_fogofwar')).'</th>
+      <th colspan="3">'.__('Turn %s', $territory_status_row['turn']).$icon.'</th>
     </tr>';
 
       if( $can_see_troops && isset( $player_troops[ $territory_status_row['turn'] ] ) ) {

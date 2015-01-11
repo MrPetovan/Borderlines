@@ -282,7 +282,7 @@ WHERE `game_id` = '.mysql_ureal_escape_string($game_id).$where;
 
   public function get_last_player_diplomacy_list($game_id) {
     $sql = '
-SELECT `game_id`, `turn`, `from_player_id`, `pd`.`to_player_id`, `status`
+SELECT `game_id`, `turn`, `from_player_id`, `pd`.`to_player_id`, `status`, `shared_vision`
 FROM `player_diplomacy` pd
 JOIN (
   SELECT `to_player_id`, MAX( `turn` ) AS `max_turn`
@@ -303,7 +303,7 @@ AND `turn` = `pd_max`.`max_turn`';
 
   public function get_to_player_last_diplomacy_list($game_id) {
     $sql = '
-SELECT `game_id`, `turn`, `pd`.`from_player_id`, `to_player_id`, `status`
+SELECT `game_id`, `turn`, `pd`.`from_player_id`, `to_player_id`, `status`, `shared_vision`, IFNULL(`last_shared_vision`, 0) AS `last_shared_vision`
 FROM `player_diplomacy` pd
 JOIN (
   SELECT `from_player_id`, MAX( `turn` ) AS `max_turn`
@@ -313,6 +313,15 @@ JOIN (
   AND `to_player_id` != `from_player_id`
   GROUP BY `from_player_id`
 ) AS `pd_max`
+LEFT JOIN (
+  SELECT `from_player_id`, MAX( `turn` ) AS `last_shared_vision`
+  FROM `player_diplomacy`
+  WHERE `to_player_id` = '.mysql_ureal_escape_string($this->get_id()).'
+  AND `game_id` = '.mysql_ureal_escape_string($game_id).'
+  AND `to_player_id` != `from_player_id`
+  AND `shared_vision` = 1
+  GROUP BY `from_player_id`
+) AS `sv_max` ON `pd`.`from_player_id` = `sv_max`.`from_player_id`
 WHERE `to_player_id` = '.mysql_ureal_escape_string($this->get_id()).'
 AND `game_id` = '.mysql_ureal_escape_string($game_id).'
 AND `pd`.`from_player_id` = `pd_max`.`from_player_id`

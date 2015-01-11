@@ -261,7 +261,7 @@ AND `from_player_id` = '.mysql_ureal_escape_string($from_player_id);
 AND `to_player_id` = '.mysql_ureal_escape_string($to_player_id);
 
     $sql = '
-SELECT `game_id`, `turn`, `from_player_id`, `to_player_id`, `status`
+SELECT `game_id`, `turn`, `from_player_id`, `to_player_id`, `status`, `shared_vision`
 FROM `player_diplomacy`
 WHERE `game_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
     $res = mysql_uquery($sql);
@@ -269,8 +269,8 @@ WHERE `game_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
     return mysql_fetch_to_array($res);
   }
 
-  public function set_player_diplomacy( $turn, $from_player_id, $to_player_id, $status ) {
-    $sql = "REPLACE INTO `player_diplomacy` ( `game_id`, `turn`, `from_player_id`, `to_player_id`, `status` ) VALUES (".mysql_ureal_escape_string( $this->get_id(), $turn, $from_player_id, $to_player_id, $status ).")";
+  public function set_player_diplomacy( $turn, $from_player_id, $to_player_id, $status, $shared_vision ) {
+    $sql = "REPLACE INTO `player_diplomacy` ( `game_id`, `turn`, `from_player_id`, `to_player_id`, `status`, `shared_vision` ) VALUES (".mysql_ureal_escape_string( $this->get_id(), $turn, $from_player_id, $to_player_id, $status, $shared_vision ).")";
 
     return mysql_uquery($sql);
   }
