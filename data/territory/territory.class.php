@@ -454,7 +454,7 @@ AND `game_id` = '.mysql_ureal_escape_string($game->id).$where;
     foreach( $player_troops as $key => $attacker_row ) {
       /* @var $player Player */
       $player = Player::instance($attacker_row['player_id']);
-      $last_diplomacy = $player->get_last_player_diplomacy( $game, $turn );
+      $last_diplomacy = $player->get_player_last_diplomacy_list( $game, $turn );
 
       foreach( $last_diplomacy as $diplomacy_row ) {
         $diplomacy[ $diplomacy_row['from_player_id'] ][ $diplomacy_row['to_player_id'] ] = $diplomacy_row['status'];
@@ -629,7 +629,7 @@ AND `game_id` = '.mysql_ureal_escape_string($game->id).$where;
         $troops[ $player_territory_from['player_id'] ] = $player_territory_from['quantity'];
         $player_supremacy_troops[ $player_territory_from['player_id'] ] = $player_territory_from['quantity'];
 
-        $player_diplomacy_list = $player_from->get_last_player_diplomacy($game, $turn);
+        $player_diplomacy_list = $player_from->get_player_last_diplomacy_list($game, $turn);
 
         foreach( $territory_player_troops_list as $player_territory_to ) {
           foreach( $player_diplomacy_list as $key => $player_diplomacy ) {

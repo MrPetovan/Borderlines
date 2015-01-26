@@ -84,7 +84,7 @@ foreach( $table_columns as $column_name => $column_props ) {
 
   if(count($<?php echo $sub_table?>_list)) {
 ?>
-    <table>
+    <table class="table table-condensed table-striped table-hover">
       <thead>
         <tr><?php echo $th_list?>
           <th>Action</th>

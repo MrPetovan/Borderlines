@@ -5,34 +5,13 @@
     <link rel="shortcut icon" type="image/x-icon" href="img/favicon.ico" />
     <link rel="icon" type="image/x-icon" href="img/favicon.ico" />
 
-    <link rel="stylesheet" type="text/css" href="<?php echo URL_ROOT ?>style/jquery-ui-latest.custom.min.css" media="all" />
-    <link rel="stylesheet" type="text/css" href="<?php echo URL_ROOT ?>style/commun.css" media="all" />
-    <link rel="stylesheet" type="text/css" href="<?php echo URL_ROOT ?>style/framework.css" media="all" />
+    <link rel="stylesheet" type="text/css" href="<?php echo URL_ROOT ?>style/bootstrap3.min.css" media="all" />
+    <link rel="stylesheet" type="text/css" href="<?php echo URL_ROOT ?>style/jquery-ui.structure.min.css" media="all" />
+    <link rel="stylesheet" type="text/css" href="<?php echo URL_ROOT ?>style/jquery-ui.theme.min.css" media="all" />
     <link rel="stylesheet" type="text/css" href="<?php echo URL_ROOT ?>style/scramblednations.css" media="all" />
 
-    <!--[if IE 7]>
-    <link rel="stylesheet" type="text/css" href="style/ie7.css" media="all" />
-    <![endif]-->
-    <!--[if IE 6]>
-    <link rel="stylesheet" type="text/css" href="style/ie6.css" media="all" />
-    <![endif]-->
-<?php
-  $dir_js_name = 'js';
-  $dir_js_path = DIR_ROOT . $dir_js_name . '/';
-  $js_array = array();
-  if (is_dir($dir_js_path)) {
-    if ($dir_js = opendir($dir_js_path)) {
-      while (($file_js = readdir($dir_js)) !== false) {
-        if($file_js != '.' && $file_js != '..' && !is_dir($dir_js_path.$file_js)) {
-          $js_array[] = URL_ROOT.$dir_js_name.'/'.$file_js;
-        }
-      }
-      closedir($dir_js);
-    }
-  }
-  sort($js_array);
-  foreach ($js_array as $js_file) {
-    echo '
-    <script type="text/javascript" src="'.$js_file.'"></script>';
-  }
-?>
+    <script type="text/javascript">
+      var domReadyQueue = [];
+      var URL_ROOT = '<?php echo URL_ROOT?>';
+      var API_TOKEN_HASH = '<?php echo isset($api_token_hash) ? $api_token_hash : ''?>';
+    </script>

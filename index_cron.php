@@ -86,6 +86,8 @@
     mysql_uquery("SET NAMES 'utf8'");
   }
 
+  define('LOCALE', 'en-US.utf8');
+
   $options = getopt('cgw:');
 
   echo date('[Y-m-d H:i:s]').' '.implode(' ', $_SERVER['argv'])."\n";

@@ -148,20 +148,22 @@ LIMIT 0,1";
   }
 
   public static function display_messages() {
-    $messages['error'] = Page::get_message(Page::PAGE_MESSAGE_ERROR);
-    $messages['warning'] = Page::get_message(Page::PAGE_MESSAGE_WARNING);
-    $messages['notice'] = Page::get_message(Page::PAGE_MESSAGE_NOTICE);
+    $messages['alert-danger'] = Page::get_message(Page::PAGE_MESSAGE_ERROR);
+    $messages['alert-warning'] = Page::get_message(Page::PAGE_MESSAGE_WARNING);
+    $messages['alert-success'] = Page::get_message(Page::PAGE_MESSAGE_NOTICE);
 
-    if( count( $messages['error'] ) || count( $messages['warning'] ) || count( $messages['notice'] ) ) {
+    if( count( $messages['alert-danger'] ) || count( $messages['alert-warning'] ) || count( $messages['alert-success'] ) ) {
       echo '
         <div id="messages">';
       foreach( $messages as $message_class => $message_list ) {
         if( $message_list ) {
           echo '
-            <ul class="'.$message_class.'">
-              <li>'.implode('</li>
-              <li>', $message_list ).'</li>
-            </ul>';
+            <div class="alert '.$message_class.'">
+              <ul>
+                <li>'.implode('</li>
+                <li>', $message_list ).'</li>
+              </ul>
+            </div>';
         }
       }
       echo '
@@ -210,22 +212,17 @@ LIMIT 0,1";
    * @return string URL de la page
    */
   public static function get_page_url($code_page, $root = true, $params = array()) {
-    //echo "get_page_url( $code_page, $root, tab[".count($params)."])";
     $return = '';
     if($root) $return = URL_ROOT;
     $page = Page::db_get_page_by_code($code_page);
     if($page) {
-      //echo "Page Ok; ";
       if($page->get_dsp()) {
-        //echo "DSP Ok; ";
         if(REWRITE_URL_ACTIVE) {
-          //echo "Rewrite On; ";
           if(($rewrite_pattern = $page->get_rewrite_pattern_safe()) && count($params) != 0) {
-            //echo "Page Rewrite On; ";
             $rewrite_pattern = str_replace("{page}", $code_page, $rewrite_pattern);
             foreach($params as $name => $value) {
               if(strpos($rewrite_pattern, "{".$name."}") !== false) {
-                $rewrite_pattern = str_replace("{".$name."}", $value, $rewrite_pattern);
+                $rewrite_pattern = str_replace("{".$name."}", urlencode($value), $rewrite_pattern);
                 unset($params[$name]);
               }
             }
@@ -251,14 +248,13 @@ LIMIT 0,1";
           //param1=value1&param2=value2...
           $params_url = array();
           foreach($params as $name => $value) {
-            $params_url[] = $name."=".$value;
+            $params_url[] = $name . "=" . urlencode($value);
           }
           $return .= implode('&', $params_url);
         }
       }
     }
     unset($page);
-    //echo "<br/>";
     return $return;
   }
 

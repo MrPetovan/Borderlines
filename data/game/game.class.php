@@ -14,6 +14,93 @@ class Game extends Game_Model {
   protected $capturable_territories_count;
   protected $players_count;
 
+  public function get_territory_troops_vision_list($player_id, $turn = null, $territory_id = null) {
+    $player = Player::instance($player_id);
+
+    if( is_null($turn) ) {
+      $current_turn = $this->current_turn;
+    }else {
+      $current_turn = (int)$turn;
+    }
+
+    $territory_status_list = $this->get_territory_status_list($territory_id, $turn);
+    /* @var $player Player */
+    $diplomacy_list = $player->get_to_player_last_diplomacy_list($this, $turn);
+
+    $shared_vision = array($player->id => $current_turn);
+    foreach( $diplomacy_list as $diplomacy_row ) {
+      if( $diplomacy_row['shared_vision'] == 1 ) {
+        $shared_vision[$diplomacy_row['from_player_id']] = $current_turn;
+      }elseif( $diplomacy_row['last_shared_vision'] != 0 ) {
+        $shared_vision[$diplomacy_row['from_player_id']] = $diplomacy_row['last_shared_vision'];
+      }
+    }
+
+    $player_troops = array();
+
+    $troops_history_list = $this->get_territory_player_troops_history_list($turn, $territory_id);
+
+    $troops_history = array();
+    foreach( $troops_history_list as $territory_player_troops_history_row ) {
+      $player_troops[ $territory_player_troops_history_row['territory_id'] ][ $territory_player_troops_history_row['turn'] ][ $territory_player_troops_history_row['player_id'] ] = 0;
+      $troops_history[ $territory_player_troops_history_row['territory_id'] ][ $territory_player_troops_history_row['turn'] ][] = $territory_player_troops_history_row;
+    }
+
+    $troops_list = $this->get_territory_player_troops_list($turn, $territory_id);
+
+    $troops_current = array();
+    foreach( $troops_list as $territory_player_troops_row ) {
+      $player_troops[ $territory_player_troops_row['territory_id'] ][ $territory_player_troops_row['turn'] ][ $territory_player_troops_row['player_id'] ] = $territory_player_troops_row['quantity'];
+      $troops_current[ $territory_player_troops_row['territory_id'] ][ $territory_player_troops_row['turn'] ][] = $territory_player_troops_row;
+    }
+
+    $player_vision_troops = array();
+    $player_vision_history = array();
+
+    foreach( $territory_status_list as $index => $territory_status_row ) {
+      $can_see_troops = $this->has_ended();
+      $vision_is_current = false;
+      $vision_is_direct = true;
+
+      if( !$can_see_troops ) {
+        foreach( $shared_vision as $shared_vision_player_id => $last_shared_vision_turn ) {
+          $can_see_troops = $can_see_troops
+            || $last_shared_vision_turn >= $territory_status_row['turn']
+            && (
+              isset( $player_troops[ $territory_status_row['territory_id'] ][ $territory_status_row['turn'] ][ $shared_vision_player_id ] )
+              || $territory_status_row['owner_id'] == $shared_vision_player_id
+            );
+          $vision_is_direct = $shared_vision_player_id == $player->id;
+
+          $vision_is_current = $last_shared_vision_turn == $turn;
+
+          if( $can_see_troops ) break;
+        }
+      }
+
+      $territory_status_list[$index]['can_see_troops'] = $can_see_troops;
+      $territory_status_list[$index]['vision_is_current'] = $vision_is_current;
+      $territory_status_list[$index]['vision_is_direct'] = $vision_is_direct;
+
+      if( $can_see_troops && isset($troops_current[ $territory_status_row['territory_id'] ][ $territory_status_row['turn'] ]) ) {
+        $player_vision_troops[ $territory_status_row['territory_id'] ][ $territory_status_row['turn'] ] =
+              $troops_current[ $territory_status_row['territory_id'] ][ $territory_status_row['turn'] ];
+      }
+      if( $can_see_troops && isset($troops_history[ $territory_status_row['territory_id'] ][ $territory_status_row['turn'] ]) ) {
+        $player_vision_history[ $territory_status_row['territory_id'] ][ $territory_status_row['turn'] ] =
+              $troops_history[ $territory_status_row['territory_id'] ][ $territory_status_row['turn'] ];
+        }
+      }
+
+    $return = array(
+      'territory_status_list' => $territory_status_list,
+      'troops_history' => $player_vision_history,
+      'troops_list' => $player_vision_troops
+    );
+
+    return $return;
+  }
+
   public function get_territory_player_troops_list($turn = null, $territory_id = null, $player_id = null) {
     $return = array();
     if( is_null( $turn ) ) {
@@ -613,7 +700,7 @@ WHERE `ended` IS NULL";
     // TODO : Avoid enemies
     if( $avoid_enemies ) {
       $diplomacy = array( $player->id => true );
-      $diplomacy_list = $player->get_last_player_diplomacy_list( $this->id );
+      $diplomacy_list = $player->get_player_latest_diplomacy_list( $this->id );
       foreach( $diplomacy_list as $diplomacy_row ) {
         $diplomacy[ $diplomacy_row['to_player_id'] ] = $diplomacy_row['status'] != 'Enemy';
       }

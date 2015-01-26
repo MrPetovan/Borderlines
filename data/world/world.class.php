@@ -359,8 +359,6 @@ class World extends World_Model {
     $font = DIR_ROOT.'/style/arial.ttf';
 
     $img = imagecreatetruecolor( ($size_x - $offset_x) * $ratio, ($size_y - $offset_y) * $ratio);
-    //imagealphablending($img, false);
-    //imagesavealpha($img, true);
 
     // Fill the image with transparent color
     $transparent = imagecolorallocatealpha($img,0x00,0x00,0x00,127);
@@ -495,26 +493,30 @@ class World extends World_Model {
         //imagepolygon( $img, $polygon, count( $area->vertices ), $marine );
       }
     }
-    foreach( $territories as $key => $area ) {
-      $centroid = $area->get_centroid();
 
-      $name = $area->name;
+    // Territory names
+    if( !$no_names ) {
+      foreach( $territories as $key => $area ) {
+        $centroid = $area->get_centroid();
 
-      $font_size = round( min( max( 7, 10 * $ratio), 12 ) );
+        $name = $area->name;
 
-      $bbox = imagettfbbox( $font_size, 0, $font, $name );
-      $textwidth = $bbox[2] - $bbox[0];
-      $textheight = $bbox[5] - $bbox[1];
+        $font_size = round( min( max( 7, 10 * $ratio), 12 ) );
 
-      $bot_left_x = ($centroid->x - $offset_x) * $ratio - $textwidth / 2;
-      $bot_left_y = self::y($size_y, $offset_y, $centroid->y) * $ratio;
+        $bbox = imagettfbbox( $font_size, 0, $font, $name );
+        $textwidth = $bbox[2] - $bbox[0];
+        $textheight = $bbox[5] - $bbox[1];
 
-      // Ajout d'ombres au texte
-      //imagettftext($img, $font_size, 0, (($centroid->x - $offset_x) * $ratio - $textwidth / 2) + 1, self::y($size_y, $offset_y, $centroid->y ) * $ratio + 1, $grey, $font, $name);
-      imagefilledrectangle($img, $bot_left_x, $bot_left_y + 2, $bot_left_x + $textwidth, $bot_left_y + $textheight + 2, $veil);
+        $bot_left_x = ($centroid->x - $offset_x) * $ratio - $textwidth / 2;
+        $bot_left_y = self::y($size_y, $offset_y, $centroid->y) * $ratio;
 
-      // Ajout du texte
-      imagettftext($img, $font_size, 0, $bot_left_x, $bot_left_y, $white, $font, $name);
+        // Ajout d'ombres au texte
+        //imagettftext($img, $font_size, 0, (($centroid->x - $offset_x) * $ratio - $textwidth / 2) + 1, self::y($size_y, $offset_y, $centroid->y ) * $ratio + 1, $grey, $font, $name);
+        imagefilledrectangle($img, $bot_left_x, $bot_left_y + 2, $bot_left_x + $textwidth, $bot_left_y + $textheight + 2, $veil);
+
+        // Ajout du texte
+        imagettftext($img, $font_size, 0, $bot_left_x, $bot_left_y, $white, $font, $name);
+      }
     }
 
     if( $game_id != null ) {
@@ -547,18 +549,19 @@ class World extends World_Model {
     return $size_y - $y;
   }
 
-  public function drawImg( $options = array() ) {
+  public function getImgUrl( &$options = array() ) {
     $defaults = array(
-        'with_map' => false,
-        'territories' => null,
-        'game_id' => null,
-        'turn' => null,
-        'size_x' => $this->size_x,
-        'size_y' => $this->size_y,
-        'offset_x' => 0,
-        'offset_y' => 0,
-        'ratio' => 1,
-        'force' => false
+      'with_map' => false,
+      'territories' => null,
+      'game_id' => null,
+      'turn' => null,
+      'size_x' => $this->size_x,
+      'size_y' => $this->size_y,
+      'offset_x' => 0,
+      'offset_y' => 0,
+      'ratio' => 1,
+      'force' => false,
+      'no_names' => false
     );
 
     foreach( $defaults as $key => $value ) {
@@ -611,8 +614,13 @@ class World extends World_Model {
       $options['size_y'] = $options['size_y'] - $options['offset_y'] + 10;
     }
 
-    extract( $options );
+    return $image_src;
+  }
 
+  public function drawImg( $options = array() ) {
+    $image_src = $this->getImgUrl($options);
+
+    extract( $options );
     if( $with_map ) {
       echo '
       <map name="world">';
@@ -622,10 +630,11 @@ class World extends World_Model {
           $coords[] = round(( $vertex->x - $offset_x ) * $ratio ).','. round(($size_y - ($vertex->y - $offset_y)) * $ratio);
         }
         if( $game_id ) {
+          $game = Game::instance($options['game_id']);
           $owner = $territory->get_owner( $game, $turn );
           echo '
         <area
-          territory="'.$territory->id.'"
+          data-territory-id="'.$territory->id.'"
           shape="polygon"
           coords="'.implode(',', $coords).'"
           href="'.Page::get_url('show_territory', array('game_id' => $game_id, 'id' => $territory->id)).'"
@@ -636,7 +645,7 @@ class World extends World_Model {
         }else {
           echo '
         <area
-          territory="'.$territory->id.'"
+          data-territory-id="'.$territory->id.'"
           shape="polygon"
           coords="'.implode(',', $coords).'"
           href="'.Page::get_url('show_territory', array('id' => $territory->id)).'"
@@ -669,7 +678,7 @@ class World extends World_Model {
 
     $return = '
     <script>
-    $(function(){
+    domReadyQueue.push(function($){
       $options = $(".options");
 
       $("#select_generation_method").change(function(){

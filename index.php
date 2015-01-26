@@ -125,12 +125,8 @@
     if(is_admin()) {
       error_reporting(E_ALL);
     }
-    if(isset($_GET[PARAM_PAGE])) {
-      $PAGE_CODE = $_GET[PARAM_PAGE];
-      unset($_GET[PARAM_PAGE]);
-    }else {
-      $PAGE_CODE = PAGE_DEFAUT;
-    }
+
+    $PAGE_CODE = getValue(PARAM_PAGE, PAGE_DEFAUT, true);
 
     $CURRENT_PAGE = Page::db_get_page_by_code( $PAGE_CODE );
 

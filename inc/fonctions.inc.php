@@ -206,14 +206,24 @@ function is_image_ext($file) {
   return in_array($extension, $extension_autorise);
 }
 
-function icon($name) {
+function icon($name, $title = null) {
   $return = '';
   $icons = array(
+      'area' => 'Area',
+      'border_length' => 'Border Length',
+      'capital' => 'Capital City',
+      'capital_territory' => 'Capital Territory',
       'bureaucracy' => 'Bureaucracy',
+      'capture_troops' => 'Troops needed for capture',
+      'coin' => 'Money',
       'coins' => 'Money',
+      'diplomacy' => 'Diplomacy',
       'diplomacy_ally' => 'Ally',
       'diplomacy_enemy' => 'Enemy',
       'diplomacy_neutral' => 'Neutral',
+      'economy_ratio' => 'Economy ratio',
+      'owner' => 'Owner',
+      'revenue_suppression' => 'Revenue suppression',
       'supremacy' => 'Supremacy',
       'supremacy_retreat' => 'Retreat',
       'territory_conflict' => 'Conflict',
@@ -225,11 +235,15 @@ function icon($name) {
       'vision_fogofwar' => 'No vision',
       'vision_history' => 'Vision history',
       'vision_shared' => 'Shared vision',
+      'world' => 'World',
 
       'edit' => 'Edit',
   );
   if( isset( $icons[$name] ) ) {
-    $return = '<img src="' . IMG . 'img_html/' . $name . '.png" class="icon" alt="' . __($icons[$name]) . '" title="' . __($icons[$name]) . '"/>';
+    if( $title === null ) {
+      $title = $icons[$name];
+    }
+    $return = '<img src="' . IMG . 'img_html/' . $name . '.png" class="icon" alt="' . __($title) . '" title="' . __($title) . '"/>';
   }
   return $return;
 }
@@ -951,10 +965,14 @@ function which_os ()
   * @param mixed $defaultValue (optional)
   * @return mixed Value
   */
-  function getValue($key, $defaultValue = null) {
+  function getValue($key, $defaultValue = null, $delValue = false) {
     if (!isset($key) OR empty($key) OR !is_string($key))
       return false;
-    $ret = (isset($_POST[$key]) ? $_POST[$key] : (isset($_GET[$key]) ? $_GET[$key] : $defaultValue));
+    $ret = (isset($_REQUEST[$key]) ? $_REQUEST[$key] : $defaultValue);
+
+    if( $delValue ) {
+      delValue($key);
+    }
 
     if (is_string($ret) === true)
       $ret = urldecode(preg_replace('/((\%5C0+)|(\%00+))/i', '', urlencode($ret)));
@@ -973,6 +991,12 @@ function which_os ()
       $return[$key] = getValue( $key );
     }
     return $return;
+  }
+
+  function delValue($key) {
+    if( isset($_REQUEST[$key]) ) {
+      unset($_REQUEST[$key]);
+    }
   }
 
   function correctype($var) {

@@ -1,4 +1,6 @@
 <?php
+  Page::redirect('game_map', getValues());
+
   $member = Member::get_current_user();
 
   if( getValue('player_id') ) {
@@ -39,7 +41,7 @@
                 foreach( $new_status as $player_id => $status ) {
                   $current_player->set_player_diplomacy( $current_game->id, $current_game->current_turn + 1, $player_id, $status, $new_shared_vision[$player_id]);
                 }
- 
+
                 break;
               }
             }

@@ -3,7 +3,7 @@
   $success = false;
   $content = null;
 
-  $method = getValue('m', '');
+  $method = getValue('m', '', true);
   $api_token = null;
 
   $compare_sig = true;
@@ -44,32 +44,16 @@
   }elseif( $method == 'request_token' ) {
     $player_id = getValue('player_id');
     $sig = getValue('sig');
-    $current_player = Player::instance($player_id);
 
-    if( $player_id !== null && $current_player->id == $player_id ) {
-      $sig_compare = sha1( $player_id . $current_player->api_key );
+    $api_token = Api_Token::request_token($player_id, $compare_sig, $sig);
 
-      if( !$compare_sig || ($sig_compare == $sig) ) {
-        $previous_tokens = Api_Token::db_get_by_player_id($current_player->id);
-        foreach( $previous_tokens as $previous_token ) {
-          $previous_token->expires = time();
-          $previous_token->save();
-        }
-
-        $api_token = Api_Token::instance();
-        $api_token->hash = sha1( time() . $current_player->id . $current_player->api_key . 'py(_à(^)dfùvb^sué_à');
-        $api_token->player_id = $current_player->id;
-        $api_token->created = time();
-        $api_token->expires = time() + 3600;
-        $error = $api_token->save();
-
-        $success = true;
-        $allowed = true;
-        $content = $api_token->get_public_vars();
-      }
+    if( $api_token ) {
+      $success = true;
+      $allowed = true;
+      $content = $api_token->get_public_vars();
     }
   }else {
-    $token = getValue('token');
+    $token = getValue('token', null, true);
     $api_token = Api_Token::db_get_by_hash($token);
 
     if( !$compare_sig || ($api_token && $api_token->hash == $token && $api_token->expires > time() ) ) {
@@ -150,7 +134,7 @@
         }
         case 'get_last_player_diplomacy_list' : {
           if( $current_game ) {
-            $content = $current_player->get_last_player_diplomacy_list($current_game->id, $current_game->current_turn );
+            $content = $current_player->get_player_latest_diplomacy_list($current_game->id, $current_game->current_turn );
           }
           break;
         }
@@ -320,6 +304,8 @@
             $player_order = Player_Order::factory_by_class($method);
 
             $success = $player_order->plan( $order_type, $current_player, $parameters );
+
+            $content = array('planned_order_id' => $player_order->id);
           }
           break;
         }
@@ -342,9 +328,6 @@
     /* @var $api_token Api_Token */
     $api_token = Api_Token::instance();
   }
-  $params = $_REQUEST;
-  unset( $params['token'] );
-  unset( $params['m'] );
-  unset( $params['page'] );
-  $api_token->set_api_log($method, str_replace("\n", '&', trim(parameters_to_string($params))), $allowed?1:0, $success?1:0, time());
+
+  $api_token->set_api_log($method, str_replace("\n", '&', trim(parameters_to_string(getValues()))), $allowed?1:0, $success?1:0, time());
 ?>

@@ -31,11 +31,11 @@
   $is_conflict = $territory_status['conflict'];
 
   if( $is_conflict ) {
-    $status = 'Conflict';
+    $status = icon('territory_conflict') . __('Conflict');
   }elseif( $is_contested ) {
-    $status = 'Contested';
+    $status = icon('territory_contested') . __('Contested');
   }else {
-    $status = 'Stable';
+    $status = icon('territory_stable') . __('Stable');
   }
 ?>
 
@@ -44,73 +44,41 @@
 <?php else :?>
 <h2><?php echo __('"%s" on turn %s', $territory->name, $turn)?></h2>
 <?php endif;?>
-<div class="informations formulaire">
-  <p>
-    <span class="label"><?php echo __('Area')?></span>
-    <span class="value"><?php echo l10n_number( $territory->get_area() )?> km²</span>
-  </p>
-  <p>
-    <span class="label"><?php echo __('Border length')?></span>
-    <span class="value"><?php echo l10n_number( $territory->get_perimeter() )?> km</span>
-  </p>
-  <p>
-    <span class="label"><?php echo __('Capital city')?></span>
-    <span class="value"><?php echo $territory->capital_name?></span>
-  </p>
-<?php if( $current_game ) :?>
-  <p>
-    <span class="label"><?php echo __('Current owner')?></span>
-    <span class="value"><?php echo $territory_owner->id?'<a href="'.Page::get_url('show_player', array('id' => $territory_owner->id)).'">'.$territory_owner->name.'</a>':__('Nobody')?></span>
-  </p>
-<?php
-  $distance = $territory->get_distance_to_capital($current_game, $turn);
 
-  if( $distance ) {
-?>
-  <p>
-    <span class="label"><?php echo __('Distance to the owner\'s capital')?></span>
-    <span class="value"><?php echo $distance?l10n_number( $distance ).' km':__('No capital')?></span>
-  </p>
-<?php
-  }
-  $economy_ratio = $territory->get_economy_ratio( $current_game, $turn );
-?>
-  <p>
-    <span class="label"><?php echo __('Economy ratio')?></span>
-    <span class="value"><?php echo l10n_number( round( $economy_ratio * 100 ) ).' %'?></span>
-  </p>
-  <p>
-    <span class="label"><?php echo __('Status')?></span>
-    <span class="value"><?php echo __($status)?></span>
-  </p>
-  <p>
-    <span class="label"><?php echo __('Troops needed for capture')?></span>
-    <span class="value"><?php echo l10n_number( ceil( $territory->area / $game_parameters['TROOPS_CAPTURE_POWER'] ) )?></span>
-  </p>
-<?php if( $is_conflict || $is_contested ) :?>
-  <p>
-    <span class="label"><?php echo __('Revenue Suppression')?></span>
-    <span class="value"><?php echo l10n_number( $territory_status['revenue_suppression'] * 100 )?> %</span>
-  </p>
-<?php endif;?>
+<ul class="icon_infos">
+  <li><?php echo icon('area') . l10n_number( $territory->get_area() )?> km²</li>
+  <li><?php echo icon('border_length') . l10n_number( $territory->get_perimeter() )?> km</li>
+  <li><?php echo icon('capital') . $territory->capital_name?></li>
+<?php if( $current_game ) :?>
+  <li><?php echo icon('owner', 'Current owner') . ($territory_owner->id ? '<a href="'.Page::get_url('show_player', array('id' => $territory_owner->id)).'">'.$territory_owner->name.'</a>' : __('Nobody'))?></li>
+  <li><?php echo $status?></td>
+  <?php
+    $economy_ratio = $territory->get_economy_ratio( $current_game, $turn );
+  ?>
+  <li><?php echo icon('capture_troops') . l10n_number( ceil( $territory->area / $game_parameters['TROOPS_CAPTURE_POWER'] ) )?></li>
+  <li><?php echo icon('economy_ratio') . l10n_number( round( $territory->get_economy_ratio( $current_game, $turn ) * 100 ) ).' %'?></li>
+  <?php if( $is_conflict || $is_contested ) :?>
+  <li><?php echo icon('revenue_suppression') . l10n_number( $territory_status['revenue_suppression'] * 100 ).' %'?></li>
+  <?php endif;?>
 <?php endif; //if( $current_game ) :?>
-</div>
+</ul>
+
 <?php if( !$is_ajax ) :?>
 <p>
     <?php echo $world->drawImg(array(
-        'with_map' => true,
-        'territories' => array_merge( array($territory), $neighbour_list),
-        'game_id' => $current_game->id,
-        'turn' => $turn
+      'with_map' => true,
+      'territories' => array_merge( array($territory), $neighbour_list),
+      'game_id' => $current_game->id,
+      'turn' => $turn
     ));?>
 </p>
 <p><a href="<?php echo Page::get_url('show_world', array('id' => $territory->world_id, 'game_id' => $current_game->id, 'turn' => $turn ) )?>"><?php echo __('Return to world map')?></a></p>
 <h3><?php echo __('Neighbours')?></h3>
-<table>
+<table class="table table-hover table-condensed">
   <thead>
     <tr>
       <th><?php echo __('Name')?></th>
-      <th><?php echo __('Area')?></th>
+      <th class="num"><?php echo __('Area')?></th>
       <th><?php echo __('Current owner')?></th>
       <th><?php echo __('Status')?></th>
     </tr>
@@ -125,7 +93,7 @@
       echo '
     <tr>
       <td><a href="'.Page::get_url('show_territory', array_merge( $territory_params, array('id' => $neighbour->id) )).'">'.$neighbour->name.'</a></td>
-      <td>'.l10n_number( $neighbour->get_area() ).' km²</td>
+      <td class="num">'.l10n_number( $neighbour->get_area() ).' km²</td>
       <td>'.($territory_status_row['owner_id']?'<a href="'.Page::get_url('show_player', array('id' => $territory_owner->id)).'">'.$territory_owner->name.'</a>':__('Nobody')).'</td>
       <td>'.($territory_status_row['contested']?__('Contested'):__('Stable')).'</td>
     </tr>';
@@ -139,7 +107,7 @@
 <?php if( $current_game ) :?>
 
 <h3><?php echo __('Troops')?></h3>
-<table class="accordion">
+<table class="table table-bordered table-hover table-condensed accordion">
   <thead>
     <tr>
       <th><?php echo __('Player')?></th>
@@ -152,7 +120,7 @@
 
     $territory_status_list = $current_game->get_territory_status_list($territory->id);
     /* @var $current_player Player */
-    $diplomacy_list = $current_player->get_to_player_last_diplomacy_list($current_game->id);
+    $diplomacy_list = $current_player->get_to_player_latest_diplomacy_list($current_game->id);
 
     $shared_vision = array($current_player->id => $current_game->current_turn);
     foreach( $diplomacy_list as $diplomacy_row ) {
@@ -219,7 +187,7 @@
       }
 
       echo '
-  <tbody class="archive'.($is_current?' current':'').($can_see_troops?'':' fogofwar').'"'.($can_see_troops?'':' title="'. __('No vision').'"').'">
+  <tbody class="archive'.($is_current?' current':'').($can_see_troops?'':' fogofwar').'"'.($can_see_troops?'':' title="'. __('No vision').'"').'>
     <tr class="title">
       <th colspan="3">'.__('Turn %s', $territory_status_row['turn']).$icon.'</th>
     </tr>';
@@ -336,7 +304,7 @@
 <?php } ?>
 <h3>Issue an order</h3>
 <script>
-  $( function () {
+  domReadyQueue.push(function($){
     $( ".orders" ).accordion({
       collapsible: true,
       header: "legend",

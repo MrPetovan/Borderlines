@@ -280,7 +280,7 @@ WHERE `game_id` = '.mysql_ureal_escape_string($game_id).$where;
     return $return;
   }
 
-  public function get_last_player_diplomacy_list($game_id) {
+  public function get_player_latest_diplomacy_list($game_id) {
     $sql = '
 SELECT `game_id`, `turn`, `from_player_id`, `pd`.`to_player_id`, `status`, `shared_vision`
 FROM `player_diplomacy` pd
@@ -301,7 +301,7 @@ AND `turn` = `pd_max`.`max_turn`';
     return mysql_fetch_to_array($res);
   }
 
-  public function get_to_player_last_diplomacy_list($game_id) {
+  public function get_to_player_latest_diplomacy_list($game_id) {
     $sql = '
 SELECT `game_id`, `turn`, `pd`.`from_player_id`, `to_player_id`, `status`, `shared_vision`, IFNULL(`last_shared_vision`, 0) AS `last_shared_vision`
 FROM `player_diplomacy` pd
@@ -331,7 +331,7 @@ AND `turn` = `pd_max`.`max_turn`';
     return mysql_fetch_to_array($res);
   }
 
-  public function get_last_player_diplomacy( Game $game, $turn = null ) {
+  public function get_player_last_diplomacy_list( Game $game, $turn = null ) {
     if( is_null( $turn ) ) {
       $turn = $game->current_turn;
     }
@@ -351,6 +351,42 @@ JOIN (
 WHERE `from_player_id` = '.mysql_ureal_escape_string( $this->id ).'
 AND `game_id` = '.mysql_ureal_escape_string( $game->id ).'
 AND `pd`.`to_player_id` = `pd_max`.`to_player_id`
+AND `turn` = `pd_max`.`max_turn`';
+    $res = mysql_uquery($sql);
+
+    return mysql_fetch_to_array($res);
+  }
+
+  public function get_to_player_last_diplomacy_list( Game $game, $turn = null ) {
+    if( is_null( $turn ) ) {
+      $turn = $game->current_turn;
+    }
+
+    $sql = '
+SELECT `game_id`, `turn`, `pd`.`from_player_id`, `to_player_id`, `status`, `shared_vision`, IFNULL(`last_shared_vision`, 0) AS `last_shared_vision`
+FROM `player_diplomacy` pd
+JOIN (
+  SELECT `from_player_id`, MAX( `turn` ) AS `max_turn`
+  FROM `player_diplomacy`
+  WHERE `to_player_id` = '.mysql_ureal_escape_string($this->get_id()).'
+  AND `game_id` = '.mysql_ureal_escape_string($game->id).'
+  AND `to_player_id` != `from_player_id`
+  AND `turn` <= ' . $turn . '
+  GROUP BY `from_player_id`
+) AS `pd_max`
+LEFT JOIN (
+  SELECT `from_player_id`, MAX( `turn` ) AS `last_shared_vision`
+  FROM `player_diplomacy`
+  WHERE `to_player_id` = '.mysql_ureal_escape_string($this->id).'
+  AND `game_id` = '.mysql_ureal_escape_string($game->id).'
+  AND `to_player_id` != `from_player_id`
+  AND `shared_vision` = 1
+  AND `turn` <= ' . $turn . '
+  GROUP BY `from_player_id`
+) AS `sv_max` ON `pd`.`from_player_id` = `sv_max`.`from_player_id`
+WHERE `to_player_id` = '.mysql_ureal_escape_string($this->id).'
+AND `game_id` = '.mysql_ureal_escape_string($game->id).'
+AND `pd`.`from_player_id` = `pd_max`.`from_player_id`
 AND `turn` = `pd_max`.`max_turn`';
     $res = mysql_uquery($sql);
 
@@ -395,6 +431,23 @@ LIMIT 1';
     return $return;
   }
 
+  public function get_territory_economy_summary( Game $game, $turn = null ) {
+    if( is_null( $turn ) ) {
+      $turn = $game->current_turn;
+    }
+
+    $sql = '
+SELECT ts.*, IFNULL( SUM( `delta` ), 0 ) AS `economy_ratio`
+FROM `territory_status` ts
+LEFT JOIN `territory_economy_history` teh ON teh.`territory_id` = ts.`territory_id` AND teh.`game_id` = ts.`game_id` AND teh.`turn` <= ts.`turn`
+WHERE ts.`game_id` = '.mysql_ureal_escape_string($game->id).'
+AND ts.`turn` = ' . mysql_ureal_escape_string($turn) . '
+AND `owner_id` = '.mysql_ureal_escape_string($this->id).'
+GROUP BY ts.`territory_id`';
+    $res = mysql_uquery($sql);
+
+    return mysql_fetch_to_array($res);
+  }
   public function get_territory_summary( Game $game, $turn = null ) {
     if( is_null( $turn ) ) {
       $turn = $game->current_turn;
@@ -413,7 +466,7 @@ LIMIT 1';
       $return[ $territory_row['territory_id'] ] = $territory_row;
 
     }
-    //var_debug( $territory_status_list );
+
     foreach( $territory_status_list as $territory_status_row ) {
       if( !isset( $return[ $territory_status_row['territory_id'] ] ) ) {
         $territory = Territory::instance($territory_status_row['territory_id']);

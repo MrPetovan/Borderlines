@@ -479,7 +479,7 @@ class Move_Troops extends Player_Order {
     if( !$allow_move && $to_owner->id === null ) {
       $supremacists = array_keys( $supremacy_to, 1 );
       if( count( $supremacists ) ) {
-        $diplomacy_list = $player->get_last_player_diplomacy_list($game->id);
+        $diplomacy_list = $player->get_player_latest_diplomacy_list($game->id);
         foreach( $diplomacy_list as $diplomacy_row ) {
           if( $diplomacy_row['status'] == 'Ally' && in_array( $diplomacy_row['to_player_id'], $supremacists ) ) {
             $allow_move = true;

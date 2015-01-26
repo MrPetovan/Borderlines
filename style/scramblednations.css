@@ -6,8 +6,110 @@
         Purpose of the stylesheet follows.
 */
 
+body {
+  padding-top: 70px;
+  background-color: rgb(17, 17, 17);
+  color: rgb(211, 211, 211);
+}
+
 body.clean {
   background: none;
+  padding: 0;
+}
+
+button {
+  color: rgb(17, 17, 17);
+}
+
+a {
+  color: white;
+  font-weight: bold;
+}
+
+a:focus, a:hover {
+  color: white;
+}
+
+.nav-tabs>li.active>a, .nav-tabs>li.active>a:focus, .nav-tabs>li.active>a:hover {
+  color: inherit;
+  background-color: none;
+  border: 1px solid #ddd;
+  border-bottom-color: rgb(17, 17, 17);
+  outline: none;
+}
+
+.nav>li>a:focus, .nav>li>a:hover {
+  background-color: transparent;
+}
+
+.table>thead>tr>th {
+  text-transform: uppercase;
+  font-size: 0.8em;
+  font-weight: normal;
+}
+
+.table-hover>tbody>tr:hover {
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+.well,
+input,
+select,
+option{
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+
+.nav-tabs>li.active>a, .nav-tabs>li.active>a:focus, .nav-tabs>li.active>a:hover {
+  background: none;
+  color: inherit;
+}
+
+.map_background:before {
+  content: "";
+  position: fixed;
+  left: 0;
+  right: 0;
+  z-index: -1;
+
+  display: block;
+  background-size: 100%;
+  width: 1140px;
+  height: 1140px;
+  margin: 0 auto;
+
+  -webkit-filter: blur(20px);
+  -moz-filter: blur(20px);
+  -o-filter: blur(20px);
+  -ms-filter: blur(20px);
+  filter: blur(20px);
+}
+
+.pagination>li>a,
+.pagination>li>span {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.2);
+  border-color: #ddd;
+}
+
+.pagination>li>a:focus,
+.pagination>li>a:hover,
+.pagination>li>span:focus,
+.pagination>li>span:hover {
+  color: rgb(17, 17, 17);
+  background-color: #eee;
+}
+
+.pagination>.active>a,
+.pagination>.active>a:focus,
+.pagination>.active>a:hover,
+.pagination>.active>span,
+.pagination>.active>span:focus,
+.pagination>.active>span:hover {
+  color: #fff;
+  cursor: default;
+  background-color: rgba(255, 255, 255, 0.4);
+  border-color: #ddd;
 }
 
 .dialog{
@@ -16,6 +118,7 @@ body.clean {
   top: 200px;
   left: 50%;
   background-color: rgba(255, 255, 255, 0.9);
+  z-index: 2;
 }
 
 .dialog h4 {
@@ -23,6 +126,7 @@ body.clean {
   padding: 10px;
   cursor: move;
   position: relative;
+  margin: 0;
 }
 
 .dialog h4 a.close {
@@ -82,6 +186,7 @@ body.clean {
   background-color: #333333;
   color: #FFFFFF;
   border-bottom: 1px solid #FFFFFF;
+  text-align: center;
 }
 
 .archive.fogofwar .title th {
@@ -102,6 +207,98 @@ body.clean {
   margin: 0;
 }
 
+td.num,
+th.num {
+  text-align: right;
+}
+
 .icon {
   margin: 0 5px;
+  vertical-align: sub;
+}
+
+.territory_summary {
+  position: relative;
+  left: -50%;
+  top: -15px;
+  background-color: rgba(0, 0, 0, 0.5);
+  border-radius: 3px;
+  border: 1px solid black;
+  font-size: 80%;
+}
+
+.territory_summary h3 {
+  margin: 0;
+  padding: 0 5px 0 0;
+  background-color: rgb(0, 0, 0);
+  color: rgb(255, 255, 255);
+  text-align: center;
+  font-size: inherit;
+}
+
+.territory_summary.refuse_move {
+  opacity: 0.4;
+}
+
+.territory_summary.refuse_move .ui-state-highlight {
+  display: none;
+}
+
+.troops_list {
+  margin: 0;
+  padding: 5px;
+  list-style: none;
+  min-height: 20px;
+}
+
+.troops_list li {
+  line-height: 1em;
+  white-space: nowrap;
+  margin-bottom: 3px;
+  height: 20px;
+}
+
+.troops_list li.moveable {
+  border: 1px solid black;
+  border-radius: 0 0.5em 0.5em 0;
+  background-color: rgba(255, 0, 0, 0.2);
+}
+
+.troops_list li .split,
+.troops_list li.moveable.moved .split,
+.troops_list li .cancel {
+  display: none;
+  padding: 3px 5px 3px 0;
+}
+.troops_list li.moveable .split,
+.troops_list li.moveable.moved .cancel {
+  display: inline;
+  cursor: pointer;
+  padding: 3px 5px 3px 0;
+}
+
+.troops_list li.moveable:before {
+  content: url(../img/img_html/arrow_move.png);
+  height: 16px;
+  margin: 0 5px;
+  vertical-align: sub;
+  cursor: move;
+}
+
+.troops_list li.moved:before {
+  content: url(../img/img_html/territory_in.png);
+  height: 16px;
+  margin: 0 5px;
+  vertical-align: sub;
+}
+
+.icon_infos {
+  list-style: none;
+  padding: 0;
+  overflow: hidden;
+}
+
+.icon_infos li {
+  float: left;
+  margin: 0 15px 5px 0;
 }

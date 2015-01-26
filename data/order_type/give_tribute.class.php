@@ -1,6 +1,6 @@
 <?php
 class Give_Tribute extends Player_Order {
-  public function plan( Order_Type $order_type, Player $player, $params ) {
+  public function plan( Order_Type $order_type, Player $player, $params, $turn = null, $player_order_id = null ) {
     $valid = isset( $params['to_player_id'] ) && isset( $params['count'] );
 
     if( $valid ) {

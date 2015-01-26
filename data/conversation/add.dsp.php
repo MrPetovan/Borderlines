@@ -8,6 +8,10 @@
     $add_array = array();
   }
 
+  if( getValue('return_url') ) {
+    $add_array['return_url'] = getValue('return_url');
+  }
+
   $other_player_list = array();
   if( $game_id !== null ) {
     $game_player_list = $current_player->current_game->get_game_player_list();

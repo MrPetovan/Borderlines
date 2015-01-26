@@ -32,7 +32,7 @@
 <?php endif;?>
 <h3><?php echo __('Map')?></h3>
 <script type="text/javascript">
-  $(function() {
+  domReadyQueue.push(function($){
     //$('.map').maphilight();
 
     /*$('a[rel]').mouseover(function(e) {
@@ -73,14 +73,14 @@
 <?php
     $territory_summary = $current_player->get_territory_summary( $current_game, $turn );
 ?>
-<table>
+<table class="table table-hover table-condensed">
   <tr>
     <th><?php echo __('Territory')?></th>
     <th><?php echo __('Owner')?></th>
     <th><?php echo __('Type')?></th>
-    <th><?php echo __('Area')?></th>
+    <th class="num"><?php echo __('Area')?></th>
     <th><?php echo __('Status')?></th>
-    <th><?php echo __('Troops')?></th>
+    <th class="num"><?php echo __('Troops')?></th>
   </tr>
 <?php
 
@@ -127,9 +127,9 @@
   <tbody>
     <tr>
       <th colspan="2"></th>
-      <th><?php echo __('Total')?></th>
+      <th class="num"><?php echo __('Total')?></th>
       <td class="num"><?php echo l10n_number( $total_territory )?> km²</td>
-      <th><?php echo __('Total')?></th>
+      <th class="num"><?php echo __('Total')?></th>
       <td class="num"><?php echo l10n_number( $total_troops ) . icon('troops')?></td>
     </tr>
   </tbody>
@@ -155,11 +155,11 @@
   $owner_url = Page::get_url(PAGE_CODE, $owner_url_params);
 
 ?>
-<table>
+<table class="table table-hover table-condensed">
   <thead>
     <tr>
       <th><a href="<?php echo $name_url?>#territories"><?php echo __('Name')?></a></th>
-      <th><?php echo __('Area')?></th>
+      <th class="num"><?php echo __('Area')?></th>
       <th><a href="<?php echo $owner_url?>#territories"><?php echo __('Owner')?></a></th>
     </tr>
   </thead>
@@ -176,7 +176,7 @@
     echo '
     <tr>
       <td><a href="'.Page::get_url('show_territory', array_merge($territory_params, array('id' => $territory->id))).'">'.$territory->name.'</a></td>
-      <td>'.l10n_number( $territory->get_area() ).' km²</td>
+      <td class="num">'.l10n_number( $territory->get_area() ).' km²</td>
       <td>'.($owner->id?'<a href="'.Page::get_url('show_player', array('id' => $owner->id)).'">'.$owner->name.'</a>':__('Nobody')).'</td>
     </tr>';
   }
@@ -219,7 +219,7 @@
 <?php
     if(count($territory_list)) {
 ?>
-<table>
+<table class="table table-hover table-condensed">
   <thead>
     <tr>
       <th><?php echo __('Name')?></th>

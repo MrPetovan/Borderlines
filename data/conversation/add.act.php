@@ -66,12 +66,16 @@
         }
 
         Page::set_message( 'Record successfuly saved' );
-        if( getValue('general') !== null ) {
-          $params = array('general' => getValue('general'));
+        if( getValue('return_url') ) {
+          redirect(getValue('return_url'));
         }else {
-          $params = array();
+          if( getValue('general') !== null ) {
+            $params = array('general' => getValue('general'));
+          }else {
+            $params = array();
+          }
+          Page::redirect( 'conversation_list', $params );
         }
-        Page::redirect( 'conversation_list', $params );
       }else {
         Conversation::manage_errors($tab_error, $html_msg);
         Page::set_message( $html_msg, Page::PAGE_MESSAGE_WARNING );

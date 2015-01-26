@@ -34,7 +34,7 @@
   </li>
 </ul>
 <form action="<?php echo Page::get_url(PAGE_CODE, $_GET)?>" method="post">
-  <table class="accordion">
+  <table class="table table-hover accordion">
     <thead>
       <tr>
         <th><?php echo __('Sel.')?></th>

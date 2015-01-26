@@ -113,7 +113,7 @@
     $territory_summaries[ $current_game->current_turn - 1 ] = $current_player->get_territory_summary($current_game, $current_game->current_turn - 1);
     $territory_summaries[ $current_game->current_turn ] = $current_player->get_territory_summary($current_game, $current_game->current_turn);
 ?>
-<table class="accordion">
+<table class="table table-hover table-condensed accordion">
 <?php
 
     foreach( $territory_summaries as $turn => $territory_summary ) {
@@ -211,10 +211,10 @@
 </p>
 <h3><?php echo __('Diplomacy')?></h3>
 <?php
-    $player_diplomacy_list = $current_player->get_last_player_diplomacy_list($current_game->id);
+    $player_diplomacy_list = $current_player->get_player_latest_diplomacy_list($current_game->id);
 ?>
 <form action="<?php echo Page::get_url( PAGE_CODE )?>" method="POST">
-  <table>
+  <table class="table table-hover table-condensed">
     <tr>
       <th><?php echo __('Player')?></th>
       <th colspan="3"><?php echo __('Status')?></th>
@@ -343,7 +343,7 @@
 <?php
     $player_history_list = $current_player->get_player_history_list($current_game->id);
 ?>
-<table class="accordion">
+<table class="table table-hover table-condensed accordion">
 <?php
     $current_turn = null;
     foreach( $player_history_list as $player_history_row ) {
@@ -387,7 +387,7 @@
 <h3><?php echo __('Orders')?></h3>
 <h3>Issue an order</h3>
 <script>
-  $( function () {
+  domReadyQueue.push(function($){
     $( ".orders" ).accordion({
       collapsible: true,
       header: "legend",
@@ -395,7 +395,7 @@
       autoHeight: 0,
       active: false
     });
-  })
+  });
 </script>
 <div class="orders">
 <?php
@@ -408,7 +408,7 @@
 <?php
       $orders = Player_Order::db_get_planned_by_player_id( $current_player->id, $current_game->id );
 ?>
-<table>
+<table class="table table-hover table-condensed">
   <tr>
     <th><?php echo __('Order Type')?></th>
     <th><?php echo __('Ordered')?></th>
