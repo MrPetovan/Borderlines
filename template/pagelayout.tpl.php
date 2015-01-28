@@ -66,5 +66,7 @@
   </div><!-- /.container -->
 
   <?php include('template/footer.tpl.php'); ?>
+
+  <?php include('template/body_bottom.tpl.php'); ?>
 </body>
 </html>

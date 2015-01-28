@@ -8,6 +8,6 @@
 <body class="clean">
   <?php Page::display_messages();?>
   <?php echo $PAGE_CONTENU; ?>
-  <?php include('template/footer.tpl.php'); ?>
+  <?php include('template/body_bottom.tpl.php'); ?>
 </body>
 </html>
