@@ -881,17 +881,33 @@ function which_os ()
     $nb_page = ceil($nb_total / $nb_per_page);
 
     $return = '
-    <div class="pagination">
-      <ul class="nav">';
+    <nav>
+      <ul class="pagination">';
 
     if($nb_page == 1 || $current_page == 1) {
       $return .= '
-        <li class="disabled"><span>&lt; &lt;</span></li>
-        <li class="disabled"><span>&lt;</span></li>';
+        <li class="disabled">
+          <a href="#" aria-label="' . __('First') . '">
+            <span aria-hidden="true">&laquo;</span>
+          </a>
+        </li>
+        <li class="disabled">
+          <a href="#" aria-label="' . __('Previous') . '">
+            <span aria-hidden="true">&lt;</span>
+          </a>
+        </li>';
     }else {
       $return .= '
-        <li><a href="'.get_page_url($codepage, true, array('p' => 1, 'nb_per_page' => $nb_per_page)).'">&lt; &lt;</a></li>
-        <li><a href="'.get_page_url($codepage, true, array('p' => $current_page - 1, 'nb_per_page' => $nb_per_page)).'">&lt;</a></li>';
+        <li>
+          <a href="'.get_page_url($codepage, true, array('p' => 1, 'nb_per_page' => $nb_per_page)).'" aria-label="' . __('First') . '">
+            <span aria-hidden="true">&laquo;</span>
+          </a>
+        </li>
+        <li>
+          <a href="'.get_page_url($codepage, true, array('p' => $current_page - 1, 'nb_per_page' => $nb_per_page)).'" aria-label="' . __('Previous') . '">
+            <span aria-hidden="true">&lt;</span>
+          </a>
+        </li>';
     }
 
     if($nb_page > NB_VISIBLE_LINKS) {
@@ -909,22 +925,40 @@ function which_os ()
         $j = $current_page - ceil(NB_VISIBLE_LINKS / 2) + $i;
       }
       $return .= '
-        <li'.($j == $current_page?' class="active"':'').'><a href="'.get_page_url($codepage, true, array('p' => $j, 'nb_per_page' => $nb_per_page)).'">'.$j.'</a></li>';
+        <li'.($j == $current_page?' class="active"':'').'>
+          <a href="'.get_page_url($codepage, true, array('p' => $j, 'nb_per_page' => $nb_per_page)).'">' . $j . ($j == $current_page ? ' <span class="sr-only">(current)</span>' : '') . '</a>
+        </li>';
     }
 
     if($nb_page == 1 || $current_page == $nb_page) {
       $return .= '
-        <li class="disabled"><span>&gt;</span></li>
-        <li class="disabled"><span>&gt; &gt;</span></li>';
+        <li class="disabled">
+          <a href="#" aria-label="' . __('Next') . '">
+            <span aria-hidden="true">&gt;</span>
+          </a>
+        </li>
+        <li class="disabled">
+          <a href="#" aria-label="' . __('Last') . '">
+            <span aria-hidden="true">&raquo;</span>
+          </a>
+        </li>';
     }else {
       $return .= '
-        <li><a href="'.get_page_url($codepage, true, array('p' => $current_page + 1, 'nb_per_page' => $nb_per_page)).'">&gt;</a></li>
-        <li><a href="'.get_page_url($codepage, true, array('p' => $nb_page, 'nb_per_page' => $nb_per_page)).'">&gt; &gt;</a></li>';
+        <li>
+          <a href="'.get_page_url($codepage, true, array('p' => $current_page + 1, 'nb_per_page' => $nb_per_page)).'" aria-label="' . __('Next') . '">
+            <span aria-hidden="true">&gt;</span>
+          </a>
+        </li>
+        <li>
+          <a href="'.get_page_url($codepage, true, array('p' => $nb_page, 'nb_per_page' => $nb_per_page)).'" aria-label="' . __('Last') . '">
+            <span aria-hidden="true">&raquo;</span>
+          </a>
+        </li>';
     }
 
     $return .= '
       </ul>
-    </div>';
+    </nav>';
 
     return $return;
   }
