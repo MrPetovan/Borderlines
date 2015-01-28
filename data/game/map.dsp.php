@@ -172,7 +172,7 @@
 
     $centroid = $territory->get_centroid();
     echo '
-      <div style="position: absolute; left:' . round($centroid->x * $ratio) .'px; top:' . round(($world->size_y - $centroid->y) * $ratio) . 'px;">
+      <div style="position: absolute; left:' . round($centroid->x * $ratio) .'px; top:' . round(($world->size_y - $centroid->y) * $ratio) . 'px; pointer-events: none">
         <div data-territory-id="' . $territory->id . '" title="' . $territory->name . ' (' . ($owner->id ? $owner->name : __('Nobody')) . ')" class="territory_summary">
           <h3 data-territory-id="' . $territory->id . '" title="' . $territory->name . ' (' . ($owner->id ? $owner->name : __('Nobody')) . ')">' . $status . $vision . $territory->name . $capital . $capture_troops . '</h3>
           <ul class="' . implode(' ', $move_classes) . '" data-territory-id="' . $territory->id . '" id="territory_' . $territory->id . '">';
