@@ -241,6 +241,15 @@ th.num {
   vertical-align: sub;
 }
 
+.territory_summary_wrapper {
+  position: absolute;
+  pointer-events: none;
+}
+
+.territory_summary_wrapper * {
+  pointer-events: all;
+}
+
 .territory_summary {
   position: relative;
   left: -50%;
