@@ -6,6 +6,8 @@
   /* @var $world World */
   /* @var $current_player Player */
   $territory_params = array('game_id' => $current_game->id, 'turn' => $turn);
+
+  $game_parameters = $current_game->get_parameters();
 ?>
 <ul class="nav nav-tabs">
   <li role="presentation" class="active">
@@ -129,6 +131,8 @@
       $status = icon('territory_stable');
     }
 
+    $status = '';
+
     if( $territory_status_row['can_see_troops'] ) {
       if( $territory_status_row['vision_is_direct'] ) {
         $vision = icon('vision_clear');
@@ -148,6 +152,11 @@
       $capital = icon('capital_territory');
     }
 
+    $capital = '';
+
+    $capture_troops = icon('capture_troops') . l10n_number( ceil( $territory->area / $game_parameters['TROOPS_CAPTURE_POWER'] ) );
+
+
     $move_classes = array('troops_list');
     if( $territory->is_passable() ) {
       $move_classes[] = 'receive_from_' . $territory->id;
@@ -165,14 +174,14 @@
     echo '
       <div style="position: absolute; left:' . round($centroid->x * $ratio) .'px; top:' . round(($world->size_y - $centroid->y) * $ratio) . 'px;">
         <div data-territory-id="' . $territory->id . '" title="' . $territory->name . ' (' . ($owner->id ? $owner->name : __('Nobody')) . ')" class="territory_summary">
-          <h3 data-territory-id="' . $territory->id . '" title="' . $territory->name . ' (' . ($owner->id ? $owner->name : __('Nobody')) . ')">' . $status . $vision . $territory->name . $capital . '</h3>
+          <h3 data-territory-id="' . $territory->id . '" title="' . $territory->name . ' (' . ($owner->id ? $owner->name : __('Nobody')) . ')">' . $status . $vision . $territory->name . $capital . $capture_troops . '</h3>
           <ul class="' . implode(' ', $move_classes) . '" data-territory-id="' . $territory->id . '" id="territory_' . $territory->id . '">';
     if( isset($troops_by_territory[$territory->id]) ) {
       foreach($troops_by_territory[$territory->id] as $territory_player_troops_row ) {
         /* @var $player Player */
         $player = Player::instance($territory_player_troops_row['player_id']);
         $troops_territory = Territory::instance($territory_player_troops_row['territory_id']);
-        $classes = array();
+        $classes = array('text-right');
         if( $player->id == $current_player->id && $is_current_turn ) {
           $classes[] = 'moveable';
         }
@@ -187,13 +196,12 @@
               data-quantity="' . $territory_player_troops_row['quantity'] . '"
               data-from-territory-id="' . $troops_territory->id . '"
               data-planned-order-id="' . ( isset($territory_player_troops_row['planned_order_id']) ? $territory_player_troops_row['planned_order_id'] : '' ) . '"
-              id="' . $player->name . ':' . l10n_number( $territory_player_troops_row['quantity'], 0 ) .'
-            ">
+            >
                 ' . $player->name . ': <span class="value">' . l10n_number( $territory_player_troops_row['quantity'], 0 ) . '</span>' .
                 icon('troops') .
                 '
-                  <span class="glyphicon glyphicon-scissors split pull-right" title="' . __('Split Troops') . '"></span>
-                  <span class="glyphicon glyphicon-remove cancel pull-right" title="' . __('Cancel Move') . '"></span>
+                  <button class="btn btn-xs split"><span class="glyphicon glyphicon-scissors" title="' . __('Split Troops') . '"></span></button>
+                  <button class="btn btn-xs cancel"><span class="glyphicon glyphicon-remove" title="' . __('Cancel Move') . '"></span></button>
             </li>';
       }
     }
@@ -268,11 +276,16 @@
         <h4 class="modal-title"><?php echo __('Split troops')?></h4>
       </div>
       <div class="modal-body">
-        <p class="clearfix">
-          <span class="troops pull-left"><span class="value"></span><?php echo icon('troops')?></span>
-          <span class="troops pull-right"><span class="value"></span><?php echo icon('troops')?></span>
-        </p>
-        <div id="slider-troops"></div>
+        <form class="form-inline">
+          <p class="clearfix text-center">
+            <span class="troops pull-left"><input type="text" disabled class="value text-right disabled form-control"/><?php echo icon('troops')?></span>
+            <->
+            <span class="troops pull-right"><input type="text" class="value text-right form-control"/><?php echo icon('troops')?></span>
+          </p>
+        </form>
+        <div class="form-group">
+          <div id="slider-troops"></div>
+        </div>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>

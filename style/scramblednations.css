@@ -52,6 +52,10 @@ a:focus, a:hover {
   background-color: rgba(0, 0, 0, 0.4);
 }
 
+.table-striped>tbody>tr:nth-of-type(odd) {
+  background-color: rgba(64, 64, 64, 0.4);
+}
+
 .well,
 input,
 select,
@@ -78,11 +82,11 @@ option{
   height: 1140px;
   margin: 0 auto;
 
-  -webkit-filter: blur(20px);
-  -moz-filter: blur(20px);
-  -o-filter: blur(20px);
-  -ms-filter: blur(20px);
-  filter: blur(20px);
+  -webkit-filter: blur(10px) brightness(0.5);
+  -moz-filter: blur(10px) brightness(0.5);
+  -o-filter: blur(10px) brightness(0.5);
+  -ms-filter: blur(10px) brightness(0.5);
+  filter: blur(10px) brightness(0.5);
 }
 
 .pagination>li>a,
@@ -112,21 +116,41 @@ option{
   border-color: #ddd;
 }
 
+.modal-content {
+  background-color: rgba(17, 17, 17, 0.8);
+}
+
+.modal-header {
+  background-color: black;
+}
+
+.close {
+  color: inherit;
+  opacity: 1;
+}
+.close:focus, .close:hover {
+  color: rgb(255, 255, 255);
+}
+
 .dialog{
   display: none;
   position: absolute !important;
   top: 200px;
   left: 50%;
-  background-color: rgba(255, 255, 255, 0.9);
+  background-color: rgba(0, 0, 0, 0.9);
   z-index: 2;
+  border-radius: 8px 8px 0 0;
+  border: 1px solid rgb(128, 128, 128);
 }
 
 .dialog h4 {
-  background-color: #CCC;
+  background-color: rgba(0, 0, 0, 1);
   padding: 10px;
   cursor: move;
   position: relative;
   margin: 0;
+  border-bottom:  1px solid rgb(128, 128, 128);
+  border-radius: 8px 8px 0 0;
 }
 
 .dialog h4 a.close {
@@ -140,8 +164,8 @@ option{
   border: 1px double #C0C0C0;
   border-width: 0 3px 3px 0;
   margin: 0 3px 3px 0;
-  padding: 0 5px 5px 5px;
-  width: 350px;
+  padding: 5px;
+  width: 400px;
   height: 600px;
 }
 .dialog .content iframe{
@@ -229,11 +253,13 @@ th.num {
 
 .territory_summary h3 {
   margin: 0;
-  padding: 0 5px 0 0;
+  padding: 3px 5px;
   background-color: rgb(0, 0, 0);
   color: rgb(255, 255, 255);
   text-align: center;
   font-size: inherit;
+  cursor: help;
+  border-radius: 4px 4px 0 0;
 }
 
 .territory_summary.refuse_move {
@@ -255,7 +281,7 @@ th.num {
   line-height: 1em;
   white-space: nowrap;
   margin-bottom: 3px;
-  height: 20px;
+  min-height: 16px;
 }
 
 .troops_list li.moveable {
@@ -268,28 +294,25 @@ th.num {
 .troops_list li.moveable.moved .split,
 .troops_list li .cancel {
   display: none;
-  padding: 3px 5px 3px 0;
+  margin: 3px 5px 3px 0;
 }
 .troops_list li.moveable .split,
 .troops_list li.moveable.moved .cancel {
   display: inline;
   cursor: pointer;
-  padding: 3px 5px 3px 0;
+  margin: 3px 5px 3px 0;
 }
 
 .troops_list li.moveable:before {
   content: url(../img/img_html/arrow_move.png);
   height: 16px;
-  margin: 0 5px;
-  vertical-align: sub;
+  margin: 5px 5px 0;
   cursor: move;
+  float: left;
 }
 
 .troops_list li.moved:before {
   content: url(../img/img_html/territory_in.png);
-  height: 16px;
-  margin: 0 5px;
-  vertical-align: sub;
 }
 
 .icon_infos {

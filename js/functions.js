@@ -8,7 +8,7 @@ $(document).ready(function() {
     <h4>\n\
       <a><img src="' + URL_ROOT + '/img/img_html/arrow_move.png" alt="" title="Move"/></a>\n\
       <span>Dialog</span>\n\
-      <a class="close">[X]</a>\n\
+      <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>\n\
     </h4>\n\
     <div class="content">\n\
       <iframe style="border: 0"></iframe>\n\
@@ -52,7 +52,7 @@ $(document).ready(function() {
         helper: 'ui-resizable-helper'
       });
     $localdialog
-      .find('h4 span').text($(this).attr('title'));
+      .find('h4 > span').text($(this).attr('title'));
     $map.after($localdialog);
 
     $localdialog
@@ -99,7 +99,7 @@ $(document).ready(function() {
             to_territory_id: $(event.target).attr('data-territory-id'),
             count: ui.item.attr('data-quantity')
           }, function(data) {
-            ui.item.attr('planned_order_id', data.planned_order_id);
+            ui.item.attr('data-planned-order-id', data.planned_order_id);
           },
           'json');
         }
@@ -116,22 +116,44 @@ $(document).ready(function() {
     },
   }).disableSelection();
 
+  function update_split_troops_slider($self) {
+    $('.troops.pull-left .value').val( $self.attr('data-quantity') - $('#slider-troops').slider('option', 'value') );
+    $('.troops.pull-right .value').val( $('#slider-troops').slider('option', 'value') );
+  }
+
   $('.troops_list li .split').on('click', function(event) {
     var $self = $(this).parent();
+
     $('#troops-modal').modal();
+    $('.troops.pull-right .value').focus();
     $('#slider-troops').slider({
       min: 1,
       max: $self.attr('data-quantity') - 1,
       value: Math.round($self.attr('data-quantity') / 2),
       slide: function(event, ui) {
-        console.log(ui.value);
-        $('.troops.pull-left .value').text($self.attr('data-quantity') - ui.value);
-        $('.troops.pull-right .value').text(ui.value);
+        update_split_troops_slider($self);
       }
     });
-    $('.troops.pull-left .value').text( $self.attr('data-quantity') - $('#slider-troops').slider('option', 'value') );
-    $('.troops.pull-right .value').text( $('#slider-troops').slider('option', 'value') );
+    update_split_troops_slider($self);
+    $('.troops.pull-right .value').on('keyup', function(event) {
+      console.log(event);
+      var newval = $(event.target).val()
+      if( newval > $('#slider-troops').slider('option', 'max' ) ) {
+        newval = $('#slider-troops').slider('option', 'max' );
+      }
+      if( newval != $('#slider-troops').slider('option', 'value') ) {
+        $('#slider-troops').slider('option', 'value', newval);
+
+        update_split_troops_slider($self);
+      }
+
+      if( event.keyCode === 13 ) {
+        $(this).off('keyup');
+        $('#troops-modal button.btn-primary').click();
+      }
+    });
     $('#troops-modal button.btn-primary').on('click', function(event) {
+      console.log(event);
       var $new_troops = $self.clone(true);
       $self.attr('data-quantity', $self.attr('data-quantity') - $('#slider-troops').slider('option', 'value'));
       $new_troops.attr('data-quantity', $('#slider-troops').slider('option', 'value'));
@@ -142,6 +164,8 @@ $(document).ready(function() {
       $new_troops.appendTo($self.parent());
 
       $('#troops-modal').modal('hide');
+
+      $(this).off('click');
     });
   })
 

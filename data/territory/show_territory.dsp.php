@@ -38,11 +38,12 @@
     $status = icon('territory_stable') . __('Stable');
   }
 ?>
-
-<?php if( $is_current_turn ) :?>
+<?php if( !$is_ajax ):?>
+  <?php if( $is_current_turn ) :?>
 <h2><?php echo __('"%s"', $territory->name)?></h2>
-<?php else :?>
+  <?php else :?>
 <h2><?php echo __('"%s" on turn %s', $territory->name, $turn)?></h2>
+  <?php endif;?>
 <?php endif;?>
 
 <ul class="icon_infos">
@@ -107,7 +108,7 @@
 <?php if( $current_game ) :?>
 
 <h3><?php echo __('Troops')?></h3>
-<table class="table table-bordered table-hover table-condensed accordion">
+<table class="table table-hover table-condensed accordion">
   <thead>
     <tr>
       <th><?php echo __('Player')?></th>
@@ -118,7 +119,7 @@
 <?php
     $current_turn = null;
 
-    $territory_status_list = $current_game->get_territory_status_list($territory->id);
+    $territory_status_list = $current_game->get_territory_status_list($territory->id, $is_ajax ? $turn : null);
     /* @var $current_player Player */
     $diplomacy_list = $current_player->get_to_player_latest_diplomacy_list($current_game->id);
 
@@ -187,10 +188,13 @@
       }
 
       echo '
-  <tbody class="archive'.($is_current?' current':'').($can_see_troops?'':' fogofwar').'"'.($can_see_troops?'':' title="'. __('No vision').'"').'>
+  <tbody class="archive'.($is_current?' current':'').($can_see_troops?'':' fogofwar').'"'.($can_see_troops?'':' title="'. __('No vision').'"').'>';
+      if( !$is_ajax ) {
+        echo '
     <tr class="title">
       <th colspan="3">'.__('Turn %s', $territory_status_row['turn']).$icon.'</th>
     </tr>';
+      }
 
       if( $can_see_troops && isset( $player_troops[ $territory_status_row['turn'] ] ) ) {
 
@@ -262,7 +266,7 @@
   }
 
   if( count( $planned_orders ) ) { ?>
-<table>
+<table class="table table-condensed">
   <thead>
     <tr>
       <th><?php echo __('Origin')?></th>
@@ -308,8 +312,7 @@
     $( ".orders" ).accordion({
       collapsible: true,
       header: "legend",
-      fillSpace: 0,
-      autoHeight: 0,
+      heightStyle: "content",
       active: false
     });
   })
