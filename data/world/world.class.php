@@ -59,6 +59,10 @@ class World extends World_Model {
   }
   public function set_generation_parameters($params) { $this->_generation_parameters = serialize($params);}
 
+  public function get_territory_count() {
+    return Territory::db_get_count_by_world_id($this->id);
+  }
+
   public function get_territories() {
     if( is_null( $this->territories )) {
       $this->territories = Territory::db_get_by_world_id($this->id);

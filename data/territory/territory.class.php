@@ -10,6 +10,14 @@ class Territory extends Territory_Model {
 
   // CUSTOM
 
+  public static function db_get_count_by_world_id($world_id) {
+    $sql = "
+SELECT COUNT(*) FROM `".self::get_table_name()."`
+WHERE `world_id` = ".mysql_ureal_escape_string($world_id);
+
+    return mysql_fetch_one($sql);
+  }
+
   public function get_vertices() {
     $vertices = unserialize( $this->_vertices );
     if( !is_array( $vertices ) ) {
