@@ -6,13 +6,13 @@
 
   if(count($player_list)) {
 ?>
-<table>
+<table class="table table-striped table-hover">
   <thead>
     <tr>
       <th><?php echo __('#')?></th>
       <th><?php echo __('Player')?></th>
-      <th><?php echo __('Games played')?></th>
-      <th><?php echo __('Total territory')?></th>
+      <th class="num"><?php echo __('Games played')?></th>
+      <th class="num"><?php echo __('Total territory')?></th>
     </tr>
   </thead>
   <tfoot>
