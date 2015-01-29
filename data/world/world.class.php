@@ -636,29 +636,32 @@ class World extends World_Model {
         if( $game_id ) {
           $game = Game::instance($options['game_id']);
           $owner = $territory->get_owner( $game, $turn );
+
+          $title = $territory->name.' ('.($owner->id?$owner->name:__('Nobody')).')'.
+                  ($territory->is_capital( $game, $turn )?' ['.__('Capital').']':'').
+                  ($territory->is_contested( $game, $turn )?' <'.__('Contested').'>':'');
           echo '
         <area
           data-territory-id="'.$territory->id.'"
-          shape="polygon"
+          shape="poly"
           coords="'.implode(',', $coords).'"
           href="'.Page::get_url('show_territory', array('game_id' => $game_id, 'id' => $territory->id)).'"
-          title="'.$territory->name.' ('.($owner->id?$owner->name:__('Nobody')).')'.
-                  ($territory->is_capital( $game, $turn )?' ['.__('Capital').']':'').
-                  ($territory->is_contested( $game, $turn )?' <'.__('Contested').'>':'').
-                '" />';
+          alt="' . $title . '"
+          title="' . $title . '" />';
         }else {
           echo '
         <area
           data-territory-id="'.$territory->id.'"
-          shape="polygon"
+          shape="poly"
           coords="'.implode(',', $coords).'"
           href="'.Page::get_url('show_territory', array('id' => $territory->id)).'"
+          alt="'.$territory->name.'"
           title="'.$territory->name.'" />';
         }
       }
       echo '
       </map>
-      <img usemap="#world" src="'.$image_src.'" class="map">';
+      <img usemap="#world" src="'.$image_src.'" class="map" alt="">';
     }else {
       echo '<img src="'.$image_src.'"/>';
     }

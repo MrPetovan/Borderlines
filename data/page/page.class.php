@@ -240,7 +240,7 @@ LIMIT 0,1";
             unset($params[PARAM_PAGE]);
           }
           if(count($params)) {
-            $return .= "&";
+            $return .= "&amp;";
           }
         }
 
@@ -250,7 +250,7 @@ LIMIT 0,1";
           foreach($params as $name => $value) {
             $params_url[] = $name . "=" . urlencode($value);
           }
-          $return .= implode('&', $params_url);
+          $return .= implode('&amp;', $params_url);
         }
       }
     }

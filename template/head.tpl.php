@@ -1,6 +1,4 @@
     <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
-    <meta http-equiv="Content-Script-Type" content="text/javascript" />
-    <meta http-equiv="Content-Style-Type" content="text/css" />
     <meta name="robots" content="index,follow" />
     <link rel="shortcut icon" type="image/x-icon" href="img/favicon.ico" />
     <link rel="icon" type="image/x-icon" href="img/favicon.ico" />

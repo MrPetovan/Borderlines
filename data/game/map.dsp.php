@@ -279,7 +279,7 @@
         <form class="form-inline">
           <p class="clearfix text-center">
             <span class="troops pull-left"><input type="text" disabled class="value text-right disabled form-control"/><?php echo icon('troops')?></span>
-            <->
+            &lt;-&gt;
             <span class="troops pull-right"><input type="text" class="value text-right form-control"/><?php echo icon('troops')?></span>
           </p>
         </form>
