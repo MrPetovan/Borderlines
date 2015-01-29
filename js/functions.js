@@ -3,7 +3,7 @@ function getURLParameter(name) {
 }
 
 $(document).ready(function() {
-  $map = $('map');
+  $map = $('.map');
   $dialog = $('<div class="dialog">\n\
     <h4>\n\
       <a><img src="' + URL_ROOT + '/img/img_html/arrow_move.png" alt="" title="Move"/></a>\n\
@@ -35,7 +35,6 @@ $(document).ready(function() {
   }
 
   function showDialog(e) {
-    console.log($(this));
     $localdialog = $dialog
       .clone(true)
       .attr('id', 'dialog-' + $(this).attr('data-territory-id'))
