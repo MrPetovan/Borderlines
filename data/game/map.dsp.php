@@ -200,8 +200,8 @@
                 ' . $player->name . ': <span class="value">' . l10n_number( $territory_player_troops_row['quantity'], 0 ) . '</span>' .
                 icon('troops') .
                 '
-                  <button class="btn btn-xs split"><span class="glyphicon glyphicon-scissors" title="' . __('Split Troops') . '"></span></button>
-                  <button class="btn btn-xs cancel"><span class="glyphicon glyphicon-remove" title="' . __('Cancel Move') . '"></span></button>
+                  <button class="btn btn-xs split" title="' . __('Split Troops') . '"><span class="glyphicon glyphicon-scissors"></span></button>
+                  <button class="btn btn-xs cancel" title="' . __('Cancel Move') . '"><span class="glyphicon glyphicon-remove"></span></button>
             </li>';
       }
     }
