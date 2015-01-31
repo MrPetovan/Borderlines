@@ -32,7 +32,7 @@
         //Prospect, pas de vérification e-mail
         $check_flags = MEMBER_COMPLETE_INFO_CHECK;
       }else {
-        $check_flags = MEMBER_NEW_USER_CHECK | MEMBER_COMPLETE_INFO_CHECK;
+        $check_flags = MEMBER_NEW_USER_CHECK;
         $member_register = new Member();
       }
 
