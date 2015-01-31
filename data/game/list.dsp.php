@@ -63,10 +63,12 @@
   </tbody>
 </table>
 <h4><?php echo __('Wall')?></h4>
+<?php if( $current_player->id ) :?>
 <form action="<?php echo Page::get_url('shout')?>" method="post">
   <input type="hidden" name="url_return" value="<?php echo Page::get_url(PAGE_CODE)?>" />
   <p><?php echo '['.guess_time(time(), GUESS_TIME_LOCALE).']'?> <strong><?php echo wash_utf8($current_player->name)?></strong> : <input type="text" name="text" size="80" value=""/><button type="submit" name="action" value="shout">Say</button></p>
 </form>
+<?php endif;?>
 <div id="shoutwall">
 <?php
     $shouts = Shout::db_get_by_game_id( null );

@@ -4,7 +4,7 @@
   $current_player = array_shift( $player_list );
 
   if( $action = getValue('action') ) {
-    if( $action == 'shout' ) {
+    if( $action == 'shout' && $current_player->id ) {
       if( trim( $text = getValue('text') ) != '' ) {
         if( is_null( $game_id = getValue('game_id') ) || $current_player->get_current_game_id() == $game_id ) {
           $shout = new Shout();
