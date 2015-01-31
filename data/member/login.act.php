@@ -1,7 +1,6 @@
 <?php
   Member::del_current_user_id();
   setcookie('adrd_remember_me', '', time()-60*60*24*30);
-  session_destroy();
 
   $error_code_login = null;
 
@@ -14,7 +13,7 @@
             //var_debug($membre, Member::password_crypt($_POST['pass']), $membre->get_password());
             if(Member::password_crypt($_POST['pass']) == $membre->get_password()) {
               if(isset($_POST['remember_me'])) {
-                $remember_token = md5($membre->get_prenom().'-'.$membre->get_nom().'-'.time().'-'.mt_rand());
+                $remember_token = md5($membre->email . '-' . time() . '-' . mt_rand());
                 $membre->set_remember_token($remember_token);
                 $membre->db_save();
                 setcookie(strtolower( SITE_NAME ).'_remember_me', $remember_token, time()+60*60*24*30);
@@ -34,6 +33,7 @@
       }
     }
   }else {
+    session_destroy();
     site_redirect();
   }
 
