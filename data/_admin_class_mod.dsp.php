@@ -24,7 +24,7 @@
     <div class="texte_texte">
       <h3>'.$PAGE_TITRE.'</h3>
       '.$html_msg.'
-      <form class="formulaire" action="'.$form_url.'" method="post">
+      <form class="formulaire" action="'.$form_url.'" method="post" class="form-horizontal">
         '.$<?php echo $class_db_identifier ?>_mod->html_get_form();
 
   // CUSTOM

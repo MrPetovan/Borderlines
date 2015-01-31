@@ -10,7 +10,7 @@
   <div class="texte_texte">
     <h3>Liste des <?php echo $class_name ?>s</h3>
     '.nav_page(PAGE_CODE, $nb_total, $page_no, $nb_per_page).'
-    <form action="'.Page::get_url(PAGE_CODE).'" method="post">
+    <form action="'.Page::get_url(PAGE_CODE).'" method="post" class="form-horizontal">
     <table class="table table-condensed table-striped table-hover">
       <thead>
         <tr>
@@ -35,7 +35,7 @@ foreach( $table_columns as $column_name => $column_props ) {
       echo '
         <tr>
           <td><input type="checkbox" name="<?php echo $class_db_identifier?>_id[]" value="'.$<?php echo $class_db_identifier?>->id.'"/></td>
-          <td><a href="'.htmlentities_utf8(Page::get_url('admin_<?php echo $class_db_identifier?>_view', array('id' => $<?php echo $class_db_identifier?>->id))).'">'.$<?php echo $class_db_identifier?>->get_<?php echo $name_field?>().'</a></td>
+          <td><a href="' . Page::get_url('admin_<?php echo $class_db_identifier?>_view', array('id' => $<?php echo $class_db_identifier?>->id)) . '">'.$<?php echo $class_db_identifier?>->get_<?php echo $name_field?>().'</a></td>
 <?php
 foreach( $table_columns as $column_name => $column_props ) {
   if( array_key_exists($column_name, $foreign_keys)) {
@@ -43,7 +43,7 @@ foreach( $table_columns as $column_name => $column_props ) {
     echo "';
       $".$foreign_table."_temp = ".to_camel_case($foreign_table, true)."::instance( $".$class_db_identifier."->".$column_name.");
       echo '
-          <td>'.$".$foreign_table."_temp->name.'</td>";
+          <td>'.(isset($".$foreign_table."_temp->name) ? $".$foreign_table."_temp->name : $".$foreign_table."_temp->id ) . '</td>";
   }elseif( $column_name != $name_field && $column_name != "id" )
     switch ($column_props['SimpleType']) {
       case 'varchar':

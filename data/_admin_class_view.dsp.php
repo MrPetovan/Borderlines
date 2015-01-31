@@ -22,10 +22,10 @@ foreach( $table_columns as $column_name => $column_props ) {
 ?>';
 ?>
 
-      <p class="field">
+      <div class="field form-group">
         <span class="libelle"><?php echo $column_props['Comment'] ?></span>
         <span class="value"><a href="<_?php echo get_page_url('admin_<?php echo $foreign_table ?>_view', true, array('id' => $<?php echo $class_db_identifier ?>-><?php echo $column_name ?> ) )?>"><_?php echo $option_list[ $<?php echo $class_db_identifier ?>-><?php echo $column_name ?> ]?></a></span>
-      </p>
+      </div>
 <?php
     }elseif( $column_name != $name_field )
       switch ($column_props['SimpleType']) {
@@ -33,26 +33,26 @@ foreach( $table_columns as $column_name => $column_props ) {
         case 'char':
         default:
           echo '
-            <p class="field">
+            <div class="field form-group">
               <span class="libelle">'.$column_props['Comment'].'</span>
               <span class="value"><?php echo is_array($'.$class_db_identifier.'->'.$column_name.')?nl2br(parameters_to_string( $'.$class_db_identifier.'->'.$column_name.' )):$'.$class_db_identifier.'->'.$column_name.'?></span>
-            </p>';
+            </div>';
           break;
         case 'datetime':
         case 'time':
         case 'date':
           echo '
-            <p class="field">
+            <div class="field form-group">
               <span class="libelle">'.$column_props['Comment'].'</span>
               <span class="value"><?php echo guess_time($'.$class_db_identifier.'->'.$column_name.', GUESS_DATETIME_LOCALE)?></span>
-            </p>';
+            </div>';
           break;
         case 'tinyint' :
           echo '
-            <p class="field">
+            <div class="field form-group">
               <span class="libelle">'.$column_props['Comment'].'</span>
               <span class="value"><?php echo $tab_visible[$'.$class_db_identifier.'->'.$column_name.']?></span>
-            </p>';
+            </div>';
           break;
       }
   }
@@ -117,7 +117,7 @@ foreach( $table_columns as $column_name => $column_props ) {
         echo '
         <tr><?php echo $td_list?>
           <td>
-            <form action="'.get_page_url(PAGE_CODE, true, array('id' => $<?php echo $class_db_identifier ?>->id)).'" method="post">
+            <form action="'.get_page_url(PAGE_CODE, true, array('id' => $<?php echo $class_db_identifier ?>->id)).'" method="post" class="form-horizontal">
               '.HTMLHelper::genererInputHidden('id', $<?php echo $class_db_identifier ?>->id).'
 <?php
     foreach( $sub_table_pk_clean as $field_name ) {
@@ -151,21 +151,21 @@ foreach( $table_columns as $column_name => $column_props ) {
       echo '
   $liste_valeurs_'.$foreign_table.' = '.to_camel_case( $foreign_table, true ).'::db_get_select_list('.($field['Null'] != 'NO'?' true ':'').');';
       $form_field .= '
-        <p class="field">
+        <div class="field form-group">
           <_?php echo HTMLHelper::genererSelect(\''.$field_name.'\', $liste_valeurs_'.$foreign_table.', null, array(), \''.$table_description[ $foreign_table ].'\' )?><a href="<_?php echo get_page_url(\'admin_'.$foreign_table.'_mod\')?>">Créer un objet '.to_readable($foreign_table).'</a>
-        </p>';
+        </div>';
     }else {
       $form_field .= '
-        <p class="field">
+        <div class="field form-group">
           <_?php echo HTMLHelper::genererInputText(\''.$field_name.'\', null, array(), \''.$table_columns_list[$sub_table][$field_name]['Comment'].($field['Null'] == 'NO'?'*':'').'\' )?>
           '.(in_array( $field['SimpleType'], array('date', 'datetime', 'timestamp'))?'<span><_?php echo guess_time(time(), GUESS_TIME_MYSQL)?></span>':'').'
-        </p>';
+        </div>';
     }
   }
 
 ?>
 ?>
-    <form action="<_?php echo get_page_url(PAGE_CODE, true, array('id' => $<?php echo $class_db_identifier ?>->id))?>" method="post" class="formulaire">
+    <form action="<_?php echo get_page_url(PAGE_CODE, true, array('id' => $<?php echo $class_db_identifier ?>->id))?>" method="post" class="formulaire form-horizontal">
       <_?php echo HTMLHelper::genererInputHidden('id', $<?php echo $class_db_identifier ?>->id )?>
       <fieldset>
         <legend>Ajouter un élément</legend><?php echo $form_field?>

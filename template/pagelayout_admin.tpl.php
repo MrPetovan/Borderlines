@@ -9,21 +9,26 @@
     <link rel="shortcut icon" type="image/x-icon" href="img/favicon.ico" />
     <link rel="icon" type="image/x-icon" href="img/favicon.ico" />
 
-    <link rel="stylesheet" type="text/css" href="<?php echo URL_ROOT ?>style/bootstrap.min.css" media="all" />
+    <link rel="stylesheet" type="text/css" href="<?php echo URL_ROOT ?>style/bootstrap3.min.css" media="all" />
     <link rel="stylesheet" type="text/css" href="<?php echo URL_ROOT ?>style/admin.css" media="all" />
 </head>
 <body>
-  <div class="navbar navbar-inverse">
-    <div class="navbar-inner">
-      <div class="container">
-        <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+  <nav class="navbar navbar-inverse">
+    <div class="container-fluid">
+      <!-- Brand and toggle get grouped for better mobile display -->
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+          <span class="sr-only">Toggle navigation</span>
           <span class="icon-bar"></span>
           <span class="icon-bar"></span>
           <span class="icon-bar"></span>
-        </a>
-        <a class="brand" href="<?php echo URL_ROOT?>"><?php echo SITE_NAME ?></a>
-        <div class="nav-collapse collapse">
-          <ul class="nav">
+        </button>
+        <a class="navbar-brand" href="<?php echo URL_ROOT?>"><?php echo SITE_NAME ?></a>
+      </div>
+
+      <!-- Collect the nav links, forms, and other content for toggling -->
+      <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+        <ul class="nav navbar-nav">
 <?php
     $data_dir = opendir(DIR_ROOT.'data');
 
@@ -46,11 +51,10 @@
     }
 ?>
             <li><a href="<?php Page::get_url('logout')?>">Logout</a></li>
-          </ul>
-        </div><!--/.nav-collapse -->
-      </div>
-    </div>
-  </div>
+        </ul>
+      </div><!-- /.navbar-collapse -->
+    </div><!-- /.container-fluid -->
+  </nav>
 
   <div class="container">
     <?php Page::display_messages();?>
