@@ -47,7 +47,7 @@ WHERE `member_id` = ".mysql_ureal_escape_string( $member_id );
 
   public function can_create_game() {
     $return = is_admin();
-    if( !$return ) {
+    if( !$return && $this->id ) {
       $sql = '
 SELECT COUNT(*)
 FROM `game`
@@ -63,7 +63,7 @@ AND `ended` IS NULL';
 
   public function can_create_world() {
     $return = is_admin();
-    if( !$return ) {
+    if( !$return && $this->id ) {
       $sql = '
 SELECT COUNT(*)
 FROM `world`

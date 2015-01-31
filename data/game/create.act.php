@@ -2,6 +2,10 @@
   $member = Member::get_current_user();
   $current_player = Player::get_current( $member );
 
+  if( !$current_player ) {
+    Page::redirect('create_player');
+  }
+
   $game_mod = Game::instance();
 
   $redirect_page = null;
