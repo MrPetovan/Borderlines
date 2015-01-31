@@ -706,24 +706,24 @@ class World extends World_Model {
     <fieldset>
       <legend>'.__('Create a world !').'</legend>
       '.HTMLHelper::genererInputHidden('id', $this->get_id()).'
-      <p class="field">'.HTMLHelper::genererInputText('name', $this->get_name(), array(), __('Name').'*').'</p>
-      <p class="field">'.HTMLHelper::genererInputText('size_x', $this->get_size_x(), array(), __('Width').'*').'</p>
-      <p class="field">'.HTMLHelper::genererInputText('size_y', $this->get_size_y(), array(), __('Height').'*').'</p>
-      <p class="field">'.HTMLHelper::genererSelect('generation_method', $generation_types, $this->get_generation_method(), array('id' => 'select_generation_method'), __('Generation Method')).'</p>
+      <div class="field form-group">'.HTMLHelper::genererInputText('name', $this->get_name(), array(), __('Name').'*').'</div>
+      <div class="field form-group">'.HTMLHelper::genererInputText('size_x', $this->get_size_x(), array(), __('Width').'*').'</div>
+      <div class="field form-group">'.HTMLHelper::genererInputText('size_y', $this->get_size_y(), array(), __('Height').'*').'</div>
+      <div class="field form-group">'.HTMLHelper::genererSelect('generation_method', $generation_types, $this->get_generation_method(), array('id' => 'select_generation_method'), __('Generation Method')).'</div>
     </fieldset>
     <fieldset class="options simple">
       <legend>'.__('Simple Generator options').'</legend>
-      <p class="field">'.HTMLHelper::genererInputText('generation_parameters[minVertexDist]', $options['minVertexDist'], array(), __('Minimum point distance')).'</p>
-      <p class="field">'.HTMLHelper::genererInputText('generation_parameters[maxVertexDist]', $options['maxVertexDist'], array(), __('Maximum point distance')).'</p>
-      <p class="field">'.HTMLHelper::genererInputText('generation_parameters[relationNumber]', $options['relationNumber'], array(), __('Territory density')).'</p>
-      <p class="field">'.HTMLHelper::genererInputText('generation_parameters[maxEdgeDist]', $options['maxEdgeDist'], array(), __('Maximum border length')).'</p>
+      <div class="field form-group">'.HTMLHelper::genererInputText('generation_parameters[minVertexDist]', $options['minVertexDist'], array(), __('Minimum point distance')).'</div>
+      <div class="field form-group">'.HTMLHelper::genererInputText('generation_parameters[maxVertexDist]', $options['maxVertexDist'], array(), __('Maximum point distance')).'</div>
+      <div class="field form-group">'.HTMLHelper::genererInputText('generation_parameters[relationNumber]', $options['relationNumber'], array(), __('Territory density')).'</div>
+      <div class="field form-group">'.HTMLHelper::genererInputText('generation_parameters[maxEdgeDist]', $options['maxEdgeDist'], array(), __('Maximum border length')).'</div>
     </fieldset>
     <fieldset class="options voronoi">
       <legend>'.__('Voronoi Generator options').'</legend>
-      <p class="field">'.HTMLHelper::genererInputText('generation_parameters[distFromEdges]', $options['distFromEdges'], array(), __('Margin from map edges')).'</p>
-      <p class="field">'.HTMLHelper::genererSelect('generation_parameters[territoryDensityDelta]', $territory_density_delta, $options['territoryDensityDelta'], array(), __('Territory Density')).'</p>
-      <p class="field">'.HTMLHelper::genererInputText('generation_parameters[lakeDensity]', $options['lakeDensity'], array(), __('Lake Density (0-50%%)')).'</p>
-      <p class="field">'.HTMLHelper::genererInputText('generation_parameters[mountainDensity]', $options['mountainDensity'], array(), __('Moutain density (0-50%%)')).'</p>
+      <div class="field form-group">'.HTMLHelper::genererInputText('generation_parameters[distFromEdges]', $options['distFromEdges'], array(), __('Margin from map edges')).'</div>
+      <div class="field form-group">'.HTMLHelper::genererSelect('generation_parameters[territoryDensityDelta]', $territory_density_delta, $options['territoryDensityDelta'], array(), __('Territory Density')).'</div>
+      <div class="field form-group">'.HTMLHelper::genererInputText('generation_parameters[lakeDensity]', $options['lakeDensity'], array(), __('Lake Density (0-50%%)')).'</div>
+      <div class="field form-group">'.HTMLHelper::genererInputText('generation_parameters[mountainDensity]', $options['mountainDensity'], array(), __('Moutain density (0-50%%)')).'</div>
     </fieldset>';
     return $return;
   }

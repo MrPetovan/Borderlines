@@ -761,26 +761,26 @@ WHERE `ended` IS NULL";
     <fieldset>
       <legend>'.__('Create a game !').'</legend>
       '.HTMLHelper::genererInputHidden('id', $this->get_id()).'
-      <p class="field">'.HTMLHelper::genererInputText('name', $this->get_name(), array(), __('Name').'*').'</p>
-      <p class="field">'.HTMLHelper::genererSelect('turn_interval', $turn_interval_list, $this->get_turn_interval(), array(), __('Turn Interval').'*').'</p>
-      <p class="field">'.HTMLHelper::genererSelect('world_id', World::db_get_select_list(), $this->world_id, array(), __('World').'*').'</p>
-      <p class="field">'.HTMLHelper::genererInputText('turn_limit', $this->get_turn_limit(), array('title' => __('Game will stop after a fixed amount of turns')), __('Turn Limit').'*').'</p>
-      <p class="field">'.HTMLHelper::genererInputText('min_players', $this->get_min_players(), array('title' => __('Number of players required to automatically launch the game')), __('Minimum nb of players')).'</p>
-      <p class="field">'.HTMLHelper::genererInputText('max_players', $this->get_max_players(), array(), __('Maximum nb of players')).'</p>
+      <div class="field form-group">'.HTMLHelper::genererInputText('name', $this->get_name(), array(), __('Name').'*').'</div>
+      <div class="field form-group">'.HTMLHelper::genererSelect('turn_interval', $turn_interval_list, $this->get_turn_interval(), array(), __('Turn Interval').'*').'</div>
+      <div class="field form-group">'.HTMLHelper::genererSelect('world_id', World::db_get_select_list(), $this->world_id, array(), __('World').'*').'</div>
+      <div class="field form-group">'.HTMLHelper::genererInputText('turn_limit', $this->get_turn_limit(), array('title' => __('Game will stop after a fixed amount of turns')), __('Turn Limit').'*').'</div>
+      <div class="field form-group">'.HTMLHelper::genererInputText('min_players', $this->get_min_players(), array('title' => __('Number of players required to automatically launch the game')), __('Minimum nb of players')).'</div>
+      <div class="field form-group">'.HTMLHelper::genererInputText('max_players', $this->get_max_players(), array(), __('Maximum nb of players')).'</div>
     </fieldset>
     <fieldset>
       <legend>'.__('Game options').'</legend>
-      <p class="field">'.HTMLHelper::genererInputText('parameters[HOME_TROOPS_MAINTENANCE]', $game_parameters['HOME_TROOPS_MAINTENANCE'], array(), __('Home troops cost')).'</p>
-      <p class="field">'.HTMLHelper::genererInputText('parameters[AWAY_TROOPS_MAINTENANCE]', $game_parameters['AWAY_TROOPS_MAINTENANCE'], array(), __('Away troops cost')).'</p>
-      <p class="field">'.HTMLHelper::genererInputText('parameters[RECRUIT_TROOPS_PRICE]', $game_parameters['RECRUIT_TROOPS_PRICE'], array(), __('Recruit troop price')).'</p>
-      <p class="field">'.HTMLHelper::genererInputText('parameters[TROOPS_EFFICACITY]', $game_parameters['TROOPS_EFFICACITY'], array(), __('Troops efficacity (1 damage/x troops)')).'</p>
-      <p class="field">'.HTMLHelper::genererInputText('parameters[TROOPS_CAPTURE_POWER]', $game_parameters['TROOPS_CAPTURE_POWER'], array(), __('Troops capture power (in km²/troops)')).'</p>
-      <p class="field">'.HTMLHelper::genererInputText('parameters[TERRITORY_BASE_REVENUE]', $game_parameters['TERRITORY_BASE_REVENUE'], array(), __('Territory base revenue')).'</p>
-      <p class="field">'.HTMLHelper::genererInputText('parameters[ECONOMY_MODIFIER_WAR]', $game_parameters['ECONOMY_MODIFIER_WAR'], array(), __('Economy modifier (Conflict)')).' %</p>
-      <p class="field">'.HTMLHelper::genererInputText('parameters[ECONOMY_MODIFIER_PEACE]', $game_parameters['ECONOMY_MODIFIER_PEACE'], array(), __('Economy modifier (Peace)')).' %</p>
-      <p class="field">'.HTMLHelper::genererInputText('parameters[BUREAUCRACY_MAX_RATIO]', $game_parameters['BUREAUCRACY_MAX_RATIO'], array(), __('BUREAUCRACY_MAX_RATIO')).' %</p>
-      <p class="field">'.HTMLHelper::genererInputText('parameters[BUREAUCRACY_MIN_RATIO]', $game_parameters['BUREAUCRACY_MIN_RATIO'], array(), __('BUREAUCRACY_MIN_RATIO')).' %</p>
-      <p class="field">'.HTMLHelper::genererInputCheckBox('parameters[ALLOW_JOIN_MIDGAME]', '0', $game_parameters['ALLOW_JOIN_MIDGAME'], array(), __('Allow players to join mid-game')).'</p>
+      <div class="field form-group">'.HTMLHelper::genererInputText('parameters[HOME_TROOPS_MAINTENANCE]', $game_parameters['HOME_TROOPS_MAINTENANCE'], array(), __('Home troops cost')).'</div>
+      <div class="field form-group">'.HTMLHelper::genererInputText('parameters[AWAY_TROOPS_MAINTENANCE]', $game_parameters['AWAY_TROOPS_MAINTENANCE'], array(), __('Away troops cost')).'</div>
+      <div class="field form-group">'.HTMLHelper::genererInputText('parameters[RECRUIT_TROOPS_PRICE]', $game_parameters['RECRUIT_TROOPS_PRICE'], array(), __('Recruit troop price')).'</div>
+      <div class="field form-group">'.HTMLHelper::genererInputText('parameters[TROOPS_EFFICACITY]', $game_parameters['TROOPS_EFFICACITY'], array(), __('Troops efficacity (1 damage/x troops)')).'</div>
+      <div class="field form-group">'.HTMLHelper::genererInputText('parameters[TROOPS_CAPTURE_POWER]', $game_parameters['TROOPS_CAPTURE_POWER'], array(), __('Troops capture power (in km²/troops)')).'</div>
+      <div class="field form-group">'.HTMLHelper::genererInputText('parameters[TERRITORY_BASE_REVENUE]', $game_parameters['TERRITORY_BASE_REVENUE'], array(), __('Territory base revenue')).'</div>
+      <div class="field form-group">'.HTMLHelper::genererInputText('parameters[ECONOMY_MODIFIER_WAR]', $game_parameters['ECONOMY_MODIFIER_WAR'], array(), __('Economy modifier (Conflict)')).' %</div>
+      <div class="field form-group">'.HTMLHelper::genererInputText('parameters[ECONOMY_MODIFIER_PEACE]', $game_parameters['ECONOMY_MODIFIER_PEACE'], array(), __('Economy modifier (Peace)')).' %</div>
+      <div class="field form-group">'.HTMLHelper::genererInputText('parameters[BUREAUCRACY_MAX_RATIO]', $game_parameters['BUREAUCRACY_MAX_RATIO'], array(), __('BUREAUCRACY_MAX_RATIO')).' %</div>
+      <div class="field form-group">'.HTMLHelper::genererInputText('parameters[BUREAUCRACY_MIN_RATIO]', $game_parameters['BUREAUCRACY_MIN_RATIO'], array(), __('BUREAUCRACY_MIN_RATIO')).' %</div>
+      <div class="field form-group">'.HTMLHelper::genererInputCheckBox('parameters[ALLOW_JOIN_MIDGAME]', '0', $game_parameters['ALLOW_JOIN_MIDGAME'], array(), __('Allow players to join mid-game')).'</div>
     </fieldset>';
 
     return $return;

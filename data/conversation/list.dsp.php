@@ -33,7 +33,7 @@
     (<a href="<?php echo Page::get_url(PAGE_CODE, array('archive' => 1))?>"><?php echo __('Archive')?></a>)
   </li>
 </ul>
-<form action="<?php echo Page::get_url(PAGE_CODE, $_GET)?>" method="post">
+<form action="<?php echo Page::get_url(PAGE_CODE, $_GET)?>" method="post" class="form-horizontal">
   <table class="table table-hover accordion">
     <thead>
       <tr>

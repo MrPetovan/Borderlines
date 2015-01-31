@@ -35,7 +35,7 @@
       }
 
       $return = '
-<label for="'.$id.'">'.$label_text.'</label>';
+<label for="'.$id.'" class="col-sm-3">'.$label_text.'</label>';
 
       return $return;
     }
@@ -50,9 +50,9 @@
         $attributs['value'] = $valeur_defaut;
       }
       if(isset($attributs['class'])) {
-        $attributs['class'] .= ' input';
+        $attributs['class'] .= ' input form-control';
       }else {
-        $attributs['class'] = 'input';
+        $attributs['class'] = 'input form-control';
       }
 
       $label_position_right = 0;
@@ -68,8 +68,19 @@
         $label = self::genererLabel($label_text, $attributs);
       }
 
-      $input = '
-<input type="'.$type.'"'.self::genererAttributs( $attributs ).'/>';
+      $input = '';
+      if( $type != 'hidden' ) {
+        $input .= '
+<div class="col-sm-9">';
+      }
+
+      $input .= '
+  <input type="'.$type.'"'.self::genererAttributs( $attributs ).'/>';
+
+      if( $type != 'hidden' ) {
+        $input .= '
+</div>';
+      }
 
 
 
@@ -94,6 +105,11 @@
       }
       if(! is_null($valeur_defaut)) {
         $attributs['value'] = $valeur_defaut;
+      }
+      if(isset($attributs['class'])) {
+        $attributs['class'] = 'btn btn-default ' . $attributs['class'];
+      }else {
+        $attributs['class'] = 'btn btn-default';
       }
 
       $return = '
@@ -178,11 +194,11 @@
     public static function genererInputSubmit( $name = null, $valeur_defaut = null, $attributs = array() )
     {
       if(isset($attributs['class'])) {
-        $attributs['class'] .= ' input_submit';
+        $attributs['class'] = 'btn btn-default ' . $attributs['class'] . ' input_submit';
       }else {
-        $attributs['class'] = 'input_submit';
+        $attributs['class'] = 'btn btn-default input_submit';
       }
-      return self::genererInput( 'submit', $name, $valeur_defaut, $attributs );
+      return self::genererButton( $name, $valeur_defaut, array_merge(array('type' => 'submit'), $attributs) );
     }
 
     public static function genererInputImage( $name = null, $valeur_defaut = null, $attributs = array() )
@@ -205,6 +221,11 @@
       if(!is_null($label_text)) {
         $return .= self::genererLabel($label_text, $attributs);
       }
+      if(isset($attributs['class'])) {
+        $attributs['class'] .= ' form-control col-sm-9';
+      }else {
+        $attributs['class'] = 'form-control col-sm-9';
+      }
       //Atributs obligatoires
       if(!isset($attributs['rows'])) {
         $attributs['rows'] = 3;
@@ -214,7 +235,9 @@
       }
 
       $return .= '
-<textarea'.self::genererAttributs( $attributs ).'>'.$valeur_defaut.'</textarea>';
+<div class="col-sm-9">
+  <textarea'.self::genererAttributs( $attributs ).'>'.$valeur_defaut.'</textarea>
+</div>';
 
       return $return;
     }
@@ -228,14 +251,22 @@
       if(!is_null($label_text)) {
         $return .= self::genererLabel($label_text, $attributs);
       }
+      if(isset($attributs['class'])) {
+        $attributs['class'] .= ' form-control col-sm-9';
+      }else {
+        $attributs['class'] = 'form-control col-sm-9';
+      }
       $return .= '
+<div class="col-sm-9">
 <select'.self::genererAttributs( $attributs ).'>';
       foreach($liste_valeurs as $key => $value) {
         $return .= '
   <option value="'.wash_utf8($key).'"'.($valeur_defaut == $key?' selected="selected"':'').'>'.wash_utf8($value).'</option>';
       }
       $return .= '
-</select>';
+</select>
+</div>
+';
 
       return $return;
     }

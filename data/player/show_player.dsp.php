@@ -3,14 +3,14 @@
 ?>
 <h2><?php echo __('Player %s', $player->name)?></h2>
 <div class="informations formulaire">
-  <!--<p class="field">
+  <!--<div class="field form-group">
     <span class="label"><?php echo __('Joined')?></span>
     <span class="value"><?php echo guess_time($player->created, GUESS_DATETIME_LOCALE)?></span>
-  </p>
-  <p class="field">
+  </div>
+  <div class="field form-group">
     <span class="label"><?php echo __('Status')?></span>
     <span class="value"><?php echo guess_time($player->created, GUESS_DATETIME_LOCALE)?></span>
-  </p>-->
+  </div>-->
 </div>
 <h3><?php echo __('Games')?></h3>
 <table>

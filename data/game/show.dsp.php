@@ -5,73 +5,73 @@
 ?>
 <h2><?php echo __('Showing "%s"', $game->name )?></h2>
 <div class="informations formulaire">
-  <p class="field">
+  <div class="field form-group">
     <span class="label"><?php echo __('Status')?></span>
     <span class="value"><?php echo __($game->status_string)?></span>
-  </p>
-  <p class="field">
+  </div>
+  <div class="field form-group">
     <span class="label"><?php echo __('Current Turn')?></span>
     <span class="value"><?php echo $game->current_turn.'/'.$game->turn_limit?></span>
-  </p>
-  <p class="field">
+  </div>
+  <div class="field form-group">
     <span class="label"><?php echo __('Turn Interval')?></span>
     <span class="value"><?php echo __('%s seconds', $game->turn_interval)?></span>
-  </p>
+  </div>
 <?php if( !$game->started && $game->min_players ) { ?>
-  <p class="field">
+  <div class="field form-group">
     <span class="label"><?php echo __('Min Players')?></span>
     <span class="value"><?php echo $game->min_players?></span>
-  </p>
+  </div>
 <?php }?>
 <?php if( $game->max_players ) {?>
-  <p class="field">
+  <div class="field form-group">
     <span class="label"><?php echo __('Max Players')?></span>
     <span class="value"><?php echo $game->max_players?></span>
-  </p>
+  </div>
 <?php }?>
-  <p class="field">
+  <div class="field form-group">
     <span class="label"><?php echo __('Created')?></span>
     <span class="value"><?php echo guess_time($game->created, GUESS_DATETIME_LOCALE)?>
     by <a href="<?php echo get_page_url('show_player', true, array('id' => $game->created_by ) )?>"><?php echo $creator->name?></a></span>
-  </p>
+  </div>
 <?php if( $game->started ) {?>
-  <p class="field">
+  <div class="field form-group">
     <span class="label"><?php echo __('Started')?></span>
     <span class="value"><?php echo guess_time($game->started, GUESS_DATETIME_LOCALE)?></span>
-  </p>
+  </div>
 <?php }?>
 <?php if( $game->updated && ! $game->ended ) {?>
-  <p class="field">
+  <div class="field form-group">
     <span class="label"><?php echo __('Updated')?></span>
     <span class="value"><?php echo guess_time($game->updated, GUESS_DATETIME_LOCALE)?></span>
-  </p>
+  </div>
 <?php }?>
 <?php if( $game->ended ) {?>
-  <p class="field">
+  <div class="field form-group">
     <span class="label"><?php echo __('Ended')?></span>
     <span class="value"><?php echo guess_time($game->ended, GUESS_DATETIME_LOCALE)?></span>
-  </p>
+  </div>
 <?php }elseif( $game->updated ) { ?>
-  <p class="field">
+  <div class="field form-group">
     <span class="label"><?php echo __('Next turn')?></span>
     <span class="value"><?php echo guess_time( $game->updated + $game->turn_interval, GUESS_DATETIME_LOCALE ) ?></span>
-  </p>
+  </div>
 <?php }?>
 <?php $world = World::instance($game->world_id);?>
-  <p class="field">
+  <div class="field form-group">
     <span class="label"><?php echo __('World')?></span>
     <span class="value">
       <a href="<?php echo Page::get_url('show_world', array('game_id' => $game->id))?>"><?php echo $world->name?></a>
     </span>
-  </p>
+  </div>
 </div>
 <h3><?php echo __('Game parameters')?></h3>
 <div class="informations formulaire">
 <?php foreach( $game->parameters as $option => $value ) :?>
-  <p class="field">
+  <div class="field form-group">
     <span class="label"><?php echo __($option)?></span>
     <span class="value"><?php echo $value?></span>
-  </p>
+  </div>
 <?php  endforeach;?>
 <h3><?php echo __('Bureaucracy table')?></h3>
 <table>

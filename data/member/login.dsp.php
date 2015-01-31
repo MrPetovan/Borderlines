@@ -8,7 +8,7 @@
 
   $flag_show_form = true;
   $html_msg = '';
-  
+
   if(isset($membre)) {
     if(isset($_GET['code'])) {
       $flag_show_form = false;
@@ -50,20 +50,20 @@
     $error_code_login = null;
   }
 ?>
-<h2>Log In</h2>
+<h2><?php echo __('Log In')?></h2>
 <p>Don't have an account yet ? <a href="<?php echo Page::get_url('register')?>">Sign Up now</a> !</p>
 <?php
   $login_email = '';
   if(is_null($error_code_login)) {
-    echo '<p class="texte_intro">Entrez votre email et votre mot de passe, ou, si vous n\'êtes pas encore membre, créez votre compte.</p>';
+    echo '<p class="alert alert-info">Entrez votre email et votre mot de passe, ou, si vous n\'êtes pas encore membre, créez votre compte.</p>';
   }else {
     if(isset($_POST['email'])) { $login_email = $_POST['email']; }
-    echo '<p class="texte_intro error">Les identifiants que vous avez entrés sont incorrects. Veuillez vérifier votre email et votre mot de passe.</p>';
+    echo '<p class="alert alert-danger">Les identifiants que vous avez entrés sont incorrects. Veuillez vérifier votre email et votre mot de passe.</p>';
   }
 ?>
-<form id="login_form" class="formulaire" action="<?php echo get_page_url('login')?>" method="post">
-<p class="field"><?php echo HTMLHelper::genererInputText('email', $login_email, array(), "Email")?></p>
-<p class="field"><?php echo HTMLHelper::genererInputPassword('pass', null, array(),"Mot de passe");?></p>
+<form id="login_form" class="formulaire form-horizontal" action="<?php echo get_page_url('login')?>" method="post">
+<div class="field form-group"><?php echo HTMLHelper::genererInputText('email', $login_email, array(), "Email")?></div>
+<div class="field form-group"><?php echo HTMLHelper::genererInputPassword('pass', null, array(),"Mot de passe");?></div>
  <p>
   <label>&nbsp;</label>
   <a href="<?php echo Page::get_url('rappel-identifiants')?>">Forgotten password ?</a>

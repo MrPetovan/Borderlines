@@ -128,7 +128,7 @@ foreach( $table_columns as $column_name => $column_props ) {
         $option_list[ $'.$foreign_table.'->id ] = $'.$foreign_table.'->name;
 
       $return .= \'
-      <p class="field">\'.HTMLHelper::genererSelect(\''.$column_name.'\', $option_list, $this->get_'.$column_name.'(), array(), "'.$column_props['Comment'].($column_props['Null'] == 'NO'?' *':'').'").\'<a href="\'.get_page_url(\'admin_'.$foreign_table.'_mod\').\'">Créer un objet '.to_readable($foreign_table).'</a></p>';
+      <div class="field form-group">\'.HTMLHelper::genererSelect(\''.$column_name.'\', $option_list, $this->get_'.$column_name.'(), array(), "'.$column_props['Comment'].($column_props['Null'] == 'NO'?' *':'').'").\'<a href="\'.get_page_url(\'admin_'.$foreign_table.'_mod\').\'">Créer un objet '.to_readable($foreign_table).'</a></div>';
 
   }elseif( $column_name != 'id' ) {
     switch ($column_props['SimpleType']) {
@@ -139,14 +139,14 @@ foreach( $table_columns as $column_name => $column_props ) {
       case 'date':
       default:
         echo '
-        <p class="field">\'.(is_array($this->get_'.$column_name.'())?
+        <div class="field form-group">\'.(is_array($this->get_'.$column_name.'())?
           HTMLHelper::genererTextArea( "'.$column_name.'", parameters_to_string( $this->get_'.$column_name.'() ), array(), "'.$column_props['Comment'].($column_props['Null'] == 'NO' && is_null( $column_props['Default'] )?' *':'').'" ):
           HTMLHelper::genererInputText( "'.$column_name.'", $this->get_'.$column_name.'(), array(), "'.$column_props['Comment'].($column_props['Null'] == 'NO' && is_null( $column_props['Default'] )?' *':'').'")).\'
-        </p>';
+        </div>';
         break;
       case 'tinyint' :
         echo '
-        <p class="field">\'.HTMLHelper::genererInputCheckBox(\''.$column_name.'\', \'1\', $this->get_'.$column_name.'(), array(\'label_position\' => \'right\'), "'.$column_props['Comment'].'" ).\'</p>';
+        <div class="field form-group">\'.HTMLHelper::genererInputCheckBox(\''.$column_name.'\', \'1\', $this->get_'.$column_name.'(), array(\'label_position\' => \'right\'), "'.$column_props['Comment'].'" ).\'</div>';
         break;
     }
   }else {

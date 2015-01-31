@@ -25,7 +25,7 @@
 
 ?>
   <h3><?php echo $PAGE_TITRE ?></h3>
-  <form class="formulaire" action="<?php echo Page::get_url(PAGE_CODE, $add_array)?>" method="post">
+  <form class="formulaire" action="<?php echo Page::get_url(PAGE_CODE, $add_array)?>" method="post" class="form-horizontal">
     <fieldset>
       <legend>To :</legend>
 <?php if( count( $recipient_list ) ) : ?>
@@ -43,7 +43,7 @@
 <?php else: ?>
       <p>No recipient yet</p>
 <?php endif;?>
-      <p class="field">
+      <div class="field form-group">
         <label for="player_id">Add recipient :</label>
         <select name="player_id" id="player_id">
 <?php
@@ -57,15 +57,15 @@
 ?>
         </select>
         <?php echo HTMLHelper::submit('add_to', 'Add a recipient')?>
-      </p>
+      </div>
 
     </fieldset>
     <fieldset>
       <legend>Text fields</legend>
-      <p class="field">
+      <div class="field form-group">
         <label for="subject">Subject *</label>
         <input type="text" class="input_text" size="80" name="conversation[subject]" id="subject" value="<?php echo $conversation_mod->subject?>"/>
-      </p>
+      </div>
       <p><label for="text">Text</label></p>
       <textarea name="message[text]" cols="80" rows="10" id="text"><?php echo $message_mod->text?></textarea>
     </fieldset>

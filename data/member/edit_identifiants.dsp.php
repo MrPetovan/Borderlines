@@ -39,8 +39,9 @@
 <form id="edit_email_form" action="<?php echo get_page_url(get_current_page())?>" method="post">
   <input type="hidden" name="type_form" value="save_email"/>
   <div class="informations formulaire">
-    <p class="field"><?php echo HTMLHelper::genererInputText('email', '', array(), "Nouvel email");?></p>
-    <p class="field"><?php echo HTMLHelper::genererInputText('email2', '', array(), "Confirmer");?></p><p></p>
+    <div class="field form-group"><?php echo HTMLHelper::genererInputText('email', '', array(), "Nouvel email");?></div>
+    <div class="field form-group"><?php echo HTMLHelper::genererInputText('email2', '', array(), "Confirmer");?></div>
+    <p></p>
   </div>
   <p class="right"><label>&nbsp;</label><?php echo HTMLHelper::genererInputSubmit('save_profile', "Save changes" );?></p>
 </form>
@@ -54,8 +55,9 @@
 <form id="edit_password_form" action="<?php echo get_page_url(get_current_page())?>" method="post">
   <input type="hidden" name="type_form" value="save_password"/>
   <div class="informations formulaire">
-    <p class="field"><?php echo HTMLHelper::genererInputPassword('password', '', array(), "Nouveau mot de passe");?></p>
-    <p class="field"><?php echo HTMLHelper::genererInputPassword('password2', '', array(), "Confirmer");?></p><p></p>
+    <div class="field form-group"><?php echo HTMLHelper::genererInputPassword('password', '', array(), "Nouveau mot de passe");?></div>
+    <div class="field form-group"><?php echo HTMLHelper::genererInputPassword('password2', '', array(), "Confirmer");?></div>
+    <p></p>
   </div>
   <p class="right"><label>&nbsp;</label><?php echo HTMLHelper::genererInputSubmit('save_profile', "Save changes" );?></p>
 </form>

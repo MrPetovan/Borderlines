@@ -27,9 +27,12 @@
     }
   }
 ?>
-<h2>Register</h2>
+<h2><?php echo __('Register')?></h2>
 <?php echo $html_msg ?>
-<form action="<?php echo get_page_url('register')?>" method="post" class="formulaire register">
+<form action="<?php echo get_page_url('register')?>" method="post" class="formulaire register form-horizontal">
 <?php echo $member_register->html_get_abonnement_form()?>
-<p class="center"><label>&nbsp;</label><?php echo HTMLHelper::genererInputSubmit('submit_register', 'Je m\'inscris' );?></p>
+<div class="form-group">
+  <div class="col-sm-9 col-sm-offset-3">
+    <?php echo HTMLHelper::genererInputSubmit('submit_register', 'Je m\'inscris', array('class' => 'btn-primary') );?>
+  </div>
 </form>

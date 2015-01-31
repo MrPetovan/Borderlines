@@ -54,8 +54,8 @@
           HTMLHelper::genererInputRadio('genre', 'H', $member->get_genre(), array('id' => 'radio_genre_m', 'label_position' => 'right'), "M" )
 ?>
         </p>
-        <p class="field"><?php echo HTMLHelper::genererInputText('prenom', $member->get_prenom(), array(), "Prénom*" );?></p>
-        <p class="field"><?php echo HTMLHelper::genererInputText('nom', $member->get_nom(), array(), "Nom*" );?></p>
+        <div class="field form-group"><?php echo HTMLHelper::genererInputText('prenom', $member->get_prenom(), array(), "Prénom*" );?></div>
+        <div class="field form-group"><?php echo HTMLHelper::genererInputText('nom', $member->get_nom(), array(), "Nom*" );?></div>
 <?php
       $liste_jour = array('' => '--');
       for($i = 1; $i <= 31; $i ++) {
@@ -84,12 +84,12 @@
         list($date_naiss_jour, $date_naiss_mois, $date_naiss_annee) = explode('/',$date_naiss);
       }
 ?>
-        <p class="field">
+        <div class="field form-group">
           <label>Date de naissance <span class="oblig">*</span></label>
           <?php echo HTMLHelper::genererSelect('date_naissance_jour', $liste_jour, $date_naiss_jour).
        HTMLHelper::genererSelect('date_naissance_mois', $liste_mois, $date_naiss_mois).
        HTMLHelper::genererSelect('date_naissance_annee', $liste_annee, $date_naiss_annee)?>
-        </p>
+        </div>
         <p></p>
       </div>
       <p class="right"><label>&nbsp;</label><?php echo HTMLHelper::genererInputSubmit('save_profile', "Save changes" );?></p>
@@ -100,13 +100,13 @@
       <p class="texte_intro">Laissez les champs vides si vous ne voulez pas changer les informations.</p>
       <form id="edit_infos_form" action="<?php echo get_page_url(get_current_page())?>" method="post">
       <div class="informations formulaire">
-        <p class="field"><?php echo HTMLHelper::genererInputText('adresse', $member->get_adresse(), array(), "Adresse*" );?></p>
-        <p class="field"><?php echo HTMLHelper::genererInputText('code_postal', $member->get_code_postal(), array(), "Code Postal*" );?></p>
-        <p class="field"><?php echo HTMLHelper::genererInputText('ville', $member->get_ville(), array(), "Ville*" );?></p>
-        <p class="field"><?php
+        <div class="field form-group"><?php echo HTMLHelper::genererInputText('adresse', $member->get_adresse(), array(), "Adresse*" );?></div>
+        <div class="field form-group"><?php echo HTMLHelper::genererInputText('code_postal', $member->get_code_postal(), array(), "Code Postal*" );?></div>
+        <div class="field form-group"><?php echo HTMLHelper::genererInputText('ville', $member->get_ville(), array(), "Ville*" );?></div>
+        <div class="field form-group"><?php
           $liste_pays = array('France' => 'France');
           echo HTMLHelper::genererSelect('pays', $liste_pays, $member->get_pays(), array(), 'Pays*');?>
-        </p>
+        </div>
       </div>
       <p class="right"><label>&nbsp;</label><?php echo HTMLHelper::genererInputSubmit('save_profile', "Save changes" );?></p>
       </form>

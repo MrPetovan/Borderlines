@@ -278,31 +278,31 @@ AND ".$attribute." <= $str_fin";
     $return = '
     <fieldset>
       <legend>Text fields</legend>
-      <p class="field">'.HTMLHelper::genererInputText('prenom', $this->prenom, array(), "Prénom *").'</p>
-      <p class="field">'.HTMLHelper::genererInputText('nom', $this->nom, array(), "Nom *").'</p>
-      <p class="field">'.HTMLHelper::genererInputText('pays', $this->pays, array(), "Pays *").'</p>
-      <p class="field">
+      <div class="field form-group">'.HTMLHelper::genererInputText('prenom', $this->prenom, array(), "Prénom *").'</div>
+      <div class="field form-group">'.HTMLHelper::genererInputText('nom', $this->nom, array(), "Nom *").'</div>
+      <div class="field form-group">'.HTMLHelper::genererInputText('pays', $this->pays, array(), "Pays *").'</div>
+      <div class="field form-group">
         <label>Vous êtes un(e)*</label>'.
           HTMLHelper::genererInputRadio('genre', 'F', $this->genre, array('id' => 'radio_genre_mme', 'checked' => 'checked', 'label_position' => 'right'), "Mme" ).
           HTMLHelper::genererInputRadio('genre', 'M', $this->genre, array('id' => 'radio_genre_mlle', 'label_position' => 'right'), "Mlle" ).
           HTMLHelper::genererInputRadio('genre', 'H', $this->genre, array('id' => 'radio_genre_m', 'label_position' => 'right'), "M" ).'
-      </p>
-      <p class="field">'.HTMLHelper::genererInputText('date_naissance', $this->date_naissance, array(), "Date de naissance *").'</p>
+      </div>
+      <div class="field form-group">'.HTMLHelper::genererInputText('date_naissance', $this->date_naissance, array(), "Date de naissance *").'</div>
 
-      <p class="field">'.HTMLHelper::genererInputText('email', $this->email, array(), "Email").'</p>
-      <p class="field"><label for="select_level">Level</label>
+      <div class="field form-group">'.HTMLHelper::genererInputText('email', $this->email, array(), "Email").'</div>
+      <div class="field form-group"><label for="select_level">Level</label>
       <select id="select_level" name="level">';
     foreach(Member::get_tab_level() as $key_level => $name_level) {
       $return .= '
         <option value="'.$key_level.'"'.(($key_level == $this->niveau)?' selected="selected"':'').'>'.$name_level.'</option>';
     }
     $return .= '
-      </select></p>
+      </select></div>
     </fieldset>
     <fieldset>
       <legend>Change Password</legend>
-      <p class="field">'.HTMLHelper::genererInputText('password_admin', null, array(), "Password").'</p>
-      <!--<p class="field">'.HTMLHelper::genererInputText('password2', null, array(), "Re-Type Password").'</p>-->
+      <div class="field form-group">'.HTMLHelper::genererInputText('password_admin', null, array(), "Password").'</div>
+      <!--<div class="field form-group">'.HTMLHelper::genererInputText('password2', null, array(), "Re-Type Password").'</div>-->
     </fieldset>';
 
     return $return;
@@ -322,34 +322,37 @@ AND ".$attribute." <= $str_fin";
       $return = HTMLHelper::genererInputHidden('origin', $this->origin, array());
     }
 
-    if( MEMBER_FORM_ADMIN == $type )
+    if( MEMBER_FORM_ADMIN == $type ) {
       $return .= HTMLHelper::genererInputHidden('id', $this->id);
+    }
 
+    if( MEMBER_FORM_ABONNEMENT != $type ) {
+      $return .= '
+          <div class="field form-group">'.HTMLHelper::genererInputText('prenom', $this->prenom, array(), 'Prénom <span class="oblig">*</span>' ).'</div>';
+      $return .= '
+          <div class="field form-group">'.HTMLHelper::genererInputText('nom', $this->nom, array(), 'Nom <span class="oblig">*</span>' ).'</div>';
+    }
     $return .= '
-          <p class="field">'.HTMLHelper::genererInputText('prenom', $this->prenom, array(), 'Prénom <span class="oblig">*</span>' ).'</p>';
-    $return .= '
-          <p class="field">'.HTMLHelper::genererInputText('nom', $this->nom, array(), 'Nom <span class="oblig">*</span>' ).'</p>';
-    $return .= '
-          <p class="field">'.HTMLHelper::genererInputText('email', $this->email, array(), 'Votre email <span class="oblig">*</span>' ).'</p>';
+          <div class="field form-group">'.HTMLHelper::genererInputText('email', $this->email, array(), 'Votre email <span class="oblig">*</span>' ).'</div>';
     if( MEMBER_FORM_ADMIN != $type ) {
       $return .= '
-          <p class="field">'.HTMLHelper::genererInputText('email2', $this->email2, array(), 'Confirmation email <span class="oblig">*</span>' ).'</p>';
+          <div class="field form-group">'.HTMLHelper::genererInputText('email2', $this->email2, array(), 'Confirmation email <span class="oblig">*</span>' ).'</div>';
     }
 
     if( MEMBER_FORM_ABONNEMENT == $type ) {
       $return .= '
-          <p class="field">'.HTMLHelper::genererInputPassword('password', $this->password, array(), 'Mot de passe <span class="oblig">*</span>' ).'</p>
-          <p class="field">'.HTMLHelper::genererInputPassword('password2', $this->password2, array(), 'Confirmation mot de passe <span class="oblig">*</span>' ).'</p>';
+          <div class="field form-group">'.HTMLHelper::genererInputPassword('password', $this->password, array(), 'Mot de passe <span class="oblig">*</span>' ).'</div>
+          <div class="field form-group">'.HTMLHelper::genererInputPassword('password2', $this->password2, array(), 'Confirmation mot de passe <span class="oblig">*</span>' ).'</div>';
     }
 
     if( MEMBER_FORM_ADMIN == $type ) {
       $return .= '
-          <p class="field">'.HTMLHelper::genererInputPassword('password_admin', null, array(), 'Changer le mot de passe' ).'</p>';
+          <div class="field form-group">'.HTMLHelper::genererInputPassword('password_admin', null, array(), 'Changer le mot de passe' ).'</div>';
     }
 
-    if( MEMBER_FORM_ABONNEMENT == $type || MEMBER_FORM_NEWSLETTER == $type || MEMBER_FORM_ADMIN == $type) {
+    if( MEMBER_FORM_NEWSLETTER == $type || MEMBER_FORM_ADMIN == $type) {
       $return .= '
-          <p class="field">';
+          <div class="field form-group">';
       $liste_pays = array(
       'FR' => 'France',
       'DE' => 'Allemagne',
@@ -384,9 +387,9 @@ AND ".$attribute." <= $str_fin";
       'SE' => 'Suède',
       'CH' => 'Suisse',
       '--' => '-- Autre');
-      $return .= HTMLHelper::genererSelect('pays', $liste_pays, $this->pays, array(), 'Pays <span class="oblig">*</span>').'</p>';
+      $return .= HTMLHelper::genererSelect('pays', $liste_pays, $this->pays, array(), 'Pays <span class="oblig">*</span>').'</div>';
     }
-    if( MEMBER_FORM_ABONNEMENT == $type || MEMBER_FORM_NEWSLETTER == $type || MEMBER_FORM_ADMIN == $type) {
+    if( MEMBER_FORM_NEWSLETTER == $type || MEMBER_FORM_ADMIN == $type) {
       $liste_jour = array('' => '--');
       for($i = 1; $i <= 31; $i ++) {
         $n = ($i < 10)? '0'.$i : $i;
@@ -414,12 +417,12 @@ AND ".$attribute." <= $str_fin";
         list($date_naiss_jour, $date_naiss_mois, $date_naiss_annee) = explode('/',$date_naiss);
       }
       $return .= '
-            <p class="field">
+            <div class="field form-group">
               <label>Date de naissance <span class="oblig">*</span></label>
               '.HTMLHelper::genererSelect('date_naissance_jour', $liste_jour, $date_naiss_jour).
            HTMLHelper::genererSelect('date_naissance_mois', $liste_mois, $date_naiss_mois).
            HTMLHelper::genererSelect('date_naissance_annee', $liste_annee, $date_naiss_annee).'
-            </p>';
+            </div>';
     }
     if(MEMBER_FORM_ADMIN != $type) {
       $return .= '
