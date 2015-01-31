@@ -1,7 +1,7 @@
 <?php
   Member::del_current_user_id();
   setcookie('adrd_remember_me', '', time()-60*60*24*30);
-  $_SESSION['current_tpl'] = '';
+  session_destroy();
 
   $error_code_login = null;
 
@@ -32,8 +32,6 @@
       }else {
         $error_code_login = 2;
       }
-    }else {
-      $error_code_login = 1;
     }
   }else {
     site_redirect();
