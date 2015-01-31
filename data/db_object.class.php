@@ -22,8 +22,19 @@
    *   propriétés du même objet tout le long du script
    *
    */
+  interface iDBTable {
+    /**
+     * Retourne le nom de la table MySQL associée
+     *
+     * @abstract
+     * @static
+     * @access protected
+     * @return string Nom de la table
+     */
+    static function get_table_name();
+  }
 
-  abstract class DBObject {
+  abstract class DBObject implements iDBTable {
     /**
      * Identifiant SQL de l'objet. N'est défini que si l'objet a sa contrepartie
      * en base
@@ -79,16 +90,6 @@
 
     public function get_id() { return $this->_id;}
     public function set_id($id) { $this->_id = $id;}
-
-    /**
-     * Retourne le nom de la table MySQL associée
-     *
-     * @abstract
-     * @static
-     * @access protected
-     * @return string Nom de la table
-     */
-    protected static abstract function get_table_name();
 
     /**
      * Vérifie la validité des données de l'objet avant la sauvegarde en base.

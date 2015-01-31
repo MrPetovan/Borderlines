@@ -32,7 +32,8 @@
   // Pour chaque table de la BD
   foreach($table_name_list as $table_name ) {
     // Description
-    $create_table_string = array_pop( mysql_fetch_row( mysql_uquery('SHOW CREATE TABLE `'.$table_name.'`') ) );
+    $row = mysql_fetch_row( mysql_uquery('SHOW CREATE TABLE `'.$table_name.'`') );
+    $create_table_string = array_pop( $row );
 
     $table_description[ $table_name ] = to_readable( $table_name );
 
