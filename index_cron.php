@@ -78,6 +78,8 @@
 
   if( isset( $_SERVER['REMOTE_ADDR'] ) ) redirect(URL_ROOT);
 
+  define('LOCALE', 'en-US.utf8');
+
   $flag_action = false;
   if(! mysql_uconnect(DB_HOST, DB_USER, DB_PASS, DB_BASE)) {
     echo "DB connection error";
@@ -86,9 +88,7 @@
     mysql_uquery("SET NAMES 'utf8'");
   }
 
-  define('LOCALE', 'en-US.utf8');
-
-  $options = getopt('cgw:');
+  $options = getopt('dcgw:');
 
   echo date('[Y-m-d H:i:s]').' '.implode(' ', $_SERVER['argv'])."\n";
 
@@ -114,6 +114,12 @@
       echo $world->name."\n";
       $world->initialize_territories();
     }
+  }
+
+  if( isset($options['d'])) {
+    echo "DB Analyse\n";
+    require(DATA.'db-analyse.dsp.php');
+    echo PHP_EOL;
   }
 
 
