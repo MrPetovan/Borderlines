@@ -42,6 +42,9 @@
       // No game ever played
       $redirect_page = 'game_list';
     }
+  }else {
+    // No pplayer created
+    $redirect_page = 'create_player';
   }
 
   if( $redirect_page ) {

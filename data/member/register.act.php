@@ -50,7 +50,7 @@
         $member_register->db_save();
         php_mail($member_register->get_email(), SITE_NAME.' | Confirmation d\'inscription', $member_register->get_email_confirmation( $clear_password ), true);
         Member::set_current_user_id( $member_register->get_id() );
-        Page::redirect('dashboard');
+        Page::redirect('create_player');
       }
 
       $_POST = array();
