@@ -29,6 +29,8 @@ WHERE `member_id` = ".mysql_ureal_escape_string( $member_id );
          $player = array_shift( $player_list );
          $_SESSION['current_player_id'] = $player->id;
          $return = $player;
+      }else {
+          $return = Player::instance();
       }
     }else {
       $return = Player::instance( $_SESSION['current_player_id'] );
