@@ -614,7 +614,7 @@ GROUP BY ts.`territory_id`';
       <td width="698" style="vertical-align:top; padding-left:80px; padding-right:80px; font-size: 14px; color:#444444;">
         <p>'.__('Hi %s,',wash_utf8($this->name)).'</p>
         <p>'.__('Game "%s" has ended !', wash_utf8($game->name)).'</p>
-        <p><a href="'.Page::get_url('show_game', array('id' => $game->id)).'">'.__('Check the leaderboard').'</a></p>
+        <p><a href="'.Page::get_url('game_show', array('id' => $game->id)).'">'.__('Check the leaderboard').'</a></p>
       </td>';
 
     return $return;

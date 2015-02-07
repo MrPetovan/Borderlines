@@ -30,16 +30,35 @@ a:focus, a:hover {
   color: white;
 }
 
-.nav-tabs>li.active>a, .nav-tabs>li.active>a:focus, .nav-tabs>li.active>a:hover {
+.nav-tabs>li>a {
   color: inherit;
-  background-color: none;
+}
+
+.nav>li>a:focus,
+.nav>li>a:hover {
+  background-color: transparent;
+}
+
+.nav-tabs>li.active>a,
+.nav-tabs>li.active>a:focus,
+.nav-tabs>li>a:hover,
+.nav-tabs>li.active>a:hover {
+  color: white;
+  background: none;
   border: 1px solid #ddd;
   border-bottom-color: rgb(17, 17, 17);
   outline: none;
 }
 
-.nav>li>a:focus, .nav>li>a:hover {
-  background-color: transparent;
+
+.nav-tabs>li.inactive>a {
+  pointer-events: none;
+  text-transform: uppercase;
+  font-size: 0.8em;
+  line-height: 1.8em;
+}
+.nav-tabs>li.inactive>a:hover {
+  border: none;
 }
 
 .table>thead>tr>th {
@@ -61,12 +80,6 @@ input,
 select,
 option{
   background-color: rgba(255, 255, 255, 0.1);
-}
-
-
-.nav-tabs>li.active>a, .nav-tabs>li.active>a:focus, .nav-tabs>li.active>a:hover {
-  background: none;
-  color: inherit;
 }
 
 .map_background:before {

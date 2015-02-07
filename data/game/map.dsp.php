@@ -9,24 +9,28 @@
 
   $game_parameters = $current_game->get_parameters();
 ?>
+
 <ul class="nav nav-tabs">
-  <li role="presentation" class="active">
-    <a href="<?php echo Page::get_url(PAGE_CODE)?>"><?php echo icon('world', '') . __('World map')?></a>
+  <li role="presentation" class="inactive">
+    <a><?php echo $current_game->name?></a>
   </li>
+  <li role="presentation" class="active">
+    <a href="<?php echo Page::get_url(PAGE_CODE, array('game_id' => $current_game->id))?>"><?php echo icon('world', '') . __('World map')?></a>
+  </li>
+<?php if( $is_player_active ):?>
   <li role="presentation">
     <a href="<?php echo Page::get_url('game_diplomacy')?>"><?php echo icon('diplomacy', '') . __('Diplomacy')?></a>
   </li>
   <li role="presentation">
     <a href="<?php echo Page::get_url('game_economy')?>"><?php echo icon('coins', '') . __('Economy')?></a>
   </li>
+<?php endif;?>
+  <li role="presentation">
+    <a href="<?php echo Page::get_url('game_show', array('id' => $current_game->id))?>"><?php echo icon('information', '') . __('Game Info')?></a>
+  </li>
 </ul>
 <nav>
   <ul class="pagination pagination-sm">
-    <!--<li>
-      <a href="#" aria-label="Previous">
-        <span aria-hidden="true">&laquo;</span>
-      </a>
-    </li>-->
     <?php for( $i = 0; $i <= $current_game->current_turn; $i ++ ) :?>
     <li<?php if( $i == $turn ) : ?> class="active"<?php endif;?>><a href="<?php echo Page::get_url(PAGE_CODE, array('game_id' => $current_game->id, 'turn' => $i))?>">
       <?php if( $i == 0 ) : ?>
@@ -35,19 +39,13 @@
         <?php echo __('Current Turn');?>
       <?php else:?>
         <span class="glyphicon glyphicon-time" title="<?php echo __('Turn')?>" aria-hidden="true"></span><span class="sr-only"><?php echo __('Turn')?></span> <?php echo $i?>
-
       <?php endif;?>
     </a></li>
     <?php endfor;?>
-    <!--<li>
-      <a href="#" aria-label="Next">
-        <span aria-hidden="true">&raquo;</span>
-      </a>
-    </li>-->
   </ul>
 </nav>
 <?php
-  if( $is_current_turn ) {
+  if( $is_player_active && $is_current_turn ) {
     $turn_ready = array_shift( $current_player->get_game_player_list( $current_game->id ) );
     if( $turn_ready['turn_ready'] <= $current_game->current_turn ) {
       echo '<p>'.__('Status').' : <img src="'.IMG.'img_html/delete.png" alt="" /> '.__('Not ready for the next turn').' <a href="'.Page::get_url(PAGE_CODE, array('action' => 'ready')).'" class="btn btn-default">'.__('Toggle').'</a></p>';
@@ -63,8 +61,6 @@
 
   $ratio = 1140 / $world->size_x;
 ?>
-
-
 <div id="world_map" style="position: relative; height: <?php echo $world->size_y * $ratio?>px">
 <?php
   //$ratio = 1;
@@ -78,7 +74,6 @@
   ));
 ?>
 <?php
-
   $orders = array();
   if( $is_current_turn ) {
     $orders = Player_Order::db_get_planned_by_player_id( $current_player->id, $current_game->id, $turn );
@@ -123,16 +118,6 @@
   foreach($territory_status_list as $territory_status_row) {
     $territory = Territory::instance($territory_status_row['territory_id']);
 
-    if( $territory_status_row['conflict'] ) {
-      $status = icon('territory_conflict');
-    }elseif( $territory_status_row['contested'] ) {
-      $status = icon('territory_contested');
-    }else {
-      $status = icon('territory_stable');
-    }
-
-    $status = '';
-
     if( $territory_status_row['can_see_troops'] ) {
       if( $territory_status_row['vision_is_direct'] ) {
         $vision = icon('vision_clear');
@@ -147,15 +132,11 @@
 
     $owner = Player::instance($territory_status_row['owner_id']);
 
-    $capital = '';
-    if( $territory_status_row['capital'] ) {
-      $capital = icon('capital_territory');
+    if( $territory->is_capturable() ) {
+      $capture_troops = icon('capture_troops') . l10n_number( ceil( $territory->area / $game_parameters['TROOPS_CAPTURE_POWER'] ) );
+    }else {
+      $capture_troops = '';
     }
-
-    $capital = '';
-
-    $capture_troops = icon('capture_troops') . l10n_number( ceil( $territory->area / $game_parameters['TROOPS_CAPTURE_POWER'] ) );
-
 
     $move_classes = array('troops_list');
     if( $territory->is_passable() ) {
@@ -174,7 +155,7 @@
     echo '
       <div style="left:' . round($centroid->x * $ratio) .'px; top:' . round(($world->size_y - $centroid->y) * $ratio) . 'px;" class="territory_summary_wrapper">
         <div data-territory-id="' . $territory->id . '" title="' . $territory->name . ' (' . ($owner->id ? $owner->name : __('Nobody')) . ')" class="territory_summary">
-          <h3 data-territory-id="' . $territory->id . '" title="' . $territory->name . ' (' . ($owner->id ? $owner->name : __('Nobody')) . ')">' . $status . $vision . $territory->name . $capital . $capture_troops . '</h3>
+          <h3 data-territory-id="' . $territory->id . '" title="' . $territory->name . ' (' . ($owner->id ? $owner->name : __('Nobody')) . ')">' . $vision . $territory->name . $capture_troops . '</h3>
           <ul class="' . implode(' ', $move_classes) . '" data-territory-id="' . $territory->id . '" id="territory_' . $territory->id . '">';
     if( isset($troops_by_territory[$territory->id]) ) {
       foreach($troops_by_territory[$territory->id] as $territory_player_troops_row ) {
@@ -182,7 +163,7 @@
         $player = Player::instance($territory_player_troops_row['player_id']);
         $troops_territory = Territory::instance($territory_player_troops_row['territory_id']);
         $classes = array('text-right');
-        if( $player->id == $current_player->id && $is_current_turn ) {
+        if( $player->id == $current_player->id && $is_current_turn && !$current_game->has_ended() ) {
           $classes[] = 'moveable';
         }
         if( $territory->id != $troops_territory->id ) {
@@ -213,7 +194,7 @@
 
 ?>
 </div>
-<?php if( $is_current_turn ) :?>
+<?php if( $is_player_active && $is_current_turn ) :?>
 <h4><?php echo __('Orders planned')?></h4>
 <?php
 ?>

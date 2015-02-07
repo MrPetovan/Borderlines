@@ -34,7 +34,7 @@
   $game_player_count = count( $game->get_game_player_list() );
 ?>
     <tr>
-      <td><a href="<?php echo Page::get_url('show_game', array('id' => $game->id))?>"><?php echo $game->name?></a></td>
+      <td><a href="<?php echo Page::get_url('game_show', array('id' => $game->id))?>"><?php echo $game->name?></a></td>
       <td><?php echo l10n_number($game_player_count)?></td>
       <td>
      <?php if( $game_player_area[ $game->id ] !== null ) {

@@ -8,6 +8,9 @@
   $game_parameters = $current_game->get_parameters();
 ?>
 <ul class="nav nav-tabs">
+  <li role="presentation" class="inactive">
+    <a><?php echo $current_game->name?></a>
+  </li>
   <li role="presentation">
     <a href="<?php echo Page::get_url('game_map')?>"><?php echo icon('world', '') . __('World map')?></a>
   </li>
@@ -16,6 +19,9 @@
   </li>
   <li role="presentation" class="active">
     <a href="<?php echo Page::get_url(PAGE_CODE)?>"><?php echo icon('coins', '') . __('Economy')?></a>
+  </li>
+  <li role="presentation">
+    <a href="<?php echo Page::get_url('game_show', array('id' => $current_game->id))?>"><?php echo icon('information', '') . __('Game Info')?></a>
   </li>
 </ul>
 <?php

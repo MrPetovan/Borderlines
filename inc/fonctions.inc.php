@@ -222,6 +222,7 @@ function icon($name, $title = null) {
       'diplomacy_enemy' => 'Enemy',
       'diplomacy_neutral' => 'Neutral',
       'economy_ratio' => 'Economy ratio',
+      'information' => 'Information',
       'owner' => 'Owner',
       'revenue_suppression' => 'Revenue suppression',
       'supremacy' => 'Supremacy',
@@ -236,6 +237,9 @@ function icon($name, $title = null) {
       'vision_history' => 'Vision history',
       'vision_shared' => 'Shared vision',
       'world' => 'World',
+
+      'accept' => '',
+      'hourglass' => '',
 
       'edit' => 'Edit',
   );

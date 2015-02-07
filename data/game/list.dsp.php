@@ -43,8 +43,8 @@
     }
     echo '
   <tr>
-    <td><a href="'.Page::get_url('show_game', array('id' => $game->id)).'">'.$game->name.'</a></td>
-    <td><a href="'.Page::get_url('show_world', array('game_id' => $game->id)).'">'.$world->name.'</a></td>
+    <td><a href="'.Page::get_url('game_show', array('id' => $game->id)).'">'.$game->name.'</a></td>
+    <td><a href="'.Page::get_url('game_map', array('game_id' => $game->id)).'">'.$world->name.'</a></td>
     <td>' . $status_icon . ' ' . __($game->status_string) . '</td>
     <td class="num">'.$game->current_turn.'/'.$game->turn_limit.'</td>
     <td class="num">'.count( $game->get_game_player_list() ).'</td>

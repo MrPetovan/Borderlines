@@ -6,6 +6,9 @@
   $territory_params = array('game_id' => $current_game->id);
 ?>
 <ul class="nav nav-tabs">
+  <li role="presentation" class="inactive">
+    <a><?php echo $current_game->name?></a>
+  </li>
   <li role="presentation">
     <a href="<?php echo Page::get_url('game_map')?>"><?php echo icon('world', '') . __('World map')?></a>
   </li>
@@ -14,6 +17,9 @@
   </li>
   <li role="presentation">
     <a href="<?php echo Page::get_url('game_economy')?>"><?php echo icon('coins', '') . __('Economy')?></a>
+  </li>
+  <li role="presentation">
+    <a href="<?php echo Page::get_url('game_show', array('id' => $current_game->id))?>"><?php echo icon('information', '') . __('Game Info')?></a>
   </li>
 </ul>
 <?php
@@ -36,8 +42,6 @@
   }
 </style>
 <div class="map_background">
-
-<h2><?php echo __('Diplomacy')?></h2>
 <h3><?php echo __('Wall')?></h3>
 <form action="<?php echo Page::get_url('shout', array('game_id' => $current_game->id, 'url_return' => Page::get_url(PAGE_CODE) ))?>" method="post">
   <p><?php echo '['.guess_time(time(), GUESS_TIME_LOCALE).']'?> <strong><?php echo wash_utf8($current_player->name)?></strong> : <input type="text" name="text" size="80" value=""/><button type="submit" name="action" value="shout">Say</button></p>

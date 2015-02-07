@@ -21,7 +21,7 @@
 <div class="informations formulaire">
   <p>
     <span class="label"><?php echo __('Current game')?></span>
-    <span class="value"><a href="<?php echo Page::get_page_url('show_game', false, array('id' => $current_game->id))?>"><?php echo $current_game->name ?></a></span>
+    <span class="value"><a href="<?php echo Page::get_page_url('game_show', false, array('id' => $current_game->id))?>"><?php echo $current_game->name ?></a></span>
   </p>
   <p>
     <span class="label"><?php echo __('Turn')?></span>
@@ -63,7 +63,7 @@
   </p>
 <?php } ?>
 <?php if( $current_game->has_ended() ) {?>
-<p><?php echo __('This game is over, check <a href="%s">the final scoreboard</a> !', Page::get_url('show_game', array('id' => $current_game->id)))?></p>
+<p><?php echo __('This game is over, check <a href="%s">the final scoreboard</a> !', Page::get_url('game_show', array('id' => $current_game->id)))?></p>
 <?php }else {
         $turn_ready = array_shift( $current_player->get_game_player_list( $current_game->id ) );
 ?>
