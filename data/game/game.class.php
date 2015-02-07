@@ -212,13 +212,13 @@ WHERE `game_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
 
   public function get_parameters() {
     $defaults = array(
-        'HOME_TROOPS_MAINTENANCE' => 2,
-        'AWAY_TROOPS_MAINTENANCE' => 3,
-        'RECRUIT_TROOPS_PRICE' => 20,
+        'TROOPS_HOME_MAINTENANCE' => 2,
+        'TROOPS_AWAY_MAINTENANCE' => 3,
+        'TROOPS_RECRUIT_PRICE' => 20,
         'TROOPS_EFFICACITY' => 5,
         'TROOPS_CAPTURE_POWER' => 10,
         'ALLOW_JOIN_MIDGAME' => 1,
-        'TERRITORY_BASE_REVENUE' => 10000,
+        'ECONOMY_BASE_REVENUE' => 10000,
         'ECONOMY_MODIFIER_WAR' => -20,
         'ECONOMY_MODIFIER_PEACE' => 20,
         'BUREAUCRACY_MAX_RATIO' => 100,
@@ -484,9 +484,9 @@ WHERE `game_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
           }
 
           if( $is_home ) {
-            $troops_maintenance += $territory_player_troops_row['quantity'] * $game_parameters['HOME_TROOPS_MAINTENANCE'];
+            $troops_maintenance += $territory_player_troops_row['quantity'] * $game_parameters['TROOPS_HOME_MAINTENANCE'];
           }else {
-            $troops_maintenance += $territory_player_troops_row['quantity'] * $game_parameters['AWAY_TROOPS_MAINTENANCE'];
+            $troops_maintenance += $territory_player_troops_row['quantity'] * $game_parameters['TROOPS_AWAY_MAINTENANCE'];
           }
         }
 
@@ -542,7 +542,7 @@ WHERE `game_id` = '.mysql_ureal_escape_string($this->get_id()).$where;
         $capital = $player->get_capital( $this, $current_turn + 1 );
 
         if( $capital->id !== null ) {
-          $troops_recruited = floor( $recruit_budget / $game_parameters['RECRUIT_TROOPS_PRICE'] );
+          $troops_recruited = floor( $recruit_budget / $game_parameters['TROOPS_RECRUIT_PRICE'] );
           $player->set_territory_player_troops_history($this->id, $next_turn, $capital->id, $troops_recruited, 'Recruitement');
           $this->set_player_history(
             $player->id,
@@ -770,12 +770,12 @@ WHERE `ended` IS NULL";
     </fieldset>
     <fieldset>
       <legend>'.__('Game options').'</legend>
-      <div class="field form-group">'.HTMLHelper::genererInputText('parameters[HOME_TROOPS_MAINTENANCE]', $game_parameters['HOME_TROOPS_MAINTENANCE'], array(), __('Home troops cost')).'</div>
-      <div class="field form-group">'.HTMLHelper::genererInputText('parameters[AWAY_TROOPS_MAINTENANCE]', $game_parameters['AWAY_TROOPS_MAINTENANCE'], array(), __('Away troops cost')).'</div>
-      <div class="field form-group">'.HTMLHelper::genererInputText('parameters[RECRUIT_TROOPS_PRICE]', $game_parameters['RECRUIT_TROOPS_PRICE'], array(), __('Recruit troop price')).'</div>
+      <div class="field form-group">'.HTMLHelper::genererInputText('parameters[TROOPS_HOME_MAINTENANCE]', $game_parameters['TROOPS_HOME_MAINTENANCE'], array(), __('Home troops cost')).'</div>
+      <div class="field form-group">'.HTMLHelper::genererInputText('parameters[TROOPS_AWAY_MAINTENANCE]', $game_parameters['TROOPS_AWAY_MAINTENANCE'], array(), __('Away troops cost')).'</div>
+      <div class="field form-group">'.HTMLHelper::genererInputText('parameters[TROOPS_RECRUIT_PRICE]', $game_parameters['TROOPS_RECRUIT_PRICE'], array(), __('Recruit troop price')).'</div>
       <div class="field form-group">'.HTMLHelper::genererInputText('parameters[TROOPS_EFFICACITY]', $game_parameters['TROOPS_EFFICACITY'], array(), __('Troops efficacity (1 damage/x troops)')).'</div>
       <div class="field form-group">'.HTMLHelper::genererInputText('parameters[TROOPS_CAPTURE_POWER]', $game_parameters['TROOPS_CAPTURE_POWER'], array(), __('Troops capture power (in km²/troops)')).'</div>
-      <div class="field form-group">'.HTMLHelper::genererInputText('parameters[TERRITORY_BASE_REVENUE]', $game_parameters['TERRITORY_BASE_REVENUE'], array(), __('Territory base revenue')).'</div>
+      <div class="field form-group">'.HTMLHelper::genererInputText('parameters[ECONOMY_BASE_REVENUE]', $game_parameters['ECONOMY_BASE_REVENUE'], array(), __('Territory base revenue')).'</div>
       <div class="field form-group">'.HTMLHelper::genererInputText('parameters[ECONOMY_MODIFIER_WAR]', $game_parameters['ECONOMY_MODIFIER_WAR'], array(), __('Economy modifier (Conflict)')).' %</div>
       <div class="field form-group">'.HTMLHelper::genererInputText('parameters[ECONOMY_MODIFIER_PEACE]', $game_parameters['ECONOMY_MODIFIER_PEACE'], array(), __('Economy modifier (Peace)')).' %</div>
       <div class="field form-group">'.HTMLHelper::genererInputText('parameters[BUREAUCRACY_MAX_RATIO]', $game_parameters['BUREAUCRACY_MAX_RATIO'], array(), __('BUREAUCRACY_MAX_RATIO')).' %</div>

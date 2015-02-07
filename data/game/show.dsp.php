@@ -99,25 +99,70 @@
       </span>
     </div>
   </div>
-<?php  endforeach;?>
-<h3><?php echo __('Bureaucracy table')?></h3>
-<table>
-  <tr>
-    <th><?php echo __('Territories')?></th>
-  <?php for($i = 1; $i < $game->get_average_territories_by_player(); $i++ ):?>
-    <th class="num"><?php echo $i?></th>
-  <?php endfor;?>
-    <th class="num"><?php echo $game->get_average_territories_by_player()?>+</th>
-  </tr>
-  <tr>
-    <th><?php echo __('Revenue ratio')?></th>
+  <h2><?php echo __('Game parameters')?></h2>
+  <div class="informations formulaire">
+<?php foreach( $game->parameters as $option => $value ) :
+  switch($option) {
+    case 'BUREAUCRACY_MIN_RATIO':
+    case 'BUREAUCRACY_MAX_RATIO':
+    case 'TROOPS_HOME_MAINTENANCE':
+    case 'TROOPS_AWAY_MAINTENANCE':
+    case 'TROOPS_RECRUIT_PRICE':
+    case 'TROOPS_EFFICACITY':
+    case 'TROOPS_CAPTURE_POWER':
+      break;
+    default:?>
+    <div class="field form-group">
+      <span class="label"><?php echo __($option)?></span>
+      <span class="value"><?php echo $value?></span>
+    </div>
+<?php
+      break;
+  }
+endforeach;?>
+  <h3><?php echo __('Troops')?></h3>
+  <table class="table table-condensed">
+    <thead>
+      <tr>
+        <th class="num"><?php echo __('TROOPS_HOME_MAINTENANCE')?></th>
+        <th class="num"><?php echo __('TROOPS_AWAY_MAINTENANCE')?></th>
+        <th class="num"><?php echo __('TROOPS_RECRUIT_PRICE')?></th>
+        <th class="num"><?php echo __('TROOPS_EFFICACITY')?></th>
+        <th class="num"><?php echo __('TROOPS_CAPTURE_POWER')?></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="num"><?php echo $game->parameters['TROOPS_HOME_MAINTENANCE'] . icon('coin')?></td>
+        <td class="num"><?php echo $game->parameters['TROOPS_AWAY_MAINTENANCE'] . icon('coin')?></td>
+        <td class="num"><?php echo $game->parameters['TROOPS_RECRUIT_PRICE'] . icon('coin')?></td>
+        <td class="num">1/<?php echo $game->parameters['TROOPS_EFFICACITY']?></td>
+        <td class="num"><?php echo $game->parameters['TROOPS_CAPTURE_POWER']?> km²</td>
+      </tr>
+    </tbody>
+  </table>
+  <h3><?php echo __('Bureaucracy table')?></h3>
+  <table class="table table-condensed">
+    <thead>
+      <tr>
+        <th><?php echo __('Territories')?></th>
+    <?php for($i = 1; $i < $game->get_average_territories_by_player(); $i++ ):?>
+        <th class="num"><?php echo $i?></th>
+    <?php endfor;?>
+        <th class="num"><?php echo $game->get_average_territories_by_player()?>+</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <th><?php echo __('Revenue ratio')?></th>
   <?php for($i = 1; $i <= $game->get_average_territories_by_player(); $i++ ):?>
-    <td class="num"><?php echo round($game->get_bureaucracy_ratio($i) * 100)?>%</td>
+        <td class="num"><?php echo round($game->get_bureaucracy_ratio($i) * 100)?>%</td>
   <?php endfor;?>
-  </tr>
-</table>
-</div>
-<h3><?php echo __('Players')?></h3>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+  <h3><?php echo __('Players')?></h3>
 <?php
     if(count($game_player_list)) {
 ?>

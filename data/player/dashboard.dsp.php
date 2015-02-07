@@ -147,7 +147,7 @@
         $territory_revenue = 0;
         if( $owner == $current_player ) {
           $territory_revenue =
-            $game_parameters['TERRITORY_BASE_REVENUE']
+            $game_parameters['ECONOMY_BASE_REVENUE']
             * ( $territory_row['economy_ratio'] )
             * ( 1 - $territory_row['revenue_suppression'] );
         }
@@ -278,7 +278,7 @@
 
   $options = $current_game->get_parameters();
 
-  $troops_maintenance = $troops_home * $options['HOME_TROOPS_MAINTENANCE'] + $troops_away * $options['AWAY_TROOPS_MAINTENANCE'];
+  $troops_maintenance = $troops_home * $options['TROOPS_HOME_MAINTENANCE'] + $troops_away * $options['TROOPS_AWAY_MAINTENANCE'];
 
   $recruit_budget = $revenue - $troops_maintenance;
 
@@ -287,7 +287,7 @@
 
   $troops_recruited = 0;
   if( $capital->id !== null ) {
-    $troops_recruited = floor( $recruit_budget / $options['RECRUIT_TROOPS_PRICE'] );
+    $troops_recruited = floor( $recruit_budget / $options['TROOPS_RECRUIT_PRICE'] );
   }
 ?>
 <div class="informations formulaire">
@@ -307,16 +307,16 @@
     <span class="label"><?php echo __('Troops home')?></span>
     <span class="value num">
       <?php echo l10n_number( $troops_home, 0 ) . icon('troops')?>@
-      <?php echo l10n_number( $options['HOME_TROOPS_MAINTENANCE'], 0 ) . icon('coins')?>=
-      <?php echo l10n_number( $troops_home * $options['HOME_TROOPS_MAINTENANCE'], 0 ) . icon('coins')?>
+      <?php echo l10n_number( $options['TROOPS_HOME_MAINTENANCE'], 0 ) . icon('coins')?>=
+      <?php echo l10n_number( $troops_home * $options['TROOPS_HOME_MAINTENANCE'], 0 ) . icon('coins')?>
     </span>
   </p>
   <p>
     <span class="label"><?php echo __('Troops away')?></span>
     <span class="value num">
       <?php echo l10n_number( $troops_away, 0 ) . icon('troops')?>@
-      <?php echo l10n_number( $options['AWAY_TROOPS_MAINTENANCE'], 0) . icon('coins')?>=
-      <?php echo l10n_number( $troops_away * $options['AWAY_TROOPS_MAINTENANCE'], 0) . icon('coins')?>
+      <?php echo l10n_number( $options['TROOPS_AWAY_MAINTENANCE'], 0) . icon('coins')?>=
+      <?php echo l10n_number( $troops_away * $options['TROOPS_AWAY_MAINTENANCE'], 0) . icon('coins')?>
     </span>
   </p>
   <p>
@@ -335,7 +335,7 @@
     <span class="label"><?php echo __('Total troops recruited')?></span>
     <span class="value num">
       <?php echo l10n_number( $troops_recruited, 0 ) . icon('troops')?>@
-      <?php echo l10n_number( $options['RECRUIT_TROOPS_PRICE'], 0) . icon('coins')?>
+      <?php echo l10n_number( $options['TROOPS_RECRUIT_PRICE'], 0) . icon('coins')?>
     </span>
   </p>
 </div>

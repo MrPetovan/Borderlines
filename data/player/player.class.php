@@ -514,7 +514,7 @@ GROUP BY ts.`territory_id`';
       $territory = Territory::instance($territory_status_row['territory_id']);
 
       $territory_revenue =
-        $game_parameters['TERRITORY_BASE_REVENUE']
+        $game_parameters['ECONOMY_BASE_REVENUE']
         * ( $territory->get_economy_ratio( $game, $turn - 1 ) )
         * ( 1 - $territory_status_row['revenue_suppression'] );
 
