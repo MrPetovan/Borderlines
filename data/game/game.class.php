@@ -14,6 +14,79 @@ class Game extends Game_Model {
   protected $capturable_territories_count;
   protected $players_count;
 
+  public function get_economy_summary($player_id, $turn = null) {
+    $player = Player::instance($player_id);
+    if( is_null($turn) ) {
+      $turn = $this->current_turn;
+    }
+
+    $return = array();
+
+    $territory_summary = $player->get_territory_economy_summary($this, $turn);
+
+    $total_revenue = 0;
+    foreach( $territory_summary as $territory_row ) {
+      $territory = Territory::instance( $territory_row['territory_id'] );
+
+      $territory_revenue =
+        $this->parameters['ECONOMY_BASE_REVENUE']
+        * ( $territory_row['economy_ratio'] )
+        * ( 1 - $territory_row['revenue_suppression'] );
+
+      $total_revenue += $territory_revenue;
+    }
+
+    $revenue_before_bureaucracy = $total_revenue;
+
+    $bureaucracy_ratio = $this->get_bureaucracy_ratio(count($player->get_territory_status_list(null, $this->id, $turn )));
+
+    $revenue = $revenue_before_bureaucracy * $bureaucracy_ratio;
+
+    $troops_home = 0;
+    $troops_away = 0;
+    $troops_list = $this->get_territory_player_troops_list($turn, null, $player->id);
+    $territory_status_list = $this->get_territory_status_list(null, $turn, $player->id);
+    foreach( $troops_list as $territory_player_troops_row ) {
+      $is_home = false;
+
+      foreach( $territory_status_list as $territory_previous_owner_row ) {
+        if( $territory_previous_owner_row['territory_id'] == $territory_player_troops_row['territory_id'] ) {
+          $is_home = true;
+          break;
+        }
+      }
+
+      if( $is_home ) {
+        $troops_home += $territory_player_troops_row['quantity'];
+      }else {
+        $troops_away += $territory_player_troops_row['quantity'];
+      }
+    }
+
+    $troops_maintenance = $troops_home * $this->parameters['TROOPS_HOME_MAINTENANCE'] + $troops_away * $this->parameters['TROOPS_AWAY_MAINTENANCE'];
+
+    $recruit_budget = $revenue - $troops_maintenance;
+
+    // Is there a capital ?
+    $capital = $player->get_capital($this);
+
+    $troops_recruited = 0;
+    if( $capital->id !== null ) {
+      $troops_recruited = floor( $recruit_budget / $this->parameters['TROOPS_RECRUIT_PRICE'] );
+    }
+
+    $return['revenue_before_bureaucracy'] = $revenue_before_bureaucracy;
+    $return['bureaucracy_ratio'] = $bureaucracy_ratio;
+    $return['revenue'] = $revenue;
+    $return['troops_home'] = $troops_maintenance;
+    $return['troops_away'] = $troops_maintenance;
+    $return['troops_maintenance'] = $troops_maintenance;
+    $return['recruit_budget'] = $recruit_budget;
+    $return['troops_recruited'] = $troops_recruited;
+
+    return $return;
+  }
+
   public function get_territory_troops_vision_list($player_id, $turn = null, $territory_id = null) {
     $player = Player::instance($player_id);
 

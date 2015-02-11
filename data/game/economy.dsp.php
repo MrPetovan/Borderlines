@@ -5,6 +5,8 @@
   /* @var $current_player Player */
   $territory_params = array('game_id' => $current_game->id);
 
+  $is_current_turn = $turn == $current_game->current_turn;
+
   $game_parameters = $current_game->get_parameters();
 ?>
 <ul class="nav nav-tabs">
@@ -62,6 +64,10 @@
 </ul>
 <h3><?php echo __('Territory Summary')?></h3>
 <?php
+    $previous_territory_summary = array();
+    if( $turn > 1 ) {
+      $previous_territory_summary = $current_player->get_territory_economy_summary($current_game, $turn - 1);
+    }
     $territory_summary = $current_player->get_territory_economy_summary($current_game, $turn);
 ?>
 <table class="table table-hover table-condensed accordion">
@@ -141,105 +147,131 @@
   </tfoot>
 </table>
 <?php
-  $revenue_before_bureaucracy = $total_revenue;
-
-  $bureaucracy_ratio = $current_game->get_bureaucracy_ratio(count($current_player->get_territory_status_list(null, $current_game->id, $turn )));
-
-  $revenue = $revenue_before_bureaucracy * $bureaucracy_ratio;
-
-  $troops_home = 0;
-  $troops_away = 0;
-  $troops_list = $current_game->get_territory_player_troops_list($turn, null, $current_player->id);
-  $territory_status_list = $current_game->get_territory_status_list(null, $turn, $current_player->id);
-  foreach( $troops_list as $territory_player_troops_row ) {
-    $is_home = false;
-
-    foreach( $territory_status_list as $territory_previous_owner_row ) {
-      if( $territory_previous_owner_row['territory_id'] == $territory_player_troops_row['territory_id'] ) {
-        $is_home = true;
-        break;
-      }
-    }
-
-    if( $is_home ) {
-      $troops_home += $territory_player_troops_row['quantity'];
-    }else {
-      $troops_away += $territory_player_troops_row['quantity'];
-    }
-  }
-
-  $options = $current_game->get_parameters();
-
-  $troops_maintenance = $troops_home * $options['TROOPS_HOME_MAINTENANCE'] + $troops_away * $options['TROOPS_AWAY_MAINTENANCE'];
-
-  $recruit_budget = $revenue - $troops_maintenance;
-
-  // Is there a capital ?
-  $capital = $current_player->get_capital($current_game);
-
-  $troops_recruited = 0;
-  if( $capital->id !== null ) {
-    $troops_recruited = floor( $recruit_budget / $options['TROOPS_RECRUIT_PRICE'] );
-  }
+  $economy_forecast = $current_game->get_economy_summary($current_player->id, $turn - 1);
 ?>
+<h3><?php echo __('Economy summary')?></h3>
 <table class="table table-condensed">
   <tr>
-    <th><?php echo __('Total revenue for turn %s', $turn)?></th>
+    <th><?php echo __('Total revenue')?></th>
     <td class="num"></td>
-    <td class="num"><?php echo l10n_number( $revenue_before_bureaucracy, 0 ) . icon('coin')?></td>
+    <td class="num"><?php echo l10n_number( $economy_forecast['revenue_before_bureaucracy'], 0 ) . icon('coin')?></td>
   </tr>
   <tr>
-    <th><?php echo __('Bureaucracy ratio for turn %s', $turn)?></th>
-    <td class="num"><?php echo l10n_number( round($bureaucracy_ratio * 100, 2), 2 ) . '%' . icon('bureaucracy')?></td>
-    <td class="num">-<?php echo l10n_number( $revenue_before_bureaucracy * (1 - $bureaucracy_ratio), 0 ) . icon('coin')?></td>
+    <th><?php echo __('Bureaucracy ratio')?></th>
+    <td class="num"><?php echo l10n_number( round($economy_forecast['bureaucracy_ratio'] * 100, 2), 2 ) . '%' . icon('bureaucracy')?></td>
+    <td class="num">-<?php echo l10n_number( $economy_forecast['revenue_before_bureaucracy'] * (1 - $economy_forecast['bureaucracy_ratio']), 0 ) . icon('coin')?></td>
   </tr>
   <tr>
     <th><?php echo __('Revenue after bureaucracy')?></th>
     <td class="num"></td>
-    <td class="num"><?php echo l10n_number( $revenue, 0 ) . icon('coin')?></td>
+    <td class="num"><?php echo l10n_number( $economy_forecast['revenue'], 0 ) . icon('coin')?></td>
   </tr>
   <tr>
     <th><?php echo __('Troops home')?></th>
     <td class="num">
-      <?php echo l10n_number( $troops_home, 0 ) . icon('troops')?>@
-      <?php echo l10n_number( $options['TROOPS_HOME_MAINTENANCE'], 0 ) . icon('coin')?>
+      <?php echo l10n_number( $economy_forecast['troops_home'], 0 ) . icon('troops')?>@
+      <?php echo l10n_number( $current_game->parameters['TROOPS_HOME_MAINTENANCE'], 0 ) . icon('coin')?>
     </td>
     <td class="num">
-      <?php echo l10n_number( $troops_home * $options['TROOPS_HOME_MAINTENANCE'], 0 ) . icon('coin')?>
+      <?php echo l10n_number( $economy_forecast['troops_home'] * $current_game->parameters['TROOPS_HOME_MAINTENANCE'], 0 ) . icon('coin')?>
     </td>
   </tr>
   <tr>
     <th><?php echo __('Troops away')?></th>
     <td class="num">
-      <?php echo l10n_number( $troops_away, 0 ) . icon('troops')?>@
-      <?php echo l10n_number( $options['TROOPS_AWAY_MAINTENANCE'], 0) . icon('coin')?>
+      <?php echo l10n_number( $economy_forecast['troops_away'], 0 ) . icon('troops')?>@
+      <?php echo l10n_number( $current_game->parameters['TROOPS_AWAY_MAINTENANCE'], 0) . icon('coin')?>
     </td>
     <td class="num">
-      <?php echo l10n_number( $troops_away * $options['TROOPS_AWAY_MAINTENANCE'], 0) . icon('coin')?>
+      <?php echo l10n_number( $economy_forecast['troops_away'] * $current_game->parameters['TROOPS_AWAY_MAINTENANCE'], 0) . icon('coin')?>
     </td>
   </tr>
   <tr>
     <th><?php echo __('Total troops maintenance')?></th>
     <td class="num"></td>
     <td class="num">
-      -<?php echo l10n_number( $troops_maintenance, 0 ) . icon('coin')?>
+      -<?php echo l10n_number( $economy_forecast['troops_maintenance'], 0 ) . icon('coin')?>
     </td>
   </tr>
   <tr>
     <th><?php echo __('Recruiting budget')?></th>
     <td class="num"></td>
     <td class="num">
-      <?php echo l10n_number( $recruit_budget, 0 ) . icon('coin')?>
+      <?php echo l10n_number( $economy_forecast['recruit_budget'], 0 ) . icon('coin')?>
     </td>
   </tr>
   <tr>
     <th><?php echo __('Total troops recruited')?></th>
     <td class="num"></td>
     <td class="num">
-      <?php echo l10n_number( $troops_recruited, 0 ) . icon('troops')?>@
-      <?php echo l10n_number( $options['TROOPS_RECRUIT_PRICE'], 0) . icon('coin')?>
+      <?php echo l10n_number( $economy_forecast['troops_recruited'], 0 ) . icon('troops')?>@
+      <?php echo l10n_number( $current_game->parameters['TROOPS_RECRUIT_PRICE'], 0) . icon('coin')?>
     </td>
   </tr>
 </table>
-
+<?php
+  if( $is_current_turn ) {
+    $economy_forecast = $current_game->get_economy_summary($current_player->id);
+?>
+<h3><?php echo __('Forecast for next turn')?></h3>
+<table class="table table-condensed">
+  <tr>
+    <th><?php echo __('Total revenue')?></th>
+    <td class="num"></td>
+    <td class="num"><?php echo l10n_number( $economy_forecast['revenue_before_bureaucracy'], 0 ) . icon('coin')?></td>
+  </tr>
+  <tr>
+    <th><?php echo __('Bureaucracy ratio')?></th>
+    <td class="num"><?php echo l10n_number( round($economy_forecast['bureaucracy_ratio'] * 100, 2), 2 ) . '%' . icon('bureaucracy')?></td>
+    <td class="num">-<?php echo l10n_number( $economy_forecast['revenue_before_bureaucracy'] * (1 - $economy_forecast['bureaucracy_ratio']), 0 ) . icon('coin')?></td>
+  </tr>
+  <tr>
+    <th><?php echo __('Revenue after bureaucracy')?></th>
+    <td class="num"></td>
+    <td class="num"><?php echo l10n_number( $economy_forecast['revenue'], 0 ) . icon('coin')?></td>
+  </tr>
+  <tr>
+    <th><?php echo __('Troops home')?></th>
+    <td class="num">
+      <?php echo l10n_number( $economy_forecast['troops_home'], 0 ) . icon('troops')?>@
+      <?php echo l10n_number( $current_game->parameters['TROOPS_HOME_MAINTENANCE'], 0 ) . icon('coin')?>
+    </td>
+    <td class="num">
+      <?php echo l10n_number( $economy_forecast['troops_home'] * $current_game->parameters['TROOPS_HOME_MAINTENANCE'], 0 ) . icon('coin')?>
+    </td>
+  </tr>
+  <tr>
+    <th><?php echo __('Troops away')?></th>
+    <td class="num">
+      <?php echo l10n_number( $economy_forecast['troops_away'], 0 ) . icon('troops')?>@
+      <?php echo l10n_number( $current_game->parameters['TROOPS_AWAY_MAINTENANCE'], 0) . icon('coin')?>
+    </td>
+    <td class="num">
+      <?php echo l10n_number( $economy_forecast['troops_away'] * $current_game->parameters['TROOPS_AWAY_MAINTENANCE'], 0) . icon('coin')?>
+    </td>
+  </tr>
+  <tr>
+    <th><?php echo __('Total troops maintenance')?></th>
+    <td class="num"></td>
+    <td class="num">
+      -<?php echo l10n_number( $economy_forecast['troops_maintenance'], 0 ) . icon('coin')?>
+    </td>
+  </tr>
+  <tr>
+    <th><?php echo __('Recruiting budget')?></th>
+    <td class="num"></td>
+    <td class="num">
+      <?php echo l10n_number( $economy_forecast['recruit_budget'], 0 ) . icon('coin')?>
+    </td>
+  </tr>
+  <tr>
+    <th><?php echo __('Total troops recruited')?></th>
+    <td class="num"></td>
+    <td class="num">
+      <?php echo l10n_number( $economy_forecast['troops_recruited'], 0 ) . icon('troops')?>@
+      <?php echo l10n_number( $current_game->parameters['TROOPS_RECRUIT_PRICE'], 0) . icon('coin')?>
+    </td>
+  </tr>
+</table>
+  <?php }?>
 </div>
