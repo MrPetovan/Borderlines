@@ -72,6 +72,7 @@
       <th class="num"><?php echo __('Area')?></th>
       <th><?php echo __('Status')?></th>
       <th class="num"><?php echo __('Economy')?></th>
+      <th><?php echo __('Forecast')?></th>
       <th class="num"><?php echo __('Suppression')?></th>
       <th class="num"><?php echo __('Revenue')?></th>
     </tr>
@@ -102,6 +103,17 @@
       }else {
         $status = icon('territory_stable').__('Stable');
       }
+      if( $territory_row['conflict'] ) {
+        $economy_evolution = min(abs($game_parameters['ECONOMY_MODIFIER_WAR']), $territory_row['economy_ratio'] * 100);
+        $economy_evolution_sign = '-';
+      }else {
+        $economy_evolution = min($game_parameters['ECONOMY_MODIFIER_PEACE'], 100 - $territory_row['economy_ratio'] * 100);
+        $economy_evolution_sign = '+';
+      }
+
+      if( $economy_evolution == 0 ) {
+        $economy_evolution_sign = '~';
+      }
 
       echo '
     <tr>
@@ -110,6 +122,7 @@
       <td class="num">'.l10n_number( $territory->area ).' km²</td>
       <td>'.$status.'</td>
       <td class="num">'.l10n_number( $territory_row['economy_ratio'] * 100 ).' %</td>
+      <td>(' . $economy_evolution_sign . l10n_number( $economy_evolution ).' %)</td>
       <td class="num">'.l10n_number( $territory_row['revenue_suppression'] * 100 ).' %</td>
       <td class="num">'.l10n_number( $territory_revenue ) . icon('coin') . '</td>
     </tr>';
