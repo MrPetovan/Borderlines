@@ -1,5 +1,5 @@
 <?php
-  $PAGE_TITRE = __('Game: Diplomacy' );
+  $PAGE_TITRE = __('Game: Economy' );
 
   /* @var $world World */
   /* @var $current_player Player */
