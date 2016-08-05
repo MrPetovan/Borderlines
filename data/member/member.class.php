@@ -562,7 +562,7 @@ AND ".$attribute." <= $str_fin";
     return $return;
   }
 
-  public function load_from_html_form($post_data, $file_data) {
+  public function load_from_html_form($post_data) {
     $return = array();
     if(isset($post_data['date_naissance_jour']) && isset($post_data['date_naissance_mois']) && isset($post_data['date_naissance_annee'])) {
       $post_data['date_naissance'] = mktime( 0, 0, 0, $post_data['date_naissance_mois'], $post_data['date_naissance_jour'], $_POST['date_naissance_annee']);
@@ -577,7 +577,7 @@ AND ".$attribute." <= $str_fin";
       $this->cgv_accepte = $post_data['cgv_accepte'];
     }
 
-    parent::load_from_html_form($post_data, $file_data);
+    parent::load_from_html_form($post_data);
 
     return $return;
   }

@@ -182,8 +182,8 @@ LIMIT 0,1";
    * @param array $post_data DonnÃ©e POST ($_POST)
    * @param array $file_data DonnÃ©e FILES ($_FILES)
    */
-  public function load_from_html_form($post_data, $file_data) {
-    parent::load_from_html_form($post_data, $file_data);
+  public function load_from_html_form($post_data) {
+    parent::load_from_html_form($post_data);
     $return = array();
 
     if(isset($post_data['code']) && $post_data['code'] != '') {
