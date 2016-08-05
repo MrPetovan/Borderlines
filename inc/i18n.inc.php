@@ -11,7 +11,7 @@
     $sql = 'SELECT `code`, `translation`, `context` FROM `translation` WHERE `locale` = '. mysql_ureal_escape_string( $locale );
     $res = mysql_uquery($sql);
 
-    while( $row = mysql_fetch_assoc($res) ) {
+    while( $row = mysqli_fetch_assoc($res) ) {
       $i18n_replacements[ $row['context'].'-'.$row['code'] ] = $row['translation'];
     }
 

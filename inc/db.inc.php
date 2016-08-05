@@ -14,9 +14,10 @@ if (!defined('DEBUG_SQL')) {
  * @return resource | false
  */
 function mysql_uconnect($host, $user, $pass, $base) {
-  $link = mysql_connect($host, $user, $pass);
-  if (is_resource($link)) {
-    $return = mysql_selectdb($base);
+  global $link;
+  $link = mysqli_connect($host, $user, $pass);
+  if (is_object($link)) {
+    $return = mysqli_select_db($link, $base);
   } else {
     $return = false;
   }
@@ -27,7 +28,8 @@ function mysql_uconnect($host, $user, $pass, $base) {
 }
 
 function mysql_udeconnect() {
-  return mysql_close();
+  global $link;
+  return mysqli_close($link);
 }
 
 /**
@@ -39,6 +41,7 @@ function mysql_udeconnect() {
  * @return string
  */
 function mysql_ureal_escape_string() {
+  global $link;
   $values = func_get_args();
   if (count($values) > 1) {
     foreach ($values as $key => $value) {
@@ -53,17 +56,18 @@ function mysql_ureal_escape_string() {
       $return = number_format($value, get_dec_count( $value ), '.','');
     } elseif (is_array($value)) {
       foreach ($value as $key => $value_item) {
-        $values[$key] = mysql_ureal_escape_string($value_item);
+        $values[$key] = mysql_ureal_escape_string($link, $value_item);
       }
       $return = implode(',', $values);
     } else {
-      $return = "'" . mysql_real_escape_string($value) . "'";
+      $return = "'" . mysqli_real_escape_string($link, $value) . "'";
     }
   }
   return $return;
 }
 
 function mysql_uquery($query, $link_identifier = null) {
+  global $link;
   if (DEBUG_SQL) {
     mysql_log($query);
   }
@@ -77,18 +81,18 @@ function mysql_uquery($query, $link_identifier = null) {
   }
   setlocale(LC_NUMERIC, 'en_US.utf8');
   if (is_null($link_identifier)) {
-    $res = mysql_query($query);
+    $res = mysqli_query($link, $query);
   } else {
-    $res = mysql_query($query, $link_identifier);
+    $res = mysqli_query($link_identifier, $query);
   }
   setlocale(LC_NUMERIC, LOCALE.'.utf8');
   if ($res) {
     return $res;
   } else {
     if (is_null($link_identifier)) {
-      $error = mysql_error();
+      $error = mysqli_error($link);
     } else {
-      $error = mysql_error($link_identifier);
+      $error = mysqli_error($link_identifier);
     }
 
     if (PROD) {
@@ -144,13 +148,13 @@ function mysql_fetch_to_array($res) {
   $return = array();
 
   if( $res !== null ) {
-    while ($row = mysql_fetch_assoc($res)) {
+    while ($row = mysqli_fetch_assoc($res)) {
       foreach ($row as $param => $value) {
         $row[$param] = correctype($value);
       }
       $return[] = $row;
     }
-    mysql_free_result($res);
+    mysqli_free_result($res);
   }
 
   return $return;
@@ -161,11 +165,11 @@ function mysql_fetch_one($query) {
   $res = mysql_uquery($query);
 
   if( $res !== null ) {
-    $row = mysql_fetch_row($res);
+    $row = mysqli_fetch_row($res);
     if( is_array($row) ) {
       $return = correctype($row[0]);
     }
-    mysql_free_result($res);
+    mysqli_free_result($res);
   }
 
   return $return;

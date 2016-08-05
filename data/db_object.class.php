@@ -268,8 +268,8 @@
 
       $res = mysql_uquery($sql);
 
-      if($res && mysql_num_rows($res) == 1) {
-        $data = mysql_fetch_assoc($res);
+      if($res && mysqli_num_rows($res) == 1) {
+        $data = mysqli_fetch_assoc($res);
 
         foreach($data as $var_name => $value) {
           $var_name = "_$var_name";
@@ -435,10 +435,10 @@ WHERE `id` = ".mysql_ureal_escape_string($this->get_id());
 
       if($res) {
         $return = array();
-        while($data = mysql_fetch_assoc($res)) {
+        while($data = mysqli_fetch_assoc($res)) {
           $return[$data['id']] = static::instance( $data['id'] );
         }
-        mysql_free_result($res);
+        mysqli_free_result($res);
       }else {
         $return = false;
       }
@@ -458,11 +458,11 @@ WHERE `id` = ".mysql_ureal_escape_string($this->get_id());
     protected static function sql_to_object($sql) {
       $res = mysql_uquery($sql);
 
-      if($res && mysql_num_rows($res) > 0) {
-        $data = mysql_fetch_assoc($res);
+      if($res && mysqli_num_rows($res) > 0) {
+        $data = mysqli_fetch_assoc($res);
         $return = static::instance( $data['id'] );
       }else {
-        $return = false;
+        $return = null;
       }
 
       return $return;
