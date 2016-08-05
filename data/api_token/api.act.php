@@ -267,8 +267,7 @@
           $world = null;
           if( $game_id ) {
             $current_game = Game::instance($game_id);
-          }
-          if( $world_id === null ) {
+          }elseif( $world_id === null ) {
             if( $current_game->world_id ) {
               $world_id = $current_game->world_id;
 
@@ -276,6 +275,8 @@
                 $turn = $current_game->current_turn;
               }
             }
+          }else {
+            $current_game = null;
           }
           if( $world_id ) {
             $world = World::instance($world_id);
