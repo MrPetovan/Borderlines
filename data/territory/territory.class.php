@@ -760,7 +760,7 @@ AND `game_id` = '.mysql_ureal_escape_string($game->id).$where;
     $return = null;
 
     if( $game === null || $game->id === null) {
-      $return = $world->territories;
+      $return = $world->get_territories();
     }else {
       if( $turn === null ) $turn = $game->current_turn;
 
