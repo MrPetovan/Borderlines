@@ -338,7 +338,6 @@ WHERE `world_id` = ".mysql_ureal_escape_string($world_id);
         }
       }
     }
-    //var_debug( $this, $territories, $neighbours );die();
 
     return $previousTerritory;
   }
@@ -444,7 +443,6 @@ AND `game_id` = '.mysql_ureal_escape_string($game->id).$where;
   }
 
   public function resolve_combat( Game $game, $turn = null ) {
-    //var_debug( "{$this->name}->resolve_combat( {$game->name}, $turn ) ");
     $return = null;
 
     if( is_null( $turn ) ) {
@@ -547,7 +545,6 @@ AND `game_id` = '.mysql_ureal_escape_string($game->id).$where;
   }
 
   public function get_territory_status( Game $game, $turn = null ) {
-    //var_debug( "{$this->name}->get_territory_status( {$game->name}, $turn ) ");
     $return = null;
 
     if( is_null( $turn ) ) {
@@ -599,8 +596,6 @@ AND `game_id` = '.mysql_ureal_escape_string($game->id).$where;
       $territory_status_list = $this->get_territory_status_list( $game->id, $turn - 1 );
       $is_capital = $territory_status_list[0]['capital'] == 1;
     }
-
-    //var_debug( "Last owner : {$last_owner->name}", $territory_player_troops_list);
 
     // Default : ownership continues
     //$new_owner = $last_owner;

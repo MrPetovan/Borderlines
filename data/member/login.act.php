@@ -9,8 +9,6 @@
       if(isset($_POST['email'])) {
         if(isset($_POST['pass'])) {
           if($membre = Member::db_get_membre_by_email($_POST['email'])) {
-            //var_debug($_POST['pass'], Member::password_crypt($_POST['pass']), $membre->get_password());
-            //var_debug($membre, Member::password_crypt($_POST['pass']), $membre->get_password());
             if(Member::password_crypt($_POST['pass']) == $membre->get_password()) {
               if(isset($_POST['remember_me'])) {
                 $remember_token = md5($membre->email . '-' . time() . '-' . mt_rand());

@@ -3,7 +3,6 @@
 
 
   if( isset( $_POST['translation'])) {
-    //var_debug($_POST['translation']);
     foreach( $_POST['translation'] as $translation_id => $translation ) {
       if( $translation != '' ) {
         /* @var $translation_obj Translation */

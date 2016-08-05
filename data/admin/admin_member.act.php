@@ -32,7 +32,5 @@
     echo iconv('utf-8', 'iso-8859-15', $data);
 
     exit;
-
-    //var_debug($data);
   }
 ?>

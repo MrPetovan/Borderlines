@@ -2,11 +2,7 @@
 
   if( isset($_GET['w']) && isset($_GET['x']) && isset($_GET['y']) && isset($_GET['z']) ) {
 
-
     $world = World::instance($_GET['w']);
-
-
-    //var_debug($options);
 
     if($world->id) {
       $dir = 'cache/world/'.$world->id.'/tile/';
