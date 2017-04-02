@@ -66,6 +66,12 @@ function mysql_ureal_escape_string() {
   return $return;
 }
 
+function mysql_uinsert_id() {
+  global $link;
+
+  return mysqli_insert_id($link);
+}
+
 function mysql_uquery($query, $link_identifier = null) {
   global $link;
   if (DEBUG_SQL) {

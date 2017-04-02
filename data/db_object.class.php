@@ -357,7 +357,7 @@ WHERE `id` = ".mysql_ureal_escape_string($this->get_id());
  ,', $champs_sql);
 
       $return = mysql_uquery($sql);
-      $this->set_id(mysqli_insert_id());
+      $this->set_id(mysql_uinsert_id());
       return $return;
     }
 
