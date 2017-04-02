@@ -609,15 +609,13 @@ AND `game_id` = '.mysql_ureal_escape_string($game->id).$where;
         $player_capturing_troops = $territory_player_troops_list[0]['quantity'];
       }else {
         $invader = Player::instance( $territory_player_troops_list[0]['player_id'] );
-        $player_diplomacy_list = $invader->get_last_player_diplomacy($game, $turn);
+        $player_diplomacy = $invader->get_last_player_diplomacy_player($last_owner, $game, $turn);
 
         // If invader marked the previous owner as enemy, he captures the territory
-        foreach( $player_diplomacy_list as $player_diplomacy ) {
-          if( $player_diplomacy['to_player_id'] == $last_owner->id && $player_diplomacy['status'] == 'Enemy' ) {
-            $player_capturing_id = $invader->id;
-            $player_capturing_troops = $territory_player_troops_list[0]['quantity'];
-            $troops_disturbing = $territory_player_troops_list[0]['quantity'];
-          }
+        if($player_diplomacy['status'] == 'Enemy' ) {
+          $player_capturing_id = $invader->id;
+          $player_capturing_troops = $territory_player_troops_list[0]['quantity'];
+          $troops_disturbing = $territory_player_troops_list[0]['quantity'];
         }
       }
 

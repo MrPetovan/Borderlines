@@ -695,10 +695,10 @@ ORDER BY `order_type_id`";
     return Player_Order::sql_to_list( $sql );
   }
 
-  public function db_get_ready_game_list() {
+  public static function db_get_ready_game_list() {
     $sql = "
 SELECT *
-FROM `".self::get_table_name()."`
+FROM `".static::get_table_name()."`
 WHERE `updated` IS NOT NULL
 AND `current_turn` < `turn_limit`
 AND `updated` + `turn_interval` < NOW()";
@@ -706,10 +706,10 @@ AND `updated` + `turn_interval` < NOW()";
     return self::sql_to_list( $sql );
   }
 
-  public function db_get_nonended_game_list() {
+  public static function db_get_nonended_game_list() {
     $sql = "
 SELECT *
-FROM `".self::get_table_name()."`
+FROM `".static::get_table_name()."`
 WHERE `ended` IS NULL";
 
     return self::sql_to_list( $sql );
