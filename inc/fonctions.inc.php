@@ -1103,7 +1103,8 @@ function which_os ()
       $array = array_diff_key( $array, $exclusions );
     }
 
-    return reset( array_keys( $array , min($array) ) );
+    $array = array_keys( $array , min($array) );
+    return reset( $array );
   }
 
   /*
