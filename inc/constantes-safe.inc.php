@@ -49,7 +49,7 @@ if( !isset( $flag_prod ) ) {
  */
 if( $flag_prod) {
   define('PROD', true);
-  error_reporting(E_ALL);
+  error_reporting(E_ALL & ~E_NOTICE & ~E_STRICT & ~E_DEPRECATED);
   /**
    * Flag URL Rewriting local (génération des url)
    *
