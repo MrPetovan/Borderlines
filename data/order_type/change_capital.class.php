@@ -1,6 +1,6 @@
 <?php
 class Change_Capital extends Player_Order {
-  public function plan( Order_Type $order_type, Player $player, $params ) {
+  public function plan( Order_Type $order_type, Player $player, $params = array(), $turn = null, $player_order_id = null ) {
     $valid = isset( $params['territory_id'] );
     if( $valid ) {
       $has_already_been_ordered = false;
