@@ -1,6 +1,6 @@
 <?php
 class Move_Troops extends Player_Order {
-  public function plan( Order_Type $order_type, Player $player, $params, $turn = null, $player_order_id = null ) {
+  public function plan( Order_Type $order_type, Player $player, $params = array(), $turn = null, $player_order_id = null ) {
     $valid =
       isset( $params['from_territory_id'] )
       && (isset( $params['to_territory_id'] ) || isset( $params['to_future_territory_id'] ))
@@ -98,7 +98,7 @@ class Move_Troops extends Player_Order {
     return $valid;
   }
 
-  public function execute( array &$intermediate_troops_array ) {
+  public function execute( array &$intermediate_troops_array = array() ) {
     $return = false;
 
     $return_code = -1;
