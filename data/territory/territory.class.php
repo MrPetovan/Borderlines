@@ -374,7 +374,7 @@ FROM `territory_economy_history`
 WHERE `territory_id` = '.mysql_ureal_escape_string($this->id).'
 AND `game_id` = '.mysql_ureal_escape_string($game->id).$where;
     $res = mysql_uquery( $sql );
-    $row = mysql_fetch_row( $res );
+    $row = $res->fetch_row();
     if( $row ) {
       $return = array_shift( $row );
     }
@@ -587,7 +587,8 @@ AND `game_id` = '.mysql_ureal_escape_string($game->id).$where;
       $last_owner_check = $this->get_owner( $game, $turn - 1 );
 
       // Left player check
-      $game_player_row = array_pop( $game->get_game_player_list($last_owner_check->id) );
+      $game_player_rows = $game->get_game_player_list($last_owner_check->id);
+      $game_player_row = array_pop($game_player_rows);
       if( $game_player_row['turn_leave'] == null ) {
         $last_owner = $last_owner_check;
       }

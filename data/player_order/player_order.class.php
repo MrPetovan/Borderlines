@@ -113,14 +113,14 @@ AND `order_type_id` = '.mysql_ureal_escape_string($order_type_id);
 
       if($res) {
         $return = array();
-        while($data = mysql_fetch_assoc($res)) {
+        while($data = $res->fetch_assoc()) {
           if( isset( $data['order_type_id'] ) ) {
             $return[$data['id']] = self::factory( $data['order_type_id'], $data['id'] );
           }else {
             $return[$data['id']] = self::instance( $data['id'] );
           }
         }
-        mysql_free_result($res);
+        $res->free();
       }else {
         $return = false;
       }
