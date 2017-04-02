@@ -415,7 +415,8 @@ WHERE `id` = ".mysql_ureal_escape_string($this->get_id());
       }
 
       $res = mysql_uquery($sql."\n".$where);
-      return array_pop(mysql_fetch_row($res));
+      $row = mysqli_fetch_row($res);
+      return array_pop($row);
     }
 
     public static function db_get_select_list() { return array(); }
