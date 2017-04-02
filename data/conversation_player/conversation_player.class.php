@@ -64,7 +64,7 @@ ORDER BY c.`game_id` DESC, c.`id` DESC';
         }
         $return[] = $new_conversation_player;
       }
-      mysql_free_result($res);
+      mysqli_free_result($res);
     }else {
       $return = false;
     }

@@ -53,7 +53,7 @@ AND m.`conversation_id` = '. mysql_ureal_escape_string($conversation_id);
         }
         $return[] = $new_message_player;
       }
-      mysql_free_result($res);
+      mysqli_free_result($res);
     }else {
       $return = false;
     }
