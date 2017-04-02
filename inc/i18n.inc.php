@@ -26,6 +26,12 @@
       }
     }
 
+    if( defined('PAGE_CODE') ) {
+      $page_code = PAGE_CODE;
+    } else {
+      $page_code = 'global';
+    }
+
     if( $format !== '' ) {
       if(array_key_exists( PAGE_CODE.'-'.$format, $i18n_replacements ) ) {
         if( $i18n_replacements[ PAGE_CODE.'-'.$format ] !== null ) {
