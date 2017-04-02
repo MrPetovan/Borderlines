@@ -55,7 +55,7 @@ ORDER BY c.`game_id` DESC, c.`id` DESC';
 
     if($res) {
       $return = array();
-      while($data = mysql_fetch_assoc($res)) {
+      while($data = mysqli_fetch_assoc($res)) {
         $new_conversation_player = new Conversation_Player();
         foreach( $data as $field => $value ) {
           try {

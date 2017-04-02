@@ -255,7 +255,7 @@ AND ".$attribute." <= $str_fin";
       echo "\r\n";
 
       // données de la table
-      while ($arrSelect = mysql_fetch_assoc($res)) {
+      while ($arrSelect = mysqli_fetch_assoc($res)) {
        foreach($arrSelect as $elem) {
         echo "$elem;";
        }

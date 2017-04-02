@@ -19,7 +19,7 @@
   if( ($code = getValue('code')) === null && ($search = getValue('search')) === null ) {
     $sql = 'SELECT COUNT(*) FROM `translation` WHERE (`translation` IS NULL OR `translation` = "") AND `locale` = "'.LOCALE.'"';
     $res = mysql_uquery($sql);
-    $translate_number = array_pop( mysql_fetch_row($res) );
+    $translate_number = array_pop( mysqli_fetch_row($res) );
 
     $sql = 'SELECT DISTINCT `code` FROM `translation` WHERE (`translation` IS NULL OR `translation` = "") AND `locale` = "'.LOCALE.'" ORDER BY RAND() LIMIT 10';
     $res = mysql_uquery($sql);

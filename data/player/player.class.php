@@ -54,7 +54,7 @@ FROM `game`
 WHERE `created_by` = '.$this->id.'
 AND `ended` IS NULL';
       $res = mysql_uquery($sql);
-      $count = array_pop( mysql_fetch_row($res) );
+      $count = array_pop( mysqli_fetch_row($res) );
 
       $return = $count == 0;
     }
@@ -70,7 +70,7 @@ FROM `world`
 WHERE `created_by` = '.$this->id.'
 AND `created` > DATE_SUB(NOW(), INTERVAL 1 HOUR)';
       $res = mysql_uquery($sql);
-      $count = array_pop( mysql_fetch_row($res) );
+      $count = array_pop( mysqli_fetch_row($res) );
 
       $return = $count == 0;
     }
@@ -85,7 +85,7 @@ SELECT COUNT(*)
 FROM `player`
 WHERE `member_id` = '.$member->id;
       $res = mysql_uquery($sql);
-      $count = array_pop( mysql_fetch_row($res) );
+      $count = array_pop( mysqli_fetch_row($res) );
 
       $return = $count < 2;
     }
@@ -125,7 +125,7 @@ ORDER BY `turn` DESC
 LIMIT 0,1';
       $res = mysql_uquery($sql);
 
-      $return = mysql_fetch_assoc( $res );
+      $return = mysqli_fetch_assoc( $res );
     }else {
       error_log('[Borderlines] '.__CLASS__.'->'.__FUNCTION__.' : $game_id not defined');
       throw new Exception('[Borderlines] '.__CLASS__.'->'.__FUNCTION__.' : $game_id not defined');
@@ -149,7 +149,7 @@ LIMIT 0,1';
 
       $res = mysql_uquery($sql);
 
-      if( $row = mysql_fetch_row( $res ) ) {
+      if( $row = mysqli_fetch_row( $res ) ) {
         $return = $row[0];
       }
     }else {
@@ -175,7 +175,7 @@ LIMIT 0,1';
 
       $res = mysql_uquery($sql);
 
-      if( $row = mysql_fetch_row( $res ) ) {
+      if( $row = mysqli_fetch_row( $res ) ) {
         $return = $row[0];
       }
     }else {

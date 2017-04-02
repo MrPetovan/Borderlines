@@ -27,12 +27,12 @@
     '_admin_class_mod.act.php' => DIR_ROOT.'data/admin/admin_CLASS_mod.act.php'
   );
 
-  while($row = mysql_fetch_row($res)) $table_name_list[] = $row[0];
+  while($row = mysqli_fetch_row($res)) $table_name_list[] = $row[0];
 
   // Pour chaque table de la BD
   foreach($table_name_list as $table_name ) {
     // Description
-    $row = mysql_fetch_row( mysql_uquery('SHOW CREATE TABLE `'.$table_name.'`') );
+    $row = mysqli_fetch_row( mysql_uquery('SHOW CREATE TABLE `'.$table_name.'`') );
     $create_table_string = array_pop( $row );
 
     $table_description[ $table_name ] = to_readable( $table_name );
@@ -59,7 +59,7 @@
 
     $foreign_keys_list[$table_name] = array();
 
-    while($row = mysql_fetch_assoc($res)) {
+    while($row = mysqli_fetch_assoc($res)) {
       if( $row['Comment'] == '') $row['Comment'] = to_readable($row['Field']);
       if( $row['Key'] == 'PRI' ) $primary_keys[ $table_name ][] = $row['Field'];
       if( $row['Key'] == 'MUL' ) $primary_keys[ $table_name ][] = $row['Field'];
@@ -111,7 +111,7 @@ JOIN `information_schema`.`KEY_COLUMN_USAGE` k_c_u_column
 ORDER BY `CONSTRAINT_NAME`";
     $res_fk = mysql_uquery($sql_fk);
 
-    while($row_fk = mysql_fetch_row($res_fk)) {
+    while($row_fk = mysqli_fetch_row($res_fk)) {
       $foreign_keys_list[$table_name][$row_fk[0]] = $row_fk[1];
 
       if( !in_array($table_name, $php_classes) && in_array( $row_fk[0], $primary_keys[ $table_name ] ) ) {
