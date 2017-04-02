@@ -46,7 +46,8 @@
 </nav>
 <?php
   if( $is_player_active && $is_current_turn ) {
-    $turn_ready = array_shift( $current_player->get_game_player_list( $current_game->id ) );
+    $game_player_list = $current_player->get_game_player_list( $current_game->id );
+    $turn_ready = array_shift( $game_player_list );
     if( $turn_ready['turn_ready'] <= $current_game->current_turn ) {
       echo '<p>'.__('Status').' : <img src="'.IMG.'img_html/delete.png" alt="" /> '.__('Not ready for the next turn').' <a href="'.Page::get_url(PAGE_CODE, array('action' => 'ready')).'" class="btn btn-default">'.__('Toggle').'</a></p>';
     }else {

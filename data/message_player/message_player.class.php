@@ -44,7 +44,7 @@ AND m.`conversation_id` = '. mysql_ureal_escape_string($conversation_id);
 
     if($res) {
       $return = array();
-      while($data = mysql_fetch_assoc($res)) {
+      while($data = $res->fetch_assoc()) {
         $new_message_player = new Message_Player();
         foreach( $data as $field => $value ) {
           try {
@@ -81,7 +81,8 @@ WHERE m_r.`read` IS NULL
 AND m_r.`player_id` = '.  mysql_ureal_escape_string($player_id).$where;
     $res = mysql_uquery($sql);
     if( $res ){
-      $count = array_pop( mysql_fetch_row($res) );
+      $row = $res->fetch_row();
+      $count = array_pop( $row );
     }else {
       $count = 0;
     }
