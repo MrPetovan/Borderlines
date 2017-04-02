@@ -99,7 +99,8 @@
     if( isset($_COOKIE['locale']) ) {
       $locale = $_COOKIE['locale'];
     }elseif( isset( $_SERVER['HTTP_ACCEPT_LANGUAGE'] )) {
-      $locale = str_replace( '-', '_', array_pop( array_reverse( explode( ',', $_SERVER['HTTP_ACCEPT_LANGUAGE']) ) ) );
+      $accept_language_array = array_reverse( explode( ',', $_SERVER['HTTP_ACCEPT_LANGUAGE']) );
+      $locale = str_replace( '-', '_', array_pop( $accept_language_array ) );
     }
   }
 
