@@ -1,3 +1,4 @@
+#!/usr/bin/env php
 <?php
 /**
  * Dispatcher général du site
@@ -24,7 +25,7 @@
   define('URL_ROOT_RELATIVE', $URL_ROOT_RELATIVE);
 
   // Constante principale, c'est l'URL absolue de la base du site
-  define("URL_ROOT", 'http://scramblednations.com/');
+  define("URL_ROOT", 'https://scramblednations.mrpetovan.com/');
   // PATH absolu de la base du site
   define('DIR_ROOT', dirname($_SERVER['SCRIPT_FILENAME']) .'/');
   // PATH du répertoire d'inclusions

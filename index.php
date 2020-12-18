@@ -23,9 +23,8 @@
   define('URL_ROOT_RELATIVE', $URL_ROOT_RELATIVE);
 
   //Relative URL used, calculate absolute URL
-  $protocol = strtolower(substr($_SERVER['SERVER_PROTOCOL'], 0, strpos($_SERVER['SERVER_PROTOCOL'], "/", 0)));
   // Constante principale, c'est l'URL absolue de la base du site
-  define("URL_ROOT", $protocol."://".$_SERVER['HTTP_HOST'].URL_ROOT_RELATIVE.'/');
+  define("URL_ROOT", $_SERVER['REQUEST_SCHEME']."://".$_SERVER['HTTP_HOST'].URL_ROOT_RELATIVE.'/');
   // PATH absolu de la base du site
   define('DIR_ROOT', dirname($_SERVER['SCRIPT_FILENAME']) .'/');
   // PATH du répertoire d'inclusions
