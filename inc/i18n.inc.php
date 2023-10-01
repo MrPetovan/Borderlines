@@ -51,7 +51,7 @@
       }
     }
 
-    return vsprintf( $format, $args );
+    return vsprintf( $format, $args ?? [] );
   }
 
   function l10n_number($number, $decimals = 0) {

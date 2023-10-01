@@ -61,7 +61,7 @@ class Page extends DBObject {
   }
 
   public static function get_message( $type = self::PAGE_MESSAGE_NOTICE ) {
-    $return = false;
+    $return = [];
 
     if( isset( $_SESSION['page']['message'][$type] ) ) {
       $return = $_SESSION['page']['message'][$type];
